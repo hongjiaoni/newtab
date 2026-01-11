@@ -15,6 +15,9 @@ body {
 
 .container {
   text-align: center;
+  padding: 24px;
+  max-width: 420px;
+  width: 100%;
 }
 
 .time {
