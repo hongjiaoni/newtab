@@ -126,3 +126,15 @@ themeToggle.onclick = () => {
 };
 
 input.focus();
+
+  
+  // ===== 首次使用提示 =====
+if (!localStorage.getItem("hasVisited")) {
+  setTimeout(() => {
+    alert(
+      "Welcome 👋\n\n• Press Enter to search\n• Add your favorite sites\n• Right-click to delete\n\nEnjoy your calm start."
+    );
+    localStorage.setItem("hasVisited", "true");
+  }, 500);
+}
+
