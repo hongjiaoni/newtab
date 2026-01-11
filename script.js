@@ -30,6 +30,7 @@ function saveLinks() {
   localStorage.setItem("links", JSON.stringify(links));
 }
 
+
 function renderLinks() {
   linksContainer.innerHTML = "";
 
@@ -37,6 +38,7 @@ function renderLinks() {
     const div = document.createElement("div");
     div.className = "link-item";
     div.textContent = link.name;
+    div.draggable = true;
 
     div.onclick = () => {
       window.location.href = link.url;
@@ -51,9 +53,37 @@ function renderLinks() {
       }
     };
 
+    div.ondragstart = () => {
+      div.classList.add("dragging");
+      div.dataset.index = index;
+    };
+
+    div.ondragend = () => {
+      div.classList.remove("dragging");
+    };
+
+    div.ondragover = (e) => {
+      e.preventDefault();
+    };
+
+    div.ondrop = (e) => {
+      e.preventDefault();
+      const fromIndex = Number(
+        document.querySelector(".dragging")?.dataset.index
+      );
+      if (fromIndex === index) return;
+
+      const moved = links.splice(fromIndex, 1)[0];
+      links.splice(index, 0, moved);
+      saveLinks();
+      renderLinks();
+    };
+
     linksContainer.appendChild(div);
   });
 }
+
+
 
 addBtn.onclick = () => {
   const name = prompt("Site name");
