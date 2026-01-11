@@ -34,6 +34,16 @@ function saveLinks() {
 function renderLinks() {
   linksContainer.innerHTML = "";
 
+  if (links.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.innerHTML = `
+      <p>Your space is empty.</p>
+      <p>Add your favorite sites to get started.</p>
+    `;
+    linksContainer.appendChild(empty);
+    return;
+  
   links.forEach((link, index) => {
     const div = document.createElement("div");
     div.className = "link-item";
