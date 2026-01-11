@@ -30,3 +30,33 @@ input {
   border: none;
   outline: none;
 }
+.links {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  max-width: 360px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.link-item {
+  background: #1c1c1c;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.link-item:hover {
+  background: #2a2a2a;
+}
+
+.add-btn {
+  margin-top: 20px;
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+}
