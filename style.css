@@ -32,15 +32,18 @@ input {
   border-radius: 8px;
   border: none;
   outline: none;
+  transition: box-shadow 0.2s, transform 0.2s;
 }
+
+input:focus {
+  box-shadow: 0 0 0 2px rgba(100, 100, 255, 0.4);
+}
+
 .links {
   margin-top: 32px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
   gap: 12px;
-  max-width: 360px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .link-item {
@@ -50,7 +53,13 @@ input {
   font-size: 14px;
   cursor: pointer;
   text-align: center;
+  transition: background 0.2s, transform 0.2s;
 }
+
+.link-item:hover {
+  transform: translateY(-2px);
+}
+
 
 .link-item:hover {
   background: #2a2a2a;
