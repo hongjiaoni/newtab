@@ -85,3 +85,4 @@ themeToggle.onclick = () => {
   themeToggle.textContent = newTheme === "dark" ? "☀︎" : "☾";
 };
 
+input.focus();
