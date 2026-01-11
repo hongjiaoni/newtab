@@ -108,3 +108,10 @@ body.light input {
   opacity: 0.5;
   transform: scale(0.95);
 }
+
+.empty {
+  grid-column: 1 / -1;
+  opacity: 0.5;
+  font-size: 14px;
+  line-height: 1.6;
+}
