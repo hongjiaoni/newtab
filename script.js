@@ -67,3 +67,21 @@ addBtn.onclick = () => {
 };
 
 renderLinks();
+
+// ===== 主题切换 =====
+const themeToggle = document.getElementById("themeToggle");
+const savedTheme = localStorage.getItem("theme") || "dark";
+
+document.body.classList.add(savedTheme);
+themeToggle.textContent = savedTheme === "dark" ? "☀︎" : "☾";
+
+themeToggle.onclick = () => {
+  const isDark = document.body.classList.contains("dark");
+  document.body.classList.toggle("dark", !isDark);
+  document.body.classList.toggle("light", isDark);
+
+  const newTheme = isDark ? "light" : "dark";
+  localStorage.setItem("theme", newTheme);
+  themeToggle.textContent = newTheme === "dark" ? "☀︎" : "☾";
+};
+
