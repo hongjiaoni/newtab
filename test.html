@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Style Tests</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    #test-results {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: white;
+      border: 2px solid #333;
+      padding: 20px;
+      font-family: monospace;
+      max-width: 500px;
+      z-index: 10000;
+    }
+    .test-pass { color: green; }
+    .test-fail { color: red; }
+  </style>
+</head>
+<body class="dark">
+  <div id="test-results">
+    <h2>CSS Style Tests</h2>
+    <div id="results"></div>
+  </div>
+
+  <!-- Test elements -->
+  <div class="search-box"></div>
+  <div class="time">00:00</div>
+  <button id="themeToggle" class="theme-btn">☀︎</button>
+  <div class="chip">Test Chip</div>
+
+  <script src="script.js"></script>
+  <script>
+    const results = document.getElementById('results');
+    
+    function runTest(name, testFn) {
+      try {
+        const result = testFn();
+        if (result.pass) {
+          results.innerHTML += `<div class="test-pass">✓ ${name}</div>`;
+        } else {
+          results.innerHTML += `<div class="test-fail">✗ ${name}: ${result.message}</div>`;
+        }
+      } catch (e) {
+        results.innerHTML += `<div class="test-fail">✗ ${name}: ${e.message}</div>`;
+      }
+    }
+
+    // Test 1: Search box border-radius > 24px (Requirement 2.1)
+    runTest('Search box border-radius > 24px', () => {
+      const searchBox = document.querySelector('.search-box');
+      const styles = window.getComputedStyle(searchBox);
+      const borderRadius = parseFloat(styles.borderRadius);
+      
+      if (borderRadius > 24) {
+        return { pass: true };
+      } else {
+        return { pass: false, message: `Expected > 24px, got ${borderRadius}px` };
+      }
+    });
+
+    // Test 2: Time element font-weight is bold (Requirement 5.1)
+    runTest('Time element font-weight is bold (≥700)', () => {
+      const timeElement = document.querySelector('.time');
+      const styles = window.getComputedStyle(timeElement);
+      const fontWeight = parseInt(styles.fontWeight);
+      
+      if (fontWeight >= 700) {
+        return { pass: true };
+      } else {
+        return { pass: false, message: `Expected ≥700, got ${fontWeight}` };
+      }
+    });
+
+    // Additional verification tests
+    runTest('Chip border-radius is 50px', () => {
+      const chip = document.querySelector('.chip');
+      const styles = window.getComputedStyle(chip);
+      const borderRadius = parseFloat(styles.borderRadius);
+      
+      if (borderRadius === 50) {
+        return { pass: true };
+      } else {
+        return { pass: false, message: `Expected 50px, got ${borderRadius}px` };
+      }
+    });
+
+    runTest('Theme button border-radius is 50%', () => {
+      const themeBtn = document.querySelector('.theme-btn');
+      const styles = window.getComputedStyle(themeBtn);
+      const borderRadius = styles.borderRadius;
+      
+      // Check if it's 50% or equivalent to half the width
+      if (borderRadius.includes('%') || parseFloat(borderRadius) === 20) {
+        return { pass: true };
+      } else {
+        return { pass: false, message: `Expected 50% or 20px, got ${borderRadius}` };
+      }
+    });
+
+    // Test 3: Dark mode displays sun icon (Requirement 1.2)
+    runTest('Dark mode displays sun icon SVG', () => {
+      // Set to dark mode
+      document.body.classList.remove('light');
+      document.body.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+      
+      // Trigger theme icon update
+      updateThemeIcon('dark');
+      
+      const themeToggle = document.getElementById('themeToggle');
+      const innerHTML = themeToggle.innerHTML;
+      
+      // Check if it contains sun SVG (circle element is characteristic of sun icon)
+      if (innerHTML.includes('<svg') && innerHTML.includes('<circle')) {
+        return { pass: true };
+      } else {
+        return { pass: false, message: 'Expected sun SVG icon in dark mode' };
+      }
+    });
+
+    // Test 4: Light mode displays moon icon (Requirement 1.3)
+    runTest('Light mode displays moon icon SVG', () => {
+      // Set to light mode
+      document.body.classList.remove('dark');
+      document.body.classList.add('light');
+      localStorage.setItem('theme', 'light');
+      
+      // Trigger theme icon update
+      updateThemeIcon('light');
+      
+      const themeToggle = document.getElementById('themeToggle');
+      const innerHTML = themeToggle.innerHTML;
+      
+      // Check if it contains moon SVG (path element with crescent is characteristic of moon icon)
+      if (innerHTML.includes('<svg') && innerHTML.includes('<path') && innerHTML.includes('12.79')) {
+        return { pass: true };
+      } else {
+        return { pass: false, message: 'Expected moon SVG icon in light mode' };
+      }
+    });
+  </script>
+</body>
+</html>

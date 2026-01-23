@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Start Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@300;400;500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="favicon.png">
+
+  <!-- Google Sign-In -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+
+  <!-- Settings Menu in top-right -->
+  <div class="top-right-controls">
+    <button id="settingsToggle" class="settings-btn">⋯</button>
+    <div id="settingsMenu" class="settings-menu hidden">
+      <div class="settings-menu-item" onclick="toggleTheme()">
+        <span id="themeText">深色模式</span>
+      </div>
+      <div class="settings-menu-item" id="languageMenuItem">
+        <span id="langText">语言</span>
+        <div id="languageSubmenu" class="settings-submenu hidden">
+          <div onclick="i18n.setLocale('zh')">中文</div>
+          <div onclick="i18n.setLocale('en')">English</div>
+        </div>
+      </div>
+      <div class="settings-menu-item" onclick="toggleMinimalist()">
+        <span id="minimalistText">极简模式</span>
+      </div>
+      <div class="settings-menu-divider"></div>
+      <div class="settings-menu-item" id="wallpaperBtn">
+        <span id="wallpaperText">壁纸</span>
+      </div>
+      <div class="settings-menu-divider"></div>
+      <div id="authMenuContainer">
+        <div class="settings-menu-item" id="loginMenuItem" onclick="handleLoginClick()">
+          <span id="loginText">登录</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Google Sign-In Modal -->
+  <div id="googleSignInModal" class="modal-overlay hidden">
+    <div class="modal google-signin-modal">
+      <h3 id="googleSignInTitle">登录</h3>
+      <div id="googleSignInContainer" style="text-align: center; padding: 20px;">
+        <div id="g_id_onload" data-client_id="608226137663-n7g5fqo6268rqs51nu6iv4m9d202phah.apps.googleusercontent.com"
+          data-callback="handleCredentialResponse" data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin" data-type="standard"></div>
+      </div>
+      <div class="modal-actions">
+        <button id="closeGoogleSignIn" class="cancel-btn">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="time" class="time">00:00</div>
+    <div id="date" class="date"></div>
+
+    <form id="searchForm" class="search-box">
+      <div id="searchEngine" class="search-engine">
+        <img id="engineIcon" src="" alt="Engine" />
+        <div id="engineMenu" class="engine-menu hidden">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <input id="searchInput" type="text" placeholder="Search..." autocomplete="off" />
+    </form>
+
+    <!-- Content Area: pinned sites and tags -->
+    <div id="content" class="content-area"></div>
+  </div>
+
+  <!-- Context Menu -->
+  <div id="contextMenu" class="context-menu hidden"></div>
+
+
+
+  <!-- Wallpaper Selection Modal -->
+  <div id="wallpaperModal" class="modal-overlay hidden">
+    <div class="modal wallpaper-modal">
+      <h3 id="wallpaperModalTitle">选择壁纸</h3>
+
+      <div id="wallpaperTabs" class="wallpaper-tabs">
+        <!-- Tabs rendered dynamically -->
+      </div>
+
+      <div class="wallpaper-content">
+        <div id="wallpaperUploadContainer" class="wallpaper-upload-container hidden">
+          <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*">
+          <button id="uploadWallpaperBtn" class="primary-btn sketchy-border"
+            style="padding: 15px 30px; margin: 20px auto; display: block;">
+            上传图片
+          </button>
+        </div>
+        <div id="wallpaperGrid" class="wallpaper-grid"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="restoreDefaultWallpaper" class="cancel-btn">恢复默认</button>
+        <button id="closeWallpaperModal" class="primary-btn">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <!-- Add/Edit Modal -->
+    <div id="addModal" class="modal hidden">
+      <h3 id="addModalTitle">Add New</h3>
+      <div class="modal-type-switch">
+        <label><input type="radio" name="addType" value="site" checked> <span id="typeLabel1">Site</span></label>
+        <label><input type="radio" name="addType" value="tag"> <span id="typeLabel2">Tag</span></label>
+      </div>
+
+      <div id="siteForm">
+        <div class="modal-section">
+          <label class="section-label" id="nameLabel">Name</label>
+          <input type="text" id="siteName" placeholder="Name" class="modal-input" />
+        </div>
+
+        <div class="modal-section">
+          <label class="section-label" id="urlLabel">URL</label>
+          <input type="url" id="siteUrl" placeholder="URL (https://...)" class="modal-input" />
+        </div>
+
+        <div class="modal-section">
+          <label class="section-label" id="selectTagsLabel">Select Tags</label>
+          <div class="tags-select" id="tagSelector">
+            <!-- Checkboxes for tags -->
+          </div>
+        </div>
+
+        <div class="modal-section">
+          <label class="checkbox-label">
+            <input type="checkbox" id="showOnHome" checked> <span id="pinToHomeLabel">Pin to Home</span>
+          </label>
+        </div>
+      </div>
+
+      <div id="tagForm" class="hidden">
+        <div class="modal-section">
+          <label class="section-label" id="tagNameLabel">Tag Name</label>
+          <input type="text" id="tagName" placeholder="Tag Name" class="modal-input" />
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="closeAddModal" class="cancel-btn">Cancel</button>
+        <button id="saveItem" class="primary-btn">Save</button>
+      </div>
+    </div>
+
+    <!-- Tag View Modal -->
+    <div id="tagViewModal" class="modal hidden">
+      <h3 id="tagViewTitle">Tag Name</h3>
+      <div id="tagViewLinks" class="tag-links-grid"></div>
+      <div class="modal-actions">
+        <button id="closeTagModal">Close</button>
+      </div>
+    </div>
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal hidden">
+      <h3 id="deleteTitle">Delete Item</h3>
+      <p id="deleteMessage" style="margin-bottom: 20px;">Are you sure?</p>
+      <div class="modal-actions">
+        <button id="cancelDelete" class="cancel-btn">Cancel</button>
+        <button id="confirmDelete" class="logout-btn">Delete</button>
+      </div>
+    </div>
+
+    <!-- User Profile Modal -->
+    <div id="userProfileModal" class="modal hidden">
+      <h3 id="userProfileTitle">User Profile</h3>
+      <div id="userProfileContent" class="profile-content">
+        <!-- Populated by JS -->
+      </div>
+      <div class="modal-actions">
+        <button id="closeUserProfile" class="cancel-btn">Close</button>
+        <button id="logoutBtn" class="logout-btn">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="config.js"></script>
+  <script src="auth.js"></script>
+  <script src="wallpaper.js"></script>
+</body>
+
+</html>
