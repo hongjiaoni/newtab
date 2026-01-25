@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@300;400;500;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="wallpaper-modal.css" />
   <link rel="icon" href="favicon.png">
 
   <!-- Supabase SDK -->
@@ -43,6 +44,10 @@
       <div class="settings-menu-divider"></div>
       <div class="settings-menu-item" id="wallpaperBtn">
         <span id="wallpaperText">壁纸</span>
+      </div>
+      <div class="settings-menu-divider"></div>
+      <div class="settings-menu-item" id="themeCustomizationBtn" onclick="window.openThemeCustomization?.()">
+        <span id="themeCustomizationText">主题定制</span>
       </div>
       <div class="settings-menu-divider"></div>
       <div id="authMenuContainer">
@@ -208,6 +213,9 @@
   <script src="supabase-client.js"></script>
   <script src="wallpaper.js"></script>
   <script src="auth.js"></script>
+  <script src="data-sync.js"></script>
+  <script src="membership.js"></script>
+  <script src="themes.js"></script>
   <script src="script.js"></script>
 </body>
 

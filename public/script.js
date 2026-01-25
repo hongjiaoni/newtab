@@ -64,11 +64,12 @@ const translations = {
     custom: '自定义',
     upload: '上传',
     uploadWallpaper: '上传壁纸',
+    themeCustomization: '主题定制',
     days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
     months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
   },
   en: {
-    search: 'Search...',
+    search: 'What would you like to search?',
     addNew: 'Add',
     addNewTitle: 'Add New',
     site: 'Site',
@@ -113,6 +114,7 @@ const translations = {
     custom: 'Custom',
     upload: 'Upload',
     uploadWallpaper: 'Upload Wallpaper',
+    themeCustomization: 'Theme Customization',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   }
@@ -242,6 +244,10 @@ window.updateAllText = function () {
   if (document.getElementById('logoutBtn')) {
     document.getElementById('logoutBtn').textContent = i18n.t('logout');
   }
+
+  // Update Theme Customization button
+  const themeCustomizationText = document.getElementById('themeCustomizationText');
+  if (themeCustomizationText) themeCustomizationText.textContent = i18n.t('themeCustomization');
 
   // Re-render content to update any dynamic text
   renderHome();
