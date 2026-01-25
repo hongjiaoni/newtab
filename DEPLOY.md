@@ -31,8 +31,13 @@ npm start
 > ```
 > 或者直接运行：
 > ```bash
-> node server.js
-> ```
+
+
+
+>cd "e:\Docs\Cursor\git\newtab"
+>node server.js
+
+
 
 如果看到 "Server running at http://localhost:3000" 和 "Connected to SQLite database"，说明启动成功。
 
