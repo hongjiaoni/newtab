@@ -8,11 +8,26 @@ create table public.profiles (
   email text,
   full_name text,
   avatar_url text,
+  
+  -- User data
   sites jsonb default '[]'::jsonb,
   tags jsonb default '[]'::jsonb,
   tag_order jsonb default '[]'::jsonb,
   site_order jsonb default '[]'::jsonb,
   settings jsonb default '{}'::jsonb,
+  
+  -- Membership system
+  membership_tier integer default 1, -- 1=basic, 2=premium, 3=super
+  stripe_customer_id text,
+  subscription_status text default 'inactive', -- 'active', 'inactive', 'cancelled'
+  subscription_end_date timestamp with time zone,
+  
+  -- Customization (tier 2+ only)
+  theme_settings jsonb default '{}'::jsonb,
+  font_settings jsonb default '{}'::jsonb,
+  
+  -- Timestamps
+  created_at timestamp with time zone default timezone('utc'::text, now()),
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
@@ -89,6 +104,9 @@ begin
   return new;
 end;
 $$ language plpgsql security definer;
+
+-- Drop existing trigger if it exists
+drop trigger if exists on_auth_user_created on auth.users;
 
 -- Trigger to call the function on sign up
 create trigger on_auth_user_created

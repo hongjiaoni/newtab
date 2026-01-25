@@ -15,9 +15,11 @@
   --accent-color: #4A90E2;
 }
 
+@import url('https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css');
+
 body {
   margin: 0;
-  font-family: 'Patrick Hand', 'Quicksand', cursive, sans-serif;
+  font-family: "Patrick Hand", "优设好身体", "Quicksand", sans-serif;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -278,10 +280,14 @@ input {
   background: transparent;
   font-size: 20px;
   padding: 12px 0;
-  font-family: 'Patrick Hand', 'Quicksand', cursive, sans-serif;
+  font-family: "Patrick Hand", "优设好身体", "Quicksand", cursive, sans-serif;
   color: inherit;
   outline: none;
   font-weight: 600;
+}
+
+::placeholder {
+  font-family: "Patrick Hand", "优设好身体", "Quicksand", sans-serif;
 }
 
 /* Content Area */

@@ -60,8 +60,13 @@ async function handleSession(session) {
 
 // Google Login
 async function handleLoginClick() {
-  if (!supabase) return alert('Supabase not initialized. Please check your config.js credentials.');
+  console.log('Login button clicked');
+  if (!supabase) {
+    console.error('Supabase object is missing!');
+    return alert('Supabase not initialized. Please check your config.js credentials.');
+  }
 
+  console.log('Starting OAuth flow...');
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -70,10 +75,12 @@ async function handleLoginClick() {
   });
 
   if (error) {
-    console.error('Login error:', error);
+    console.error('Supabase OAuth Error:', error);
     showNotification('Login failed: ' + error.message, 'error');
   }
 }
+
+window.handleLoginClick = handleLoginClick; // Ensure global access
 
 // Logout
 async function handleLogout() {
