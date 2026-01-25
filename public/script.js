@@ -19,7 +19,7 @@ const THEME_ICONS = {
 // ===== Internationalization (i18n) =====
 const translations = {
   zh: {
-    search: '搜索...',
+    search: '想要搜点什么吗？',
     addNew: '添加',
     addNewTitle: '添加新项目',
     site: '网站',
