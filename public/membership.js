@@ -124,31 +124,38 @@ function hasFeatureAccess(feature) {
 
 // Show upgrade modal
 function showUpgradeModal(context = 'general') {
-    const modal = document.getElementById('upgradeModal');
-    if (!modal) {
-        createUpgradeModal();
+    // Always remove and recreate modal to ensure fresh i18n content
+    const existingModal = document.getElementById('upgradeModal');
+    if (existingModal) {
+        existingModal.remove();
     }
+
+    // Create fresh modal with current language
+    createUpgradeModal();
+
+    const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+    const isZh = currentLocale === 'zh';
 
     const modalTitle = document.getElementById('upgradeModalTitle');
     const modalDesc = document.getElementById('upgradeModalDesc');
 
-    // Customize message based on context
+    // Customize message based on context (multilingual)
     const messages = {
         theme: {
-            title: '解锁主题定制',
-            desc: '升级至高级会员，自由定制您的专属主题风格！'
+            title: isZh ? '解锁主题定制' : 'Unlock Theme Customization',
+            desc: isZh ? '升级至高级会员，自由定制您的专属主题风格！' : 'Upgrade to Premium to customize your theme!'
         },
         wallpaper: {
-            title: '解锁自定义壁纸',
-            desc: '升级至高级会员，上传您喜爱的壁纸，打造个性化首页！'
+            title: isZh ? '解锁自定义壁纸' : 'Unlock Custom Wallpapers',
+            desc: isZh ? '升级至高级会员，上传您喜爱的壁纸，打造个性化首页！' : 'Upgrade to Premium to upload your favorite wallpapers!'
         },
         font: {
-            title: '解锁字体定制',
-            desc: '升级至高级会员，选择您喜欢的中英文字体组合！'
+            title: isZh ? '解锁字体定制' : 'Unlock Font Customization',
+            desc: isZh ? '升级至高级会员，选择您喜欢的中英文字体组合！' : 'Upgrade to Premium to choose custom fonts!'
         },
         general: {
-            title: '升级会员',
-            desc: '解锁更多高级功能，提升您的使用体验！'
+            title: isZh ? '升级会员' : 'Upgrade Membership',
+            desc: isZh ? '解锁更多高级功能，提升您的使用体验！' : 'Unlock premium features and enhance your experience!'
         }
     };
 
@@ -159,49 +166,42 @@ function showUpgradeModal(context = 'general') {
     document.getElementById('upgradeModal').classList.remove('hidden');
 }
 
-// Create upgrade modal HTML
+// Create upgrade modal HTML with multilingual support
 function createUpgradeModal() {
+    const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+    const isZh = currentLocale === 'zh';
+
     const modalHTML = `
     <div id="upgradeModal" class="modal-overlay hidden">
-      <div class="modal upgrade-modal">
-        <h3 id="upgradeModalTitle">升级会员</h3>
-        <p id="upgradeModalDesc" style="margin-bottom: 20px; opacity: 0.8;">解锁更多高级功能,提升您的使用体验!</p>
+      <div class="modal upgrade-modal" style="max-width: 500px;">
+        <h3 id="upgradeModalTitle">${isZh ? '升级会员' : 'Upgrade Membership'}</h3>
+        <p id="upgradeModalDesc" style="margin-bottom: 20px; opacity: 0.8;">
+          ${isZh ? '解锁更多高级功能，提升您的使用体验！' : 'Unlock premium features and enhance your experience!'}
+        </p>
         
-        <div class="membership-tiers">
-          <div class="tier-card ${membershipState.tier === 2 ? 'current' : ''}" data-tier="2">
-            <div class="tier-badge">⭐</div>
-            <h4>高级会员</h4>
-            <div class="tier-price">¥9.99<span>/月</span></div>
-            <ul class="tier-features">
-              <li>✓ 自定义主题</li>
-              <li>✓ 自定义字体</li>
-              <li>✓ 上传壁纸 (50张)</li>
-              <li>✓ 优先支持</li>
+        <div class="membership-tiers" style="display: flex; flex-direction: column; gap: 20px;">
+          <div class="tier-card ${membershipState.tier === 2 ? 'current' : ''}" data-tier="2" 
+               style="border: 3px solid var(--border-color); padding: 20px; border-radius: 12px; background: var(--card-bg);">
+            <div class="tier-badge" style="font-size: 32px; text-align: center;">⭐</div>
+            <h4 style="text-align: center; margin: 10px 0;">${isZh ? '高级会员' : 'Premium'}</h4>
+            <div class="tier-price" style="text-align: center; font-size: 28px; font-weight: bold; margin: 10px 0;">
+              $5.9<span style="font-size: 16px; opacity: 0.7;">/${isZh ? '月' : 'month'}</span>
+            </div>
+            <ul class="tier-features" style="list-style: none; padding: 0; margin: 15px 0;">
+              <li style="padding: 5px 0;">✓ ${isZh ? '自定义主题' : 'Custom themes'}</li>
+              <li style="padding: 5px 0;">✓ ${isZh ? '自定义字体' : 'Custom fonts'}</li>
+              <li style="padding: 5px 0;">✓ ${isZh ? '上传壁纸 (50张)' : 'Upload wallpapers (50 images)'}</li>
             </ul>
-            <button class="btn primary-btn" onclick="handleUpgrade(2)" ${membershipState.tier >= 2 ? 'disabled' : ''}>
-              ${membershipState.tier >= 2 ? '当前方案' : '立即升级'}
-            </button>
-          </div>
-
-          <div class="tier-card ${membershipState.tier === 3 ? 'current' : ''}" data-tier="3">
-            <div class="tier-badge">👑</div>
-            <h4>超级会员</h4>
-            <div class="tier-price">¥19.99<span>/月</span></div>
-            <ul class="tier-features">
-              <li>✓ 所有高级功能</li>
-              <li>✓ 无限壁纸上传</li>
-              <li>✓ 专属主题</li>
-              <li>✓ API访问</li>
-              <li>✓ 专属客服</li>
-            </ul>
-            <button class="btn primary-btn" onclick="handleUpgrade(3)" ${membershipState.tier >= 3 ? 'disabled' : ''}>
-              ${membershipState.tier >= 3 ? '当前方案' : '立即升级'}
+            <button class="btn primary-btn" onclick="handleUpgrade(2)" 
+                    style="width: 100%; padding: 12px;" 
+                    ${membershipState.tier >= 2 ? 'disabled' : ''}>
+              ${membershipState.tier >= 2 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '立即升级' : 'Upgrade Now')}
             </button>
           </div>
         </div>
 
-        <div class="modal-actions">
-          <button class="cancel-btn" onclick="closeUpgradeModal()">稍后再说</button>
+        <div class="modal-actions" style="margin-top: 20px;">
+          <button class="cancel-btn" onclick="closeUpgradeModal()">${isZh ? '稍后再说' : 'Maybe Later'}</button>
         </div>
       </div>
     </div>
@@ -215,10 +215,52 @@ function closeUpgradeModal() {
     document.getElementById('upgradeModal')?.classList.add('hidden');
 }
 
+// Show custom notification modal (replaces alert)
+function showLoginRequiredModal() {
+    const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+    const isZh = currentLocale === 'zh';
+
+    // Remove existing modal if any
+    const existing = document.getElementById('loginRequiredModal');
+    if (existing) existing.remove();
+
+    const modalHTML = `
+    <div id="loginRequiredModal" class="modal-overlay">
+      <div class="modal" style="max-width: 400px; text-align: center;">
+        <h3>${isZh ? '需要登录' : 'Login Required'}</h3>
+        <p style="margin: 20px 0; opacity: 0.8;">
+          ${isZh ? '请先登录以使用此功能' : 'Please login to use this feature'}
+        </p>
+        <div class="modal-actions" style="justify-content: center;">
+          <button class="cancel-btn" onclick="
+            document.getElementById('loginRequiredModal').remove();
+          ">
+            ${isZh ? '取消' : 'Cancel'}
+          </button>
+          <button class="primary-btn" onclick="
+            document.getElementById('loginRequiredModal').remove();
+            window.closeUpgradeModal?.();
+            window.openGoogleSignInModal?.();
+          ">
+            ${isZh ? '立即登录' : 'Login Now'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
 // Handle upgrade button click
 async function handleUpgrade(tier) {
-    if (!window.authState || !window.authState.isLoggedIn) {
-        alert('请先登录');
+    console.log('handleUpgrade called, tier:', tier);
+    console.log('authState:', window.authState);
+
+    // Check login with proper authState check
+    if (!window.authState || !window.authState.isLoggedIn || !window.authState.user) {
+        console.log('User not logged in');
+        showLoginRequiredModal();
         return;
     }
 
@@ -232,11 +274,23 @@ async function handleUpgrade(tier) {
             await window.createCheckoutSession(tier);
         } catch (err) {
             console.error('Upgrade failed:', err);
-            alert('升级失败,请稍后重试');
+            const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+            if (window.showNotification) {
+                window.showNotification(
+                    currentLocale === 'zh' ? '升级失败，请稍后重试' : 'Upgrade failed, please try again',
+                    'error'
+                );
+            }
         }
     } else {
         console.error('Stripe integration not loaded');
-        alert('支付系统未加载,请刷新页面重试');
+        const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+        if (window.showNotification) {
+            window.showNotification(
+                currentLocale === 'zh' ? '支付系统未加载，请刷新页面重试' : 'Payment system not loaded, please refresh',
+                'error'
+            );
+        }
     }
 }
 

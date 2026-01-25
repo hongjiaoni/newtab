@@ -90,6 +90,29 @@ async function handleLogout() {
   if (error) {
     console.error('Logout error:', error);
   } else {
+    // Clear all local storage data
+    localStorage.clear();
+
+    // Reset state to defaults if available
+    if (typeof state !== 'undefined') {
+      state.sites = [];
+      state.tags = [];
+      state.tagOrder = [];
+      state.siteOrder = [];
+      state.engineIndex = 0;
+      state.dateFormatIndex = 0;
+      state.timeFormat = '24h';
+      state.viewMode = 'general';
+    }
+
+    // Reset wallpaper
+    if (window.wallpaperState) {
+      window.wallpaperState.selectedWallpaper = null;
+      document.body.style.backgroundImage = '';
+      document.body.style.backgroundColor = '';
+    }
+
+    // Reload page to reset all UI
     window.location.reload();
   }
 }
