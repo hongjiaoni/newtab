@@ -1,14 +1,155 @@
-// ===== Authentication Module =====
+// ===== Authentication Module (Supabase) =====
 
-const API_BASE_URL = API_CONFIG.baseURL;
-
-// Auth state
 const authState = {
   isLoggedIn: false,
   user: null,
-  token: null,
-  loginTime: null
+  profile: null // Stores extra profile data
 };
+
+// Initialize auth on page load
+async function initializeAuth() {
+  if (!supabase) return;
+
+  // Check active session
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (session) {
+    handleSession(session);
+  }
+
+  // Listen for auth changes
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session) {
+      handleSession(session);
+    } else {
+      authState.isLoggedIn = false;
+      authState.user = null;
+      authState.profile = null;
+      updateAuthUI();
+    }
+  });
+}
+
+// Handle Valid Session
+async function handleSession(session) {
+  authState.isLoggedIn = true;
+  authState.user = session.user;
+
+  // Load extra profile data (if any)
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (data) {
+      authState.profile = data;
+      // Sync local state if profile has data 
+      // (Optional: depending on if we trust DB over local storage on login)
+      if (data.settings && Object.keys(data.settings).length > 0) {
+        // We might want to trigger a data merge here, but for now just load
+        // loadUserData(data); 
+      }
+    }
+  } catch (err) {
+    console.error('Error fetching profile:', err);
+  }
+
+  updateAuthUI();
+
+  // Trigger data load
+  if (window.loadUserData) {
+    window.loadUserData(); // Define this in script.js to fetch from Supabase
+  }
+}
+
+// Google Login
+async function handleLoginClick() {
+  if (!supabase) return alert('Supabase not initialized');
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: window.location.origin
+    }
+  });
+
+  if (error) {
+    console.error('Login error:', error);
+    alert('Login failed: ' + error.message);
+  }
+}
+
+// Logout
+async function handleLogout() {
+  if (!supabase) return;
+
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error('Logout error:', error);
+  } else {
+    // Clear local state if needed
+    // localStorage.removeItem('user'); // Handled by supabase
+    window.location.reload();
+  }
+}
+
+// Update auth UI (Avatar vs Login button)
+function updateAuthUI() {
+  const authMenuContainer = document.getElementById('authMenuContainer');
+  if (!authMenuContainer) return;
+
+  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+
+  if (authState.isLoggedIn && authState.user) {
+    const avatarUrl = authState.user.user_metadata.avatar_url || authState.user.user_metadata.picture || 'https://via.placeholder.com/32';
+    const name = authState.user.user_metadata.full_name || authState.user.user_metadata.name || authState.user.email;
+
+    // Show user avatar that opens profile modal
+    authMenuContainer.innerHTML = `
+      <div class="settings-menu-item" onclick="openUserProfile()">
+        <div class="user-info-menu">
+            <img src="${avatarUrl}" alt="Avatar" style="width:24px;height:24px;border-radius:50%;margin-right:8px;">
+            <span>${name}</span>
+        </div>
+      </div>
+    `;
+  } else {
+    // Show login button
+    authMenuContainer.innerHTML = `
+      <div class="settings-menu-item" id="loginMenuItem" onclick="handleLoginClick()">
+        <span id="loginText">${typeof i18n !== 'undefined' ? i18n.t('login') : '登录'}</span>
+      </div>
+    `;
+  }
+}
+
+// User Profile Modal Logic (Simplified)
+function openUserProfile() {
+  // Can re-use existing modal logic or simple alert for now if modal code isn't updated
+  // Assuming existing modal structure exists from previous phases
+  const modal = document.getElementById('userProfileModal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    // Populate modal data...
+    document.getElementById('profileEmail').textContent = authState.user.email;
+    // ...
+  } else {
+    // Fallback if modal not found
+    if (confirm('Log out?')) {
+      handleLogout();
+    }
+  }
+}
+
+// Export for global access
+window.handleLoginClick = handleLoginClick;
+window.handleLogout = handleLogout;
+window.initializeAuth = initializeAuth;
+window.authState = authState;
+window.openUserProfile = openUserProfile;
+window.updateAuthUI = updateAuthUI;
 
 // Initialize auth on page load
 function initializeAuth() {
