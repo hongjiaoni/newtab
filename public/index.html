@@ -46,7 +46,8 @@
       </div>
       <div class="settings-menu-divider"></div>
       <div id="authMenuContainer">
-        <div class="settings-menu-item" id="loginMenuItem" onclick="handleLoginClick()">
+        <div class="settings-menu-item" id="loginMenuItem"
+          onclick="document.getElementById('googleSignInModal').classList.remove('hidden')">
           <span id="loginText">登录</span>
         </div>
       </div>
@@ -58,10 +59,15 @@
     <div class="modal google-signin-modal">
       <h3 id="googleSignInTitle">登录</h3>
       <div id="googleSignInContainer" style="text-align: center; padding: 20px;">
+        <button onclick="handleLoginClick()" class="primary-btn sketchy-border"
+          style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
+          <img src="https://www.google.com/favicon.ico" width="18" height="18">
+          Google 登录
+        </button>
+        <!-- Legacy container hidden but kept for structure -->
         <div id="g_id_onload" data-client_id="608226137663-n7g5fqo6268rqs51nu6iv4m9d202phah.apps.googleusercontent.com"
-          data-callback="handleCredentialResponse" data-auto_prompt="false">
+          data-callback="handleCredentialResponse" data-auto_prompt="false" style="display:none">
         </div>
-        <div class="g_id_signin" data-type="standard"></div>
       </div>
       <div class="modal-actions">
         <button id="closeGoogleSignIn" class="cancel-btn">取消</button>
@@ -114,7 +120,7 @@
 
       <div class="modal-actions">
         <button id="restoreDefaultWallpaper" class="cancel-btn">恢复默认</button>
-        <button id="closeWallpaperModal" class="primary-btn">关闭</button>
+        <button id="closeWallpaperModal" class="cancel-btn">关闭</button>
       </div>
     </div>
   </div>
@@ -198,10 +204,11 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
   <script src="config.js"></script>
-  <script src="auth.js"></script>
+  <script src="supabase-client.js"></script>
   <script src="wallpaper.js"></script>
+  <script src="auth.js"></script>
+  <script src="script.js"></script>
 </body>
 
 </html>

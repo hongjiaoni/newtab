@@ -442,18 +442,18 @@ button:active {
 
 .modal-actions .cancel-btn {
   background: transparent;
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
+.cancel-btn:hover {
+  background-color: var(--hover-bg);
 }
 
 .logout-btn {
   background: #ff6b6b;
   color: white;
   border-color: #c0392b;
-}
-
-.cancel-btn:hover,
-.logout-btn:hover {
-  background-color: inherit;
-  /* Ensure no change from button:hover */
 }
 
 .logout-btn:hover {
