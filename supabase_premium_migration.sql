@@ -70,9 +70,7 @@ create policy "Users can view their own quota."
   on public.upload_quota for select
   using ( auth.uid() = user_id );
 
-create policy "Users can update their own quota."
-  on public.upload_quota for update
-  using ( auth.uid() = user_id );
+drop policy if exists "Users can update their own quota." on public.upload_quota;
 
 -- Function to increment wallpaper count
 create or replace function public.increment_wallpaper_count()
@@ -114,19 +112,7 @@ create trigger on_wallpaper_delete
   when (old.source = 'user')
   execute procedure public.decrement_wallpaper_count();
 
--- 4. Enhanced RLS Policies for Tier-based Access
-
--- Policy: Only tier 2+ can upload to custom category
-create policy "Tier 2+ can upload custom wallpapers."
-  on public.wallpapers for insert
-  with check (
-    auth.uid() = user_id 
-    and (
-      select membership_tier from public.profiles where id = auth.uid()
-    ) >= 2
-  );
-
--- 5. Helper Functions
+-- 4. Helper Functions (needed by policies below)
 
 -- Check if user can upload more wallpapers
 create or replace function public.can_upload_wallpaper(p_user_id uuid)
@@ -147,6 +133,64 @@ begin
   return v_count < v_max;
 end;
 $$ language plpgsql security definer;
+
+-- 4. Enhanced RLS Policies for Tier-based Access
+
+-- Policy: Only tier 2+ can upload to custom category
+drop policy if exists "Users can upload their own wallpapers." on public.wallpapers;
+drop policy if exists "Tier 2+ can upload custom wallpapers." on public.wallpapers;
+
+create policy "Tier 2+ can upload custom wallpapers."
+  on public.wallpapers for insert
+  with check (
+    auth.uid() = user_id 
+    and (
+      select membership_tier from public.profiles where id = auth.uid()
+    ) >= 2
+    and public.can_upload_wallpaper(auth.uid())
+  );
+
+-- 4.1 Protect profiles from client-side privilege escalation
+create or replace function public.enforce_profile_update_restrictions()
+returns trigger as $$
+declare
+  v_tier integer;
+begin
+  if auth.role() = 'service_role' then
+    return new;
+  end if;
+
+  if auth.uid() is null or auth.uid() <> old.id then
+    raise exception 'not allowed';
+  end if;
+
+  -- Block client-side membership escalation
+  if new.membership_tier is distinct from old.membership_tier then
+    raise exception 'membership_tier is managed by server';
+  end if;
+
+  select membership_tier into v_tier from public.profiles where id = auth.uid();
+  v_tier := coalesce(v_tier, 1);
+
+  -- Tier 1 cannot modify theme/font settings
+  if v_tier < 2 then
+    if new.theme_settings is distinct from old.theme_settings then
+      raise exception 'theme_settings requires premium membership';
+    end if;
+    if new.font_settings is distinct from old.font_settings then
+      raise exception 'font_settings requires premium membership';
+    end if;
+  end if;
+
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists trg_enforce_profile_update_restrictions on public.profiles;
+create trigger trg_enforce_profile_update_restrictions
+  before update on public.profiles
+  for each row
+  execute procedure public.enforce_profile_update_restrictions();
 
 -- Update user membership tier (called by webhook)
 create or replace function public.update_membership_tier(

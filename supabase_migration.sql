@@ -34,9 +34,11 @@ create table public.profiles (
 -- RLS for Profiles
 alter table public.profiles enable row level security;
 
-create policy "Public profiles are viewable by everyone."
+drop policy if exists "Public profiles are viewable by everyone." on public.profiles;
+
+create policy "Users can view their own profile."
   on public.profiles for select
-  using ( true );
+  using ( auth.uid() = id );
 
 create policy "Users can insert their own profile."
   on public.profiles for insert
@@ -86,10 +88,6 @@ alter table public.wallpapers enable row level security;
 create policy "Wallpapers are viewable by everyone."
   on public.wallpapers for select
   using ( true );
-
-create policy "Users can upload their own wallpapers."
-  on public.wallpapers for insert
-  with check ( auth.uid() = user_id );
 
 create policy "Users can delete their own wallpapers."
   on public.wallpapers for delete

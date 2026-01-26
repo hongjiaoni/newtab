@@ -45,6 +45,7 @@ const translations = {
     login: '登录',
     logout: '退出',
     googleSignIn: '登录',
+    googleLoginButton: 'Google 登录',
     loginSuccess: '登录成功！',
     logoutSuccess: '已退出登录',
     wallpaper: '壁纸',
@@ -95,6 +96,7 @@ const translations = {
     login: 'Login',
     logout: 'Logout',
     googleSignIn: 'Login',
+    googleLoginButton: 'Continue with Google',
     loginSuccess: 'Login successful!',
     logoutSuccess: 'Logged out',
     wallpaper: 'Wallpaper',
@@ -120,18 +122,76 @@ const translations = {
   }
 };
 
+function normalizeLocale(input) {
+  if (!input) return 'zh';
+  const v = String(input).trim();
+  if (!v) return 'zh';
+  const lower = v.toLowerCase();
+
+  if (lower === 'zh' || lower.startsWith('zh-')) return 'zh';
+  if (lower === 'en' || lower.startsWith('en-')) return 'en';
+
+  if (Object.prototype.hasOwnProperty.call(translations, lower)) return lower;
+  return 'zh';
+}
+
+function getLangFromUrl() {
+  try {
+    const url = new URL(window.location.href);
+    const lang = url.searchParams.get('lang');
+    return lang ? normalizeLocale(lang) : null;
+  } catch {
+    return null;
+  }
+}
+
+function getBrowserLocale() {
+  return normalizeLocale(navigator.language || navigator.userLanguage || 'zh');
+}
+
+function getInitialLocale() {
+  const urlLang = getLangFromUrl();
+  if (urlLang) return urlLang;
+  const saved = localStorage.getItem('locale');
+  if (saved) return normalizeLocale(saved);
+  return getBrowserLocale();
+}
+
+function validateTranslations(baseLocale = 'zh') {
+  const base = translations[baseLocale] || {};
+  Object.keys(translations).forEach((locale) => {
+    if (locale === baseLocale) return;
+    const dict = translations[locale] || {};
+    const missing = Object.keys(base).filter(k => !(k in dict));
+    if (missing.length > 0) {
+      console.warn(`[i18n] Missing keys in ${locale}:`, missing);
+    }
+  });
+}
+
+validateTranslations('zh');
+
 const i18n = {
-  currentLocale: localStorage.getItem('locale') || 'zh',
+  currentLocale: getInitialLocale(),
 
   t(key) {
     return translations[this.currentLocale][key] || key;
   },
 
-  setLocale(locale) {
-    this.currentLocale = locale;
-    localStorage.setItem('locale', locale);
+  setLocale(locale, syncToBackend = true) {
+    const normalized = normalizeLocale(locale);
+    this.currentLocale = normalized;
+    localStorage.setItem('locale', normalized);
     updateAllText();
     updateTime(); // Update date format when language changes
+
+    if (syncToBackend && window.authState && window.authState.isLoggedIn) {
+      if (window.markHomeConfigUpdated) {
+        window.markHomeConfigUpdated();
+      } else if (window.saveUserDataToBackend) {
+        window.saveUserDataToBackend();
+      }
+    }
   },
 
   toggleLocale() {
@@ -213,11 +273,15 @@ window.updateAllText = function () {
   // Login Modal Title
   const googleSignInTitle = document.getElementById('googleSignInTitle');
   const closeGoogleSignIn = document.getElementById('closeGoogleSignIn');
+  const googleLoginBtnText = document.getElementById('googleLoginBtnText');
   if (googleSignInTitle) {
     googleSignInTitle.textContent = i18n.t('googleSignIn');
   }
   if (closeGoogleSignIn) {
     closeGoogleSignIn.textContent = i18n.t('cancel');
+  }
+  if (googleLoginBtnText) {
+    googleLoginBtnText.textContent = i18n.t('googleLoginButton');
   }
 
   // Update wallpaper modal translation
@@ -322,7 +386,11 @@ function saveData(syncToBackend = true) {
   localStorage.setItem('viewMode', state.viewMode);
 
   if (syncToBackend && window.authState && window.authState.isLoggedIn) {
-    window.saveUserDataToBackend();
+    if (window.markHomeConfigUpdated) {
+      window.markHomeConfigUpdated();
+    } else if (window.saveUserDataToBackend) {
+      window.saveUserDataToBackend();
+    }
   }
 }
 
@@ -998,6 +1066,16 @@ window.toggleTheme = function toggleTheme() {
 
   const isDark = document.body.classList.contains('dark');
   localStorage.setItem('theme', isDark ? 'dark' : 'light');
+
+  if (window.applyCustomThemeForCurrentMode) {
+    window.applyCustomThemeForCurrentMode();
+  }
+
+  if (window.markHomeConfigUpdated) {
+    window.markHomeConfigUpdated();
+  } else if (window.authState && window.authState.isLoggedIn && window.saveUserDataToBackend) {
+    window.saveUserDataToBackend();
+  }
 
   // Update icon
   const themeIcon = document.getElementById('themeIcon');

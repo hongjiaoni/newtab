@@ -18,6 +18,9 @@ const API_CONFIG = {
 const SUPABASE_URL = 'https://jmexpjhpqrydmswxiomt.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptZXhwamhwcXJ5ZG1zd3hpb210Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzMjI3OTMsImV4cCI6MjA4NDg5ODc5M30.cwM-m8TCKpOLsCaT6xUEjEtSNH8KnQ7nawD9GvLEMWk';
 
+const SITE_URL = '';
+const OAUTH_REDIRECT_URL = 'https://newtab.online/';
+
 // Feature Flags
 const FEATURES = {
   enableAutoLogin: true,
