@@ -16,6 +16,32 @@ function getOAuthRedirectUrl() {
   return window.location.origin;
 }
 
+function getHomeRedirectUrl() {
+  const base = getOAuthRedirectUrl();
+  try {
+    return new URL('/', base).toString();
+  } catch (_err) {
+    return window.location.origin + '/';
+  }
+}
+
+function cleanUrlToHome() {
+  try {
+    const base = getOAuthRedirectUrl();
+    const home = new URL('/', base);
+    const current = new URL(window.location.href);
+    const lang = current.searchParams.get('lang');
+    if (lang) home.searchParams.set('lang', lang);
+
+    const desired = home.toString();
+    if (window.location.href !== desired) {
+      window.history.replaceState({}, document.title, desired);
+    }
+  } catch (_err) {
+    // no-op
+  }
+}
+
 function getUserNickname() {
   const meta = authState.user?.user_metadata || {};
   const given = typeof meta.given_name === 'string' ? meta.given_name.trim() : '';
@@ -76,6 +102,8 @@ async function handleSession(session) {
 
   updateAuthUI();
 
+  cleanUrlToHome();
+
   if (window.flushPendingProfileSync) {
     try {
       await window.flushPendingProfileSync();
@@ -102,7 +130,7 @@ async function handleLoginClick() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: getOAuthRedirectUrl()
+      redirectTo: getHomeRedirectUrl()
     }
   });
 
