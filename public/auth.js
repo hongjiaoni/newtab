@@ -6,6 +6,30 @@ const authState = {
   profile: null // Stores extra profile data
 };
 
+function getOAuthRedirectUrl() {
+  if (typeof OAUTH_REDIRECT_URL === 'string' && OAUTH_REDIRECT_URL.trim()) {
+    return OAUTH_REDIRECT_URL.trim();
+  }
+  if (typeof SITE_URL === 'string' && SITE_URL.trim()) {
+    return SITE_URL.trim();
+  }
+  return window.location.origin;
+}
+
+function getUserNickname() {
+  const meta = authState.user?.user_metadata || {};
+  const given = typeof meta.given_name === 'string' ? meta.given_name.trim() : '';
+  if (given) return given;
+
+  const full = typeof meta.full_name === 'string' ? meta.full_name.trim() : '';
+  if (full) return full.split(/\s+/)[0];
+
+  const name = typeof meta.name === 'string' ? meta.name.trim() : '';
+  if (name) return name.split(/\s+/)[0];
+
+  return (typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'User' : '用户';
+}
+
 // Initialize auth on page load
 async function initializeAuth() {
   if (!supabase) return;
@@ -52,6 +76,14 @@ async function handleSession(session) {
 
   updateAuthUI();
 
+  if (window.flushPendingProfileSync) {
+    try {
+      await window.flushPendingProfileSync();
+    } catch (err) {
+      console.error('Error flushing pending sync:', err);
+    }
+  }
+
   // Trigger data load from server
   if (window.loadUserData) {
     window.loadUserData();
@@ -70,7 +102,7 @@ async function handleLoginClick() {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: window.location.origin
+      redirectTo: getOAuthRedirectUrl()
     }
   });
 
@@ -126,7 +158,7 @@ function updateAuthUI() {
 
   if (authState.isLoggedIn && authState.user) {
     const avatarUrl = authState.user.user_metadata.avatar_url || authState.user.user_metadata.picture || 'https://via.placeholder.com/32';
-    const name = authState.user.user_metadata.full_name || authState.user.user_metadata.name || authState.user.email;
+    const name = getUserNickname();
 
     // Show user info
     authMenuContainer.innerHTML = `
@@ -158,7 +190,7 @@ window.openUserProfile = function () {
   if (!authState.user) return;
 
   const avatarUrl = authState.user.user_metadata.avatar_url || authState.user.user_metadata.picture || 'https://via.placeholder.com/80';
-  const name = authState.user.user_metadata.full_name || authState.user.user_metadata.name || 'User';
+  const name = getUserNickname();
 
   content.innerHTML = `
     <div style="text-align: center; padding: 20px;">

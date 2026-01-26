@@ -8,6 +8,10 @@ const wallpaperState = {
   isLoading: false
 };
 
+const MAX_WALLPAPER_UPLOAD_BYTES = 15 * 1024 * 1024;
+const WALLPAPER_UPLOAD_COOLDOWN_MS = 10 * 1000;
+const LAST_WALLPAPER_UPLOAD_AT_KEY = 'wallpaper_last_upload_at';
+
 // Initialize wallpaper system
 async function initializeWallpaper() {
   await loadCategories();
@@ -85,6 +89,16 @@ function applyWallpaper(wallpaperId) {
   if (!wallpaperId) {
     document.body.style.backgroundImage = '';
     document.body.style.backgroundColor = '';
+    wallpaperState.selectedWallpaper = null;
+    localStorage.removeItem('selectedWallpaper');
+
+    if (window.authState && window.authState.isLoggedIn) {
+      if (window.markHomeConfigUpdated) {
+        window.markHomeConfigUpdated();
+      } else if (window.saveUserDataToBackend) {
+        window.saveUserDataToBackend();
+      }
+    }
     return;
   }
 
@@ -101,34 +115,12 @@ function applyWallpaper(wallpaperId) {
   wallpaperState.selectedWallpaper = wallpaperId;
   localStorage.setItem('selectedWallpaper', wallpaperId);
 
-  if (typeof authState !== 'undefined' && authState.isLoggedIn) {
-    saveWallpaperToBackend(wallpaperId);
-  }
-}
-
-// Save wallpaper to backend
-async function saveWallpaperToBackend(wallpaperId) {
-  if (!authState.isLoggedIn || !authState.token) return;
-  try {
-    const userData = {
-      sites: typeof state !== 'undefined' ? state.sites : [],
-      tags: state.tags,
-      tagOrder: state.tagOrder,
-      siteOrder: state.siteOrder,
-      viewMode: state.viewMode,
-      wallpaper: wallpaperId
-    };
-
-    await fetch(`${API_CONFIG.baseURL}/user/data`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${authState.token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(userData)
-    });
-  } catch (error) {
-    console.error('Save wallpaper observer error:', error);
+  if (window.authState && window.authState.isLoggedIn) {
+    if (window.markHomeConfigUpdated) {
+      window.markHomeConfigUpdated();
+    } else if (window.saveUserDataToBackend) {
+      window.saveUserDataToBackend();
+    }
   }
 }
 
@@ -317,14 +309,26 @@ async function handleUserWallpaperUpload(event) {
     return;
   }
 
-  // Check file size (max 5MB before compression)
-  if (file.size > 5 * 1024 * 1024) {
-    showNotification(currentLocale === 'zh' ? '图片太大，请选择小于5MB的图片' : 'Image too large, max 5MB', 'error');
+  const lastUploadAt = Number(localStorage.getItem(LAST_WALLPAPER_UPLOAD_AT_KEY) || 0);
+  if (lastUploadAt && Date.now() - lastUploadAt < WALLPAPER_UPLOAD_COOLDOWN_MS) {
+    showNotification(
+      currentLocale === 'zh' ? '操作太频繁，请稍后再试' : 'Too many requests, please try again later',
+      'error'
+    );
+    return;
+  }
+
+  if (file.size > MAX_WALLPAPER_UPLOAD_BYTES) {
+    showNotification(
+      currentLocale === 'zh' ? '图片太大，请选择小于15MB的图片' : 'Image too large, max 15MB',
+      'error'
+    );
     return;
   }
 
   try {
     showNotification(currentLocale === 'zh' ? '正在上传...' : 'Uploading...', 'info');
+    localStorage.setItem(LAST_WALLPAPER_UPLOAD_AT_KEY, String(Date.now()));
 
     // Compress image if needed
     let fileToUpload = file;
@@ -382,6 +386,7 @@ async function handleUserWallpaperUpload(event) {
     event.target.value = '';
   } catch (err) {
     console.error('Upload exception:', err);
+    localStorage.removeItem(LAST_WALLPAPER_UPLOAD_AT_KEY);
     showNotification(currentLocale === 'zh' ? '上传出错' : 'Upload error', 'error');
   }
 }
@@ -449,14 +454,7 @@ function selectWallpaper(wallpaperId) {
 }
 
 function restoreDefaultWallpaper() {
-  localStorage.removeItem('selectedWallpaper');
-  wallpaperState.selectedWallpaper = null;
-  document.body.style.backgroundImage = '';
-  document.body.style.backgroundColor = '';
-
-  if (typeof authState !== 'undefined' && authState.isLoggedIn) {
-    saveWallpaperToBackend(null);
-  }
+  applyWallpaper(null);
 
   closeWallpaperModal();
   const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
