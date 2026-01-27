@@ -6,6 +6,10 @@ const authState = {
   profile: null // Stores extra profile data
 };
 
+const AUTH_LAST_LOGIN_AT_KEY = 'auth_last_login_at';
+const AUTH_PENDING_LOGIN_AT_KEY = 'auth_pending_login_at';
+const AUTH_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
+
 function getOAuthRedirectUrl() {
   if (typeof OAUTH_REDIRECT_URL === 'string' && OAUTH_REDIRECT_URL.trim()) {
     return OAUTH_REDIRECT_URL.trim();
@@ -14,6 +18,32 @@ function getOAuthRedirectUrl() {
     return SITE_URL.trim();
   }
   return window.location.origin;
+}
+
+function getHomeRedirectUrl() {
+  const base = getOAuthRedirectUrl();
+  try {
+    return new URL('/', base).toString();
+  } catch (_err) {
+    return window.location.origin + '/';
+  }
+}
+
+function cleanUrlToHome() {
+  try {
+    const base = getOAuthRedirectUrl();
+    const home = new URL('/', base);
+    const current = new URL(window.location.href);
+    const lang = current.searchParams.get('lang');
+    if (lang) home.searchParams.set('lang', lang);
+
+    const desired = home.toString();
+    if (window.location.href !== desired) {
+      window.history.replaceState({}, document.title, desired);
+    }
+  } catch (_err) {
+    // no-op
+  }
 }
 
 function getUserNickname() {
@@ -38,7 +68,21 @@ async function initializeAuth() {
   const { data: { session } } = await supabase.auth.getSession();
 
   if (session) {
-    handleSession(session);
+    const lastLoginAt = Number(localStorage.getItem(AUTH_LAST_LOGIN_AT_KEY) || 0);
+    if (lastLoginAt && Date.now() - lastLoginAt > AUTH_MAX_AGE_MS) {
+      try {
+        await supabase.auth.signOut();
+      } finally {
+        showNotification(
+          (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
+            ? 'Session expired, please login again'
+            : '登录已过期，请重新登录',
+          'info'
+        );
+      }
+    } else {
+      handleSession(session);
+    }
   }
 
   // Listen for auth changes
@@ -50,6 +94,9 @@ async function initializeAuth() {
       authState.user = null;
       authState.profile = null;
       updateAuthUI();
+      if (window.initializeMembership) {
+        window.initializeMembership();
+      }
     }
   });
 }
@@ -58,6 +105,14 @@ async function initializeAuth() {
 async function handleSession(session) {
   authState.isLoggedIn = true;
   authState.user = session.user;
+
+  const pendingLoginAt = Number(localStorage.getItem(AUTH_PENDING_LOGIN_AT_KEY) || 0);
+  if (pendingLoginAt) {
+    localStorage.setItem(AUTH_LAST_LOGIN_AT_KEY, String(pendingLoginAt));
+    localStorage.removeItem(AUTH_PENDING_LOGIN_AT_KEY);
+  } else if (!localStorage.getItem(AUTH_LAST_LOGIN_AT_KEY)) {
+    localStorage.setItem(AUTH_LAST_LOGIN_AT_KEY, String(Date.now()));
+  }
 
   // Load extra profile data (if any)
   try {
@@ -76,6 +131,8 @@ async function handleSession(session) {
 
   updateAuthUI();
 
+  cleanUrlToHome();
+
   if (window.flushPendingProfileSync) {
     try {
       await window.flushPendingProfileSync();
@@ -88,6 +145,10 @@ async function handleSession(session) {
   if (window.loadUserData) {
     window.loadUserData();
   }
+
+  if (window.initializeMembership) {
+    window.initializeMembership();
+  }
 }
 
 // Google Login
@@ -98,11 +159,13 @@ async function handleLoginClick() {
     return alert('Supabase not initialized. Please check your config.js credentials.');
   }
 
+  localStorage.setItem(AUTH_PENDING_LOGIN_AT_KEY, String(Date.now()));
+
   console.log('Starting OAuth flow...');
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: getOAuthRedirectUrl()
+      redirectTo: getHomeRedirectUrl()
     }
   });
 

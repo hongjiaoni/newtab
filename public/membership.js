@@ -18,14 +18,16 @@ const MEMBERSHIP_CONFIG = {
     2: {
         name: '高级会员',
         nameEn: 'Premium',
-        price: 9.99,
+        priceMonthly: 4.99,
+        priceYearly: 49.99,
         features: ['所有基础功能', '自定义主题', '自定义字体', '上传壁纸 (50张)', '优先支持'],
         badge: '⭐'
     },
     3: {
         name: '超级会员',
         nameEn: 'Super',
-        price: 19.99,
+        priceMonthly: 9.99,
+        priceYearly: 99.99,
         features: ['所有高级功能', '无限壁纸上传', '专属主题', 'API访问', '专属客服'],
         badge: '👑'
     }
@@ -86,7 +88,13 @@ function updateFeatureLocks() {
     if (themeBtn) {
         if (membershipState.tier < 2) {
             themeBtn.classList.add('locked-feature');
-            themeBtn.onclick = () => showUpgradeModal('theme');
+            themeBtn.onclick = () => {
+                if (!window.authState || !window.authState.isLoggedIn) {
+                    window.openGoogleSignInModal?.();
+                    return;
+                }
+                showUpgradeModal('theme');
+            };
         } else {
             themeBtn.classList.remove('locked-feature');
             themeBtn.onclick = () => window.openThemeCustomization?.();
@@ -100,6 +108,10 @@ function updateFeatureLocks() {
             customCategory.classList.add('locked-feature');
             customCategory.onclick = (e) => {
                 e.preventDefault();
+                if (!window.authState || !window.authState.isLoggedIn) {
+                    window.openGoogleSignInModal?.();
+                    return;
+                }
                 showUpgradeModal('wallpaper');
             };
         } else {
@@ -184,19 +196,55 @@ function createUpgradeModal() {
                style="border: 3px solid var(--border-color); padding: 20px; border-radius: 12px; background: var(--card-bg);">
             <div class="tier-badge" style="font-size: 32px; text-align: center;">⭐</div>
             <h4 style="text-align: center; margin: 10px 0;">${isZh ? '高级会员' : 'Premium'}</h4>
-            <div class="tier-price" style="text-align: center; font-size: 28px; font-weight: bold; margin: 10px 0;">
-              $5.9<span style="font-size: 16px; opacity: 0.7;">/${isZh ? '月' : 'month'}</span>
+            <div class="tier-price" style="text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0;">
+              $${MEMBERSHIP_CONFIG[2].priceMonthly}<span style="font-size: 14px; opacity: 0.7;">/${isZh ? '月' : 'month'}</span>
+              <span style="opacity: 0.5; padding: 0 8px;">|</span>
+              $${MEMBERSHIP_CONFIG[2].priceYearly}<span style="font-size: 14px; opacity: 0.7;">/${isZh ? '年' : 'year'}</span>
             </div>
             <ul class="tier-features" style="list-style: none; padding: 0; margin: 15px 0;">
               <li style="padding: 5px 0;">✓ ${isZh ? '自定义主题' : 'Custom themes'}</li>
               <li style="padding: 5px 0;">✓ ${isZh ? '自定义字体' : 'Custom fonts'}</li>
               <li style="padding: 5px 0;">✓ ${isZh ? '上传壁纸 (50张)' : 'Upload wallpapers (50 images)'}</li>
             </ul>
-            <button class="btn primary-btn" onclick="handleUpgrade(2)" 
-                    style="width: 100%; padding: 12px;" 
-                    ${membershipState.tier >= 2 ? 'disabled' : ''}>
-              ${membershipState.tier >= 2 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '立即升级' : 'Upgrade Now')}
-            </button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button class="btn primary-btn" onclick="handleUpgrade(2, 'monthly')" 
+                      style="width: 100%; padding: 12px;" 
+                      ${membershipState.tier >= 2 ? 'disabled' : ''}>
+                ${membershipState.tier >= 2 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '月付升级' : 'Upgrade Monthly')}
+              </button>
+              <button class="btn primary-btn" onclick="handleUpgrade(2, 'yearly')" 
+                      style="width: 100%; padding: 12px;" 
+                      ${membershipState.tier >= 2 ? 'disabled' : ''}>
+                ${membershipState.tier >= 2 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '年付升级' : 'Upgrade Yearly')}
+              </button>
+            </div>
+          </div>
+
+          <div class="tier-card ${membershipState.tier === 3 ? 'current' : ''}" data-tier="3" 
+               style="border: 3px solid var(--border-color); padding: 20px; border-radius: 12px; background: var(--card-bg);">
+            <div class="tier-badge" style="font-size: 32px; text-align: center;">👑</div>
+            <h4 style="text-align: center; margin: 10px 0;">${isZh ? '超级会员' : 'Super'}</h4>
+            <div class="tier-price" style="text-align: center; font-size: 18px; font-weight: bold; margin: 10px 0;">
+              $${MEMBERSHIP_CONFIG[3].priceMonthly}<span style="font-size: 14px; opacity: 0.7;">/${isZh ? '月' : 'month'}</span>
+              <span style="opacity: 0.5; padding: 0 8px;">|</span>
+              $${MEMBERSHIP_CONFIG[3].priceYearly}<span style="font-size: 14px; opacity: 0.7;">/${isZh ? '年' : 'year'}</span>
+            </div>
+            <ul class="tier-features" style="list-style: none; padding: 0; margin: 15px 0;">
+              <li style="padding: 5px 0;">✓ ${isZh ? '所有高级功能' : 'All Premium features'}</li>
+              <li style="padding: 5px 0;">✓ ${isZh ? '无限壁纸上传' : 'Unlimited wallpaper uploads'}</li>
+            </ul>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button class="btn primary-btn" onclick="handleUpgrade(3, 'monthly')" 
+                      style="width: 100%; padding: 12px;" 
+                      ${membershipState.tier >= 3 ? 'disabled' : ''}>
+                ${membershipState.tier >= 3 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '月付升级' : 'Upgrade Monthly')}
+              </button>
+              <button class="btn primary-btn" onclick="handleUpgrade(3, 'yearly')" 
+                      style="width: 100%; padding: 12px;" 
+                      ${membershipState.tier >= 3 ? 'disabled' : ''}>
+                ${membershipState.tier >= 3 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '年付升级' : 'Upgrade Yearly')}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -253,7 +301,7 @@ function showLoginRequiredModal() {
 }
 
 // Handle upgrade button click
-async function handleUpgrade(tier) {
+async function handleUpgrade(tier, billingCycle = 'monthly') {
     console.log('handleUpgrade called, tier:', tier);
     console.log('authState:', window.authState);
 
@@ -271,7 +319,7 @@ async function handleUpgrade(tier) {
     // Call Stripe integration
     if (window.createCheckoutSession) {
         try {
-            await window.createCheckoutSession(tier);
+            await window.createCheckoutSession(tier, billingCycle);
         } catch (err) {
             console.error('Upgrade failed:', err);
             const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
