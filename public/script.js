@@ -783,6 +783,13 @@ function renderHome() {
     chip.textContent = site.name;
     chip.onclick = () => window.location.href = site.url;
     chip.oncontextmenu = (e) => showContextMenu(e, site, 'site');
+    // Middle-click opens in new tab
+    chip.onmousedown = (e) => {
+      if (e.button === 1) {
+        e.preventDefault();
+        window.open(site.url, '_blank');
+      }
+    };
 
     // Add drag and drop attributes
     chip.draggable = true;
@@ -1062,6 +1069,13 @@ function openTagView(tagName) {
       el.className = 'tag-link-item';
       el.href = site.url;
       el.textContent = site.name;
+      // Middle-click opens in new tab
+      el.onmousedown = (e) => {
+        if (e.button === 1) {
+          e.preventDefault();
+          window.open(site.url, '_blank');
+        }
+      };
       grid.appendChild(el);
 
       // Add separator if not last
@@ -1291,13 +1305,22 @@ window.submitFeedback = submitFeedback;
 const pageContextMenu = document.getElementById('pageContextMenu');
 
 function showPageContextMenu(e) {
-  e.preventDefault();
+  // Don't show on interactive elements
+  const interactiveSelectors = [
+    'a', 'button', 'input', 'select', 'textarea',
+    '.modal', '.modal-overlay:not(.hidden)', '.settings-menu', '.settings-btn',
+    '.context-menu', '.page-context-menu',
+    '.site-card', '.tag-card', '.add-card',
+    '.search-box', '.search-engine', '#time', '#date',
+    '[onclick]', '[role="button"]'
+  ];
   
-  // Don't show on modals or settings menu
-  if (e.target.closest('.modal') || e.target.closest('.settings-menu') || e.target.closest('.context-menu')) {
-    return;
+  const isInteractive = interactiveSelectors.some(sel => e.target.closest(sel));
+  if (isInteractive) {
+    return; // Let default context menu show for interactive elements
   }
 
+  e.preventDefault();
   pageContextMenu.style.left = e.clientX + 'px';
   pageContextMenu.style.top = e.clientY + 'px';
   pageContextMenu.classList.remove('hidden');
