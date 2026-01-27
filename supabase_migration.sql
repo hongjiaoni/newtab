@@ -93,6 +93,10 @@ create policy "Users can delete their own wallpapers."
   on public.wallpapers for delete
   using ( auth.uid() = user_id );
 
+create policy "Users can insert their own wallpapers."
+  on public.wallpapers for insert
+  with check ( auth.uid() = user_id );
+
 -- Function to handle new user signup (auto-create profile)
 create or replace function public.handle_new_user()
 returns trigger as $$

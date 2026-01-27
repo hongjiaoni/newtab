@@ -546,7 +546,6 @@ button:active {
   transform: none;
   box-shadow: none;
   opacity: 1;
-  text-decoration: underline;
 }
 
 .wallpaper-tab.active {
@@ -736,4 +735,79 @@ input:disabled {
   background: var(--border-color);
   margin: 4px 0;
   opacity: 0.3;
+}
+
+/* Theme Customization Styles */
+.theme-tab-btn {
+  padding: 6px 12px;
+  border: 2px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.theme-tab-btn:hover {
+  background: var(--hover-bg);
+}
+
+.theme-tab-btn.active {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.theme-panel {
+  min-height: 200px;
+}
+
+.theme-color-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.theme-color-item {
+  text-align: center;
+}
+
+.theme-color-item label {
+  display: block;
+  font-size: 11px;
+  margin-bottom: 4px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.theme-color-item input[type="color"] {
+  width: 100%;
+  height: 36px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 2px;
+}
+
+.theme-color-row {
+  margin-bottom: 12px;
+}
+
+.theme-color-row label {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+/* Wallpaper category no underline on hover */
+.wallpaper-category-item {
+  text-decoration: none !important;
+}
+
+.wallpaper-category-item:hover {
+  text-decoration: none !important;
 }
