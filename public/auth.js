@@ -6,6 +6,9 @@ const authState = {
   profile: null // Stores extra profile data
 };
 
+// Export authState to window for other modules
+window.authState = authState;
+
 const AUTH_LAST_LOGIN_AT_KEY = 'auth_last_login_at';
 const AUTH_PENDING_LOGIN_AT_KEY = 'auth_pending_login_at';
 const AUTH_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
@@ -60,6 +63,54 @@ function getUserNickname() {
   return (typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'User' : '用户';
 }
 
+// Ensure user profile exists in Supabase (create if not exists)
+async function ensureProfileExists(user) {
+  if (!supabase || !user) return;
+
+  try {
+    // First check if profile exists
+    const { data: existing, error: fetchError } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('id', user.id)
+      .single();
+
+    if (existing) {
+      console.log('Profile already exists');
+      return;
+    }
+
+    // Profile doesn't exist, create it
+    if (fetchError && fetchError.code === 'PGRST116') {
+      console.log('Creating new profile for user:', user.id);
+      
+      const meta = user.user_metadata || {};
+      const { error: insertError } = await supabase
+        .from('profiles')
+        .insert({
+          id: user.id,
+          email: user.email,
+          full_name: meta.full_name || meta.name || '',
+          avatar_url: meta.avatar_url || meta.picture || '',
+          membership_tier: 1,
+          sites: [],
+          tags: [],
+          settings: {},
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+
+      if (insertError) {
+        console.error('Failed to create profile:', insertError);
+      } else {
+        console.log('Profile created successfully');
+      }
+    }
+  } catch (err) {
+    console.error('Error ensuring profile exists:', err);
+  }
+}
+
 // Initialize auth on page load
 async function initializeAuth() {
   if (!supabase) return;
@@ -105,6 +156,7 @@ async function initializeAuth() {
 async function handleSession(session) {
   authState.isLoggedIn = true;
   authState.user = session.user;
+  window.authState = authState; // Ensure window reference is updated
 
   const pendingLoginAt = Number(localStorage.getItem(AUTH_PENDING_LOGIN_AT_KEY) || 0);
   if (pendingLoginAt) {
@@ -114,7 +166,10 @@ async function handleSession(session) {
     localStorage.setItem(AUTH_LAST_LOGIN_AT_KEY, String(Date.now()));
   }
 
-  // Load extra profile data (if any)
+  // Ensure profile exists in database (create if not exists)
+  await ensureProfileExists(session.user);
+
+  // Load extra profile data
   try {
     const { data, error } = await supabase
       .from('profiles')
@@ -124,6 +179,9 @@ async function handleSession(session) {
 
     if (data) {
       authState.profile = data;
+      console.log('Profile loaded:', data);
+    } else if (error) {
+      console.error('Error fetching profile:', error);
     }
   } catch (err) {
     console.error('Error fetching profile:', err);

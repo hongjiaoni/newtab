@@ -53,6 +53,10 @@
         <span id="themeCustomizationText">主题定制</span>
       </div>
       <div class="settings-menu-divider"></div>
+      <div class="settings-menu-item" onclick="openAboutModal()">
+        <span id="aboutText">关于</span>
+      </div>
+      <div class="settings-menu-divider"></div>
       <div id="authMenuContainer">
         <div class="settings-menu-item" id="loginMenuItem"
           onclick="document.getElementById('googleSignInModal').classList.remove('hidden')">
@@ -209,6 +213,101 @@
         <button id="closeUserProfile" class="cancel-btn">Close</button>
         <button id="logoutBtn" class="logout-btn">Logout</button>
       </div>
+    </div>
+  </div>
+
+  <!-- About Modal -->
+  <div id="aboutModal" class="modal-overlay hidden">
+    <div class="modal" style="max-width: 500px;">
+      <h3 id="aboutModalTitle">关于 NewTab</h3>
+      <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 48px; margin-bottom: 15px;">🏠</div>
+        <p style="margin-bottom: 20px; opacity: 0.8;" id="aboutDesc">简洁美观的新标签页，让每次打开浏览器都是一种享受。</p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+          <button onclick="openCoffeeModal()" class="primary-btn sketchy-border" style="padding: 12px 24px;">
+            ☕ <span id="coffeeBtn">请我喝杯咖啡</span>
+          </button>
+          <button onclick="openFeedbackModal()" class="cancel-btn sketchy-border" style="padding: 12px 24px;">
+            💬 <span id="feedbackBtn">提交反馈</span>
+          </button>
+        </div>
+        <div style="margin-top: 30px; font-size: 13px; opacity: 0.6;">
+          <a href="https://newtab.example.com" target="_blank" style="color: inherit;">官网</a> · 
+          <a href="https://github.com/your-repo/newtab" target="_blank" style="color: inherit;">GitHub</a> · 
+          v1.0.0
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button onclick="closeAboutModal()" class="cancel-btn">关闭</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Buy Me a Coffee Modal -->
+  <div id="coffeeModal" class="modal-overlay hidden">
+    <div class="modal" style="max-width: 400px;">
+      <h3>☕ <span id="coffeeTitle">请我喝杯咖啡</span></h3>
+      <div style="padding: 20px;">
+        <p style="margin-bottom: 20px; opacity: 0.8;" id="coffeeDesc">如果你喜欢这个项目，可以请我喝杯咖啡表示支持！</p>
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+          <button class="coffee-amount-btn" data-amount="1" onclick="selectCoffeeAmount(1)">$1</button>
+          <button class="coffee-amount-btn" data-amount="3" onclick="selectCoffeeAmount(3)">$3</button>
+          <button class="coffee-amount-btn selected" data-amount="5" onclick="selectCoffeeAmount(5)">$5</button>
+          <button class="coffee-amount-btn" data-amount="10" onclick="selectCoffeeAmount(10)">$10</button>
+        </div>
+        <div style="text-align: center;">
+          <input type="number" id="coffeeCustomAmount" min="1" max="100" placeholder="自定义金额" 
+            class="modal-input" style="width: 150px; text-align: center;">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button onclick="closeCoffeeModal()" class="cancel-btn">取消</button>
+        <button onclick="processCoffeePayment()" class="primary-btn">支付</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="feedbackModal" class="modal-overlay hidden">
+    <div class="modal" style="max-width: 500px;">
+      <h3>💬 <span id="feedbackTitle">提交反馈</span></h3>
+      <div style="padding: 20px;">
+        <div class="modal-section">
+          <label class="section-label" id="feedbackTypeLabel">反馈类型</label>
+          <select id="feedbackType" class="modal-input">
+            <option value="bug">Bug 报告</option>
+            <option value="feature">功能建议</option>
+            <option value="other">其他</option>
+          </select>
+        </div>
+        <div class="modal-section">
+          <label class="section-label" id="feedbackContentLabel">反馈内容</label>
+          <textarea id="feedbackContent" class="modal-input" rows="5" 
+            placeholder="请描述你的问题或建议..." style="resize: vertical;"></textarea>
+        </div>
+        <div class="modal-section">
+          <label class="section-label" id="feedbackEmailLabel">联系邮箱（可选）</label>
+          <input type="email" id="feedbackEmail" class="modal-input" placeholder="your@email.com">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button onclick="closeFeedbackModal()" class="cancel-btn">取消</button>
+        <button onclick="submitFeedback()" class="primary-btn" id="submitFeedbackBtn">提交</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right-click Context Menu -->
+  <div id="pageContextMenu" class="page-context-menu hidden">
+    <div class="context-menu-item" onclick="openAddSiteFromContext()">
+      <span>➕</span> <span id="ctxAddSite">添加网站</span>
+    </div>
+    <div class="context-menu-item" onclick="openAddTagFromContext()">
+      <span>🏷️</span> <span id="ctxAddTag">添加标签</span>
+    </div>
+    <div class="context-menu-divider"></div>
+    <div class="context-menu-item" onclick="openWallpaperFromContext()">
+      <span>🖼️</span> <span id="ctxWallpaper">更换壁纸</span>
     </div>
   </div>
 
