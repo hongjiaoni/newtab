@@ -114,19 +114,61 @@ async function handleSession(session) {
     localStorage.setItem(AUTH_LAST_LOGIN_AT_KEY, String(Date.now()));
   }
 
-  // Load extra profile data (if any)
+  // Load or create profile
   try {
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', session.user.id)
       .single();
 
+    // If profile doesn't exist, create it using upsert
+    if (error && error.code === 'PGRST116') {
+      console.log('Profile not found, creating new profile...');
+      const newProfile = {
+        id: session.user.id,
+        email: session.user.email,
+        full_name: session.user.user_metadata?.full_name || session.user.user_metadata?.name || '',
+        avatar_url: session.user.user_metadata?.avatar_url || session.user.user_metadata?.picture || '',
+        membership_tier: 1,
+        sites: [],
+        tags: [],
+        settings: {},
+        updated_at: new Date().toISOString()
+      };
+
+      // Use upsert to handle race condition with database trigger
+      const { data: upsertedData, error: upsertError } = await supabase
+        .from('profiles')
+        .upsert(newProfile, { onConflict: 'id' })
+        .select()
+        .single();
+
+      if (upsertError) {
+        console.error('Error creating profile:', upsertError);
+        // Try to fetch again in case trigger created it
+        const { data: retryData } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', session.user.id)
+          .single();
+        if (retryData) {
+          data = retryData;
+        }
+      } else {
+        data = upsertedData;
+        console.log('Profile created successfully');
+      }
+    } else if (error) {
+      console.error('Error fetching profile:', error);
+    }
+
     if (data) {
       authState.profile = data;
+      console.log('Profile loaded:', data.id);
     }
   } catch (err) {
-    console.error('Error fetching profile:', err);
+    console.error('Error fetching/creating profile:', err);
   }
 
   updateAuthUI();
@@ -328,6 +370,7 @@ function setupAuthEventListeners() {
 }
 
 // Export for global access
+window.authState = authState;
 window.handleLoginClick = handleLoginClick;
 window.handleLogout = handleLogout;
 window.openGoogleSignInModal = openGoogleSignInModal;
