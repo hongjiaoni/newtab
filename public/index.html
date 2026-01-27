@@ -259,8 +259,8 @@
         </div>
       </div>
       <div class="modal-actions">
-        <button onclick="closeCoffeeModal()" class="cancel-btn">取消</button>
-        <button onclick="processCoffeePayment()" class="primary-btn">支付</button>
+        <button onclick="closeCoffeeModal()" class="cancel-btn" id="coffeeCancelBtn">取消</button>
+        <button onclick="processCoffeePayment()" class="primary-btn" id="coffeePayBtn">支付</button>
       </div>
     </div>
   </div>
@@ -289,13 +289,13 @@
         </div>
       </div>
       <div class="modal-actions">
-        <button onclick="closeFeedbackModal()" class="cancel-btn">取消</button>
+        <button onclick="closeFeedbackModal()" class="cancel-btn" id="feedbackCancelBtn">取消</button>
         <button onclick="submitFeedback()" class="primary-btn" id="submitFeedbackBtn">提交</button>
       </div>
     </div>
   </div>
 
-  <!-- Right-click Context Menu -->
+  <!-- Right-click Context Menu (for empty areas) -->
   <div id="pageContextMenu" class="page-context-menu hidden">
     <div class="context-menu-item" onclick="openAddSiteFromContext()">
       <span id="ctxAddSite">添加网站</span>
@@ -306,6 +306,16 @@
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" onclick="openWallpaperFromContext()">
       <span id="ctxWallpaper">更换壁纸</span>
+    </div>
+  </div>
+
+  <!-- Item Context Menu (for sites/tags) -->
+  <div id="itemContextMenu" class="page-context-menu item-context-menu hidden">
+    <div class="context-menu-item" onclick="editItemFromContext()">
+      <span id="ctxEditItem">编辑</span>
+    </div>
+    <div class="context-menu-item" onclick="deleteItemFromContext()">
+      <span id="ctxDeleteItem">删除</span>
     </div>
   </div>
 

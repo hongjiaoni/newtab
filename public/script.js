@@ -83,6 +83,11 @@ const translations = {
     addSite: '添加网站',
     addTag: '添加标签',
     changeWallpaper: '更换壁纸',
+    feedbackTypeBug: 'Bug 报告',
+    feedbackTypeFeature: '功能建议',
+    feedbackTypeOther: '其他',
+    editSite: '编辑网站',
+    editTag: '编辑标签',
     days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
     months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
   },
@@ -151,6 +156,11 @@ const translations = {
     addSite: 'Add Site',
     addTag: 'Add Tag',
     changeWallpaper: 'Change Wallpaper',
+    feedbackTypeBug: 'Bug Report',
+    feedbackTypeFeature: 'Feature Request',
+    feedbackTypeOther: 'Other',
+    editSite: 'Edit Site',
+    editTag: 'Edit Tag',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   }
@@ -396,6 +406,29 @@ window.updateAllText = function () {
   
   const ctxWallpaper = document.getElementById('ctxWallpaper');
   if (ctxWallpaper) ctxWallpaper.textContent = i18n.t('changeWallpaper');
+
+  // Update coffee modal buttons
+  const coffeeCancelBtn = document.getElementById('coffeeCancelBtn');
+  if (coffeeCancelBtn) coffeeCancelBtn.textContent = i18n.t('cancel');
+  
+  const coffeePayBtn = document.getElementById('coffeePayBtn');
+  if (coffeePayBtn) coffeePayBtn.textContent = i18n.t('pay');
+  
+  // Update feedback modal buttons
+  const feedbackCancelBtn = document.getElementById('feedbackCancelBtn');
+  if (feedbackCancelBtn) feedbackCancelBtn.textContent = i18n.t('cancel');
+  
+  const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+  if (submitFeedbackBtn) submitFeedbackBtn.textContent = i18n.t('submit');
+  
+  // Update feedback type options
+  const feedbackTypeSelect = document.getElementById('feedbackType');
+  if (feedbackTypeSelect) {
+    const options = feedbackTypeSelect.options;
+    if (options[0]) options[0].textContent = i18n.t('feedbackTypeBug');
+    if (options[1]) options[1].textContent = i18n.t('feedbackTypeFeature');
+    if (options[2]) options[2].textContent = i18n.t('feedbackTypeOther');
+  }
 
   // Re-render content to update any dynamic text
   renderHome();
@@ -1274,16 +1307,42 @@ function processCoffeePayment() {
     return;
   }
 
-  // Use Paddle for coffee payment
-  if (window.Paddle && window.PADDLE_CLIENT_TOKEN) {
-    // For donations, we'd need a separate Paddle price or use custom amount
-    // For now, show a placeholder message
-    showNotification(i18n.currentLocale === 'zh' ? `感谢你的支持！$${amount}` : `Thank you for your support! $${amount}`, 'success');
-    closeCoffeeModal();
-    // TODO: Integrate with Paddle custom amount or external payment link
-  } else {
-    showNotification(i18n.currentLocale === 'zh' ? '支付功能配置中' : 'Payment coming soon', 'info');
+  // Check if Paddle is configured
+  if (!window.PADDLE_CLIENT_TOKEN) {
+    showNotification(
+      i18n.currentLocale === 'zh' 
+        ? '支付功能尚未配置，请联系开发者' 
+        : 'Payment not configured. Please contact the developer.',
+      'warning'
+    );
+    console.error('Paddle not configured: PADDLE_CLIENT_TOKEN is empty in config.js');
+    return;
   }
+
+  // Check if Paddle SDK is loaded
+  if (typeof Paddle === 'undefined') {
+    showNotification(
+      i18n.currentLocale === 'zh' 
+        ? '支付模块加载失败，请刷新页面重试' 
+        : 'Payment module failed to load. Please refresh and try again.',
+      'error'
+    );
+    return;
+  }
+
+  // For donations, open external payment link or use Paddle custom amount
+  // Since Paddle doesn't support arbitrary amounts without custom prices,
+  // we'll redirect to a donation page or show a message
+  showNotification(
+    i18n.currentLocale === 'zh' 
+      ? '感谢你的支持意向！捐赠功能即将上线' 
+      : 'Thank you for your interest! Donation feature coming soon.',
+    'info'
+  );
+  closeCoffeeModal();
+  
+  // TODO: When ready, create donation prices in Paddle and use:
+  // window.openPaddleCheckout?.('donation', amount);
 }
 
 function openFeedbackModal() {
@@ -1353,24 +1412,40 @@ window.submitFeedback = submitFeedback;
 
 // ===== Right-click Context Menu =====
 const pageContextMenu = document.getElementById('pageContextMenu');
+const itemContextMenu = document.getElementById('itemContextMenu');
+let currentContextItem = null; // Store reference to the item being right-clicked
 
 function showPageContextMenu(e) {
-  // Don't show on interactive elements
-  const interactiveSelectors = [
-    'a', 'button', 'input', 'select', 'textarea',
+  // Always prevent default browser context menu
+  e.preventDefault();
+  
+  // Hide any existing context menus first
+  hideAllContextMenus();
+  
+  // Check if right-clicking on a site or tag card
+  const siteCard = e.target.closest('.site-card');
+  const tagCard = e.target.closest('.tag-card');
+  
+  if (siteCard || tagCard) {
+    // Show item edit menu for sites/tags
+    currentContextItem = siteCard || tagCard;
+    showItemContextMenu(e, siteCard ? 'site' : 'tag');
+    return;
+  }
+  
+  // Check if on modal or other non-applicable areas
+  const skipSelectors = [
     '.modal', '.modal-overlay:not(.hidden)', '.settings-menu', '.settings-btn',
-    '.context-menu', '.page-context-menu',
-    '.site-card', '.tag-card', '.add-card',
-    '.search-box', '.search-engine', '#time', '#date',
-    '[onclick]', '[role="button"]'
+    '.context-menu', '.page-context-menu', '.item-context-menu',
+    '.add-card'
   ];
   
-  const isInteractive = interactiveSelectors.some(sel => e.target.closest(sel));
-  if (isInteractive) {
-    return; // Let default context menu show for interactive elements
+  const shouldSkip = skipSelectors.some(sel => e.target.closest(sel));
+  if (shouldSkip) {
+    return;
   }
 
-  e.preventDefault();
+  // Show page context menu (with wallpaper option)
   pageContextMenu.style.left = e.clientX + 'px';
   pageContextMenu.style.top = e.clientY + 'px';
   pageContextMenu.classList.remove('hidden');
@@ -1385,8 +1460,45 @@ function showPageContextMenu(e) {
   }
 }
 
+function showItemContextMenu(e, type) {
+  if (!itemContextMenu) return;
+  
+  // Update menu content based on type
+  const editLabel = document.getElementById('ctxEditItem');
+  const deleteLabel = document.getElementById('ctxDeleteItem');
+  
+  if (editLabel) {
+    editLabel.textContent = i18n.currentLocale === 'zh' 
+      ? (type === 'site' ? '编辑网站' : '编辑标签')
+      : (type === 'site' ? 'Edit Site' : 'Edit Tag');
+  }
+  if (deleteLabel) {
+    deleteLabel.textContent = i18n.currentLocale === 'zh' ? '删除' : 'Delete';
+  }
+  
+  itemContextMenu.dataset.type = type;
+  itemContextMenu.style.left = e.clientX + 'px';
+  itemContextMenu.style.top = e.clientY + 'px';
+  itemContextMenu.classList.remove('hidden');
+
+  // Adjust position if menu goes off screen
+  const rect = itemContextMenu.getBoundingClientRect();
+  if (rect.right > window.innerWidth) {
+    itemContextMenu.style.left = (e.clientX - rect.width) + 'px';
+  }
+  if (rect.bottom > window.innerHeight) {
+    itemContextMenu.style.top = (e.clientY - rect.height) + 'px';
+  }
+}
+
+function hideAllContextMenus() {
+  pageContextMenu?.classList.add('hidden');
+  itemContextMenu?.classList.add('hidden');
+  currentContextItem = null;
+}
+
 function hidePageContextMenu() {
-  pageContextMenu.classList.add('hidden');
+  hideAllContextMenus();
 }
 
 function openAddSiteFromContext() {
@@ -1418,15 +1530,60 @@ function openWallpaperFromContext() {
   }
 }
 
+// Edit item from context menu
+function editItemFromContext() {
+  hideAllContextMenus();
+  if (!currentContextItem) return;
+  
+  const type = document.getElementById('itemContextMenu')?.dataset.type;
+  
+  if (type === 'site') {
+    const siteId = currentContextItem.dataset.id;
+    if (siteId) {
+      editSite(siteId);
+    }
+  } else if (type === 'tag') {
+    const tagId = currentContextItem.dataset.id;
+    if (tagId) {
+      editTag(tagId);
+    }
+  }
+}
+
+// Delete item from context menu
+function deleteItemFromContext() {
+  hideAllContextMenus();
+  if (!currentContextItem) return;
+  
+  const type = document.getElementById('itemContextMenu')?.dataset.type;
+  const confirmMsg = i18n.currentLocale === 'zh' ? '确定要删除吗？' : 'Are you sure you want to delete?';
+  
+  if (!confirm(confirmMsg)) return;
+  
+  if (type === 'site') {
+    const siteId = currentContextItem.dataset.id;
+    if (siteId) {
+      deleteSite(siteId);
+    }
+  } else if (type === 'tag') {
+    const tagId = currentContextItem.dataset.id;
+    if (tagId) {
+      deleteTag(tagId);
+    }
+  }
+}
+
 // Context menu event listeners
 document.addEventListener('contextmenu', showPageContextMenu);
-document.addEventListener('click', hidePageContextMenu);
-document.addEventListener('scroll', hidePageContextMenu);
+document.addEventListener('click', hideAllContextMenus);
+document.addEventListener('scroll', hideAllContextMenus);
 
 // Export context menu functions
 window.openAddSiteFromContext = openAddSiteFromContext;
 window.openAddTagFromContext = openAddTagFromContext;
 window.openWallpaperFromContext = openWallpaperFromContext;
+window.editItemFromContext = editItemFromContext;
+window.deleteItemFromContext = deleteItemFromContext;
 
 // Close modals on overlay click
 document.getElementById('aboutModal')?.addEventListener('click', (e) => {
