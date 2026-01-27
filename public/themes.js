@@ -77,6 +77,9 @@ function openThemeCustomization() {
   renderThemePreview();
 }
 
+// Current theme tab
+let currentThemeTab = 'font';
+
 // Create theme customization modal
 function createThemeModal() {
   const existing = document.getElementById('themeCustomizationModal');
@@ -88,225 +91,151 @@ function createThemeModal() {
   const isZh = currentLocale === 'zh';
 
   const modalHTML = `
-    <div id="themeCustomizationModal" class="modal-overlay hidden">
-      <div class="modal" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+    <div id="themeCustomizationModal" class="modal-overlay hidden" onclick="handleThemeModalOverlayClick(event)">
+      <div class="modal" style="max-width: 700px; max-height: 85vh; overflow-y: auto;" onclick="event.stopPropagation()">
         <h3>${isZh ? '主题定制' : 'Theme Customization'}</h3>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
-          <!-- Left: Settings -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+          <!-- Left: Settings with Tabs -->
           <div>
-            <h4 style="margin-bottom: 15px;">${isZh ? '字体设置' : 'Font Settings'}</h4>
-            
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '中文字体' : 'Chinese Font'}
-              </label>
-              <select id="fontChineseSelect" class="modal-input" onchange="updateThemePreview()">
-                ${AVAILABLE_FONTS.chinese.map(f => `
-                  <option value="${f.value}" ${themeState.customSettings.fontChinese === f.value ? 'selected' : ''}>
-                    ${f.name}
-                  </option>
-                `).join('')}
-              </select>
+            <!-- Tab Buttons -->
+            <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+              <button class="theme-tab-btn active" id="tabFont" onclick="switchThemeTab('font')">
+                ${isZh ? '字体' : 'Font'}
+              </button>
+              <button class="theme-tab-btn" id="tabLight" onclick="switchThemeTab('light')">
+                ${isZh ? '浅色模式' : 'Light'}
+              </button>
+              <button class="theme-tab-btn" id="tabDark" onclick="switchThemeTab('dark')">
+                ${isZh ? '深色模式' : 'Dark'}
+              </button>
             </div>
 
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '英文字体' : 'English Font'}
-              </label>
-              <select id="fontEnglishSelect" class="modal-input" onchange="updateThemePreview()">
-                ${AVAILABLE_FONTS.english.map(f => `
-                  <option value="${f.value}" ${themeState.customSettings.fontEnglish === f.value ? 'selected' : ''}>
-                    ${f.name}
-                  </option>
-                `).join('')}
-              </select>
+            <!-- Font Tab -->
+            <div id="themePanelFont" class="theme-panel">
+              <div class="theme-color-row">
+                <label>${isZh ? '中文字体' : 'Chinese Font'}</label>
+                <select id="fontChineseSelect" class="modal-input" onchange="updateThemePreview()">
+                  ${AVAILABLE_FONTS.chinese.map(f => `
+                    <option value="${f.value}" ${themeState.customSettings.fontChinese === f.value ? 'selected' : ''}>
+                      ${f.name}
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
+              <div class="theme-color-row">
+                <label>${isZh ? '英文字体' : 'English Font'}</label>
+                <select id="fontEnglishSelect" class="modal-input" onchange="updateThemePreview()">
+                  ${AVAILABLE_FONTS.english.map(f => `
+                    <option value="${f.value}" ${themeState.customSettings.fontEnglish === f.value ? 'selected' : ''}>
+                      ${f.name}
+                    </option>
+                  `).join('')}
+                </select>
+              </div>
             </div>
 
-            <h4 style="margin: 25px 0 15px;">${isZh ? '颜色设置' : 'Color Settings'}</h4>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '背景颜色 (浅色模式)' : 'Background Color (Light Mode)'}
-              </label>
-              <input type="color" id="bgColorInput" class="modal-input"
-                     value="${themeState.customSettings.bgColor}"
-                     onchange="updateThemePreview()" style="height: 50px;">
+            <!-- Light Mode Tab -->
+            <div id="themePanelLight" class="theme-panel hidden">
+              <div class="theme-color-grid">
+                <div class="theme-color-item">
+                  <label>${isZh ? '背景' : 'Background'}</label>
+                  <input type="color" id="bgColorInput" value="${themeState.customSettings.bgColor}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '卡片' : 'Card'}</label>
+                  <input type="color" id="cardBgInput" value="${themeState.customSettings.cardBg}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '输入框' : 'Input'}</label>
+                  <input type="color" id="inputBgInput" value="${themeState.customSettings.inputBg}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '边框' : 'Border'}</label>
+                  <input type="color" id="borderColorInput" value="${themeState.customSettings.borderColor}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '文字' : 'Text'}</label>
+                  <input type="color" id="textColorInput" value="${themeState.customSettings.textColor}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '弹窗' : 'Modal'}</label>
+                  <input type="color" id="modalBgInput" value="${themeState.customSettings.modalBg}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '悬浮' : 'Hover'}</label>
+                  <input type="color" id="hoverBgInput" value="${themeState.customSettings.hoverBg}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '强调' : 'Accent'}</label>
+                  <input type="color" id="accentColorInput" value="${themeState.customSettings.accentColor}" onchange="updateThemePreview()">
+                </div>
+              </div>
+              <div class="theme-color-row" style="margin-top: 10px;">
+                <label>${isZh ? '阴影 (rgba/hex)' : 'Shadow (rgba/hex)'}</label>
+                <input type="text" id="shadowColorInput" class="modal-input" value="${themeState.customSettings.shadowColor}" onchange="updateThemePreview()">
+              </div>
             </div>
 
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '卡片背景 (浅色模式)' : 'Card Background (Light Mode)'}
-              </label>
-              <input type="color" id="cardBgInput" class="modal-input"
-                     value="${themeState.customSettings.cardBg}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '输入框背景 (浅色模式)' : 'Input Background (Light Mode)'}
-              </label>
-              <input type="color" id="inputBgInput" class="modal-input"
-                     value="${themeState.customSettings.inputBg}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '边框颜色 (浅色模式)' : 'Border Color (Light Mode)'}
-              </label>
-              <input type="color" id="borderColorInput" class="modal-input" 
-                     value="${themeState.customSettings.borderColor}" 
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '文字颜色 (浅色模式)' : 'Text Color (Light Mode)'}
-              </label>
-              <input type="color" id="textColorInput" class="modal-input" 
-                     value="${themeState.customSettings.textColor}" 
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '弹窗背景 (浅色模式)' : 'Modal Background (Light Mode)'}
-              </label>
-              <input type="color" id="modalBgInput" class="modal-input"
-                     value="${themeState.customSettings.modalBg}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '悬浮背景 (浅色模式)' : 'Hover Background (Light Mode)'}
-              </label>
-              <input type="color" id="hoverBgInput" class="modal-input"
-                     value="${themeState.customSettings.hoverBg}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '强调色 (浅色模式)' : 'Accent Color (Light Mode)'}
-              </label>
-              <input type="color" id="accentColorInput" class="modal-input"
-                     value="${themeState.customSettings.accentColor}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '阴影颜色 (浅色模式，支持 rgba/hex)' : 'Shadow Color (Light Mode, rgba/hex)'}
-              </label>
-              <input type="text" id="shadowColorInput" class="modal-input"
-                     value="${themeState.customSettings.shadowColor}"
-                     onchange="updateThemePreview()">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '背景颜色 (深色模式)' : 'Background Color (Dark Mode)'}
-              </label>
-              <input type="color" id="bgColorDarkInput" class="modal-input"
-                     value="${themeState.customSettings.darkMode.bgColor}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '卡片背景 (深色模式)' : 'Card Background (Dark Mode)'}
-              </label>
-              <input type="color" id="cardBgDarkInput" class="modal-input"
-                     value="${themeState.customSettings.darkMode.cardBg}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '输入框背景 (深色模式)' : 'Input Background (Dark Mode)'}
-              </label>
-              <input type="color" id="inputBgDarkInput" class="modal-input"
-                     value="${themeState.customSettings.darkMode.inputBg}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '边框颜色 (深色模式)' : 'Border Color (Dark Mode)'}
-              </label>
-              <input type="color" id="borderColorDarkInput" class="modal-input" 
-                     value="${themeState.customSettings.darkMode.borderColor}" 
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '文字颜色 (深色模式)' : 'Text Color (Dark Mode)'}
-              </label>
-              <input type="color" id="textColorDarkInput" class="modal-input" 
-                     value="${themeState.customSettings.darkMode.textColor}" 
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '弹窗背景 (深色模式)' : 'Modal Background (Dark Mode)'}
-              </label>
-              <input type="color" id="modalBgDarkInput" class="modal-input"
-                     value="${themeState.customSettings.darkMode.modalBg}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '悬浮背景 (深色模式)' : 'Hover Background (Dark Mode)'}
-              </label>
-              <input type="color" id="hoverBgDarkInput" class="modal-input"
-                     value="${themeState.customSettings.darkMode.hoverBg}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '强调色 (深色模式)' : 'Accent Color (Dark Mode)'}
-              </label>
-              <input type="color" id="accentColorDarkInput" class="modal-input"
-                     value="${themeState.customSettings.darkMode.accentColor}"
-                     onchange="updateThemePreview()" style="height: 50px;">
-            </div>
-
-            <div style="margin-bottom: 20px;">
-              <label style="display: block; margin-bottom: 8px; font-weight: bold;">
-                ${isZh ? '阴影颜色 (深色模式，支持 rgba/hex)' : 'Shadow Color (Dark Mode, rgba/hex)'}
-              </label>
-              <input type="text" id="shadowColorDarkInput" class="modal-input"
-                     value="${themeState.customSettings.darkMode.shadowColor}"
-                     onchange="updateThemePreview()">
+            <!-- Dark Mode Tab -->
+            <div id="themePanelDark" class="theme-panel hidden">
+              <div class="theme-color-grid">
+                <div class="theme-color-item">
+                  <label>${isZh ? '背景' : 'Background'}</label>
+                  <input type="color" id="bgColorDarkInput" value="${themeState.customSettings.darkMode.bgColor}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '卡片' : 'Card'}</label>
+                  <input type="color" id="cardBgDarkInput" value="${themeState.customSettings.darkMode.cardBg}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '输入框' : 'Input'}</label>
+                  <input type="color" id="inputBgDarkInput" value="${themeState.customSettings.darkMode.inputBg}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '边框' : 'Border'}</label>
+                  <input type="color" id="borderColorDarkInput" value="${themeState.customSettings.darkMode.borderColor}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '文字' : 'Text'}</label>
+                  <input type="color" id="textColorDarkInput" value="${themeState.customSettings.darkMode.textColor}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '弹窗' : 'Modal'}</label>
+                  <input type="color" id="modalBgDarkInput" value="${themeState.customSettings.darkMode.modalBg}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '悬浮' : 'Hover'}</label>
+                  <input type="color" id="hoverBgDarkInput" value="${themeState.customSettings.darkMode.hoverBg}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '强调' : 'Accent'}</label>
+                  <input type="color" id="accentColorDarkInput" value="${themeState.customSettings.darkMode.accentColor}" onchange="updateThemePreview()">
+                </div>
+              </div>
+              <div class="theme-color-row" style="margin-top: 10px;">
+                <label>${isZh ? '阴影 (rgba/hex)' : 'Shadow (rgba/hex)'}</label>
+                <input type="text" id="shadowColorDarkInput" class="modal-input" value="${themeState.customSettings.darkMode.shadowColor}" onchange="updateThemePreview()">
+              </div>
             </div>
           </div>
 
           <!-- Right: Preview -->
           <div>
-            <h4 style="margin-bottom: 15px;">${isZh ? '预览' : 'Preview'}</h4>
-            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-              <button class="cancel-btn" onclick="setPreviewMode('light')" id="previewLightBtn">
-                ${isZh ? '浅色' : 'Light'}
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+              <button class="theme-tab-btn active" onclick="setPreviewMode('light')" id="previewLightBtn">
+                ${isZh ? '浅色预览' : 'Light'}
               </button>
-              <button class="cancel-btn" onclick="setPreviewMode('dark')" id="previewDarkBtn">
-                ${isZh ? '深色' : 'Dark'}
+              <button class="theme-tab-btn" onclick="setPreviewMode('dark')" id="previewDarkBtn">
+                ${isZh ? '深色预览' : 'Dark'}
               </button>
             </div>
-            <div id="themePreview" style="border: 2px solid var(--border-color); border-radius: 8px; padding: 20px; min-height: 400px;">
-              <!-- Preview content will be rendered here -->
+            <div id="themePreview" style="border: 2px solid var(--border-color); border-radius: 8px; padding: 15px; min-height: 280px;">
             </div>
           </div>
         </div>
 
-        <div class="modal-actions" style="margin-top: 30px;">
-          <button class="cancel-btn" onclick="closeThemeModal()">${isZh ? '取消' : 'Cancel'}</button>
+        <div class="modal-actions" style="margin-top: 20px;">
           <button class="cancel-btn" onclick="resetThemeCustomization()">${isZh ? '重置' : 'Reset'}</button>
           <button class="primary-btn" onclick="saveThemeSettings()">${isZh ? '保存' : 'Save'}</button>
         </div>
@@ -315,6 +244,32 @@ function createThemeModal() {
   `;
 
   document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+// Switch theme tab
+function switchThemeTab(tab) {
+  currentThemeTab = tab;
+  // Update tab buttons
+  document.querySelectorAll('.theme-tab-btn').forEach(btn => {
+    if (btn.id === 'tabFont') btn.classList.toggle('active', tab === 'font');
+    if (btn.id === 'tabLight') btn.classList.toggle('active', tab === 'light');
+    if (btn.id === 'tabDark') btn.classList.toggle('active', tab === 'dark');
+  });
+  // Update panels
+  document.getElementById('themePanelFont')?.classList.toggle('hidden', tab !== 'font');
+  document.getElementById('themePanelLight')?.classList.toggle('hidden', tab !== 'light');
+  document.getElementById('themePanelDark')?.classList.toggle('hidden', tab !== 'dark');
+  
+  // Auto-switch preview mode
+  if (tab === 'light') setPreviewMode('light');
+  if (tab === 'dark') setPreviewMode('dark');
+}
+
+// Handle overlay click to close modal
+function handleThemeModalOverlayClick(event) {
+  if (event.target.id === 'themeCustomizationModal') {
+    closeThemeModal();
+  }
 }
 
 // Preview mode state

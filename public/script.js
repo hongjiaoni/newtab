@@ -347,6 +347,56 @@ window.updateAllText = function () {
   const themeCustomizationText = document.getElementById('themeCustomizationText');
   if (themeCustomizationText) themeCustomizationText.textContent = i18n.t('themeCustomization');
 
+  // Update About menu and modals
+  const aboutText = document.getElementById('aboutText');
+  if (aboutText) aboutText.textContent = i18n.t('about');
+  
+  const aboutModalTitle = document.getElementById('aboutModalTitle');
+  if (aboutModalTitle) aboutModalTitle.textContent = i18n.t('aboutTitle');
+  
+  const aboutDesc = document.getElementById('aboutDesc');
+  if (aboutDesc) aboutDesc.textContent = i18n.t('aboutDesc');
+  
+  const coffeeBtn = document.getElementById('coffeeBtn');
+  if (coffeeBtn) coffeeBtn.textContent = i18n.t('buyMeCoffee');
+  
+  const feedbackBtn = document.getElementById('feedbackBtn');
+  if (feedbackBtn) feedbackBtn.textContent = i18n.t('feedback');
+  
+  const coffeeTitle = document.getElementById('coffeeTitle');
+  if (coffeeTitle) coffeeTitle.textContent = i18n.t('buyMeCoffee');
+  
+  const coffeeDesc = document.getElementById('coffeeDesc');
+  if (coffeeDesc) coffeeDesc.textContent = i18n.t('coffeeDesc');
+  
+  const feedbackTitle = document.getElementById('feedbackTitle');
+  if (feedbackTitle) feedbackTitle.textContent = i18n.t('feedback');
+  
+  const feedbackTypeLabel = document.getElementById('feedbackTypeLabel');
+  if (feedbackTypeLabel) feedbackTypeLabel.textContent = i18n.t('feedbackType');
+  
+  const feedbackContentLabel = document.getElementById('feedbackContentLabel');
+  if (feedbackContentLabel) feedbackContentLabel.textContent = i18n.t('feedbackContent');
+  
+  const feedbackEmailLabel = document.getElementById('feedbackEmailLabel');
+  if (feedbackEmailLabel) feedbackEmailLabel.textContent = i18n.t('feedbackEmail');
+  
+  const feedbackContent = document.getElementById('feedbackContent');
+  if (feedbackContent) feedbackContent.placeholder = i18n.t('feedbackPlaceholder');
+  
+  const coffeeCustomAmount = document.getElementById('coffeeCustomAmount');
+  if (coffeeCustomAmount) coffeeCustomAmount.placeholder = i18n.t('customAmount');
+
+  // Update right-click context menu
+  const ctxAddSite = document.getElementById('ctxAddSite');
+  if (ctxAddSite) ctxAddSite.textContent = i18n.t('addSite');
+  
+  const ctxAddTag = document.getElementById('ctxAddTag');
+  if (ctxAddTag) ctxAddTag.textContent = i18n.t('addTag');
+  
+  const ctxWallpaper = document.getElementById('ctxWallpaper');
+  if (ctxWallpaper) ctxWallpaper.textContent = i18n.t('changeWallpaper');
+
   // Re-render content to update any dynamic text
   renderHome();
 }
