@@ -21,6 +21,25 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const SITE_URL = '';
 const OAUTH_REDIRECT_URL = 'https://newtab-rfyoq591j-hongjiaonis-projects.vercel.app';
 
+// Paddle Configuration
+// Replace with your actual Paddle credentials from Paddle Dashboard
+const PADDLE_ENVIRONMENT = 'production'; // 'sandbox' for testing, 'production' for live
+const PADDLE_CLIENT_TOKEN = 'live_245fc506cb9dc81b3ff831cd963'; // Your Paddle client-side token
+
+// Paddle Price IDs (create these in Paddle Dashboard)
+const PADDLE_PRICE_TIER2_MONTHLY = 'pri_01kfyxzhfmthgs70hcv20zvkdc'; // Premium tier monthly price ID
+const PADDLE_PRICE_TIER2_YEARLY = 'pri_01kfyy17rj346xj7xj0k6vzem9';  // Premium tier yearly price ID
+const PADDLE_PRICE_TIER3_MONTHLY = ''; // Super tier monthly price ID
+const PADDLE_PRICE_TIER3_YEARLY = '';  // Super tier yearly price ID
+
+// Export Paddle config to window for paddle.js
+window.PADDLE_ENVIRONMENT = PADDLE_ENVIRONMENT;
+window.PADDLE_CLIENT_TOKEN = PADDLE_CLIENT_TOKEN;
+window.PADDLE_PRICE_TIER2_MONTHLY = PADDLE_PRICE_TIER2_MONTHLY;
+window.PADDLE_PRICE_TIER2_YEARLY = PADDLE_PRICE_TIER2_YEARLY;
+window.PADDLE_PRICE_TIER3_MONTHLY = PADDLE_PRICE_TIER3_MONTHLY;
+window.PADDLE_PRICE_TIER3_YEARLY = PADDLE_PRICE_TIER3_YEARLY;
+
 // Feature Flags
 const FEATURES = {
   enableAutoLogin: true,
