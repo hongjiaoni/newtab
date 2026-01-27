@@ -66,6 +66,23 @@ const translations = {
     upload: '上传',
     uploadWallpaper: '上传壁纸',
     themeCustomization: '主题定制',
+    about: '关于',
+    aboutTitle: '关于 NewTab',
+    aboutDesc: '简洁美观的新标签页，让每次打开浏览器都是一种享受。',
+    buyMeCoffee: '请我喝杯咖啡',
+    coffeeDesc: '如果你喜欢这个项目，可以请我喝杯咖啡表示支持！',
+    feedback: '提交反馈',
+    feedbackType: '反馈类型',
+    feedbackContent: '反馈内容',
+    feedbackEmail: '联系邮箱（可选）',
+    feedbackPlaceholder: '请描述你的问题或建议...',
+    submit: '提交',
+    submitting: '提交中...',
+    pay: '支付',
+    customAmount: '自定义金额',
+    addSite: '添加网站',
+    addTag: '添加标签',
+    changeWallpaper: '更换壁纸',
     days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
     months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
   },
@@ -117,6 +134,23 @@ const translations = {
     upload: 'Upload',
     uploadWallpaper: 'Upload Wallpaper',
     themeCustomization: 'Theme Customization',
+    about: 'About',
+    aboutTitle: 'About NewTab',
+    aboutDesc: 'A beautiful new tab page that makes every browser launch a pleasure.',
+    buyMeCoffee: 'Buy Me a Coffee',
+    coffeeDesc: 'If you enjoy this project, consider buying me a coffee to show your support!',
+    feedback: 'Send Feedback',
+    feedbackType: 'Feedback Type',
+    feedbackContent: 'Feedback Content',
+    feedbackEmail: 'Contact Email (optional)',
+    feedbackPlaceholder: 'Please describe your issue or suggestion...',
+    submit: 'Submit',
+    submitting: 'Submitting...',
+    pay: 'Pay',
+    customAmount: 'Custom Amount',
+    addSite: 'Add Site',
+    addTag: 'Add Tag',
+    changeWallpaper: 'Change Wallpaper',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   }
@@ -1131,6 +1165,205 @@ document.addEventListener('click', (e) => {
   } else if (!e.target.closest('#languageMenuItem')) {
     document.getElementById('languageSubmenu').classList.add('hidden');
   }
+});
+
+// ===== About, Coffee, Feedback Modals =====
+let selectedCoffeeAmount = 5;
+
+function openAboutModal() {
+  document.getElementById('settingsMenu').classList.add('hidden');
+  document.getElementById('aboutModal').classList.remove('hidden');
+}
+
+function closeAboutModal() {
+  document.getElementById('aboutModal').classList.add('hidden');
+}
+
+function openCoffeeModal() {
+  document.getElementById('aboutModal').classList.add('hidden');
+  document.getElementById('coffeeModal').classList.remove('hidden');
+  selectedCoffeeAmount = 5;
+  document.querySelectorAll('.coffee-amount-btn').forEach(btn => {
+    btn.classList.toggle('selected', btn.dataset.amount === '5');
+  });
+  document.getElementById('coffeeCustomAmount').value = '';
+}
+
+function closeCoffeeModal() {
+  document.getElementById('coffeeModal').classList.add('hidden');
+}
+
+function selectCoffeeAmount(amount) {
+  selectedCoffeeAmount = amount;
+  document.querySelectorAll('.coffee-amount-btn').forEach(btn => {
+    btn.classList.toggle('selected', parseInt(btn.dataset.amount) === amount);
+  });
+  document.getElementById('coffeeCustomAmount').value = '';
+}
+
+function processCoffeePayment() {
+  const customAmount = parseInt(document.getElementById('coffeeCustomAmount').value);
+  const amount = customAmount > 0 ? customAmount : selectedCoffeeAmount;
+  
+  if (amount < 1 || amount > 100) {
+    showNotification(i18n.currentLocale === 'zh' ? '请输入 1-100 之间的金额' : 'Please enter amount between 1-100', 'error');
+    return;
+  }
+
+  // Use Paddle for coffee payment
+  if (window.Paddle && window.PADDLE_CLIENT_TOKEN) {
+    // For donations, we'd need a separate Paddle price or use custom amount
+    // For now, show a placeholder message
+    showNotification(i18n.currentLocale === 'zh' ? `感谢你的支持！$${amount}` : `Thank you for your support! $${amount}`, 'success');
+    closeCoffeeModal();
+    // TODO: Integrate with Paddle custom amount or external payment link
+  } else {
+    showNotification(i18n.currentLocale === 'zh' ? '支付功能配置中' : 'Payment coming soon', 'info');
+  }
+}
+
+function openFeedbackModal() {
+  document.getElementById('aboutModal').classList.add('hidden');
+  document.getElementById('feedbackModal').classList.remove('hidden');
+  document.getElementById('feedbackType').value = 'bug';
+  document.getElementById('feedbackContent').value = '';
+  document.getElementById('feedbackEmail').value = window.authState?.user?.email || '';
+}
+
+function closeFeedbackModal() {
+  document.getElementById('feedbackModal').classList.add('hidden');
+}
+
+async function submitFeedback() {
+  const type = document.getElementById('feedbackType').value;
+  const content = document.getElementById('feedbackContent').value.trim();
+  const email = document.getElementById('feedbackEmail').value.trim();
+
+  if (!content) {
+    showNotification(i18n.currentLocale === 'zh' ? '请填写反馈内容' : 'Please enter feedback content', 'error');
+    return;
+  }
+
+  const submitBtn = document.getElementById('submitFeedbackBtn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = i18n.currentLocale === 'zh' ? '提交中...' : 'Submitting...';
+
+  try {
+    const { error } = await supabase
+      .from('feedback')
+      .insert({
+        type: type,
+        content: content,
+        email: email || null,
+        user_id: window.authState?.user?.id || null,
+        user_agent: navigator.userAgent,
+        created_at: new Date().toISOString()
+      });
+
+    if (error) {
+      console.error('Feedback submit error:', error);
+      showNotification(i18n.currentLocale === 'zh' ? '提交失败，请重试' : 'Submit failed, please retry', 'error');
+    } else {
+      showNotification(i18n.currentLocale === 'zh' ? '感谢你的反馈！' : 'Thank you for your feedback!', 'success');
+      closeFeedbackModal();
+    }
+  } catch (err) {
+    console.error('Feedback exception:', err);
+    showNotification(i18n.currentLocale === 'zh' ? '提交失败' : 'Submit failed', 'error');
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = i18n.currentLocale === 'zh' ? '提交' : 'Submit';
+  }
+}
+
+// Export modal functions
+window.openAboutModal = openAboutModal;
+window.closeAboutModal = closeAboutModal;
+window.openCoffeeModal = openCoffeeModal;
+window.closeCoffeeModal = closeCoffeeModal;
+window.selectCoffeeAmount = selectCoffeeAmount;
+window.processCoffeePayment = processCoffeePayment;
+window.openFeedbackModal = openFeedbackModal;
+window.closeFeedbackModal = closeFeedbackModal;
+window.submitFeedback = submitFeedback;
+
+// ===== Right-click Context Menu =====
+const pageContextMenu = document.getElementById('pageContextMenu');
+
+function showPageContextMenu(e) {
+  e.preventDefault();
+  
+  // Don't show on modals or settings menu
+  if (e.target.closest('.modal') || e.target.closest('.settings-menu') || e.target.closest('.context-menu')) {
+    return;
+  }
+
+  pageContextMenu.style.left = e.clientX + 'px';
+  pageContextMenu.style.top = e.clientY + 'px';
+  pageContextMenu.classList.remove('hidden');
+
+  // Adjust position if menu goes off screen
+  const rect = pageContextMenu.getBoundingClientRect();
+  if (rect.right > window.innerWidth) {
+    pageContextMenu.style.left = (e.clientX - rect.width) + 'px';
+  }
+  if (rect.bottom > window.innerHeight) {
+    pageContextMenu.style.top = (e.clientY - rect.height) + 'px';
+  }
+}
+
+function hidePageContextMenu() {
+  pageContextMenu.classList.add('hidden');
+}
+
+function openAddSiteFromContext() {
+  hidePageContextMenu();
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.getElementById('addModal').classList.remove('hidden');
+  document.querySelector('input[name="addType"][value="site"]').checked = true;
+  document.getElementById('siteForm').classList.remove('hidden');
+  document.getElementById('tagForm').classList.add('hidden');
+  renderTagSelector();
+}
+
+function openAddTagFromContext() {
+  hidePageContextMenu();
+  document.getElementById('modalOverlay').classList.remove('hidden');
+  document.getElementById('addModal').classList.remove('hidden');
+  document.querySelector('input[name="addType"][value="tag"]').checked = true;
+  document.getElementById('siteForm').classList.add('hidden');
+  document.getElementById('tagForm').classList.remove('hidden');
+}
+
+function openWallpaperFromContext() {
+  hidePageContextMenu();
+  if (window.openWallpaperModal) {
+    window.openWallpaperModal();
+  } else {
+    document.getElementById('wallpaperModal').classList.remove('hidden');
+    if (window.renderWallpaperUI) window.renderWallpaperUI();
+  }
+}
+
+// Context menu event listeners
+document.addEventListener('contextmenu', showPageContextMenu);
+document.addEventListener('click', hidePageContextMenu);
+document.addEventListener('scroll', hidePageContextMenu);
+
+// Export context menu functions
+window.openAddSiteFromContext = openAddSiteFromContext;
+window.openAddTagFromContext = openAddTagFromContext;
+window.openWallpaperFromContext = openWallpaperFromContext;
+
+// Close modals on overlay click
+document.getElementById('aboutModal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'aboutModal') closeAboutModal();
+});
+document.getElementById('coffeeModal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'coffeeModal') closeCoffeeModal();
+});
+document.getElementById('feedbackModal')?.addEventListener('click', (e) => {
+  if (e.target.id === 'feedbackModal') closeFeedbackModal();
 });
 
 // ===== Initialize =====
