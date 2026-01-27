@@ -157,6 +157,7 @@ function renderWallpaperUI() {
 
   const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
   const memberTier = window.membershipState?.tier || 1;
+  const isLoggedIn = !!(window.authState && window.authState.isLoggedIn);
 
   // Toggle upload container visibility and content
   if (uploadContainer) {
@@ -165,21 +166,37 @@ function renderWallpaperUI() {
 
       // Update upload button based on membership tier
       if (memberTier < 2) {
-        // Basic member - show upgrade button
-        uploadContainer.innerHTML = `
-          <div style="text-align: center; padding: 30px;">
-            <p style="margin-bottom: 15px; opacity: 0.8;">
-              ${currentLocale === 'zh' ? '上传自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}
-            </p>
-            <button onclick="
-              if (window.closeWallpaperModal) window.closeWallpaperModal();
-              window.showUpgradeModal?.('wallpaper');
-            " class="primary-btn sketchy-border"
-              style="padding: 15px 30px; margin: 0 auto; display: block;">
-              ${currentLocale === 'zh' ? '升级会员' : 'Upgrade Membership'}
-            </button>
-          </div>
-        `;
+        if (!isLoggedIn) {
+          uploadContainer.innerHTML = `
+            <div style="text-align: center; padding: 30px;">
+              <p style="margin-bottom: 15px; opacity: 0.8;">
+                ${currentLocale === 'zh' ? '登录后可上传自定义壁纸' : 'Login to upload custom wallpapers'}
+              </p>
+              <button onclick="
+                if (window.closeWallpaperModal) window.closeWallpaperModal();
+                window.openGoogleSignInModal?.();
+              " class="primary-btn sketchy-border"
+                style="padding: 15px 30px; margin: 0 auto; display: block;">
+                ${currentLocale === 'zh' ? '立即登录' : 'Login'}
+              </button>
+            </div>
+          `;
+        } else {
+          uploadContainer.innerHTML = `
+            <div style="text-align: center; padding: 30px;">
+              <p style="margin-bottom: 15px; opacity: 0.8;">
+                ${currentLocale === 'zh' ? '上传自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}
+              </p>
+              <button onclick="
+                if (window.closeWallpaperModal) window.closeWallpaperModal();
+                window.showUpgradeModal?.('wallpaper');
+              " class="primary-btn sketchy-border"
+                style="padding: 15px 30px; margin: 0 auto; display: block;">
+                ${currentLocale === 'zh' ? '升级会员' : 'Upgrade Membership'}
+              </button>
+            </div>
+          `;
+        }
       } else {
         // Premium/Super member - show upload button with quota
         supabase.from('upload_quota')
