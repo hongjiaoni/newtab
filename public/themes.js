@@ -100,6 +100,9 @@ function createThemeModal() {
           <div>
             <!-- Tab Buttons -->
             <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
+              <button class="theme-tab-btn" id="tabStyle" onclick="switchThemeTab('style')">
+                ${isZh ? '风格' : 'Style'}
+              </button>
               <button class="theme-tab-btn active" id="tabFont" onclick="switchThemeTab('font')">
                 ${isZh ? '字体' : 'Font'}
               </button>
@@ -109,6 +112,21 @@ function createThemeModal() {
               <button class="theme-tab-btn" id="tabDark" onclick="switchThemeTab('dark')">
                 ${isZh ? '深色模式' : 'Dark'}
               </button>
+            </div>
+
+            <!-- Style Tab -->
+            <div id="themePanelStyle" class="theme-panel hidden">
+              <div class="theme-color-row">
+                <label>${isZh ? '当前风格' : 'Current Style'}</label>
+                <select id="themeStyleSelect" class="modal-input" onchange="updateThemePreview()">
+                  <option value="handdrawn" ${themeState.currentTheme === 'handdrawn' ? 'selected' : ''}>
+                    ${isZh ? '手绘（默认）' : 'Hand-drawn (Default)'}
+                  </option>
+                </select>
+              </div>
+              <div style="font-size: 12px; opacity: 0.7; line-height: 1.4;">
+                ${isZh ? '更多付费风格后续会陆续上线。' : 'More premium styles will be available later.'}
+              </div>
             </div>
 
             <!-- Font Tab -->
@@ -250,12 +268,12 @@ function createThemeModal() {
 function switchThemeTab(tab) {
   currentThemeTab = tab;
   // Update tab buttons
-  document.querySelectorAll('.theme-tab-btn').forEach(btn => {
-    if (btn.id === 'tabFont') btn.classList.toggle('active', tab === 'font');
-    if (btn.id === 'tabLight') btn.classList.toggle('active', tab === 'light');
-    if (btn.id === 'tabDark') btn.classList.toggle('active', tab === 'dark');
-  });
+  document.getElementById('tabStyle')?.classList.toggle('active', tab === 'style');
+  document.getElementById('tabFont')?.classList.toggle('active', tab === 'font');
+  document.getElementById('tabLight')?.classList.toggle('active', tab === 'light');
+  document.getElementById('tabDark')?.classList.toggle('active', tab === 'dark');
   // Update panels
+  document.getElementById('themePanelStyle')?.classList.toggle('hidden', tab !== 'style');
   document.getElementById('themePanelFont')?.classList.toggle('hidden', tab !== 'font');
   document.getElementById('themePanelLight')?.classList.toggle('hidden', tab !== 'light');
   document.getElementById('themePanelDark')?.classList.toggle('hidden', tab !== 'dark');
@@ -277,8 +295,8 @@ let previewMode = 'light';
 
 function setPreviewMode(mode) {
   previewMode = mode;
-  document.getElementById('previewLightBtn').classList.toggle('primary-btn', mode === 'light');
-  document.getElementById('previewDarkBtn').classList.toggle('primary-btn', mode === 'dark');
+  document.getElementById('previewLightBtn')?.classList.toggle('active', mode === 'light');
+  document.getElementById('previewDarkBtn')?.classList.toggle('active', mode === 'dark');
   renderThemePreview();
 }
 
@@ -359,6 +377,7 @@ async function saveThemeSettings() {
   const isZh = currentLocale === 'zh';
 
   const settings = {
+    style: document.getElementById('themeStyleSelect')?.value || themeState.currentTheme,
     fontChinese: document.getElementById('fontChineseSelect').value,
     fontEnglish: document.getElementById('fontEnglishSelect').value,
     bgColor: document.getElementById('bgColorInput').value,
@@ -382,6 +401,8 @@ async function saveThemeSettings() {
       shadowColor: document.getElementById('shadowColorDarkInput').value
     }
   };
+
+  themeState.currentTheme = settings.style;
 
   // Apply to current page (respect current mode)
   applyThemeSettings(settings);

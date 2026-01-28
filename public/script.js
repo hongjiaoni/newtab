@@ -65,10 +65,11 @@ const translations = {
     custom: '自定义',
     upload: '上传',
     uploadWallpaper: '上传壁纸',
-    themeCustomization: '主题定制',
+    themeCustomization: '主题',
     about: '关于',
     aboutTitle: '关于 NewTab',
     aboutDesc: '简洁美观的新标签页，让每次打开浏览器都是一种享受。',
+    officialWebsite: '官网',
     buyMeCoffee: '请我喝杯咖啡',
     coffeeDesc: '如果你喜欢这个项目，可以请我喝杯咖啡表示支持！',
     feedback: '提交反馈',
@@ -88,6 +89,10 @@ const translations = {
     feedbackTypeOther: '其他',
     editSite: '编辑网站',
     editTag: '编辑标签',
+    imageUrl: '图片地址',
+    apply: '应用',
+    pasteImageUrl: '粘贴图片链接 (http/https)',
+    invalidImageUrl: '请输入正确的图片链接',
     days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
     months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
   },
@@ -138,10 +143,11 @@ const translations = {
     custom: 'Custom',
     upload: 'Upload',
     uploadWallpaper: 'Upload Wallpaper',
-    themeCustomization: 'Theme Customization',
+    themeCustomization: 'Theme',
     about: 'About',
     aboutTitle: 'About NewTab',
     aboutDesc: 'A beautiful new tab page that makes every browser launch a pleasure.',
+    officialWebsite: 'Official Website',
     buyMeCoffee: 'Buy Me a Coffee',
     coffeeDesc: 'If you enjoy this project, consider buying me a coffee to show your support!',
     feedback: 'Send Feedback',
@@ -161,6 +167,10 @@ const translations = {
     feedbackTypeOther: 'Other',
     editSite: 'Edit Site',
     editTag: 'Edit Tag',
+    imageUrl: 'Image URL',
+    apply: 'Apply',
+    pasteImageUrl: 'Paste image URL (http/https)',
+    invalidImageUrl: 'Please enter a valid image URL',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   }
@@ -366,6 +376,12 @@ window.updateAllText = function () {
   
   const aboutDesc = document.getElementById('aboutDesc');
   if (aboutDesc) aboutDesc.textContent = i18n.t('aboutDesc');
+
+  const officialWebsiteLink = document.getElementById('officialWebsiteLink');
+  if (officialWebsiteLink) officialWebsiteLink.textContent = i18n.t('officialWebsite');
+
+  const aboutCloseBtn = document.getElementById('aboutCloseBtn');
+  if (aboutCloseBtn) aboutCloseBtn.textContent = i18n.t('close');
   
   const coffeeBtn = document.getElementById('coffeeBtn');
   if (coffeeBtn) coffeeBtn.textContent = i18n.t('buyMeCoffee');

@@ -552,7 +552,6 @@ button:active {
   opacity: 1;
   text-decoration: underline;
   text-decoration-thickness: 3px;
-  text-decoration-style: wavy;
 }
 
 /* Context Menu */

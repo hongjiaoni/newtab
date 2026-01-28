@@ -164,10 +164,27 @@ function renderWallpaperUI() {
     if (wallpaperState.activeCategory === 'Custom') {
       uploadContainer.classList.remove('hidden');
 
+      const t = (key) => (typeof i18n !== 'undefined' ? i18n.t(key) : key);
+
+      // Always allow setting custom wallpaper by URL
+      const urlBlock = `
+        <div style="text-align: center; padding: 10px 20px 0;">
+          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
+            <input type="text" id="customWallpaperUrlInput" class="modal-input"
+              placeholder="${t('pasteImageUrl')}" style="max-width: 320px;">
+            <button class="cancel-btn sketchy-border" onclick="applyCustomWallpaperUrl()"
+              style="padding: 10px 18px;">
+              ${t('apply')}
+            </button>
+          </div>
+        </div>
+      `;
+
       // Update upload button based on membership tier
       if (memberTier < 2) {
         if (!isLoggedIn) {
           uploadContainer.innerHTML = `
+            ${urlBlock}
             <div style="text-align: center; padding: 30px;">
               <p style="margin-bottom: 15px; opacity: 0.8;">
                 ${currentLocale === 'zh' ? '登录后可上传自定义壁纸' : 'Login to upload custom wallpapers'}
@@ -183,6 +200,7 @@ function renderWallpaperUI() {
           `;
         } else {
           uploadContainer.innerHTML = `
+            ${urlBlock}
             <div style="text-align: center; padding: 30px;">
               <p style="margin-bottom: 15px; opacity: 0.8;">
                 ${currentLocale === 'zh' ? '上传自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}
@@ -208,6 +226,7 @@ function renderWallpaperUI() {
             const max = data?.max_wallpapers || 50;
 
             uploadContainer.innerHTML = `
+              ${urlBlock}
               <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
               <div style="text-align: center; padding: 20px;">
                 <p style="margin-bottom: 10px; opacity: 0.7; font-size: 14px;">
@@ -301,19 +320,20 @@ async function handleUserWallpaperUpload(event) {
 
   // Check quota
   try {
-    const { data: quotaData } = await supabase
+    const { data: quotaData, error: quotaError } = await supabase
       .from('upload_quota')
       .select('wallpaper_count, max_wallpapers')
       .eq('user_id', authState.user.id)
       .single();
 
-    if (quotaData && quotaData.wallpaper_count >= quotaData.max_wallpapers) {
+    if (!quotaError && quotaData && quotaData.wallpaper_count >= quotaData.max_wallpapers) {
       showNotification(
         currentLocale === 'zh'
           ? `已达上传上限 (${quotaData.max_wallpapers}张)`
           : `Upload limit reached (${quotaData.max_wallpapers} images)`,
         'error'
       );
+      event.target.value = '';
       return;
     }
   } catch (err) {
@@ -323,6 +343,7 @@ async function handleUserWallpaperUpload(event) {
   // Validate file
   if (!file.type.startsWith('image/')) {
     showNotification(currentLocale === 'zh' ? '请选择图片文件' : 'Please select an image file', 'error');
+    event.target.value = '';
     return;
   }
 
@@ -332,6 +353,7 @@ async function handleUserWallpaperUpload(event) {
       currentLocale === 'zh' ? '操作太频繁，请稍后再试' : 'Too many requests, please try again later',
       'error'
     );
+    event.target.value = '';
     return;
   }
 
@@ -340,6 +362,7 @@ async function handleUserWallpaperUpload(event) {
       currentLocale === 'zh' ? '图片太大，请选择小于15MB的图片' : 'Image too large, max 15MB',
       'error'
     );
+    event.target.value = '';
     return;
   }
 
@@ -354,7 +377,8 @@ async function handleUserWallpaperUpload(event) {
     }
 
     // Generate unique filename
-    const fileExt = file.name.split('.').pop();
+    const originalExt = file.name.split('.').pop();
+    const fileExt = (fileToUpload.type === 'image/jpeg' || fileToUpload.type === 'image/jpg') ? 'jpg' : originalExt;
     const fileName = `${authState.user.id}/${Date.now()}.${fileExt}`;
 
     // Upload to Supabase Storage
@@ -362,12 +386,20 @@ async function handleUserWallpaperUpload(event) {
       .from('wallpapers')
       .upload(fileName, fileToUpload, {
         cacheControl: '3600',
+        contentType: fileToUpload.type || 'image/jpeg',
         upsert: false
       });
 
     if (uploadError) {
       console.error('Upload error:', uploadError);
-      showNotification(currentLocale === 'zh' ? '上传失败' : 'Upload failed', 'error');
+      localStorage.removeItem(LAST_WALLPAPER_UPLOAD_AT_KEY);
+      showNotification(
+        currentLocale === 'zh'
+          ? `上传失败：${uploadError.message || '请检查存储桶/权限配置'}`
+          : `Upload failed: ${uploadError.message || 'Please check bucket/policies'}`,
+        'error'
+      );
+      event.target.value = '';
       return;
     }
 
@@ -389,7 +421,14 @@ async function handleUserWallpaperUpload(event) {
 
     if (dbError) {
       console.error('Database error:', dbError);
-      showNotification(currentLocale === 'zh' ? '保存失败' : 'Save failed', 'error');
+      localStorage.removeItem(LAST_WALLPAPER_UPLOAD_AT_KEY);
+      showNotification(
+        currentLocale === 'zh'
+          ? `保存失败：${dbError.message || '请检查数据库权限'}`
+          : `Save failed: ${dbError.message || 'Please check database RLS policy'}`,
+        'error'
+      );
+      event.target.value = '';
       return;
     }
 
@@ -404,8 +443,32 @@ async function handleUserWallpaperUpload(event) {
   } catch (err) {
     console.error('Upload exception:', err);
     localStorage.removeItem(LAST_WALLPAPER_UPLOAD_AT_KEY);
-    showNotification(currentLocale === 'zh' ? '上传出错' : 'Upload error', 'error');
+    showNotification(
+      currentLocale === 'zh'
+        ? `上传出错：${err?.message || '请稍后重试'}`
+        : `Upload error: ${err?.message || 'Please try again later'}`,
+      'error'
+    );
+    event.target.value = '';
   }
+}
+
+function applyCustomWallpaperUrl() {
+  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  const input = document.getElementById('customWallpaperUrlInput');
+  const url = (input?.value || '').trim();
+
+  if (!url || !/^https?:\/\//i.test(url)) {
+    showNotification(
+      typeof i18n !== 'undefined' ? i18n.t('invalidImageUrl') : (currentLocale === 'zh' ? '请输入正确的图片链接' : 'Invalid image url'),
+      'error'
+    );
+    return;
+  }
+
+  applyWallpaper(url);
+  closeWallpaperModal();
+  showNotification(currentLocale === 'zh' ? '壁纸已更换' : 'Wallpaper changed', 'success');
 }
 
 // Compress image using canvas (8K support for premium members)
