@@ -18,7 +18,7 @@
 @import url('https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css');
 @import url('https://chinese-fonts-cdn.deno.dev/packages/zhbtt/dist/result.css');
 @import url('https://chinese-fonts-cdn.deno.dev/packages/zkklt/dist/result.css');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=ZCOOL+KuaiLe&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=ZCOOL+KuaiLe&display=swap');
 
 body {
   margin: 0;
@@ -283,14 +283,14 @@ input {
   background: transparent;
   font-size: 16px;
   padding: 10px 0;
-  font-family: "Patrick Hand", "优设好身体", "Quicksand", cursive, sans-serif;
+  font-family: inherit;
   color: inherit;
   outline: none;
   font-weight: 600;
 }
 
 ::placeholder {
-  font-family: "Patrick Hand", "优设好身体", "Quicksand", sans-serif;
+  font-family: inherit;
 }
 
 /* Content Area */
@@ -620,7 +620,7 @@ button:active {
 .tag-link-item {
   color: var(--text-color);
   text-decoration: none;
-  font-family: 'Patrick Hand', 'Quicksand', cursive, sans-serif;
+  font-family: inherit;
   margin-right: 5px;
 }
 

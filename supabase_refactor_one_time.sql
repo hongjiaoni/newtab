@@ -57,7 +57,8 @@ create table if not exists public.user_sites (
   updated_at timestamp with time zone default timezone('utc'::text, now())
 );
 
-alter table public.user_sites add constraint if not exists user_sites_user_id_id_unique unique (user_id, id);
+alter table public.user_sites drop constraint if exists user_sites_user_id_id_unique;
+alter table public.user_sites add constraint user_sites_user_id_id_unique unique (user_id, id);
 
 alter table public.user_sites enable row level security;
 
@@ -285,6 +286,12 @@ declare
   v_tier integer;
 begin
   if auth.role() = 'service_role' then
+    return new;
+  end if;
+
+  -- SQL Editor / migrations run without a JWT context, so auth.uid() is null.
+  -- Allow these operations; unauthenticated client writes are still blocked by RLS.
+  if auth.uid() is null then
     return new;
   end if;
 
