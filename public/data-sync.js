@@ -3,7 +3,7 @@
 let syncDebounceTimer = null;
 const SYNC_DEBOUNCE_MS = 500;
 const LOCAL_UPDATED_AT_KEY = 'home_config_updated_at';
-const PENDING_PROFILE_PATCH_KEY = 'home_config_pending_profile_patch';
+const PENDING_HOME_SYNC_KEY = 'home_config_pending_home_sync';
 const SETTINGS_SCHEMA_VERSION = 1;
 let flushPendingInProgress = false;
 
@@ -13,49 +13,34 @@ function parseIsoToMs(v) {
     return Number.isFinite(t) ? t : 0;
 }
 
-function getPendingProfilePatch() {
-    const raw = localStorage.getItem(PENDING_PROFILE_PATCH_KEY);
+function getPendingHomeSync() {
+    const raw = localStorage.getItem(PENDING_HOME_SYNC_KEY);
     if (!raw) return null;
     try {
         const obj = JSON.parse(raw);
         if (!obj || typeof obj !== 'object') return null;
-        if (!obj.patch || typeof obj.patch !== 'object') return null;
+        if (!obj.payload || typeof obj.payload !== 'object') return null;
         return obj;
     } catch {
         return null;
     }
 }
 
-function setPendingProfilePatch(obj) {
+function setPendingHomeSync(obj) {
     if (!obj) {
-        localStorage.removeItem(PENDING_PROFILE_PATCH_KEY);
+        localStorage.removeItem(PENDING_HOME_SYNC_KEY);
         return;
     }
-    localStorage.setItem(PENDING_PROFILE_PATCH_KEY, JSON.stringify(obj));
+    localStorage.setItem(PENDING_HOME_SYNC_KEY, JSON.stringify(obj));
 }
 
-function shallowMergeProfilePatch(existingPatch, nextPatch) {
-    const out = { ...(existingPatch || {}), ...(nextPatch || {}) };
+function queueHomeSync(payload, reason = 'unknown') {
+    const updatedAt = payload.updated_at || new Date().toISOString();
+    payload.updated_at = updatedAt;
 
-    if (existingPatch && typeof existingPatch.settings === 'object' && existingPatch.settings) {
-        out.settings = { ...existingPatch.settings };
-    }
-    if (nextPatch && typeof nextPatch.settings === 'object' && nextPatch.settings) {
-        out.settings = { ...(out.settings || {}), ...nextPatch.settings };
-    }
-
-    return out;
-}
-
-function queueProfilePatch(patch, reason = 'unknown') {
-    const pending = getPendingProfilePatch();
-    const mergedPatch = shallowMergeProfilePatch(pending?.patch, patch);
-
-    const updatedAt = mergedPatch.updated_at || new Date().toISOString();
-    mergedPatch.updated_at = updatedAt;
-
-    setPendingProfilePatch({
-        patch: mergedPatch,
+    const pending = getPendingHomeSync();
+    setPendingHomeSync({
+        payload,
         reason,
         updated_at: updatedAt,
         created_at: pending?.created_at || new Date().toISOString(),
@@ -65,29 +50,25 @@ function queueProfilePatch(patch, reason = 'unknown') {
     setLocalUpdatedAt(updatedAt);
 }
 
-async function updateProfileWithRetry(patch, { queueReason = 'update_failed' } = {}) {
+async function syncHomeConfigWithRetry(payload, { queueReason = 'sync_failed' } = {}) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
         return { ok: false, queued: false };
     }
 
     if (!navigator.onLine) {
-        queueProfilePatch(patch, 'offline');
+        queueHomeSync(payload, 'offline');
         return { ok: false, queued: true };
     }
 
-    const { error } = await supabase
-        .from('profiles')
-        .update(patch)
-        .eq('id', window.authState.user.id);
-
+    const { error } = await supabase.rpc('sync_home_config', { p_payload: payload });
     if (error) {
-        console.error('Failed to sync data:', error);
-        queueProfilePatch(patch, queueReason);
+        console.error('Failed to sync home config:', error);
+        queueHomeSync(payload, queueReason);
         return { ok: false, queued: true, error };
     }
 
-    if (patch.updated_at) {
-        setLocalUpdatedAt(patch.updated_at);
+    if (payload.updated_at) {
+        setLocalUpdatedAt(payload.updated_at);
     }
 
     return { ok: true, queued: false };
@@ -97,46 +78,27 @@ async function flushPendingProfileSync() {
     if (flushPendingInProgress) return;
     if (!window.authState || !window.authState.isLoggedIn || !supabase) return;
 
-    const pending = getPendingProfilePatch();
-    if (!pending || !pending.patch) return;
+    const pending = getPendingHomeSync();
+    if (!pending || !pending.payload) return;
 
     if (!navigator.onLine) return;
 
     flushPendingInProgress = true;
     try {
-        const pendingUpdatedAtMs = parseIsoToMs(pending.patch.updated_at || pending.updated_at);
-        if (pendingUpdatedAtMs > 0) {
-            const { data: serverMeta, error: metaError } = await supabase
-                .from('profiles')
-                .select('updated_at')
-                .eq('id', window.authState.user.id)
-                .single();
-
-            if (!metaError && serverMeta?.updated_at) {
-                const serverUpdatedAtMs = parseIsoToMs(serverMeta.updated_at);
-                if (serverUpdatedAtMs > pendingUpdatedAtMs) {
-                    console.warn('Pending local changes are older than server. Discarding pending patch.');
-                    setPendingProfilePatch(null);
-                    setLocalUpdatedAt(serverMeta.updated_at);
-                    return { status: 'discarded' };
-                }
-            }
-        }
-
         const next = {
-            ...pending.patch,
-            updated_at: pending.patch.updated_at || new Date().toISOString()
+            ...pending.payload,
+            updated_at: pending.payload.updated_at || new Date().toISOString()
         };
 
-        const { ok } = await updateProfileWithRetry(next, { queueReason: 'flush_failed' });
+        const { ok } = await syncHomeConfigWithRetry(next, { queueReason: 'flush_failed' });
         if (ok) {
-            setPendingProfilePatch(null);
+            setPendingHomeSync(null);
             return { status: 'flushed' };
         } else {
-            const latest = getPendingProfilePatch();
+            const latest = getPendingHomeSync();
             if (latest) {
                 latest.attempts = (latest.attempts || 0) + 1;
-                setPendingProfilePatch(latest);
+                setPendingHomeSync(latest);
             }
             return { status: 'failed' };
         }
@@ -200,66 +162,82 @@ async function loadUserData() {
     try {
         console.log('Loading user data from Supabase...');
 
-        let { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', window.authState.user.id)
-            .single();
+        const uid = window.authState.user.id;
 
-        if (error) {
-            console.error('Failed to load user data:', error);
+        const [homeRes, sitesRes, tagsRes, siteTagsRes, siteOrderRes, tagOrderRes] = await Promise.all([
+            supabase.from('user_home_settings').select('*').eq('user_id', uid).single(),
+            supabase.from('user_sites').select('id,name,url,show_on_home,created_at,updated_at').eq('user_id', uid),
+            supabase.from('user_tags').select('name').eq('user_id', uid),
+            supabase.from('user_site_tags').select('site_id,tag_name').eq('user_id', uid),
+            supabase.from('user_site_order').select('site_id,position').eq('user_id', uid).order('position', { ascending: true }),
+            supabase.from('user_tag_order').select('tag_name,position').eq('user_id', uid).order('position', { ascending: true })
+        ]);
+
+        if (homeRes.error && homeRes.error.code !== 'PGRST116') {
+            console.error('Failed to load home settings:', homeRes.error);
             return;
         }
 
-        if (data) {
-            const serverUpdatedAt = parseIsoToMs(data.updated_at);
-            const localUpdatedAt = getLocalUpdatedAt();
-            const effectiveTier = Number.isFinite(data.membership_tier) ? data.membership_tier : (window.membershipState?.tier || 1);
-            const pending = getPendingProfilePatch();
-            const pendingUpdatedAt = parseIsoToMs(pending?.patch?.updated_at || pending?.updated_at);
+        const home = homeRes.data || null;
+        const effectiveTier = window.membershipState?.tier || 1;
+        const serverUpdatedAt = parseIsoToMs(home?.updated_at);
+        const localUpdatedAt = getLocalUpdatedAt();
+        const pending = getPendingHomeSync();
+        const pendingUpdatedAt = parseIsoToMs(pending?.payload?.updated_at || pending?.updated_at);
 
-            if (pending && pendingUpdatedAt > 0 && serverUpdatedAt > 0 && serverUpdatedAt > pendingUpdatedAt) {
-                console.warn('Server data is newer than pending local patch. Discarding pending patch.');
-                setPendingProfilePatch(null);
-            }
+        if (pending && pendingUpdatedAt > 0 && serverUpdatedAt > 0 && serverUpdatedAt > pendingUpdatedAt) {
+            console.warn('Server data is newer than pending local sync. Discarding pending payload.');
+            setPendingHomeSync(null);
+        }
 
-            if (localUpdatedAt > 0 && serverUpdatedAt > 0 && localUpdatedAt > serverUpdatedAt) {
-                if (pending) {
-                    console.log('Local pending changes are newer than server, flushing pending patch first...');
-                    await flushPendingProfileSync();
+        if (localUpdatedAt > 0 && serverUpdatedAt > 0 && localUpdatedAt > serverUpdatedAt) {
+            if (pending) {
+                console.log('Local pending changes are newer than server, flushing pending payload first...');
+                await flushPendingProfileSync();
+            }
+            console.log('Local data is newer than server, pushing local data to Supabase...');
+            await saveUserDataToBackend({ immediate: true });
+            return;
+        }
 
-                    // Re-fetch once after flush attempt (avoid recursive loops if flush keeps failing)
-                    ({ data, error } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .eq('id', window.authState.user.id)
-                        .single());
+        const sites = Array.isArray(sitesRes.data) ? sitesRes.data : [];
+        const tags = Array.isArray(tagsRes.data) ? tagsRes.data.map(t => t.name) : [];
+        const siteTags = Array.isArray(siteTagsRes.data) ? siteTagsRes.data : [];
 
-                    if (error || !data) {
-                        console.error('Failed to reload user data after pending flush:', error);
-                        return;
-                    }
-                }
-                console.log('Local data is newer than server, pushing local data to Supabase...');
-                await saveUserDataToBackend({ immediate: true });
-                return;
-            }
+        const tagsBySiteId = new Map();
+        siteTags.forEach((row) => {
+            const list = tagsBySiteId.get(row.site_id) || [];
+            list.push(row.tag_name);
+            tagsBySiteId.set(row.site_id, list);
+        });
 
-            if (Array.isArray(data.sites)) {
-                state.sites = data.sites;
-            }
-            if (Array.isArray(data.tags)) {
-                state.tags = data.tags;
-            }
-            if (Array.isArray(data.tag_order)) {
-                state.tagOrder = data.tag_order;
-            }
-            if (Array.isArray(data.site_order)) {
-                state.siteOrder = data.site_order;
-            }
+        state.sites = sites.map((s) => ({
+            id: s.id,
+            name: s.name,
+            url: s.url,
+            tags: tagsBySiteId.get(s.id) || [],
+            showOnHome: !!s.show_on_home
+        }));
+        state.tags = tags;
 
-            // Load settings
-            const serverSettings = migrateSettings(data.settings);
+        const orderedSiteIds = Array.isArray(siteOrderRes.data) ? siteOrderRes.data.map(r => r.site_id) : [];
+        state.siteOrder = orderedSiteIds.length ? orderedSiteIds : state.sites.filter(s => s.showOnHome).map(s => s.id);
+
+        const orderedTags = Array.isArray(tagOrderRes.data) ? tagOrderRes.data.map(r => r.tag_name) : [];
+        state.tagOrder = orderedTags.length ? orderedTags : [...state.tags];
+
+        // Load settings
+        const serverSettings = migrateSettings({
+            viewMode: home?.view_mode,
+            engineIndex: home?.engine_index,
+            dateFormatIndex: home?.date_format_index,
+            timeFormat: home?.time_format,
+            locale: home?.locale,
+            wallpaper: home?.wallpaper,
+            theme: home?.theme,
+            colorMode: home?.color_mode,
+            schema_version: home?.schema_version
+        });
             if (serverSettings) {
                 if (typeof serverSettings.viewMode === 'string') {
                     state.viewMode = serverSettings.viewMode;
@@ -300,9 +278,17 @@ async function loadUserData() {
             }
 
             if (effectiveTier >= 2) {
-                if (data.theme_settings && Object.keys(data.theme_settings).length > 0) {
+                const [themeRes, fontRes] = await Promise.all([
+                    supabase.from('user_theme_settings').select('theme_settings').eq('user_id', uid).single(),
+                    supabase.from('user_font_settings').select('font_settings').eq('user_id', uid).single()
+                ]);
+
+                const themeSettings = themeRes.error ? null : themeRes.data?.theme_settings;
+                const fontSettings = fontRes.error ? null : fontRes.data?.font_settings;
+
+                if (themeSettings && Object.keys(themeSettings).length > 0) {
                     if (window.applyThemeSettings) {
-                        window.applyThemeSettings(data.theme_settings);
+                        window.applyThemeSettings(themeSettings);
                     }
                     if (window.applyCustomThemeForCurrentMode) {
                         window.applyCustomThemeForCurrentMode();
@@ -313,9 +299,9 @@ async function loadUserData() {
                     }
                 }
 
-                if (data.font_settings && Object.keys(data.font_settings).length > 0) {
+                if (fontSettings && Object.keys(fontSettings).length > 0) {
                     if (window.applyFontSettings) {
-                        window.applyFontSettings(data.font_settings);
+                        window.applyFontSettings(fontSettings);
                     }
                 } else {
                     if (window.clearCustomFontSettings) {
@@ -333,7 +319,7 @@ async function loadUserData() {
 
             // Save to localStorage for offline access
             saveData(false); // Don't trigger sync back
-            setLocalUpdatedAt(data.updated_at || new Date().toISOString());
+            setLocalUpdatedAt(home?.updated_at || new Date().toISOString());
 
             // Re-render UI
             if (window.renderHome) window.renderHome();
@@ -341,7 +327,6 @@ async function loadUserData() {
             if (window.updateTime) window.updateTime();
 
             console.log('User data loaded successfully');
-        }
     } catch (err) {
         console.error('Error loading user data:', err);
     }
@@ -355,15 +340,21 @@ async function saveUserDataToBackend(options = {}) {
     }
 
     const doSync = async () => {
-        let userData = null;
+        let payload = null;
         try {
             console.log('Syncing data to Supabase...');
 
             const colorMode = document.body.classList.contains('dark') ? 'dark' : 'light';
             const updatedAt = new Date().toISOString();
 
-            userData = {
-                sites: state.sites || [],
+            payload = {
+                sites: (state.sites || []).map(s => ({
+                    id: s.id,
+                    name: s.name,
+                    url: s.url,
+                    tags: Array.isArray(s.tags) ? s.tags : [],
+                    showOnHome: !!s.showOnHome
+                })),
                 tags: state.tags || [],
                 tag_order: state.tagOrder || [],
                 site_order: state.siteOrder || [],
@@ -381,16 +372,16 @@ async function saveUserDataToBackend(options = {}) {
                 updated_at: updatedAt
             };
 
-            const { ok } = await updateProfileWithRetry(userData, { queueReason: 'saveUserDataToBackend_failed' });
+            const { ok } = await syncHomeConfigWithRetry(payload, { queueReason: 'saveUserDataToBackend_failed' });
             if (ok) {
                 console.log('Data synced successfully');
             }
         } catch (err) {
             console.error('Error syncing data:', err);
-            if (userData) {
-                queueProfilePatch(userData, 'saveUserDataToBackend_exception');
+            if (payload) {
+                queueHomeSync(payload, 'saveUserDataToBackend_exception');
             } else {
-                queueProfilePatch({ updated_at: new Date().toISOString() }, 'saveUserDataToBackend_exception');
+                queueHomeSync({ updated_at: new Date().toISOString(), sites: [], tags: [], site_order: [], tag_order: [], settings: {} }, 'saveUserDataToBackend_exception');
             }
         }
     };
@@ -424,17 +415,15 @@ async function saveThemeSettings(themeSettings) {
 
     try {
         const updatedAt = new Date().toISOString();
-        const patch = {
-            theme_settings: themeSettings,
-            updated_at: updatedAt
-        };
-        const { ok } = await updateProfileWithRetry(patch, { queueReason: 'saveThemeSettings_failed' });
-        if (ok) {
-            console.log('Theme settings saved');
+        const { error } = await supabase
+            .from('user_theme_settings')
+            .upsert({ user_id: window.authState.user.id, theme_settings: themeSettings, updated_at: updatedAt }, { onConflict: 'user_id' });
+
+        if (error) {
+            console.error('Failed to save theme settings:', error);
         }
     } catch (err) {
         console.error('Error saving theme settings:', err);
-        queueProfilePatch({ theme_settings: themeSettings, updated_at: new Date().toISOString() }, 'saveThemeSettings_exception');
     }
 }
 
@@ -451,17 +440,15 @@ async function saveFontSettings(fontSettings) {
 
     try {
         const updatedAt = new Date().toISOString();
-        const patch = {
-            font_settings: fontSettings,
-            updated_at: updatedAt
-        };
-        const { ok } = await updateProfileWithRetry(patch, { queueReason: 'saveFontSettings_failed' });
-        if (ok) {
-            console.log('Font settings saved');
+        const { error } = await supabase
+            .from('user_font_settings')
+            .upsert({ user_id: window.authState.user.id, font_settings: fontSettings, updated_at: updatedAt }, { onConflict: 'user_id' });
+
+        if (error) {
+            console.error('Failed to save font settings:', error);
         }
     } catch (err) {
         console.error('Error saving font settings:', err);
-        queueProfilePatch({ font_settings: fontSettings, updated_at: new Date().toISOString() }, 'saveFontSettings_exception');
     }
 }
 
@@ -477,15 +464,14 @@ async function resetThemeCustomization() {
 
     try {
         const updatedAt = new Date().toISOString();
-        const patch = {
-            theme_settings: {},
-            font_settings: {},
-            updated_at: updatedAt
-        };
-        await updateProfileWithRetry(patch, { queueReason: 'resetThemeCustomization_failed' });
+        await supabase
+            .from('user_theme_settings')
+            .upsert({ user_id: window.authState.user.id, theme_settings: {}, updated_at: updatedAt }, { onConflict: 'user_id' });
+        await supabase
+            .from('user_font_settings')
+            .upsert({ user_id: window.authState.user.id, font_settings: {}, updated_at: updatedAt }, { onConflict: 'user_id' });
     } catch (err) {
         console.error('Error resetting theme customization:', err);
-        queueProfilePatch({ theme_settings: {}, font_settings: {}, updated_at: new Date().toISOString() }, 'resetThemeCustomization_exception');
     }
 }
 

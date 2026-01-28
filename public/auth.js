@@ -93,9 +93,6 @@ async function ensureProfileExists(user) {
           full_name: meta.full_name || meta.name || '',
           avatar_url: meta.avatar_url || meta.picture || '',
           membership_tier: 1,
-          sites: [],
-          tags: [],
-          settings: {},
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         });
@@ -104,6 +101,18 @@ async function ensureProfileExists(user) {
         console.error('Failed to create profile:', insertError);
       } else {
         console.log('Profile created successfully');
+      }
+
+      // Ensure default home settings row exists
+      const { error: settingsError } = await supabase
+        .from('user_home_settings')
+        .upsert({
+          user_id: user.id,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+
+      if (settingsError) {
+        console.error('Failed to create user_home_settings:', settingsError);
       }
     }
   } catch (err) {
