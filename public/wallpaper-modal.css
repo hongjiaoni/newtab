@@ -80,8 +80,7 @@
     transform: none;
     box-shadow: none;
     opacity: 1;
-    text-decoration: underline;
-    text-decoration-style: wavy;
+    text-decoration: none;
     background: var(--hover-bg);
 }
 
@@ -89,6 +88,5 @@
     opacity: 1;
     text-decoration: underline;
     text-decoration-thickness: 3px;
-    text-decoration-style: wavy;
     font-weight: bold;
 }

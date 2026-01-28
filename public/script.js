@@ -93,6 +93,10 @@ const translations = {
     apply: '应用',
     pasteImageUrl: '粘贴图片链接 (http/https)',
     invalidImageUrl: '请输入正确的图片链接',
+    addImage: '添加图片',
+    chooseUpload: '上传图片',
+    chooseLink: '填写链接',
+    addByLink: '添加链接',
     days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
     months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
   },
@@ -171,6 +175,10 @@ const translations = {
     apply: 'Apply',
     pasteImageUrl: 'Paste image URL (http/https)',
     invalidImageUrl: 'Please enter a valid image URL',
+    addImage: 'Add Image',
+    chooseUpload: 'Upload Image',
+    chooseLink: 'Use Link',
+    addByLink: 'Add Link',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   }
@@ -469,6 +477,42 @@ let state = {
   viewMode: localStorage.getItem('viewMode') || 'general' // 'general' or 'minimalist'
 };
 
+function generateUuid() {
+  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+    return window.crypto.randomUUID();
+  }
+  // Fallback RFC4122 v4-ish
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+function isUuidLike(v) {
+  return typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+}
+
+function migrateLocalSiteIdsToUuid() {
+  const idMap = new Map();
+  let changed = false;
+
+  state.sites = (state.sites || []).map((s) => {
+    const currentId = s?.id;
+    if (isUuidLike(currentId)) return s;
+
+    const nextId = generateUuid();
+    idMap.set(String(currentId), nextId);
+    changed = true;
+    return { ...s, id: nextId };
+  });
+
+  if (changed) {
+    state.siteOrder = (state.siteOrder || []).map((id) => idMap.get(String(id)) || id);
+    saveData(false);
+  }
+}
+
 // Drag and drop state
 const dragState = {
   draggedElement: null,
@@ -507,6 +551,8 @@ if (state.tagOrder.length === 0 && state.tags.length > 0) {
 if (state.siteOrder.length === 0 && state.sites.length > 0) {
   state.siteOrder = state.sites.map(s => s.id);
 }
+
+migrateLocalSiteIdsToUuid();
 
 function saveData(syncToBackend = true) {
   localStorage.setItem('sites', JSON.stringify(state.sites));
@@ -674,6 +720,7 @@ renderSearchEngine();
 // ===== Context Menu Functions =====
 function showContextMenu(event, item, type) {
   event.preventDefault();
+  event.stopPropagation();
   contextMenuState.visible = true;
   contextMenuState.targetItem = item;
   contextMenuState.targetType = type;
@@ -690,10 +737,10 @@ function hideContextMenu() {
 function renderContextMenu() {
   contextMenu.innerHTML = `
     <div class="context-menu-item" onclick="editItem()">
-      ✏️ ${i18n.t('edit') || 'Edit'}
+      ${i18n.t('edit') || 'Edit'}
     </div>
     <div class="context-menu-item" onclick="deleteItem()">
-      🗑️ ${i18n.t('delete')}
+      ${i18n.t('delete')}
     </div>
   `;
 
@@ -1089,7 +1136,7 @@ saveItemBtn.addEventListener('click', () => {
     } else {
       // Create new site
       const newSite = {
-        id: Date.now(),
+        id: generateUuid(),
         name,
         url,
         tags: selectedTags,
@@ -1168,6 +1215,7 @@ function openTagView(tagName) {
       el.className = 'tag-link-item';
       el.href = site.url;
       el.textContent = site.name;
+      el.oncontextmenu = (e) => showContextMenu(e, site, 'site');
       // Middle-click opens in new tab
       el.onmousedown = (e) => {
         if (e.button === 1) {
@@ -1437,6 +1485,20 @@ function showPageContextMenu(e) {
   
   // Hide any existing context menus first
   hideAllContextMenus();
+
+  // Do not show any context menu on search/time/date
+  const noMenuSelectors = [
+    '#searchInput', '#searchForm', '.search-box', '#searchEngine', '.search-engine',
+    '#time', '#date'
+  ];
+  if (noMenuSelectors.some(sel => e.target.closest(sel))) {
+    return;
+  }
+
+  // If this is a chip/tag link that uses the legacy edit/delete menu, do nothing here
+  if (e.target.closest('.chip') || e.target.closest('.tag-link-item') || e.target.closest('#contextMenu')) {
+    return;
+  }
   
   // Check if right-clicking on a site or tag card
   const siteCard = e.target.closest('.site-card');

@@ -33,12 +33,18 @@ const AVAILABLE_FONTS = {
   chinese: [
     { name: '优设好身体', value: '优设好身体', package: 'yshst' },
     { name: '字魂扁桃体', value: '字魂扁桃体', package: 'zhbtt' },
-    { name: '站酷快乐体', value: '站酷快乐体', package: 'zkklt' }
+    { name: '站酷快乐体', value: '站酷快乐体', package: 'zkklt' },
+    { name: 'Noto Sans SC', value: 'Noto Sans SC', google: true },
+    { name: 'Noto Serif SC', value: 'Noto Serif SC', google: true },
+    { name: 'ZCOOL KuaiLe', value: 'ZCOOL KuaiLe', google: true }
   ],
   english: [
     { name: 'Patrick Hand', value: 'Patrick Hand', google: true },
     { name: 'Quicksand', value: 'Quicksand', google: true },
-    { name: 'Roboto', value: 'Roboto', google: true }
+    { name: 'Roboto', value: 'Roboto', google: true },
+    { name: 'Inter', value: 'Inter', google: true },
+    { name: 'Poppins', value: 'Poppins', google: true },
+    { name: 'Nunito', value: 'Nunito', google: true }
   ]
 };
 
@@ -254,6 +260,7 @@ function createThemeModal() {
         </div>
 
         <div class="modal-actions" style="margin-top: 20px;">
+          <button class="cancel-btn" onclick="closeThemeModal()">${isZh ? '取消' : 'Cancel'}</button>
           <button class="cancel-btn" onclick="resetThemeCustomization()">${isZh ? '重置' : 'Reset'}</button>
           <button class="primary-btn" onclick="saveThemeSettings()">${isZh ? '保存' : 'Save'}</button>
         </div>
@@ -344,7 +351,7 @@ function renderThemePreview() {
       
       <div style="border: 2px solid ${borderColor}; border-radius: 12px; padding: 15px; background: ${modalBg}; margin-bottom: 15px; box-shadow: 4px 4px 0 ${shadowColor};">
         <input type="text" placeholder="想要搜点什么吗？" 
-               style="width: 100%; border: none; background: ${inputBg}; font-family: inherit; color: ${textColor}; font-size: 16px; outline: none; padding: 8px; border-radius: 6px;">
+               style="width: 100%; border: none; background: ${inputBg}; font-family: '${fontEnglish}', '${fontChinese}', sans-serif; color: ${textColor}; font-size: 16px; outline: none; padding: 8px; border-radius: 6px;">
       </div>
 
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">

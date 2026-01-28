@@ -5,7 +5,9 @@ const wallpaperState = {
   activeCategory: null,
   categories: [],
   wallpapers: [],
-  isLoading: false
+  isLoading: false,
+  customAddOpen: false,
+  customAddMode: 'upload' // 'upload' | 'link'
 };
 
 const MAX_WALLPAPER_UPLOAD_BYTES = 15 * 1024 * 1024;
@@ -166,28 +168,63 @@ function renderWallpaperUI() {
 
       const t = (key) => (typeof i18n !== 'undefined' ? i18n.t(key) : key);
 
-      // Always allow setting custom wallpaper by URL
-      const urlBlock = `
-        <div style="text-align: center; padding: 10px 20px 0;">
-          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
-            <input type="text" id="customWallpaperUrlInput" class="modal-input"
-              placeholder="${t('pasteImageUrl')}" style="max-width: 320px;">
-            <button class="cancel-btn sketchy-border" onclick="applyCustomWallpaperUrl()"
-              style="padding: 10px 18px;">
-              ${t('apply')}
-            </button>
+      const addPanel = wallpaperState.customAddOpen
+        ? `
+          <div style="margin-top: 12px;">
+            <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+              <button class="cancel-btn sketchy-border" onclick="setCustomWallpaperAddMode('upload')"
+                style="padding: 10px 18px; ${wallpaperState.customAddMode === 'upload' ? 'opacity:1' : 'opacity:0.7'}">
+                ${t('chooseUpload')}
+              </button>
+              <button class="cancel-btn sketchy-border" onclick="setCustomWallpaperAddMode('link')"
+                style="padding: 10px 18px; ${wallpaperState.customAddMode === 'link' ? 'opacity:1' : 'opacity:0.7'}">
+                ${t('chooseLink')}
+              </button>
+            </div>
+
+            ${wallpaperState.customAddMode === 'upload'
+              ? `
+                <div style="text-align:center; padding: 12px 20px 0;">
+                  <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
+                  <button id="uploadWallpaperBtn" class="primary-btn sketchy-border"
+                    style="padding: 12px 22px; margin: 0 auto; display: inline-block;"
+                    onclick="document.getElementById('wallpaperFileInput').click()">
+                    ${t('chooseUpload')}
+                  </button>
+                </div>
+              `
+              : `
+                <div style="text-align: center; padding: 12px 20px 0;">
+                  <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
+                    <input type="text" id="customWallpaperUrlInput" class="modal-input"
+                      placeholder="${t('pasteImageUrl')}" style="max-width: 360px; margin-bottom: 0;">
+                    <button class="primary-btn sketchy-border" onclick="addCustomWallpaperByUrl()"
+                      style="padding: 10px 18px;">
+                      ${t('addByLink')}
+                    </button>
+                  </div>
+                </div>
+              `
+            }
           </div>
-        </div>
-      `;
+        `
+        : '';
 
       // Update upload button based on membership tier
       if (memberTier < 2) {
         if (!isLoggedIn) {
           uploadContainer.innerHTML = `
-            ${urlBlock}
-            <div style="text-align: center; padding: 30px;">
+            <div style="text-align: center; padding: 20px 20px 0;">
+              <button class="primary-btn sketchy-border" onclick="toggleCustomWallpaperAdd()"
+                style="padding: 12px 22px; margin: 0 auto; display: inline-block;">
+                ${t('addImage')}
+              </button>
+              ${addPanel}
+            </div>
+
+            <div style="text-align: center; padding: 24px 30px 10px;">
               <p style="margin-bottom: 15px; opacity: 0.8;">
-                ${currentLocale === 'zh' ? '登录后可上传自定义壁纸' : 'Login to upload custom wallpapers'}
+                ${currentLocale === 'zh' ? '登录后可添加自定义壁纸' : 'Login to add custom wallpapers'}
               </p>
               <button onclick="
                 if (window.closeWallpaperModal) window.closeWallpaperModal();
@@ -200,10 +237,17 @@ function renderWallpaperUI() {
           `;
         } else {
           uploadContainer.innerHTML = `
-            ${urlBlock}
-            <div style="text-align: center; padding: 30px;">
+            <div style="text-align: center; padding: 20px 20px 0;">
+              <button class="primary-btn sketchy-border" onclick="toggleCustomWallpaperAdd()"
+                style="padding: 12px 22px; margin: 0 auto; display: inline-block;">
+                ${t('addImage')}
+              </button>
+              ${addPanel}
+            </div>
+
+            <div style="text-align: center; padding: 24px 30px 10px;">
               <p style="margin-bottom: 15px; opacity: 0.8;">
-                ${currentLocale === 'zh' ? '上传自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}
+                ${currentLocale === 'zh' ? '自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}
               </p>
               <button onclick="
                 if (window.closeWallpaperModal) window.closeWallpaperModal();
@@ -216,8 +260,9 @@ function renderWallpaperUI() {
           `;
         }
       } else {
-        // Premium/Super member - show upload button with quota
-        supabase.from('upload_quota')
+        // Premium/Super member - show add flow with quota
+        supabase
+          .from('upload_quota')
           .select('wallpaper_count, max_wallpapers')
           .eq('user_id', window.authState.user.id)
           .single()
@@ -226,17 +271,26 @@ function renderWallpaperUI() {
             const max = data?.max_wallpapers || 50;
 
             uploadContainer.innerHTML = `
-              ${urlBlock}
-              <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
-              <div style="text-align: center; padding: 20px;">
-                <p style="margin-bottom: 10px; opacity: 0.7; font-size: 14px;">
-                  ${currentLocale === 'zh' ? `已上传 ${count}/${max} 张` : `Uploaded ${count}/${max} images`}
+              <div style="text-align: center; padding: 12px 20px 0;">
+                <p style="margin: 0 0 10px; opacity: 0.7; font-size: 14px;">
+                  ${currentLocale === 'zh' ? `已添加 ${count}/${max} 张` : `Added ${count}/${max} images`}
                 </p>
-                <button id="uploadWallpaperBtn" class="primary-btn sketchy-border"
-                  style="padding: 15px 30px; margin: 0 auto; display: block;"
-                  onclick="document.getElementById('wallpaperFileInput').click()">
-                  ${currentLocale === 'zh' ? '上传图片' : 'Upload Image'}
+                <button class="primary-btn sketchy-border" onclick="toggleCustomWallpaperAdd()"
+                  style="padding: 12px 22px; margin: 0 auto; display: inline-block;">
+                  ${t('addImage')}
                 </button>
+                ${addPanel}
+              </div>
+            `;
+          })
+          .catch(() => {
+            uploadContainer.innerHTML = `
+              <div style="text-align: center; padding: 12px 20px 0;">
+                <button class="primary-btn sketchy-border" onclick="toggleCustomWallpaperAdd()"
+                  style="padding: 12px 22px; margin: 0 auto; display: inline-block;">
+                  ${t('addImage')}
+                </button>
+                ${addPanel}
               </div>
             `;
           });
@@ -270,12 +324,100 @@ function renderWallpaperUI() {
   } else {
     gridContainer.innerHTML = filteredWallpapers.map(w => `
       <div class="wallpaper-item" onclick="selectWallpaper('${w.url}')">
-        <img src="${w.url}" alt="${w.title || 'Wallpaper'}" title="${w.title || 'Wallpaper'}">
-        <div class="wallpaper-title">${w.title || ''}</div>
+        <img src="${w.url}" alt="Wallpaper" title="Wallpaper">
       </div>
     `).join('');
   }
 }
+
+function toggleCustomWallpaperAdd() {
+  wallpaperState.customAddOpen = !wallpaperState.customAddOpen;
+  renderWallpaperUI();
+}
+
+function setCustomWallpaperAddMode(mode) {
+  wallpaperState.customAddMode = mode;
+  renderWallpaperUI();
+}
+
+async function addCustomWallpaperByUrl() {
+  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  const input = document.getElementById('customWallpaperUrlInput');
+  const url = (input?.value || '').trim();
+
+  if (!url || !/^https?:\/\//i.test(url)) {
+    showNotification(typeof i18n !== 'undefined' ? i18n.t('invalidImageUrl') : (currentLocale === 'zh' ? '请输入正确的图片链接' : 'Invalid image url'), 'error');
+    return;
+  }
+
+  if (!window.authState || !window.authState.isLoggedIn) {
+    showNotification(currentLocale === 'zh' ? '请先登录' : 'Please login first', 'error');
+    window.openGoogleSignInModal?.();
+    return;
+  }
+
+  if (!window.membershipState || window.membershipState.tier < 2) {
+    showNotification(currentLocale === 'zh' ? '自定义壁纸需要高级会员' : 'Premium membership required', 'error');
+    window.showUpgradeModal?.('wallpaper');
+    return;
+  }
+
+  try {
+    const { data: quotaData, error: quotaError } = await supabase
+      .from('upload_quota')
+      .select('wallpaper_count, max_wallpapers')
+      .eq('user_id', authState.user.id)
+      .single();
+
+    if (!quotaError && quotaData && quotaData.wallpaper_count >= quotaData.max_wallpapers) {
+      showNotification(
+        currentLocale === 'zh'
+          ? `已达上传上限 (${quotaData.max_wallpapers}张)`
+          : `Upload limit reached (${quotaData.max_wallpapers} images)`,
+        'error'
+      );
+      return;
+    }
+  } catch (err) {
+    // no quota record yet
+  }
+
+  try {
+    showNotification(currentLocale === 'zh' ? '正在添加...' : 'Adding...', 'info');
+
+    const { error: dbError } = await supabase
+      .from('wallpapers')
+      .insert({
+        url,
+        category: 'Custom',
+        source: 'user',
+        user_id: authState.user.id
+      });
+
+    if (dbError) {
+      console.error('Add link wallpaper error:', dbError);
+      showNotification(
+        currentLocale === 'zh' ? `添加失败：${dbError.message || ''}` : `Add failed: ${dbError.message || ''}`,
+        'error'
+      );
+      return;
+    }
+
+    // Apply immediately and refresh list
+    applyWallpaper(url);
+    await loadWallpapers();
+    renderWallpaperUI();
+    if (input) input.value = '';
+    showNotification(currentLocale === 'zh' ? '已添加并应用' : 'Added and applied', 'success');
+  } catch (err) {
+    console.error('Add link wallpaper exception:', err);
+    showNotification(currentLocale === 'zh' ? '添加出错' : 'Add error', 'error');
+  }
+}
+
+window.toggleCustomWallpaperAdd = toggleCustomWallpaperAdd;
+window.setCustomWallpaperAddMode = setCustomWallpaperAddMode;
+window.addCustomWallpaperByUrl = addCustomWallpaperByUrl;
 
 // User Wallpaper Upload Logic (Tier 2+ only)
 async function handleUserWallpaperUpload(event) {
@@ -412,7 +554,6 @@ async function handleUserWallpaperUpload(event) {
     const { error: dbError } = await supabase
       .from('wallpapers')
       .insert({
-        title: file.name.split('.')[0],
         url: urlData.publicUrl,
         category: 'Custom',
         source: 'user',

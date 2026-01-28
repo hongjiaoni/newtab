@@ -169,19 +169,6 @@ begin
     raise exception 'membership_tier is managed by server';
   end if;
 
-  select membership_tier into v_tier from public.profiles where id = auth.uid();
-  v_tier := coalesce(v_tier, 1);
-
-  -- Tier 1 cannot modify theme/font settings
-  if v_tier < 2 then
-    if new.theme_settings is distinct from old.theme_settings then
-      raise exception 'theme_settings requires premium membership';
-    end if;
-    if new.font_settings is distinct from old.font_settings then
-      raise exception 'font_settings requires premium membership';
-    end if;
-  end if;
-
   return new;
 end;
 $$ language plpgsql security definer;
@@ -191,6 +178,80 @@ create trigger trg_enforce_profile_update_restrictions
   before update on public.profiles
   for each row
   execute procedure public.enforce_profile_update_restrictions();
+
+-- 5. User Theme/Font Settings (normalized)
+create table public.user_theme_settings (
+  user_id uuid references auth.users not null primary key,
+  theme_settings jsonb not null default '{}'::jsonb,
+  updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+alter table public.user_theme_settings enable row level security;
+
+create policy "Users can view their own theme settings."
+  on public.user_theme_settings for select
+  using ( auth.uid() = user_id );
+
+create policy "Users can insert their own theme settings."
+  on public.user_theme_settings for insert
+  with check ( auth.uid() = user_id );
+
+create policy "Users can update their own theme settings."
+  on public.user_theme_settings for update
+  using ( auth.uid() = user_id );
+
+create table public.user_font_settings (
+  user_id uuid references auth.users not null primary key,
+  font_settings jsonb not null default '{}'::jsonb,
+  updated_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+alter table public.user_font_settings enable row level security;
+
+create policy "Users can view their own font settings."
+  on public.user_font_settings for select
+  using ( auth.uid() = user_id );
+
+create policy "Users can insert their own font settings."
+  on public.user_font_settings for insert
+  with check ( auth.uid() = user_id );
+
+create policy "Users can update their own font settings."
+  on public.user_font_settings for update
+  using ( auth.uid() = user_id );
+
+-- Enforce tier>=2 for theme/font settings
+create or replace function public.enforce_premium_settings_access()
+returns trigger as $$
+declare
+  v_tier integer;
+begin
+  if auth.role() = 'service_role' then
+    return new;
+  end if;
+
+  select membership_tier into v_tier from public.profiles where id = auth.uid();
+  v_tier := coalesce(v_tier, 1);
+
+  if v_tier < 2 then
+    raise exception 'premium membership required';
+  end if;
+
+  return new;
+end;
+$$ language plpgsql security definer;
+
+drop trigger if exists trg_enforce_premium_theme_settings on public.user_theme_settings;
+create trigger trg_enforce_premium_theme_settings
+  before insert or update on public.user_theme_settings
+  for each row
+  execute procedure public.enforce_premium_settings_access();
+
+drop trigger if exists trg_enforce_premium_font_settings on public.user_font_settings;
+create trigger trg_enforce_premium_font_settings
+  before insert or update on public.user_font_settings
+  for each row
+  execute procedure public.enforce_premium_settings_access();
 
 -- Update user membership tier (called by webhook)
 create or replace function public.update_membership_tier(

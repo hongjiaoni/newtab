@@ -8,7 +8,7 @@ const adminState = {
 };
 
 // Admin translations (Keep existing)
-const adminTranslations = {
+var adminTranslations = {
   zh: {
     dashboard: '仪表板',
     users: '用户管理',
@@ -450,9 +450,9 @@ async function loadWallpapers() {
       const container = document.getElementById('wallpapersContainer');
       container.innerHTML = wallpapers.map(w => `
         <div class="wallpaper-card-admin">
-          <img src="${w.url}" alt="${w.title}">
+          <img src="${w.url}" alt="Wallpaper">
           <div class="wallpaper-info">
-            <h4>${w.title || 'Untitled'}</h4>
+            <h4>${w.category || ''}</h4>
             <p>分类: ${w.category}</p>
             <p>来源: ${w.source === 'user' ? '<span class="tag-user">用户上传</span>' : '系统'}</p>
             <div class="wallpaper-actions">
@@ -514,8 +514,8 @@ async function uploadWallpaper() {
   // but for now let's support the existing URL input or logic.
   // If user enters a URL, we save that.
 
-  if (!title || !imageUrl) {
-    alert('请填写标题和图片URL');
+  if (!imageUrl) {
+    alert('请填写图片URL');
     return;
   }
 
@@ -523,7 +523,6 @@ async function uploadWallpaper() {
     const { error } = await supabase
       .from('wallpapers')
       .insert({
-        title,
         url: imageUrl,
         category,
         source: 'system' // Admin uploads are system
@@ -593,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Admin translations
-const adminTranslations = {
+adminTranslations = {
   zh: {
     dashboard: '仪表板',
     users: '用户管理',
@@ -1151,9 +1150,9 @@ async function loadWallpapers() {
       const container = document.getElementById('wallpapersContainer');
       container.innerHTML = data.wallpapers.map(w => `
         <div class="wallpaper-card-admin">
-          <img src="${w.imageUrl}" alt="${w.title}">
+          <img src="${w.imageUrl}" alt="Wallpaper">
           <div class="wallpaper-info">
-            <h4>${w.title}</h4>
+            <h4>${w.title || w.category || ''}</h4>
             <p>分类: ${w.category}</p>
             <p>来源: ${w.source === 'user' ? '<span class="tag-user">用户上传</span>' : '系统'}</p>
             <div class="wallpaper-actions">
