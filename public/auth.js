@@ -208,13 +208,14 @@ async function handleSession(session) {
     }
   }
 
-  // Trigger data load from server
-  if (window.loadUserData) {
-    window.loadUserData();
+  // IMPORTANT: membership tier is needed before loading premium settings (theme/font)
+  if (window.initializeMembership) {
+    await window.initializeMembership();
   }
 
-  if (window.initializeMembership) {
-    window.initializeMembership();
+  // Trigger data load from server
+  if (window.loadUserData) {
+    await window.loadUserData();
   }
 }
 
@@ -321,6 +322,11 @@ window.openUserProfile = function () {
 
   const avatarUrl = authState.user.user_metadata.avatar_url || authState.user.user_metadata.picture || 'https://via.placeholder.com/80';
   const name = getUserNickname();
+  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  const isZh = currentLocale === 'zh';
+  const tier = window.membershipState?.tier || 1;
+  const endDateRaw = window.membershipState?.endDate;
+  const endDateText = endDateRaw ? new Date(endDateRaw).toLocaleString() : (isZh ? '未开通' : 'Not active');
 
   content.innerHTML = `
     <div style="text-align: center; padding: 20px;">
@@ -328,12 +334,151 @@ window.openUserProfile = function () {
         <h3 style="margin: 0;">${name}</h3>
         <p style="opacity: 0.7; margin: 5px 0;">${authState.user.email}</p>
     </div>
+    <div style="padding: 0 20px 20px; display: grid; gap: 12px;">
+      <div style="display:flex; justify-content: space-between; align-items:center; padding: 10px 12px; border: 2px solid var(--border-color); border-radius: 10px; background: var(--input-bg);">
+        <span style="opacity:0.8;">${isZh ? '会员等级' : 'Membership tier'}</span>
+        <strong>${tier}</strong>
+      </div>
+      <div style="display:flex; justify-content: space-between; align-items:center; padding: 10px 12px; border: 2px solid var(--border-color); border-radius: 10px; background: var(--input-bg);">
+        <span style="opacity:0.8;">${isZh ? '到期时间' : 'Expires at'}</span>
+        <strong>${endDateText}</strong>
+      </div>
+      <button class="primary-btn sketchy-border" style="width: 100%;" onclick="openSubscriptionRecords()">
+        ${isZh ? '订阅记录' : 'Subscription records'}
+      </button>
+    </div>
   `;
 
   modal.classList.remove('hidden');
   document.getElementById('modalOverlay').classList.remove('hidden');
   document.getElementById('settingsMenu').classList.add('hidden');
 };
+
+async function openSubscriptionRecords() {
+  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  const isZh = currentLocale === 'zh';
+
+  const profileModal = document.getElementById('userProfileModal');
+  const recordsModal = document.getElementById('subscriptionRecordsModal');
+  const content = document.getElementById('subscriptionRecordsContent');
+
+  if (!authState.user) return;
+  if (!recordsModal || !content) return;
+
+  if (profileModal) profileModal.classList.add('hidden');
+  recordsModal.classList.remove('hidden');
+  document.getElementById('modalOverlay')?.classList.remove('hidden');
+
+  content.innerHTML = `
+    <div style="padding: 20px; opacity: 0.8;">${isZh ? '加载中…' : 'Loading…'}</div>
+  `;
+
+  if (!window.supabase) {
+    content.innerHTML = `
+      <div style="padding: 20px;">${isZh ? 'Supabase 未初始化，无法加载订阅记录。' : 'Supabase not initialized. Cannot load subscription records.'}</div>
+    `;
+    return;
+  }
+
+  try {
+    const { data, error } = await window.supabase
+      .from('user_subscriptions')
+      .select('id,tier,amount,currency,status,started_at,ends_at,created_at')
+      .eq('user_id', authState.user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Failed to load subscription records:', error);
+      content.innerHTML = `
+        <div style="padding: 20px;">${isZh ? '加载失败，请稍后重试。' : 'Failed to load. Please try again later.'}</div>
+      `;
+      return;
+    }
+
+    const rows = Array.isArray(data) ? data : [];
+    if (!rows.length) {
+      content.innerHTML = `
+        <div style="padding: 20px; opacity: 0.8;">${isZh ? '暂无订阅记录。' : 'No subscription records yet.'}</div>
+      `;
+      return;
+    }
+
+    const money = (amount, currency) => {
+      const v = Number(amount || 0) / 100;
+      const code = String(currency || 'usd').toUpperCase();
+      return `${v.toFixed(2)} ${code}`;
+    };
+
+    const formatTime = (iso) => {
+      if (!iso) return '-';
+      try {
+        return new Date(iso).toLocaleString();
+      } catch {
+        return String(iso);
+      }
+    };
+
+    const periodText = (s, e) => {
+      if (!s && !e) return '-';
+      const ss = formatTime(s);
+      const ee = formatTime(e);
+      return `${ss} ~ ${ee}`;
+    };
+
+    content.innerHTML = `
+      <div style="padding: 16px; display: grid; gap: 12px;">
+        ${rows.map((r) => {
+          const paidAt = formatTime(r.created_at);
+          const period = periodText(r.started_at, r.ends_at);
+          const product = (isZh ? `会员等级 ${r.tier}` : `Tier ${r.tier}`);
+          const status = String(r.status || '').toLowerCase() || '-';
+          return `
+            <div style="border: 2px solid var(--border-color); border-radius: 12px; padding: 12px; background: var(--card-bg);">
+              <div style="display:flex; justify-content: space-between; gap: 12px; align-items: baseline;">
+                <strong>${product}</strong>
+                <span style="opacity: 0.75; font-size: 12px;">${paidAt}</span>
+              </div>
+              <div style="margin-top: 8px; display:grid; gap: 6px; font-size: 13px;">
+                <div style="display:flex; justify-content: space-between; gap: 12px;">
+                  <span style="opacity: 0.75;">${isZh ? '金额' : 'Amount'}</span>
+                  <span>${money(r.amount, r.currency)}</span>
+                </div>
+                <div style="display:flex; justify-content: space-between; gap: 12px;">
+                  <span style="opacity: 0.75;">${isZh ? '订阅周期' : 'Period'}</span>
+                  <span style="text-align:right;">${period}</span>
+                </div>
+                <div style="display:flex; justify-content: space-between; gap: 12px;">
+                  <span style="opacity: 0.75;">${isZh ? '状态' : 'Status'}</span>
+                  <span>${status}</span>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } catch (err) {
+    console.error('Error loading subscription records:', err);
+    content.innerHTML = `
+      <div style="padding: 20px;">${isZh ? '加载失败，请稍后重试。' : 'Failed to load. Please try again later.'}</div>
+    `;
+  }
+}
+
+window.openSubscriptionRecords = openSubscriptionRecords;
+
+function closeSubscriptionRecords() {
+  const recordsModal = document.getElementById('subscriptionRecordsModal');
+  if (recordsModal) recordsModal.classList.add('hidden');
+  document.getElementById('modalOverlay')?.classList.add('hidden');
+}
+
+function backToUserProfile() {
+  const profileModal = document.getElementById('userProfileModal');
+  const recordsModal = document.getElementById('subscriptionRecordsModal');
+  if (recordsModal) recordsModal.classList.add('hidden');
+  if (profileModal) profileModal.classList.remove('hidden');
+}
 
 function closeUserProfile() {
   document.getElementById('userProfileModal').classList.add('hidden');
@@ -391,6 +536,16 @@ function setupAuthEventListeners() {
   const closeProfileBtn = document.getElementById('closeUserProfile');
   if (closeProfileBtn) {
     closeProfileBtn.onclick = closeUserProfile;
+  }
+
+  const closeRecordsBtn = document.getElementById('closeSubscriptionRecords');
+  if (closeRecordsBtn) {
+    closeRecordsBtn.onclick = closeSubscriptionRecords;
+  }
+
+  const backBtn = document.getElementById('backToUserProfile');
+  if (backBtn) {
+    backBtn.onclick = backToUserProfile;
   }
 }
 

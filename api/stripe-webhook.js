@@ -64,7 +64,6 @@ module.exports = async (req, res) => {
       let startedAt = null;
       let subscriptionId = '';
       let paymentIntentId = '';
-      let productName = '';
       let amount = null;
       let currency = (session?.currency || 'usd');
 
@@ -86,11 +85,13 @@ module.exports = async (req, res) => {
 
           const desc = (first?.description || '').trim();
           if (desc) {
-            productName = desc;
+            // kept for potential future use
           } else {
             const price = first?.price;
             const nickname = (price?.nickname || '').trim();
-            if (nickname) productName = nickname;
+            if (nickname) {
+              // kept for potential future use
+            }
           }
         } catch (_err) {
           // best-effort
@@ -125,9 +126,7 @@ module.exports = async (req, res) => {
               currency: currency || 'usd',
               status: 'completed',
               started_at: startedAt,
-              ends_at: endDate,
-              product_name: productName || null,
-              billing_cycle: String(session?.metadata?.billing_cycle || '') || null
+              ends_at: endDate
             });
         } catch (err) {
           console.error('Failed to insert subscription record:', err);
