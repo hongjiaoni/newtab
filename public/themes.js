@@ -4,7 +4,7 @@ const themeState = {
   currentTheme: 'handdrawn', // handdrawn, minimal, modern, glassmorphism
   customSettings: {
     fontChinese: '优设好身体',
-    fontEnglish: 'Patrick Hand',
+    fontEnglish: 'Fredoka',
     bgColor: '#f9f9f9',
     borderColor: '#444444',
     textColor: '#333333',
@@ -33,6 +33,8 @@ const AVAILABLE_FONTS = {
   chinese: [
     { name: '优设好身体', value: '优设好身体', package: 'yshst' },
     { name: '字魂扁桃体', value: '字魂扁桃体', package: 'zhbtt' },
+    { name: 'StarloveMarker', value: 'Love Marker' },
+    { name: '优设标题黑', value: '优设标题黑', package: 'ysbth' },
     { name: '站酷快乐体', value: '站酷快乐体', package: 'zkklt' },
     { name: 'Noto Sans SC', value: 'Noto Sans SC', google: true },
     { name: 'Noto Serif SC', value: 'Noto Serif SC', google: true },
@@ -40,6 +42,10 @@ const AVAILABLE_FONTS = {
   ],
   english: [
     { name: 'Patrick Hand', value: 'Patrick Hand', google: true },
+    { name: 'Fredoka', value: 'Fredoka', google: true },
+    { name: 'Baloo 2', value: 'Baloo 2', google: true },
+    { name: 'Chewy', value: 'Chewy', google: true },
+    { name: 'Comic Neue', value: 'Comic Neue', google: true },
     { name: 'Quicksand', value: 'Quicksand', google: true },
     { name: 'Roboto', value: 'Roboto', google: true },
     { name: 'Inter', value: 'Inter', google: true },

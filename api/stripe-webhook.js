@@ -61,11 +61,47 @@ module.exports = async (req, res) => {
       const customerId = session?.customer || '';
 
       let endDate = null;
+      let startedAt = null;
+      let subscriptionId = '';
+      let paymentIntentId = '';
+      let productName = '';
+      let amount = null;
+      let currency = (session?.currency || 'usd');
+
+      if (session?.payment_intent) {
+        paymentIntentId = String(session.payment_intent);
+      }
+
       if (session?.subscription) {
-        const sub = await stripe.subscriptions.retrieve(session.subscription);
-        endDate = new Date(sub.current_period_end * 1000).toISOString();
+        subscriptionId = String(session.subscription);
+        const sub = await stripe.subscriptions.retrieve(subscriptionId);
+        startedAt = sub?.current_period_start ? new Date(sub.current_period_start * 1000).toISOString() : null;
+        endDate = sub?.current_period_end ? new Date(sub.current_period_end * 1000).toISOString() : null;
+
+        try {
+          const items = await stripe.checkout.sessions.listLineItems(session.id, { limit: 10 });
+          const first = items?.data?.[0];
+          amount = (first?.amount_total != null) ? Number(first.amount_total) : (session?.amount_total != null ? Number(session.amount_total) : null);
+          currency = first?.currency || currency;
+
+          const desc = (first?.description || '').trim();
+          if (desc) {
+            productName = desc;
+          } else {
+            const price = first?.price;
+            const nickname = (price?.nickname || '').trim();
+            if (nickname) productName = nickname;
+          }
+        } catch (_err) {
+          // best-effort
+        }
       } else {
+        startedAt = new Date().toISOString();
         endDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      }
+
+      if (session?.amount_total != null && amount == null) {
+        amount = Number(session.amount_total);
       }
 
       if (userId) {
@@ -75,6 +111,27 @@ module.exports = async (req, res) => {
           p_stripe_customer_id: customerId,
           p_subscription_end_date: endDate
         });
+
+        // Record subscription history for UI display
+        try {
+          await supabaseAdmin
+            .from('user_subscriptions')
+            .insert({
+              user_id: userId,
+              stripe_subscription_id: subscriptionId || null,
+              stripe_payment_intent_id: paymentIntentId || null,
+              tier,
+              amount: Number.isFinite(amount) ? amount : 0,
+              currency: currency || 'usd',
+              status: 'completed',
+              started_at: startedAt,
+              ends_at: endDate,
+              product_name: productName || null,
+              billing_cycle: String(session?.metadata?.billing_cycle || '') || null
+            });
+        } catch (err) {
+          console.error('Failed to insert subscription record:', err);
+        }
       }
     }
 

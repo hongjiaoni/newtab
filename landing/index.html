@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="NewTab - 手绘风新标签页，支持壁纸、网站收藏、主题与字体定制">
   <title>NewTab - 手绘风新标签页</title>
-  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -88,6 +88,15 @@
       letter-spacing: 0.3px;
     }
 
+    .brand,
+    .nav,
+    .pill,
+    .btn,
+    .arrow,
+    .dots {
+      color: var(--text);
+    }
+
     .brand-badge {
       width: 34px;
       height: 34px;
@@ -130,6 +139,11 @@
     .nav a:hover {
       border-color: rgba(0,0,0,0.18);
       background: rgba(255,255,255,0.6);
+    }
+
+    html[data-theme="dark"] .nav a:hover {
+      border-color: rgba(255,255,255,0.22);
+      background: rgba(255,255,255,0.08);
     }
 
     .btn {
@@ -283,6 +297,25 @@
       color: rgba(0,0,0,0.45);
       text-align: center;
       padding: 16px;
+    }
+
+    html[data-theme="dark"] .mock .canvas {
+      border: 2px dashed rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.06);
+      color: rgba(255,255,255,0.55);
+    }
+
+    .hero-preview {
+      width: 100%;
+      height: 100%;
+      max-height: 248px;
+      object-fit: contain;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .hero-preview-hint {
+      display: block;
     }
 
     .section-title {
@@ -467,6 +500,7 @@
       background: color-mix(in srgb, var(--card) 75%, transparent);
       color: var(--text);
       font-weight: 700;
+      font-family: inherit;
       outline: none;
     }
 
@@ -478,6 +512,7 @@
       font-size: 13px;
       color: var(--muted);
       text-align: left;
+      display: none;
     }
 
     .page-cta {
@@ -501,14 +536,12 @@
 <body>
   <header>
     <div class="wrap header-inner">
-      <div class="brand">
-        <button class="brand-badge-btn" id="badgeDownloadBtn" type="button" aria-label="Download badge as PNG">
-          <span class="brand-badge">
-            <img class="brand-badge-img" src="./badge.svg" alt="NewTab badge" />
-          </span>
-        </button>
+      <a class="brand" href="/" aria-label="Go to app">
+        <span class="brand-badge">
+          <img class="brand-badge-img" src="/landing/badge.svg" alt="NewTab badge" />
+        </span>
         <span>NewTab</span>
-      </div>
+      </a>
       <nav class="nav">
         <button class="pill" id="langToggle" type="button" aria-label="Language">
           <span id="langLabel">中/EN</span>
@@ -538,7 +571,8 @@
               <span class="dot"></span><span class="dot"></span><span class="dot"></span>
             </div>
             <div class="canvas">
-              <div>
+              <img id="heroPreview" class="hero-preview" alt="Preview" />
+              <div id="heroPreviewHint" class="hero-preview-hint">
                 <div style="font-size:14px; font-weight:700; margin-bottom:6px;" data-i18n="mock_title">（预览图占位）</div>
                 <div style="font-size:13px;" data-i18n="mock_desc">你可以把截图放到 landing/screenshot.png</div>
               </div>
@@ -591,7 +625,7 @@
                   <button class="btn btn-primary" type="submit" data-i18n="cta_submit">订阅</button>
                 </form>
               </div>
-              <div class="newsletter-status" id="newsletterStatus" data-i18n="cta_hint">未配置提交地址时将只做本地提示（不会真的提交）。</div>
+              <div class="newsletter-status" id="newsletterStatus"></div>
             </div>
 
             <div class="page-cta">
@@ -683,7 +717,6 @@
     const dots = Array.from(document.querySelectorAll('.dotbtn'));
     const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-    const badgeDownloadBtn = document.getElementById('badgeDownloadBtn');
 
     const langToggle = document.getElementById('langToggle');
     const themeToggle = document.getElementById('themeToggle');
@@ -693,6 +726,39 @@
     const newsletterForm = document.getElementById('newsletterForm');
     const newsletterEmail = document.getElementById('newsletterEmail');
     const newsletterStatus = document.getElementById('newsletterStatus');
+    const heroPreview = document.getElementById('heroPreview');
+    const heroPreviewHint = document.getElementById('heroPreviewHint');
+
+    function setNewsletterStatus(text) {
+      if (!newsletterStatus) return;
+      if (!text) {
+        newsletterStatus.style.display = 'none';
+        newsletterStatus.textContent = '';
+        return;
+      }
+      newsletterStatus.style.display = 'block';
+      newsletterStatus.textContent = text;
+    }
+
+    function pickHeroPreviewSrc() {
+      const lang = document.documentElement.lang === 'en' ? 'en' : 'zh';
+      const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+      return `/landing/screenshot-${lang}-${theme}.png`;
+    }
+
+    function updateHeroPreview() {
+      if (!heroPreview || !heroPreviewHint) return;
+      const src = pickHeroPreviewSrc();
+      heroPreview.onload = () => {
+        heroPreview.style.display = 'block';
+        heroPreviewHint.style.display = 'none';
+      };
+      heroPreview.onerror = () => {
+        heroPreview.style.display = 'none';
+        heroPreviewHint.style.display = 'block';
+      };
+      heroPreview.src = src;
+    }
 
     const NEWSLETTER_ACTION_URL = '';
 
@@ -709,13 +775,13 @@
         if (typeof v !== 'string') return;
         el.innerHTML = v;
       });
-      langLabel.textContent = currentLang === 'zh' ? '中文/EN' : 'EN/中文';
-      newsletterStatus.textContent = dict.cta_hint;
+      langLabel.textContent = currentLang === 'zh' ? '中文' : 'English';
     }
 
     function applyTheme() {
       document.documentElement.dataset.theme = currentTheme;
       themeLabel.textContent = currentTheme === 'dark' ? 'Dark' : 'Light';
+      updateHeroPreview();
     }
 
     function setPage(next) {
@@ -798,6 +864,7 @@
       currentLang = currentLang === 'zh' ? 'en' : 'zh';
       localStorage.setItem(STORAGE_LANG, currentLang);
       applyI18n();
+      updateHeroPreview();
     });
 
     themeToggle.addEventListener('click', () => {
@@ -810,8 +877,10 @@
       e.preventDefault();
       const dict = T[currentLang];
 
+      setNewsletterStatus('');
+
       if (!NEWSLETTER_ACTION_URL) {
-        newsletterStatus.textContent = dict.subscribed_need_cfg;
+        setNewsletterStatus(dict.subscribed_need_cfg);
         return;
       }
 
@@ -826,16 +895,17 @@
         });
 
         if (!res.ok) throw new Error('bad status');
-        newsletterStatus.textContent = dict.subscribed_ok;
+        setNewsletterStatus(dict.subscribed_ok);
         newsletterForm.reset();
       } catch (_) {
-        newsletterStatus.textContent = dict.subscribed_ok;
+        setNewsletterStatus(dict.subscribed_ok);
       }
     });
 
     applyTheme();
     applyI18n();
     refreshPage();
+    updateHeroPreview();
   </script>
 </body>
 </html>
