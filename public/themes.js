@@ -262,7 +262,7 @@ function createThemeModal() {
         <div class="modal-actions" style="margin-top: 20px;">
           <button class="cancel-btn" onclick="closeThemeModal()">${isZh ? '取消' : 'Cancel'}</button>
           <button class="cancel-btn" onclick="resetThemeCustomization()">${isZh ? '重置' : 'Reset'}</button>
-          <button class="primary-btn" onclick="saveThemeSettings()">${isZh ? '保存' : 'Save'}</button>
+          <button class="primary-btn" onclick="saveThemeCustomization()">${isZh ? '保存' : 'Save'}</button>
         </div>
       </div>
     </div>
@@ -379,7 +379,7 @@ function updateThemePreview() {
 }
 
 // Save theme settings
-async function saveThemeSettings() {
+async function saveThemeCustomization() {
   const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
   const isZh = currentLocale === 'zh';
 
@@ -449,15 +449,15 @@ function applyCustomThemeForCurrentMode() {
 
   if (!modeSettings) return;
 
-  if (modeSettings.bgColor) document.documentElement.style.setProperty('--bg-color', modeSettings.bgColor);
-  if (modeSettings.cardBg) document.documentElement.style.setProperty('--card-bg', modeSettings.cardBg);
-  if (modeSettings.modalBg) document.documentElement.style.setProperty('--modal-bg', modeSettings.modalBg);
-  if (modeSettings.inputBg) document.documentElement.style.setProperty('--input-bg', modeSettings.inputBg);
-  if (modeSettings.borderColor) document.documentElement.style.setProperty('--border-color', modeSettings.borderColor);
-  if (modeSettings.textColor) document.documentElement.style.setProperty('--text-color', modeSettings.textColor);
-  if (modeSettings.hoverBg) document.documentElement.style.setProperty('--hover-bg', modeSettings.hoverBg);
-  if (modeSettings.shadowColor) document.documentElement.style.setProperty('--shadow-color', modeSettings.shadowColor);
-  if (modeSettings.accentColor) document.documentElement.style.setProperty('--accent-color', modeSettings.accentColor);
+  if (modeSettings.bgColor) document.body.style.setProperty('--bg-color', modeSettings.bgColor);
+  if (modeSettings.cardBg) document.body.style.setProperty('--card-bg', modeSettings.cardBg);
+  if (modeSettings.modalBg) document.body.style.setProperty('--modal-bg', modeSettings.modalBg);
+  if (modeSettings.inputBg) document.body.style.setProperty('--input-bg', modeSettings.inputBg);
+  if (modeSettings.borderColor) document.body.style.setProperty('--border-color', modeSettings.borderColor);
+  if (modeSettings.textColor) document.body.style.setProperty('--text-color', modeSettings.textColor);
+  if (modeSettings.hoverBg) document.body.style.setProperty('--hover-bg', modeSettings.hoverBg);
+  if (modeSettings.shadowColor) document.body.style.setProperty('--shadow-color', modeSettings.shadowColor);
+  if (modeSettings.accentColor) document.body.style.setProperty('--accent-color', modeSettings.accentColor);
 
   if (s.fontEnglish || s.fontChinese) {
     document.body.style.fontFamily = `"${s.fontEnglish || 'Patrick Hand'}", "${s.fontChinese || '优设好身体'}", sans-serif`;
@@ -465,15 +465,15 @@ function applyCustomThemeForCurrentMode() {
 }
 
 function clearCustomThemeSettings() {
-  document.documentElement.style.removeProperty('--bg-color');
-  document.documentElement.style.removeProperty('--card-bg');
-  document.documentElement.style.removeProperty('--border-color');
-  document.documentElement.style.removeProperty('--text-color');
-  document.documentElement.style.removeProperty('--modal-bg');
-  document.documentElement.style.removeProperty('--input-bg');
-  document.documentElement.style.removeProperty('--hover-bg');
-  document.documentElement.style.removeProperty('--shadow-color');
-  document.documentElement.style.removeProperty('--accent-color');
+  document.body.style.removeProperty('--bg-color');
+  document.body.style.removeProperty('--card-bg');
+  document.body.style.removeProperty('--border-color');
+  document.body.style.removeProperty('--text-color');
+  document.body.style.removeProperty('--modal-bg');
+  document.body.style.removeProperty('--input-bg');
+  document.body.style.removeProperty('--hover-bg');
+  document.body.style.removeProperty('--shadow-color');
+  document.body.style.removeProperty('--accent-color');
 }
 
 function clearCustomFontSettings() {
@@ -525,5 +525,6 @@ window.applyCustomThemeForCurrentMode = applyCustomThemeForCurrentMode;
 window.clearCustomThemeSettings = clearCustomThemeSettings;
 window.applyFontSettings = applyFontSettings;
 window.clearCustomFontSettings = clearCustomFontSettings;
+window.saveThemeCustomization = saveThemeCustomization;
 window.resetThemeCustomization = resetThemeCustomization;
 window.themeState = themeState;
