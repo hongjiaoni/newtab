@@ -405,12 +405,12 @@ async function saveUserDataToBackend(options = {}) {
 // Save theme settings (tier 2+ only)
 async function saveThemeSettings(themeSettings) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
-        return;
+        throw new Error('Not logged in');
     }
 
     if (!window.membershipState || window.membershipState.tier < 2) {
         console.warn('Theme customization requires premium membership');
-        return;
+        throw new Error('premium membership required');
     }
 
     try {
@@ -421,21 +421,24 @@ async function saveThemeSettings(themeSettings) {
 
         if (error) {
             console.error('Failed to save theme settings:', error);
+            throw error;
         }
+        return { ok: true };
     } catch (err) {
         console.error('Error saving theme settings:', err);
+        throw err;
     }
 }
 
 // Save font settings (tier 2+ only)
 async function saveFontSettings(fontSettings) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
-        return;
+        throw new Error('Not logged in');
     }
 
     if (!window.membershipState || window.membershipState.tier < 2) {
         console.warn('Font customization requires premium membership');
-        return;
+        throw new Error('premium membership required');
     }
 
     try {
@@ -446,9 +449,12 @@ async function saveFontSettings(fontSettings) {
 
         if (error) {
             console.error('Failed to save font settings:', error);
+            throw error;
         }
+        return { ok: true };
     } catch (err) {
         console.error('Error saving font settings:', err);
+        throw err;
     }
 }
 

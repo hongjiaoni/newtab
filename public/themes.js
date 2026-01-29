@@ -422,23 +422,33 @@ async function saveThemeCustomization() {
   applyCustomThemeForCurrentMode();
 
   // Save to database
-  if (window.saveThemeSettings) {
-    await window.saveThemeSettings(settings);
-  }
-  if (window.saveFontSettings) {
-    await window.saveFontSettings({
-      fontChinese: settings.fontChinese,
-      fontEnglish: settings.fontEnglish
-    });
-  }
+  try {
+    if (window.saveThemeSettings) {
+      await window.saveThemeSettings(settings);
+    }
+    if (window.saveFontSettings) {
+      await window.saveFontSettings({
+        fontChinese: settings.fontChinese,
+        fontEnglish: settings.fontEnglish
+      });
+    }
 
-  closeThemeModal();
+    closeThemeModal();
 
-  if (window.showNotification) {
-    window.showNotification(
-      isZh ? '主题已保存！' : 'Theme saved!',
-      'success'
-    );
+    if (window.showNotification) {
+      window.showNotification(
+        isZh ? '主题已保存！' : 'Theme saved!',
+        'success'
+      );
+    }
+  } catch (err) {
+    console.error('Failed to persist theme customization:', err);
+    if (window.showNotification) {
+      window.showNotification(
+        isZh ? '保存失败，请稍后重试' : 'Save failed, please try again',
+        'error'
+      );
+    }
   }
 }
 
