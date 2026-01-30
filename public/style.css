@@ -295,6 +295,17 @@ input {
   font-family: inherit;
 }
 
+input::placeholder,
+textarea::placeholder,
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder,
+input::-moz-placeholder,
+textarea::-moz-placeholder,
+input:-ms-input-placeholder,
+textarea:-ms-input-placeholder {
+  font-family: inherit;
+}
+
 /* Content Area */
 .content-area {
   display: flex;
@@ -411,6 +422,33 @@ input {
   font-size: 16px;
   font-family: inherit;
   box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+input[type="color"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 44px;
+  height: 34px;
+  padding: 0;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  background: var(--card-bg);
+  box-shadow: 2px 2px 0 var(--shadow-color);
+  cursor: pointer;
+}
+
+input[type="color"]:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 4px;
+}
+
+input[type="color"]::-webkit-color-swatch {
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
 }
 
 .modal select,

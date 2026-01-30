@@ -13,8 +13,8 @@
     { "src": "/intro/(.*)", "dest": "/landing/$1" },
     { "src": "/app/?$", "dest": "/public/index.html" },
 
-    { "src": "/terms/?$", "dest": "/public/terms.html" },
-    { "src": "/privacy/?$", "dest": "/public/privacy.html" },
+    { "src": "/terms/?$", "dest": "/landing/terms/index.html" },
+    { "src": "/privacy/?$", "dest": "/landing/privacy/index.html" },
 
     { "handle": "filesystem" },
 
