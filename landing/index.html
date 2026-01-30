@@ -109,9 +109,10 @@
     }
 
     .brand-badge-img {
-      width: 34px;
-      height: 34px;
+      width: 26px;
+      height: 26px;
       display: block;
+      object-fit: contain;
     }
 
     .brand-badge-btn {
@@ -160,6 +161,7 @@
       background: var(--card);
       cursor: pointer;
       white-space: nowrap;
+      font-family: inherit;
     }
 
     .btn:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--shadow); }
@@ -185,6 +187,11 @@
       cursor: pointer;
       font-weight: 700;
       user-select: none;
+      font-family: inherit;
+    }
+
+    button {
+      font-family: inherit;
     }
 
     .pill:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--shadow); }
@@ -538,7 +545,7 @@
     <div class="wrap header-inner">
       <a class="brand" href="/" aria-label="Go to app">
         <span class="brand-badge">
-          <img class="brand-badge-img" src="/landing/badge.svg" alt="NewTab badge" />
+          <img class="brand-badge-img" src="/intro/badge.svg" alt="NewTab badge" />
         </span>
         <span>NewTab</span>
       </a>
@@ -743,7 +750,7 @@
     function pickHeroPreviewSrc() {
       const lang = document.documentElement.lang === 'en' ? 'en' : 'zh';
       const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-      return `/landing/screenshot-${lang}-${theme}.png`;
+      return `/intro/screenshot-${lang}-${theme}.png`;
     }
 
     function updateHeroPreview() {
@@ -821,9 +828,10 @@
     prevBtn.addEventListener('click', prevPage);
     nextBtn.addEventListener('click', nextPage);
 
-    badgeDownloadBtn.addEventListener('click', async () => {
+    const badgeDownloadBtn = document.getElementById('badgeDownloadBtn');
+    badgeDownloadBtn?.addEventListener('click', async () => {
       try {
-        const res = await fetch('./badge.svg', { cache: 'no-cache' });
+        const res = await fetch('/intro/badge.svg', { cache: 'no-cache' });
         const svgText = await res.text();
         const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
         const url = URL.createObjectURL(svgBlob);

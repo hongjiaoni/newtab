@@ -164,6 +164,48 @@ async function loadUserData() {
 
         const uid = window.authState.user.id;
 
+        const loadThemeAndFontSettings = async (effectiveTier) => {
+            if (effectiveTier >= 2) {
+                const [themeRes, fontRes] = await Promise.all([
+                    supabase.from('user_theme_settings').select('theme_settings').eq('user_id', uid).single(),
+                    supabase.from('user_font_settings').select('font_settings').eq('user_id', uid).single()
+                ]);
+
+                const themeSettings = themeRes.error ? null : themeRes.data?.theme_settings;
+                const fontSettings = fontRes.error ? null : fontRes.data?.font_settings;
+
+                if (themeSettings && Object.keys(themeSettings).length > 0) {
+                    if (window.applyThemeSettings) {
+                        window.applyThemeSettings(themeSettings);
+                    }
+                    if (window.applyCustomThemeForCurrentMode) {
+                        window.applyCustomThemeForCurrentMode();
+                    }
+                } else {
+                    if (window.clearCustomThemeSettings) {
+                        window.clearCustomThemeSettings();
+                    }
+                }
+
+                if (fontSettings && Object.keys(fontSettings).length > 0) {
+                    if (window.applyFontSettings) {
+                        window.applyFontSettings(fontSettings);
+                    }
+                } else {
+                    if (window.clearCustomFontSettings) {
+                        window.clearCustomFontSettings();
+                    }
+                }
+            } else {
+                if (window.clearCustomThemeSettings) {
+                    window.clearCustomThemeSettings();
+                }
+                if (window.clearCustomFontSettings) {
+                    window.clearCustomFontSettings();
+                }
+            }
+        };
+
         const [homeRes, sitesRes, tagsRes, siteTagsRes, siteOrderRes, tagOrderRes] = await Promise.all([
             supabase.from('user_home_settings').select('*').eq('user_id', uid).single(),
             supabase.from('user_sites').select('id,name,url,show_on_home,created_at,updated_at').eq('user_id', uid),
@@ -197,6 +239,8 @@ async function loadUserData() {
             }
             console.log('Local data is newer than server, pushing local data to Supabase...');
             await saveUserDataToBackend({ immediate: true });
+
+            await loadThemeAndFontSettings(effectiveTier);
             return;
         }
 
@@ -277,45 +321,7 @@ async function loadUserData() {
                 }
             }
 
-            if (effectiveTier >= 2) {
-                const [themeRes, fontRes] = await Promise.all([
-                    supabase.from('user_theme_settings').select('theme_settings').eq('user_id', uid).single(),
-                    supabase.from('user_font_settings').select('font_settings').eq('user_id', uid).single()
-                ]);
-
-                const themeSettings = themeRes.error ? null : themeRes.data?.theme_settings;
-                const fontSettings = fontRes.error ? null : fontRes.data?.font_settings;
-
-                if (themeSettings && Object.keys(themeSettings).length > 0) {
-                    if (window.applyThemeSettings) {
-                        window.applyThemeSettings(themeSettings);
-                    }
-                    if (window.applyCustomThemeForCurrentMode) {
-                        window.applyCustomThemeForCurrentMode();
-                    }
-                } else {
-                    if (window.clearCustomThemeSettings) {
-                        window.clearCustomThemeSettings();
-                    }
-                }
-
-                if (fontSettings && Object.keys(fontSettings).length > 0) {
-                    if (window.applyFontSettings) {
-                        window.applyFontSettings(fontSettings);
-                    }
-                } else {
-                    if (window.clearCustomFontSettings) {
-                        window.clearCustomFontSettings();
-                    }
-                }
-            } else {
-                if (window.clearCustomThemeSettings) {
-                    window.clearCustomThemeSettings();
-                }
-                if (window.clearCustomFontSettings) {
-                    window.clearCustomFontSettings();
-                }
-            }
+            await loadThemeAndFontSettings(effectiveTier);
 
             // Save to localStorage for offline access
             saveData(false); // Don't trigger sync back

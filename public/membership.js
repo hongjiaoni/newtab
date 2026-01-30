@@ -37,10 +37,15 @@ const MEMBERSHIP_CONFIG = {
 async function initializeMembership() {
     if (!window.authState || !window.authState.isLoggedIn) {
         membershipState.tier = 1;
+        membershipState.status = 'inactive';
+        membershipState.endDate = null;
+        membershipState.stripeCustomerId = null;
+        updateMembershipUI();
         return;
     }
 
     try {
+        const prevTier = membershipState.tier;
         const { data, error } = await supabase
             .from('profiles')
             .select('membership_tier, subscription_status, subscription_end_date, stripe_customer_id')
@@ -55,6 +60,15 @@ async function initializeMembership() {
 
             console.log('Membership initialized:', membershipState);
             updateMembershipUI();
+
+            // If tier changed (e.g. upgrade completed) reload user data so premium settings load/clear correctly.
+            if (membershipState.tier !== prevTier) {
+                try {
+                    await window.loadUserData?.();
+                } catch (err) {
+                    console.error('Failed to reload user data after membership update:', err);
+                }
+            }
         }
     } catch (err) {
         console.error('Failed to load membership:', err);

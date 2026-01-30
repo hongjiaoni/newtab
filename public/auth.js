@@ -325,8 +325,9 @@ window.openUserProfile = function () {
   const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
   const isZh = currentLocale === 'zh';
   const tier = window.membershipState?.tier || 1;
-  const endDateRaw = window.membershipState?.endDate;
-  const endDateText = endDateRaw ? new Date(endDateRaw).toLocaleString() : (isZh ? '未开通' : 'Not active');
+
+  const tierIcon = tier === 3 ? '👑' : (tier === 2 ? '⭐' : '');
+  const tierText = tierIcon ? tierIcon : (isZh ? '普通' : 'Basic');
 
   content.innerHTML = `
     <div style="text-align: center; padding: 20px;">
@@ -337,11 +338,7 @@ window.openUserProfile = function () {
     <div style="padding: 0 20px 20px; display: grid; gap: 12px;">
       <div style="display:flex; justify-content: space-between; align-items:center; padding: 10px 12px; border: 2px solid var(--border-color); border-radius: 10px; background: var(--input-bg);">
         <span style="opacity:0.8;">${isZh ? '会员等级' : 'Membership tier'}</span>
-        <strong>${tier}</strong>
-      </div>
-      <div style="display:flex; justify-content: space-between; align-items:center; padding: 10px 12px; border: 2px solid var(--border-color); border-radius: 10px; background: var(--input-bg);">
-        <span style="opacity:0.8;">${isZh ? '到期时间' : 'Expires at'}</span>
-        <strong>${endDateText}</strong>
+        <strong style="font-size: 18px; line-height: 1;">${tierText}</strong>
       </div>
       <button class="primary-btn sketchy-border" style="width: 100%;" onclick="openSubscriptionRecords()">
         ${isZh ? '订阅记录' : 'Subscription records'}
