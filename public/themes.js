@@ -35,10 +35,7 @@ const AVAILABLE_FONTS = {
     { name: '字魂扁桃体', value: '字魂扁桃体', package: 'zhbtt' },
     { name: 'StarloveMarker', value: 'Love Marker' },
     { name: '优设标题黑', value: '优设标题黑', package: 'ysbth' },
-    { name: '站酷快乐体', value: '站酷快乐体', package: 'zkklt' },
-    { name: 'Noto Sans SC', value: 'Noto Sans SC', google: true },
-    { name: 'Noto Serif SC', value: 'Noto Serif SC', google: true },
-    { name: 'ZCOOL KuaiLe', value: 'ZCOOL KuaiLe', google: true }
+    { name: '站酷快乐体', value: '站酷快乐体', package: 'zkklt' }
   ],
   english: [
     { name: 'Patrick Hand', value: 'Patrick Hand', google: true },
@@ -144,20 +141,20 @@ function createThemeModal() {
             <!-- Font Tab -->
             <div id="themePanelFont" class="theme-panel">
               <div class="theme-color-row">
-                <label>${isZh ? '中文字体' : 'Chinese Font'}</label>
-                <select id="fontChineseSelect" class="modal-input" onchange="updateThemePreview()">
-                  ${AVAILABLE_FONTS.chinese.map(f => `
-                    <option value="${f.value}" ${themeState.customSettings.fontChinese === f.value ? 'selected' : ''}>
+                <label>${isZh ? '英文字体' : 'English Font'}</label>
+                <select id="fontEnglishSelect" class="modal-input" onchange="handleThemeFontChange()">
+                  ${AVAILABLE_FONTS.english.map(f => `
+                    <option value="${f.value}" ${themeState.customSettings.fontEnglish === f.value ? 'selected' : ''}>
                       ${f.name}
                     </option>
                   `).join('')}
                 </select>
               </div>
               <div class="theme-color-row">
-                <label>${isZh ? '英文字体' : 'English Font'}</label>
-                <select id="fontEnglishSelect" class="modal-input" onchange="updateThemePreview()">
-                  ${AVAILABLE_FONTS.english.map(f => `
-                    <option value="${f.value}" ${themeState.customSettings.fontEnglish === f.value ? 'selected' : ''}>
+                <label>${isZh ? '中文字体' : 'Chinese Font'}</label>
+                <select id="fontChineseSelect" class="modal-input" onchange="handleThemeFontChange()">
+                  ${AVAILABLE_FONTS.chinese.map(f => `
+                    <option value="${f.value}" ${themeState.customSettings.fontChinese === f.value ? 'selected' : ''}>
                       ${f.name}
                     </option>
                   `).join('')}
@@ -313,6 +310,15 @@ function setPreviewMode(mode) {
   renderThemePreview();
 }
 
+function handleThemeFontChange() {
+  const fontChinese = document.getElementById('fontChineseSelect')?.value;
+  const fontEnglish = document.getElementById('fontEnglishSelect')?.value;
+  if (fontChinese) themeState.customSettings.fontChinese = fontChinese;
+  if (fontEnglish) themeState.customSettings.fontEnglish = fontEnglish;
+  applyCustomThemeForCurrentMode();
+  renderThemePreview();
+}
+
 // Render theme preview
 function renderThemePreview() {
   const preview = document.getElementById('themePreview');
@@ -348,32 +354,37 @@ function renderThemePreview() {
     ? (document.getElementById('shadowColorInput')?.value || themeState.customSettings.shadowColor)
     : (document.getElementById('shadowColorDarkInput')?.value || themeState.customSettings.darkMode.shadowColor);
 
-  preview.style.backgroundColor = bgColor;
-  preview.style.color = textColor;
+  preview.style.setProperty('--bg-color', bgColor);
+  preview.style.setProperty('--card-bg', cardBg);
+  preview.style.setProperty('--modal-bg', modalBg);
+  preview.style.setProperty('--input-bg', inputBg);
+  preview.style.setProperty('--border-color', borderColor);
+  preview.style.setProperty('--text-color', textColor);
+  preview.style.setProperty('--hover-bg', hoverBg);
+  preview.style.setProperty('--shadow-color', shadowColor);
+  preview.style.setProperty('--accent-color', accentColor);
+  preview.style.fontFamily = `"${fontEnglish}", "${fontChinese}", sans-serif`;
+  preview.style.backgroundColor = 'var(--bg-color)';
+  preview.style.color = 'var(--text-color)';
+
   preview.innerHTML = `
-    <div style="font-family: '${fontEnglish}', '${fontChinese}', sans-serif;">
-      <div style="font-size: 48px; font-weight: bold; margin-bottom: 20px;">12:34</div>
-      <div style="font-size: 18px; margin-bottom: 30px;">2026年1月25日 星期六</div>
-      
-      <div style="border: 2px solid ${borderColor}; border-radius: 12px; padding: 15px; background: ${modalBg}; margin-bottom: 15px; box-shadow: 4px 4px 0 ${shadowColor};">
-        <input type="text" placeholder="想要搜点什么吗？" 
-               style="width: 100%; border: none; background: ${inputBg}; font-family: '${fontEnglish}', '${fontChinese}', sans-serif; color: ${textColor}; font-size: 16px; outline: none; padding: 8px; border-radius: 6px;">
-      </div>
+    <div style="display:flex; justify-content:center;">
+      <div class="container" style="max-width: 460px; width: 100%; padding: 12px;">
+        <div class="time" style="font-size: 54px;">12:34</div>
+        <div class="date" style="margin-bottom: 22px;">2026/01/25 Sat</div>
+        <div class="search-box" style="margin: 0 auto 26px; max-width: 420px;">
+          <div class="search-engine" style="border-right: 2px solid var(--border-color); margin-right: 12px; padding-right: 12px;">
+            <div style="width: 28px; height: 28px; border: 1px solid var(--border-color); border-radius: 4px; display:flex; align-items:center; justify-content:center; font-weight:700;">G</div>
+          </div>
+          <input type="text" placeholder="${(typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'Search...' : '想要搜点什么吗？'}" disabled />
+        </div>
 
-      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <div style="border: 2px solid ${borderColor}; border-radius: 20px; padding: 10px 20px; background: ${cardBg}; box-shadow: 2px 2px 0 ${shadowColor};">
-          Google
+        <div class="content-area" style="max-width: 520px;">
+          <div class="chip">Google</div>
+          <div class="chip">GitHub</div>
+          <div class="chip">Design</div>
+          <div class="chip tag">Work</div>
         </div>
-        <div style="border: 2px solid ${borderColor}; border-radius: 20px; padding: 10px 20px; background: ${hoverBg}; box-shadow: 2px 2px 0 ${shadowColor};">
-          GitHub
-        </div>
-        <div style="border: 2px solid ${borderColor}; border-radius: 20px; padding: 10px 20px; background: ${cardBg}; box-shadow: 2px 2px 0 ${shadowColor};">
-          开发
-        </div>
-      </div>
-
-      <div style="margin-top: 20px;">
-        <button style="background: ${accentColor}; color: #fff; border: 2px solid ${borderColor};">Accent</button>
       </div>
     </div>
   `;
@@ -381,6 +392,59 @@ function renderThemePreview() {
 
 // Update preview when settings change
 function updateThemePreview() {
+  const styleEl = document.getElementById('themeStyleSelect');
+  const fontChineseEl = document.getElementById('fontChineseSelect');
+  const fontEnglishEl = document.getElementById('fontEnglishSelect');
+  const bgColorEl = document.getElementById('bgColorInput');
+  const cardBgEl = document.getElementById('cardBgInput');
+  const inputBgEl = document.getElementById('inputBgInput');
+  const borderColorEl = document.getElementById('borderColorInput');
+  const textColorEl = document.getElementById('textColorInput');
+  const modalBgEl = document.getElementById('modalBgInput');
+  const hoverBgEl = document.getElementById('hoverBgInput');
+  const accentColorEl = document.getElementById('accentColorInput');
+  const shadowColorEl = document.getElementById('shadowColorInput');
+
+  const bgColorDarkEl = document.getElementById('bgColorDarkInput');
+  const cardBgDarkEl = document.getElementById('cardBgDarkInput');
+  const inputBgDarkEl = document.getElementById('inputBgDarkInput');
+  const borderColorDarkEl = document.getElementById('borderColorDarkInput');
+  const textColorDarkEl = document.getElementById('textColorDarkInput');
+  const modalBgDarkEl = document.getElementById('modalBgDarkInput');
+  const hoverBgDarkEl = document.getElementById('hoverBgDarkInput');
+  const accentColorDarkEl = document.getElementById('accentColorDarkInput');
+  const shadowColorDarkEl = document.getElementById('shadowColorDarkInput');
+
+  const draft = {
+    ...themeState.customSettings,
+    style: styleEl?.value || themeState.currentTheme,
+    fontChinese: fontChineseEl?.value || themeState.customSettings.fontChinese,
+    fontEnglish: fontEnglishEl?.value || themeState.customSettings.fontEnglish,
+    bgColor: bgColorEl?.value || themeState.customSettings.bgColor,
+    cardBg: cardBgEl?.value || themeState.customSettings.cardBg,
+    inputBg: inputBgEl?.value || themeState.customSettings.inputBg,
+    borderColor: borderColorEl?.value || themeState.customSettings.borderColor,
+    textColor: textColorEl?.value || themeState.customSettings.textColor,
+    modalBg: modalBgEl?.value || themeState.customSettings.modalBg,
+    hoverBg: hoverBgEl?.value || themeState.customSettings.hoverBg,
+    accentColor: accentColorEl?.value || themeState.customSettings.accentColor,
+    shadowColor: shadowColorEl?.value || themeState.customSettings.shadowColor,
+    darkMode: {
+      ...(themeState.customSettings.darkMode || {}),
+      bgColor: bgColorDarkEl?.value || themeState.customSettings.darkMode?.bgColor,
+      cardBg: cardBgDarkEl?.value || themeState.customSettings.darkMode?.cardBg,
+      inputBg: inputBgDarkEl?.value || themeState.customSettings.darkMode?.inputBg,
+      borderColor: borderColorDarkEl?.value || themeState.customSettings.darkMode?.borderColor,
+      textColor: textColorDarkEl?.value || themeState.customSettings.darkMode?.textColor,
+      modalBg: modalBgDarkEl?.value || themeState.customSettings.darkMode?.modalBg,
+      hoverBg: hoverBgDarkEl?.value || themeState.customSettings.darkMode?.hoverBg,
+      accentColor: accentColorDarkEl?.value || themeState.customSettings.darkMode?.accentColor,
+      shadowColor: shadowColorDarkEl?.value || themeState.customSettings.darkMode?.shadowColor
+    }
+  };
+
+  applyThemeSettings(draft);
+  applyCustomThemeForCurrentMode();
   renderThemePreview();
 }
 
@@ -423,6 +487,12 @@ async function saveThemeCustomization() {
 
   // Save to database
   try {
+    if (window.initializeMembership) {
+      await window.initializeMembership();
+    }
+    if (!window.membershipState || window.membershipState.tier < 2) {
+      throw new Error('premium membership required');
+    }
     if (window.saveThemeSettings) {
       await window.saveThemeSettings(settings);
     }
@@ -465,15 +535,28 @@ function applyCustomThemeForCurrentMode() {
 
   if (!modeSettings) return;
 
-  if (modeSettings.bgColor) document.body.style.setProperty('--bg-color', modeSettings.bgColor);
-  if (modeSettings.cardBg) document.body.style.setProperty('--card-bg', modeSettings.cardBg);
-  if (modeSettings.modalBg) document.body.style.setProperty('--modal-bg', modeSettings.modalBg);
-  if (modeSettings.inputBg) document.body.style.setProperty('--input-bg', modeSettings.inputBg);
-  if (modeSettings.borderColor) document.body.style.setProperty('--border-color', modeSettings.borderColor);
-  if (modeSettings.textColor) document.body.style.setProperty('--text-color', modeSettings.textColor);
-  if (modeSettings.hoverBg) document.body.style.setProperty('--hover-bg', modeSettings.hoverBg);
-  if (modeSettings.shadowColor) document.body.style.setProperty('--shadow-color', modeSettings.shadowColor);
-  if (modeSettings.accentColor) document.body.style.setProperty('--accent-color', modeSettings.accentColor);
+  const rootEl = document.documentElement;
+  const bodyEl = document.body;
+
+  if (modeSettings.bgColor) rootEl.style.setProperty('--bg-color', modeSettings.bgColor);
+  if (modeSettings.cardBg) rootEl.style.setProperty('--card-bg', modeSettings.cardBg);
+  if (modeSettings.modalBg) rootEl.style.setProperty('--modal-bg', modeSettings.modalBg);
+  if (modeSettings.inputBg) rootEl.style.setProperty('--input-bg', modeSettings.inputBg);
+  if (modeSettings.borderColor) rootEl.style.setProperty('--border-color', modeSettings.borderColor);
+  if (modeSettings.textColor) rootEl.style.setProperty('--text-color', modeSettings.textColor);
+  if (modeSettings.hoverBg) rootEl.style.setProperty('--hover-bg', modeSettings.hoverBg);
+  if (modeSettings.shadowColor) rootEl.style.setProperty('--shadow-color', modeSettings.shadowColor);
+  if (modeSettings.accentColor) rootEl.style.setProperty('--accent-color', modeSettings.accentColor);
+
+  if (modeSettings.bgColor) bodyEl.style.setProperty('--bg-color', modeSettings.bgColor);
+  if (modeSettings.cardBg) bodyEl.style.setProperty('--card-bg', modeSettings.cardBg);
+  if (modeSettings.modalBg) bodyEl.style.setProperty('--modal-bg', modeSettings.modalBg);
+  if (modeSettings.inputBg) bodyEl.style.setProperty('--input-bg', modeSettings.inputBg);
+  if (modeSettings.borderColor) bodyEl.style.setProperty('--border-color', modeSettings.borderColor);
+  if (modeSettings.textColor) bodyEl.style.setProperty('--text-color', modeSettings.textColor);
+  if (modeSettings.hoverBg) bodyEl.style.setProperty('--hover-bg', modeSettings.hoverBg);
+  if (modeSettings.shadowColor) bodyEl.style.setProperty('--shadow-color', modeSettings.shadowColor);
+  if (modeSettings.accentColor) bodyEl.style.setProperty('--accent-color', modeSettings.accentColor);
 
   if (s.fontEnglish || s.fontChinese) {
     document.body.style.fontFamily = `"${s.fontEnglish || 'Patrick Hand'}", "${s.fontChinese || '优设好身体'}", sans-serif`;
@@ -481,6 +564,17 @@ function applyCustomThemeForCurrentMode() {
 }
 
 function clearCustomThemeSettings() {
+  const rootEl = document.documentElement;
+  rootEl.style.removeProperty('--bg-color');
+  rootEl.style.removeProperty('--card-bg');
+  rootEl.style.removeProperty('--border-color');
+  rootEl.style.removeProperty('--text-color');
+  rootEl.style.removeProperty('--modal-bg');
+  rootEl.style.removeProperty('--input-bg');
+  rootEl.style.removeProperty('--hover-bg');
+  rootEl.style.removeProperty('--shadow-color');
+  rootEl.style.removeProperty('--accent-color');
+
   document.body.style.removeProperty('--bg-color');
   document.body.style.removeProperty('--card-bg');
   document.body.style.removeProperty('--border-color');

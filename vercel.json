@@ -10,6 +10,7 @@
 
     { "src": "/$", "dest": "/public/index.html" },
     { "src": "/intro/?$", "dest": "/landing/index.html" },
+    { "src": "/intro/(.*)", "dest": "/landing/$1" },
     { "src": "/app/?$", "dest": "/public/index.html" },
 
     { "src": "/terms/?$", "dest": "/public/terms.html" },
