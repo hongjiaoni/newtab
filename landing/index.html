@@ -485,22 +485,24 @@
     .arrow:active { transform: translate(1px, 1px); box-shadow: 2px 2px 0 var(--shadow); }
 
     .newsletter {
-      display: grid;
-      grid-template-columns: 1.2fr 0.8fr;
-      gap: 18px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
+      gap: 10px;
       margin-top: 10px;
     }
 
     .newsletter form {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;
       justify-content: center;
+      align-items: center;
+      flex-wrap: nowrap;
     }
 
     .newsletter input {
-      min-width: 240px;
+      width: min(420px, 70vw);
       padding: 12px 14px;
       border-radius: 999px;
       border: 2px solid var(--border);
@@ -511,6 +513,10 @@
       outline: none;
     }
 
+    .newsletter form .btn {
+      flex: 0 0 auto;
+    }
+
     .newsletter input::placeholder {
       color: color-mix(in srgb, var(--text) 55%, transparent);
     }
@@ -518,7 +524,7 @@
     .newsletter-status {
       font-size: 13px;
       color: var(--muted);
-      text-align: left;
+      text-align: center;
       display: none;
     }
 
@@ -535,8 +541,12 @@
     }
 
     @media (max-width: 900px) {
-      .newsletter { grid-template-columns: 1fr; }
-      .newsletter-status { text-align: center; }
+      .newsletter form {
+        width: 100%;
+      }
+      .newsletter input {
+        width: min(520px, 70vw);
+      }
     }
   </style>
 </head>
@@ -680,14 +690,14 @@
         hero_note: '提示：/ 为主站入口（应用），本页面为 /intro',
         mock_title: '（预览图占位）',
         mock_desc: '你可以把截图放到 landing/screenshot.png',
-        features_title: '三个核心能力',
-        features_desc: '把最常用的事情做得更顺手',
-        feat_sites_title: '网站收藏',
-        feat_sites_desc: '支持标签分类、拖拽排序、快速打开。让常用网站真正“触手可及”。',
-        feat_wall_title: '壁纸与氛围',
-        feat_wall_desc: '内置壁纸库与自定义壁纸（上传/链接），让每次打开都更舒适。',
-        feat_theme_title: '主题与字体',
-        feat_theme_desc: '浅色/深色分别配置，自定义颜色与字体。让它更像你的风格。',
+        features_title: '三个让你更舒服的细节',
+        features_desc: '不打扰、不复杂，但每天都会用得上',
+        feat_sites_title: '常用网站，一眼就到',
+        feat_sites_desc: '标签分组、拖拽排序、快速打开。把你最常去的地方安排得井井有条。',
+        feat_wall_title: '壁纸，像换一张桌面纸',
+        feat_wall_desc: '内置壁纸库与自定义壁纸（上传/链接）。让打开新标签页这一下，更轻松。',
+        feat_theme_title: '主题与字体，慢慢调到顺眼',
+        feat_theme_desc: '浅色/深色分别配置，自定义颜色与字体。让它自然地贴近你的习惯。',
         cta_title: '订阅 Newsletter',
         cta_desc: '获取更新、版本发布与功能预告。你可以在代码里配置订阅服务的提交地址。',
         cta_submit: '订阅',
@@ -703,14 +713,14 @@
         hero_note: 'Tip: / is the app entry, this page is /intro',
         mock_title: '(Preview placeholder)',
         mock_desc: 'Put your screenshot at landing/screenshot.png',
-        features_title: '3 core features',
-        features_desc: 'Make the things you do most feel easier',
-        feat_sites_title: 'Site shortcuts',
-        feat_sites_desc: 'Tags, drag sorting, and quick open. Keep your daily sites one click away.',
-        feat_wall_title: 'Wallpapers',
-        feat_wall_desc: 'Built-in library + custom wallpapers (upload/URL) for your perfect vibe.',
-        feat_theme_title: 'Theme & fonts',
-        feat_theme_desc: 'Separate light/dark settings, colors and fonts. Make it yours.',
+        features_title: 'Three small things that feel good',
+        features_desc: 'Quiet, simple, and useful every single day',
+        feat_sites_title: 'Your go-to sites, right there',
+        feat_sites_desc: 'Tag groups, drag sorting, and quick open. Keep your daily places tidy and close.',
+        feat_wall_title: 'Wallpapers & mood',
+        feat_wall_desc: 'Built-in gallery + custom wallpapers (upload/link). A softer moment, every time you open a tab.',
+        feat_theme_title: 'Themes & fonts',
+        feat_theme_desc: 'Separate light/dark setups. Tune colors and fonts until it quietly feels like yours.',
         cta_title: 'Newsletter',
         cta_desc: 'Get updates, releases, and feature previews. Configure the form action in code.',
         cta_submit: 'Subscribe',
