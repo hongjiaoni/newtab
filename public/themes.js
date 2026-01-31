@@ -4,7 +4,7 @@ const themeState = {
   currentTheme: 'handdrawn', // handdrawn, minimal, modern, glassmorphism
   customSettings: {
     fontChinese: '优设好身体',
-    fontEnglish: 'Fredoka',
+    fontEnglish: 'Patrick Hand',
     bgColor: '#f9f9f9',
     borderColor: '#444444',
     textColor: '#333333',
@@ -35,17 +35,10 @@ const AVAILABLE_FONTS = {
   chinese: [
     { name: '优设好身体', value: '优设好身体', package: 'yshst' },
     { name: '字魂扁桃体', value: '字魂扁桃体', package: 'zhbtt' },
-    { name: '优设标题黑', value: '优设标题黑', package: 'ysbth' },
-    { name: '站酷快乐体', value: '站酷快乐体', package: 'zkklt' },
-    { name: 'Noto Sans SC', value: 'Noto Sans SC', google: true }
+    { name: '优设标题黑', value: '优设标题黑', package: 'ysbth' }
   ],
   english: [
     { name: 'Patrick Hand', value: 'Patrick Hand', google: true },
-    { name: 'Fredoka', value: 'Fredoka', google: true },
-    { name: 'Baloo 2', value: 'Baloo 2', google: true },
-    { name: 'Chewy', value: 'Chewy', google: true },
-    { name: 'Comic Neue', value: 'Comic Neue', google: true },
-    { name: 'Love Marker', value: 'Love Marker' },
     { name: 'Quicksand', value: 'Quicksand', google: true },
     { name: 'Roboto', value: 'Roboto', google: true },
     { name: 'Inter', value: 'Inter', google: true },
@@ -411,6 +404,39 @@ function renderThemePreview() {
   preview.style.color = 'var(--text-color)';
 
   preview.innerHTML = `
+    <style>
+      #themePreview .preview-btn {
+        font-family: inherit;
+        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        border: 2px solid var(--border-color);
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 14px;
+        background: var(--card-bg);
+        color: var(--text-color);
+        box-shadow: 3px 3px 0 var(--shadow-color);
+        transition: all 0.2s ease;
+        padding: 8px 16px;
+      }
+
+      #themePreview .preview-btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 5px 5px 0 var(--shadow-color);
+        background: var(--hover-bg);
+      }
+
+      #themePreview .preview-btn.primary {
+        background: var(--text-color);
+        color: var(--bg-color);
+        border-color: var(--text-color);
+      }
+
+      #themePreview .preview-btn.primary:hover {
+        background: var(--hover-bg);
+        color: var(--text-color);
+        border-color: var(--border-color);
+      }
+    </style>
     <div style="display:flex; justify-content:center;">
       <div class="container" style="max-width: 460px; width: 100%; padding: 12px;">
         <div class="time" style="font-size: 54px;">12:34</div>
@@ -427,9 +453,13 @@ function renderThemePreview() {
           <div class="chip tag">Work</div>
         </div>
 
+        <div style="display:flex; justify-content:center; margin-top: 14px;">
+          <div style="width: 220px; height: 44px; border: 2px solid var(--border-color); border-radius: 10px; background: var(--card-bg); box-shadow: 6px 6px 0 var(--shadow-color);"></div>
+        </div>
+
         <div style="display:flex; justify-content:center; gap: 10px; margin-top: 18px;">
-          <button type="button" style="pointer-events:none; background: transparent; color: var(--text-color); border-color: var(--border-color);">${(typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'Cancel' : '取消'}</button>
-          <button type="button" style="pointer-events:none; background: var(--text-color); color: var(--bg-color); border-color: var(--text-color);">${(typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'Confirm' : '确认'}</button>
+          <button type="button" class="preview-btn" onclick="return false" onmousedown="return false">${(typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'Cancel' : '取消'}</button>
+          <button type="button" class="preview-btn primary" onclick="return false" onmousedown="return false">${(typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'Confirm' : '确认'}</button>
         </div>
       </div>
     </div>

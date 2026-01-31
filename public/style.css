@@ -17,10 +17,8 @@
 
 @import url('https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css');
 @import url('https://chinese-fonts-cdn.deno.dev/packages/zhbtt/dist/result.css');
-@import url('https://chinese-fonts-cdn.deno.dev/packages/zkklt/dist/result.css');
 @import url('https://chinese-fonts-cdn.deno.dev/packages/ysbth/dist/result.css');
-@import url('https://fonts.cdnfonts.com/css/love-marker');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&family=Fredoka:wght@300;400;500;600;700&family=Baloo+2:wght@400;600;700&family=Chewy&family=Comic+Neue:wght@400;700&family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&family=ZCOOL+KuaiLe&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap');
 
 body {
   margin: 0;
@@ -497,8 +495,9 @@ button:active {
 }
 
 .modal-actions .primary-btn:hover {
-  background: #2c2c2c;
-  color: #ffffff;
+  background: var(--hover-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
 }
 
 .modal-actions .cancel-btn {
@@ -847,6 +846,15 @@ input:disabled {
   padding: 2px;
 }
 
+.theme-color-row input[type="color"] {
+  width: 100%;
+  height: 36px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 2px;
+}
+
 .theme-color-row {
   margin-bottom: 12px;
 }
@@ -856,6 +864,36 @@ input:disabled {
   font-size: 12px;
   margin-bottom: 4px;
   font-weight: 600;
+}
+
+.wallpaper-tab {
+  font-family: inherit;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 14px;
+  background: var(--card-bg);
+  color: var(--text-color);
+  box-shadow: 2px 2px 0 var(--shadow-color);
+  transition: all 0.2s ease;
+  padding: 8px 14px;
+  opacity: 0.9;
+}
+
+.wallpaper-tab:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 4px 4px 0 var(--shadow-color);
+  background: var(--hover-bg);
+}
+
+.wallpaper-tab.active {
+  background: var(--accent-color);
+  color: #fff;
+  border-color: var(--accent-color);
+  opacity: 1;
+  text-decoration: none;
+  font-weight: 800;
 }
 
 /* Wallpaper category no underline on hover */
