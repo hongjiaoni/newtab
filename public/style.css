@@ -255,6 +255,20 @@ body.dark {
   width: max-content;
 }
 
+.engine-menu-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.engine-menu-divider {
+  height: 2px;
+  background: var(--border-color);
+  opacity: 0.3;
+  border-radius: 999px;
+  margin: 2px 0;
+}
+
 .engine-option {
   display: flex;
   align-items: center;
@@ -265,6 +279,68 @@ body.dark {
   font-size: 14px;
   color: var(--text-color);
   font-weight: bold;
+  justify-content: space-between;
+}
+
+.engine-option-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.engine-option.active {
+  background: color-mix(in srgb, var(--hover-bg) 70%, transparent);
+}
+
+.engine-remove,
+.engine-add-btn {
+  border: 2px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 800;
+  box-shadow: 2px 2px 0 var(--shadow-color);
+}
+
+.engine-remove {
+  width: 26px;
+  height: 24px;
+  line-height: 18px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.engine-remove-placeholder {
+  width: 26px;
+  height: 24px;
+}
+
+.engine-add {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.engine-add-btn {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.engine-add-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.engine-empty {
+  padding: 6px 10px;
+  font-size: 12px;
+  opacity: 0.75;
 }
 
 .engine-option:hover {

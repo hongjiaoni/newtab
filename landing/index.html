@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="NewTab - 手绘风新标签页，支持壁纸、网站收藏、主题与字体定制">
   <title>NewTab - 手绘风新标签页</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260131">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20260131">
+  <link rel="shortcut icon" href="/favicon.png?v=20260131">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260131">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -100,12 +103,12 @@
     .brand-badge {
       width: 34px;
       height: 34px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
+      border: none;
+      border-radius: 0;
       display: grid;
       place-items: center;
-      background: var(--card);
-      box-shadow: 3px 3px 0 var(--shadow);
+      background: transparent;
+      box-shadow: none;
     }
 
     .brand-badge-img {
@@ -345,6 +348,39 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
       margin-top: 20px;
+    }
+
+    .pricing-grid {
+      grid-template-columns: repeat(2, minmax(0, 360px));
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 820px;
+    }
+
+    .pricing-price-row {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .pricing-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 2px solid var(--border);
+      box-shadow: 3px 3px 0 var(--shadow);
+      background: var(--card);
+      font-weight: 800;
+    }
+
+    .pricing-pill span {
+      opacity: 0.82;
+      font-weight: 800;
     }
 
     .feat {
@@ -667,19 +703,21 @@
           <div class="section-title">
             <h2 data-i18n="pricing_title">Pricing</h2>
             <p data-i18n="pricing_subtitle">免费版够用，高级版解锁更深度的个性化</p>
+            <div class="pricing-price-row" aria-label="Prices">
+              <div class="pricing-pill" data-i18n="pricing_price_row_free">Free · $0</div>
+              <div class="pricing-pill" data-i18n="pricing_price_row_premium">Premium · $4.99/mo · $49.99/yr</div>
+            </div>
           </div>
 
-          <div class="grid">
+          <div class="grid pricing-grid">
             <div class="sketch-card feat">
-              <div class="icon">🆓</div>
+              <div class="icon" data-i18n="pricing_free_icon">FREE</div>
               <h3 data-i18n="pricing_free_title">Free · 免费版</h3>
-              <p data-i18n="pricing_free_price">$0</p>
               <p data-i18n="pricing_free_desc">基础壁纸库、网站标签管理、数据同步</p>
             </div>
             <div class="sketch-card feat">
-              <div class="icon">⭐</div>
+              <div class="icon" data-i18n="pricing_premium_icon">PRO</div>
               <h3 data-i18n="pricing_premium_title">Premium · 高级版</h3>
-              <p data-i18n="pricing_premium_price">$4.99/月 · $49.99/年</p>
               <p data-i18n="pricing_premium_desc">自定义主题/字体、上传壁纸（最多 50 张）、优先支持</p>
             </div>
           </div>
@@ -687,16 +725,6 @@
           <div class="page-cta">
             <a class="btn btn-primary" href="http://newtab.online" data-i18n="pricing_cta">在应用内升级</a>
           </div>
-
-          <footer>
-            <div class="footer-inner">
-              <div> NewTab</div>
-              <div class="footer-links">
-                <a href="/terms">Terms</a>
-                <a href="/privacy">Privacy</a>
-              </div>
-            </div>
-          </footer>
         </div>
       </section>
     </div>
@@ -745,11 +773,13 @@
         subscribed_need_cfg: '订阅接口未配置：请在 landing/index.html 里设置 NEWSLETTER_ACTION_URL。',
         pricing_title: 'Pricing',
         pricing_subtitle: '免费版够用，高级版解锁更深度的个性化',
+        pricing_price_row_free: '免费版 · $0',
+        pricing_price_row_premium: '高级版 · $4.99/月 · $49.99/年',
+        pricing_free_icon: '免费',
+        pricing_premium_icon: '高级',
         pricing_free_title: 'Free · 免费版',
-        pricing_free_price: '$0',
         pricing_free_desc: '基础壁纸库、网站标签管理、数据同步',
         pricing_premium_title: 'Premium · 高级版',
-        pricing_premium_price: '$4.99/月 · $49.99/年',
         pricing_premium_desc: '自定义主题/字体、上传壁纸（最多 50 张）、优先支持',
         pricing_cta: '在应用内升级'
       },
@@ -777,11 +807,13 @@
         subscribed_need_cfg: 'Newsletter endpoint not configured: set NEWSLETTER_ACTION_URL in landing/index.html.',
         pricing_title: 'Pricing',
         pricing_subtitle: 'Free is enough. Premium unlocks deeper personalization.',
+        pricing_price_row_free: 'Free · $0',
+        pricing_price_row_premium: 'Premium · $4.99/mo · $49.99/yr',
+        pricing_free_icon: 'FREE',
+        pricing_premium_icon: 'PRO',
         pricing_free_title: 'Free',
-        pricing_free_price: '$0',
         pricing_free_desc: 'Basic wallpapers, sites & tags, sync',
         pricing_premium_title: 'Premium',
-        pricing_premium_price: '$4.99/mo · $49.99/yr',
         pricing_premium_desc: 'Custom theme & fonts, upload wallpapers (50), priority support',
         pricing_cta: 'Upgrade in the app'
       }
@@ -815,7 +847,7 @@
     }
 
     function pickHeroPreviewSrc() {
-      return `/screenshot.png`;
+      return currentTheme === 'dark' ? `/screenshot-dark.png` : `/screenshot-light.png`;
     }
 
     function updateHeroPreview() {

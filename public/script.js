@@ -179,6 +179,10 @@ const translations = {
     chooseUpload: 'Upload Image',
     chooseLink: 'Use Link',
     addByLink: 'Add Link',
+    subscriptionRecords: 'Subscription records',
+    back: 'Back',
+    addEngine: 'Add engine',
+    remove: 'Remove',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   }
@@ -454,20 +458,70 @@ window.updateAllText = function () {
     if (options[2]) options[2].textContent = i18n.t('feedbackTypeOther');
   }
 
+  // Subscription records modal
+  const recordsTitle = document.getElementById('subscriptionRecordsTitle');
+  if (recordsTitle) recordsTitle.textContent = i18n.t('subscriptionRecords');
+  const backBtn = document.getElementById('backToUserProfile');
+  if (backBtn) backBtn.textContent = i18n.t('back');
+  const closeRecordsBtn = document.getElementById('closeSubscriptionRecords');
+  if (closeRecordsBtn) closeRecordsBtn.textContent = i18n.t('close');
+
   // Re-render content to update any dynamic text
   renderHome();
+
+  // Search engine menu contains localized names
+  renderSearchEngine();
 }
 
 // ===== Data & State =====
-const SEARCH_ENGINES = [
-  { name: 'Google', url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
-  { name: 'Bing', url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
-  { name: 'Baidu', url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
-  { name: 'Xiaohongshu', url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: 'https://www.xiaohongshu.com/favicon.ico' },
+const ENGINE_CATALOG = [
+  { id: 'google', name: { zh: '谷歌', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
+  { id: 'bing', name: { zh: '必应', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
+  { id: 'baidu', name: { zh: '百度', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
+  { id: 'duckduckgo', name: { zh: 'DuckDuckGo', en: 'DuckDuckGo' }, url: 'https://duckduckgo.com/?q=', icon: 'https://duckduckgo.com/favicon.ico' },
+  { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://search.yahoo.com/favicon.ico' },
+  { id: 'yandex', name: { zh: 'Yandex', en: 'Yandex' }, url: 'https://yandex.com/search/?text=', icon: 'https://yandex.com/favicon.ico' },
+  { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: 'https://www.sogou.com/favicon.ico' },
+  { id: 'so360', name: { zh: '360 搜索', en: '360 Search' }, url: 'https://www.so.com/s?q=', icon: 'https://www.so.com/favicon.ico' },
+  { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
+  { id: 'xiaohongshu', name: { zh: '小红书', en: 'Xiaohongshu' }, url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: 'https://www.xiaohongshu.com/favicon.ico' }
 ];
+
+const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
+
+function getEngineName(engine) {
+  const lang = (typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'en' : 'zh';
+  return engine?.name?.[lang] || engine?.name?.en || engine?.id || '';
+}
+
+function loadEnabledEngineIds() {
+  try {
+    const raw = localStorage.getItem('enabledEngineIds');
+    const parsed = raw ? JSON.parse(raw) : null;
+    const list = Array.isArray(parsed) ? parsed.filter((id) => ENGINE_CATALOG.some((e) => e.id === id)) : null;
+    if (list && list.length) return list;
+  } catch {
+  }
+  return [...DEFAULT_ENGINE_IDS];
+}
+
+function saveEnabledEngineIds(ids) {
+  localStorage.setItem('enabledEngineIds', JSON.stringify(ids));
+}
+
+function getEnabledEngines(ids) {
+  return ids.map((id) => ENGINE_CATALOG.find((e) => e.id === id)).filter(Boolean);
+}
+
+function getCatalogAddableEngines(enabledIds) {
+  const set = new Set(enabledIds);
+  return ENGINE_CATALOG.filter((e) => !set.has(e.id));
+}
 
 let state = {
   engineIndex: parseInt(localStorage.getItem('engineIndex')) || 0,
+  engineId: localStorage.getItem('engineId') || '',
+  enabledEngineIds: loadEnabledEngineIds(),
   dateFormatIndex: parseInt(localStorage.getItem('dateFormatIndex')) || 0, // 0: YMD, 1: MDY, 2: DMY
   timeFormat: localStorage.getItem('timeFormat') || '24h', // '24h' or '12h'
   sites: JSON.parse(localStorage.getItem('sites')) || [],
@@ -476,6 +530,22 @@ let state = {
   siteOrder: JSON.parse(localStorage.getItem('siteOrder')) || [],
   viewMode: localStorage.getItem('viewMode') || 'general' // 'general' or 'minimalist'
 };
+
+// Backward compatibility: map old engineIndex to new engineId on first run
+if (!state.engineId) {
+  const enabled = getEnabledEngines(state.enabledEngineIds);
+  const fallback = enabled[state.engineIndex] || enabled[0] || ENGINE_CATALOG[0];
+  if (fallback) {
+    state.engineId = fallback.id;
+    localStorage.setItem('engineId', state.engineId);
+  }
+}
+
+function getCurrentEngine() {
+  const enabled = getEnabledEngines(state.enabledEngineIds);
+  const found = enabled.find((e) => e.id === state.engineId);
+  return found || enabled[0] || ENGINE_CATALOG[0];
+}
 
 function generateUuid() {
   if (window.crypto && typeof window.crypto.randomUUID === 'function') {
@@ -560,6 +630,8 @@ function saveData(syncToBackend = true) {
   localStorage.setItem('tagOrder', JSON.stringify(state.tagOrder));
   localStorage.setItem('siteOrder', JSON.stringify(state.siteOrder));
   localStorage.setItem('engineIndex', state.engineIndex);
+  localStorage.setItem('engineId', state.engineId || '');
+  saveEnabledEngineIds(state.enabledEngineIds || []);
   localStorage.setItem('dateFormatIndex', state.dateFormatIndex);
   localStorage.setItem('timeFormat', state.timeFormat);
   localStorage.setItem('viewMode', state.viewMode);
@@ -678,28 +750,106 @@ updateTime();
 
 // ===== Search Engine =====
 function renderSearchEngine() {
-  const engine = SEARCH_ENGINES[state.engineIndex];
+  const enabledIds = state.enabledEngineIds || [];
+  const enabled = getEnabledEngines(enabledIds);
+  const engine = getCurrentEngine();
+
   engineIcon.src = engine.icon;
-  // Fallback if icon fails
   engineIcon.onerror = () => { engineIcon.src = 'https://www.google.com/favicon.ico'; };
 
-  engineMenu.innerHTML = SEARCH_ENGINES.map((eng, idx) => `
-    <div class="engine-option" onclick="selectEngine(${idx})">
-      <img src="${eng.icon}" alt="${eng.name}" onerror="this.src='https://www.google.com/favicon.ico'">
-      <span>${eng.name}</span>
+  const addable = getCatalogAddableEngines(enabledIds);
+  const addLabel = i18n.t('addEngine');
+  const removeLabel = i18n.t('remove');
+
+  engineMenu.innerHTML = `
+    <div class="engine-menu-section">
+      ${enabled.map((eng) => {
+        const name = getEngineName(eng);
+        const isCurrent = eng.id === engine.id;
+        const canRemove = enabled.length > 1;
+        return `
+          <div class="engine-option ${isCurrent ? 'active' : ''}" data-engine-id="${eng.id}">
+            <div class="engine-option-main" onclick="selectEngineById('${eng.id}')">
+              <img src="${eng.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
+              <span>${name}</span>
+            </div>
+            ${canRemove ? `<button class=\"engine-remove\" type=\"button\" title=\"${removeLabel}\" onclick=\"removeEngineById('${eng.id}')\">×</button>` : `<span class=\"engine-remove-placeholder\"></span>`}
+          </div>
+        `;
+      }).join('')}
     </div>
-  `).join('');
+
+    <div class="engine-menu-divider"></div>
+    <div class="engine-add">
+      <button class="engine-add-btn" type="button" onclick="toggleEngineAddMenu()">+ ${addLabel}</button>
+      <div id="engineAddMenu" class="engine-add-menu hidden">
+        ${addable.length
+          ? addable.map((eng) => {
+              const name = getEngineName(eng);
+              return `
+                <div class="engine-option" onclick="addEngineById('${eng.id}')">
+                  <img src="${eng.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
+                  <span>${name}</span>
+                </div>
+              `;
+            }).join('')
+          : `<div class="engine-empty">${i18n.currentLocale === 'zh' ? '已添加全部引擎' : 'All engines added'}</div>`}
+      </div>
+    </div>
+  `;
 }
 
-window.selectEngine = (index) => {
-  state.engineIndex = index;
+window.selectEngineById = (id) => {
+  const enabled = getEnabledEngines(state.enabledEngineIds || []);
+  const idx = enabled.findIndex((e) => e.id === id);
+  if (idx < 0) return;
+  state.engineId = id;
+  state.engineIndex = idx;
   saveData();
   renderSearchEngine();
   engineMenu.classList.add('hidden');
 };
 
+window.toggleEngineAddMenu = () => {
+  const el = document.getElementById('engineAddMenu');
+  if (!el) return;
+  el.classList.toggle('hidden');
+};
+
+window.addEngineById = (id) => {
+  if (!ENGINE_CATALOG.some((e) => e.id === id)) return;
+  const set = new Set(state.enabledEngineIds || []);
+  if (set.has(id)) return;
+  state.enabledEngineIds = [...(state.enabledEngineIds || []), id];
+  saveData();
+  renderSearchEngine();
+};
+
+window.removeEngineById = (id) => {
+  const current = String(state.engineId || '');
+  const list = (state.enabledEngineIds || []).filter((x) => x !== id);
+  if (list.length < 1) return;
+  state.enabledEngineIds = list;
+  if (current === id) {
+    const nextEngine = getEnabledEngines(list)[0];
+    if (nextEngine) {
+      state.engineId = nextEngine.id;
+      state.engineIndex = 0;
+    }
+  } else {
+    const enabled = getEnabledEngines(list);
+    const idx = enabled.findIndex((e) => e.id === state.engineId);
+    state.engineIndex = idx >= 0 ? idx : 0;
+  }
+  saveData();
+  renderSearchEngine();
+};
+
 searchEngineEl.addEventListener('click', (e) => {
   e.stopPropagation();
+  if (e.target && e.target.closest && e.target.closest('#engineMenu')) {
+    return;
+  }
   engineMenu.classList.toggle('hidden');
 });
 
@@ -711,7 +861,7 @@ searchForm.addEventListener('submit', (e) => {
   e.preventDefault();
   const query = searchInput.value.trim();
   if (!query) return;
-  const engine = SEARCH_ENGINES[state.engineIndex];
+  const engine = getCurrentEngine();
   window.location.href = engine.url + encodeURIComponent(query);
 });
 
@@ -1241,8 +1391,14 @@ function openTagView(tagName) {
 
 
 // ===== Theme =====
-const savedTheme = localStorage.getItem('theme') || 'light';
+const storedTheme = localStorage.getItem('theme');
+const savedTheme = storedTheme
+  ? storedTheme
+  : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 document.body.classList.add(savedTheme);
+if (!storedTheme) {
+  localStorage.setItem('theme', savedTheme);
+}
 
 function updateThemeIcon(theme) {
   const themeIcon = document.getElementById('themeIcon');
@@ -1678,4 +1834,3 @@ document.getElementById('feedbackModal')?.addEventListener('click', (e) => {
 searchInput.focus();
 updateAllText();
 renderHome();
-
