@@ -246,7 +246,7 @@
 <body>
   <header>
     <div class="wrap header-inner">
-      <a class="brand" href="/intro" aria-label="Go to intro">
+      <a class="brand" href="/landing" aria-label="Go to landing">
         <span>NewTab</span>
       </a>
       <button class="pill" type="button" id="themeToggle">Light/Dark</button>
@@ -312,7 +312,7 @@
   </footer>
 
   <script>
-    const key = 'newtab_intro_theme';
+    const key = 'newtab_landing_theme';
     const applyTheme = (mode) => {
       document.documentElement.setAttribute('data-theme', mode);
       localStorage.setItem(key, mode);

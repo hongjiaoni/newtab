@@ -9,11 +9,13 @@
     { "src": "/api/(.*)", "dest": "/api/$1" },
 
     { "src": "/$", "dest": "/public/index.html" },
+    { "src": "/landing/?$", "dest": "/landing/index.html" },
+    { "src": "/landing/(.*)", "dest": "/landing/$1" },
     { "src": "/intro/?$", "dest": "/landing/index.html" },
     { "src": "/intro/(.*)", "dest": "/landing/$1" },
     { "src": "/app/?$", "dest": "/public/index.html" },
 
-    { "src": "/pricing/?$", "dest": "/landing/pricing/index.html" },
+    { "src": "/pricing/?$", "dest": "/landing/index.html" },
     { "src": "/terms/?$", "dest": "/landing/terms/index.html" },
     { "src": "/privacy/?$", "dest": "/landing/privacy/index.html" },
 

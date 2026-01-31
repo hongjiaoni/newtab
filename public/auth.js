@@ -213,6 +213,15 @@ async function handleSession(session) {
     await window.initializeMembership();
   }
 
+  // Fast path: apply cached premium settings immediately (theme/font) before hitting network.
+  if (window.applyCachedUserData) {
+    try {
+      window.applyCachedUserData({ uid: session.user.id, effectiveTier: window.membershipState?.tier || 1 });
+    } catch (err) {
+      console.error('Failed to apply cached user data:', err);
+    }
+  }
+
   // Trigger data load from server
   if (window.loadUserData) {
     await window.loadUserData();
