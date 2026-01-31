@@ -42,6 +42,8 @@ create table public.user_home_settings (
   user_id uuid references auth.users not null primary key,
   view_mode text default 'general',
   engine_index integer default 0,
+  engine_id text,
+  enabled_engine_ids jsonb default '[]'::jsonb,
   date_format_index integer default 0,
   time_format text default '24h',
   locale text default 'zh',
@@ -280,7 +282,7 @@ create policy "Users can insert their own wallpapers."
 --   tags: ["tag"],
 --   site_order: ["uuid"],
 --   tag_order: ["tag"],
---   settings: {viewMode, engineIndex, dateFormatIndex, timeFormat, locale, wallpaper, theme, colorMode, schema_version},
+--   settings: {viewMode, engineIndex, engineId, enabledEngineIds, dateFormatIndex, timeFormat, locale, wallpaper, theme, colorMode, schema_version},
 --   updated_at: "ISO"
 -- }
 create or replace function public.sync_home_config(p_payload jsonb)
@@ -301,6 +303,8 @@ begin
     user_id,
     view_mode,
     engine_index,
+    engine_id,
+    enabled_engine_ids,
     date_format_index,
     time_format,
     locale,
@@ -313,6 +317,8 @@ begin
     v_uid,
     coalesce(p_payload#>>'{settings,viewMode}', 'general'),
     coalesce((p_payload#>>'{settings,engineIndex}')::int, 0),
+    nullif(p_payload#>>'{settings,engineId}', ''),
+    coalesce(p_payload#>'{settings,enabledEngineIds}', '[]'::jsonb),
     coalesce((p_payload#>>'{settings,dateFormatIndex}')::int, 0),
     coalesce(p_payload#>>'{settings,timeFormat}', '24h'),
     coalesce(p_payload#>>'{settings,locale}', 'zh'),
@@ -326,6 +332,8 @@ begin
   do update set
     view_mode = excluded.view_mode,
     engine_index = excluded.engine_index,
+    engine_id = excluded.engine_id,
+    enabled_engine_ids = excluded.enabled_engine_ids,
     date_format_index = excluded.date_format_index,
     time_format = excluded.time_format,
     locale = excluded.locale,

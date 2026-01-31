@@ -13,7 +13,10 @@
     rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="wallpaper-modal.css" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260131">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20260131">
+  <link rel="shortcut icon" href="/favicon.png?v=20260131">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260131">
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -49,7 +52,7 @@
         <span id="wallpaperText">壁纸</span>
       </div>
       <div class="settings-menu-item" id="themeCustomizationBtn" onclick="window.openThemeCustomization?.()">
-        <span id="themeCustomizationText">主题定制</span>
+        <span id="themeCustomizationText">主题</span>
       </div>
       <div class="settings-menu-divider"></div>
       <div class="settings-menu-item" onclick="openAboutModal()">
@@ -216,13 +219,13 @@
 
     <!-- Subscription Records Modal -->
     <div id="subscriptionRecordsModal" class="modal hidden">
-      <h3 id="subscriptionRecordsTitle">Subscription Records</h3>
+      <h3 id="subscriptionRecordsTitle">订阅记录</h3>
       <div id="subscriptionRecordsContent" class="profile-content">
         <!-- Populated by JS -->
       </div>
       <div class="modal-actions">
-        <button id="backToUserProfile" class="cancel-btn">Back</button>
-        <button id="closeSubscriptionRecords" class="cancel-btn">Close</button>
+        <button id="backToUserProfile" class="cancel-btn">返回</button>
+        <button id="closeSubscriptionRecords" class="cancel-btn">关闭</button>
       </div>
     </div>
   </div>

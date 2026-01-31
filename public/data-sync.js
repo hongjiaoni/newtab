@@ -4,12 +4,26 @@ let syncDebounceTimer = null;
 const SYNC_DEBOUNCE_MS = 500;
 const LOCAL_UPDATED_AT_KEY = 'home_config_updated_at';
 const PENDING_HOME_SYNC_KEY = 'home_config_pending_home_sync';
-const SETTINGS_SCHEMA_VERSION = 1;
+const SETTINGS_SCHEMA_VERSION = 2;
 const USER_CACHE_VERSION = 1;
 const USER_CACHE_THEME_PREFIX = `user_cache_theme_v${USER_CACHE_VERSION}_`;
 const USER_CACHE_FONT_PREFIX = `user_cache_font_v${USER_CACHE_VERSION}_`;
 const USER_CACHE_HOME_PREFIX = `user_cache_home_v${USER_CACHE_VERSION}_`;
 let flushPendingInProgress = false;
+
+function normalizeEngineId(input) {
+    if (!input) return '';
+    const v = String(input).trim();
+    return v;
+}
+
+function normalizeEnabledEngineIds(input) {
+    if (!Array.isArray(input)) return null;
+    const cleaned = input
+        .map(v => String(v || '').trim())
+        .filter(Boolean);
+    return cleaned.length ? cleaned : null;
+}
 
 function getUserCacheKey(prefix, uid) {
     if (!uid) return null;
@@ -136,6 +150,8 @@ function migrateSettings(rawSettings) {
     if (v < 1) {
         if (typeof s.viewMode !== 'string') s.viewMode = 'general';
         if (!Number.isFinite(s.engineIndex)) s.engineIndex = 0;
+        if (typeof s.engineId !== 'string') s.engineId = '';
+        if (!Array.isArray(s.enabledEngineIds)) s.enabledEngineIds = [];
         if (!Number.isFinite(s.dateFormatIndex)) s.dateFormatIndex = 0;
         if (typeof s.timeFormat !== 'string') s.timeFormat = '24h';
         if (typeof s.theme !== 'string') s.theme = 'handdrawn';
@@ -143,8 +159,12 @@ function migrateSettings(rawSettings) {
         if (typeof s.locale !== 'string') s.locale = (localStorage.getItem('locale') || 'zh');
         if (!Object.prototype.hasOwnProperty.call(s, 'wallpaper')) s.wallpaper = (localStorage.getItem('selectedWallpaper') || null);
         s.schema_version = SETTINGS_SCHEMA_VERSION;
-    } else if (v !== SETTINGS_SCHEMA_VERSION) {
-        s.schema_version = SETTINGS_SCHEMA_VERSION;
+    } else {
+        if (typeof s.engineId !== 'string') s.engineId = '';
+        if (!Array.isArray(s.enabledEngineIds)) s.enabledEngineIds = [];
+        if (v !== SETTINGS_SCHEMA_VERSION) {
+            s.schema_version = SETTINGS_SCHEMA_VERSION;
+        }
     }
 
     return s;
@@ -239,6 +259,12 @@ function applyCachedHomeConfig(homeConfig) {
     if (settings) {
         if (typeof settings.viewMode === 'string') state.viewMode = settings.viewMode;
         if (Number.isFinite(settings.engineIndex)) state.engineIndex = settings.engineIndex;
+        if (typeof settings.engineId === 'string') state.engineId = normalizeEngineId(settings.engineId);
+
+        const normalizedEnabled = normalizeEnabledEngineIds(settings.enabledEngineIds);
+        if (normalizedEnabled) {
+            state.enabledEngineIds = normalizedEnabled;
+        }
         if (Number.isFinite(settings.dateFormatIndex)) state.dateFormatIndex = settings.dateFormatIndex;
         if (typeof settings.timeFormat === 'string') state.timeFormat = settings.timeFormat;
 
@@ -410,6 +436,8 @@ async function loadUserData() {
         const serverSettings = migrateSettings({
             viewMode: home?.view_mode,
             engineIndex: home?.engine_index,
+            engineId: home?.engine_id,
+            enabledEngineIds: Array.isArray(home?.enabled_engine_ids) ? home.enabled_engine_ids : (home?.enabled_engine_ids || []),
             dateFormatIndex: home?.date_format_index,
             timeFormat: home?.time_format,
             locale: home?.locale,
@@ -422,6 +450,9 @@ async function loadUserData() {
         if (serverSettings) {
             if (typeof serverSettings.viewMode === 'string') state.viewMode = serverSettings.viewMode;
             if (serverSettings.engineIndex !== undefined) state.engineIndex = serverSettings.engineIndex;
+            if (typeof serverSettings.engineId === 'string') state.engineId = normalizeEngineId(serverSettings.engineId);
+            const normalizedEnabled = normalizeEnabledEngineIds(serverSettings.enabledEngineIds);
+            if (normalizedEnabled) state.enabledEngineIds = normalizedEnabled;
             if (serverSettings.dateFormatIndex !== undefined) state.dateFormatIndex = serverSettings.dateFormatIndex;
             if (typeof serverSettings.timeFormat === 'string') state.timeFormat = serverSettings.timeFormat;
 
@@ -458,6 +489,8 @@ async function loadUserData() {
             settings: {
                 viewMode: state.viewMode,
                 engineIndex: state.engineIndex,
+                engineId: state.engineId || '',
+                enabledEngineIds: Array.isArray(state.enabledEngineIds) ? state.enabledEngineIds : [],
                 dateFormatIndex: state.dateFormatIndex,
                 timeFormat: state.timeFormat,
                 locale: (typeof i18n !== 'undefined' && i18n.currentLocale) ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'),
@@ -510,6 +543,8 @@ async function saveUserDataToBackend(options = {}) {
                 settings: {
                     viewMode: state.viewMode || 'general',
                     engineIndex: state.engineIndex || 0,
+                    engineId: state.engineId || '',
+                    enabledEngineIds: Array.isArray(state.enabledEngineIds) ? state.enabledEngineIds : [],
                     dateFormatIndex: state.dateFormatIndex || 0,
                     timeFormat: state.timeFormat || '24h',
                     locale: (typeof i18n !== 'undefined' && i18n.currentLocale) ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'),
