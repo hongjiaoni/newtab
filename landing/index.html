@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="NewTab - 手绘风新标签页，支持壁纸、网站收藏、主题与字体定制">
-  <title>NewTab - 手绘风新标签页</title>
+  <title>NewTab - Customize Your New Tab</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260131">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20260131">
   <link rel="shortcut icon" href="/favicon.png?v=20260131">
@@ -101,8 +101,8 @@
     }
 
     .brand-badge {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       border: none;
       border-radius: 0;
       display: grid;
@@ -112,8 +112,8 @@
     }
 
     .brand-badge-img {
-      width: 26px;
-      height: 26px;
+      width: 32px;
+      height: 32px;
       display: block;
       object-fit: contain;
     }
@@ -616,7 +616,7 @@
             <div class="hero-actions">
               <a class="btn btn-primary" href="http://newtab.online" data-i18n="hero_enter">进入 NewTab</a>
             </div>
-            <div class="hero-note" data-i18n="hero_note">提示：/ 为主站入口（应用），本页面为 /landing</div>
+            <div class="hero-note" data-i18n="hero_note">网站持续进化中，前期试用用户有机会获得终身免费会员机会</div>
           </div>
 
           <div class="sketch-card mock">
@@ -627,7 +627,7 @@
               <img id="heroPreview" class="hero-preview" alt="Preview" />
               <div id="heroPreviewHint" class="hero-preview-hint">
                 <div style="font-size:14px; font-weight:700; margin-bottom:6px;" data-i18n="mock_title">（预览图占位）</div>
-                <div style="font-size:13px;" data-i18n="mock_desc">你可以把截图放到 landing/screenshot.png</div>
+                <div style="font-size:13px;" data-i18n="mock_desc">screenshot here</div>
               </div>
             </div>
           </div>
@@ -754,9 +754,9 @@
         hero_title: '把新标签页<br>变成你的<br>手绘工作台',
         hero_desc: '轻松管理常用网站、壁纸与主题。更像一张纸、一支笔，但更高效。',
         hero_enter: '进入 NewTab',
-        hero_note: '提示：/ 为主站入口（应用），本页面为 /landing',
+        hero_note: '网站持续进化中，前期购买用户有机会获得终身会员',
         mock_title: '（预览图占位）',
-        mock_desc: '你可以把截图放到 landing/screenshot.png',
+        mock_desc: '',
         features_title: '三个让你更舒服的细节',
         features_desc: '不打扰、不复杂，但每天都会用得上',
         feat_sites_title: '常用网站，一眼就到',
@@ -766,13 +766,13 @@
         feat_theme_title: '主题与字体，慢慢调到顺眼',
         feat_theme_desc: '浅色/深色分别配置，自定义颜色与字体。让它自然地贴近你的习惯。',
         cta_title: '订阅 Newsletter',
-        cta_desc: '获取更新、版本发布与功能预告。你可以在代码里配置订阅服务的提交地址。',
+        cta_desc: '获取更新、版本发布与功能预告。',
         cta_submit: '订阅',
         cta_hint: '未配置提交地址时将只做本地提示（不会真的提交）。',
         subscribed_ok: '已收到：我们会在服务配置完成后开始收集订阅。',
         subscribed_need_cfg: '订阅接口未配置：请在 landing/index.html 里设置 NEWSLETTER_ACTION_URL。',
-        pricing_title: 'Pricing',
-        pricing_subtitle: '免费版够用，高级版解锁更深度的个性化',
+        pricing_title: '会员价格',
+        pricing_subtitle: '订阅高级版，解锁更深度的个性化首页',
         pricing_price_row_free: '免费版 · $0',
         pricing_price_row_premium: '高级版 · $4.99/月 · $49.99/年',
         pricing_free_icon: '免费',
@@ -781,16 +781,16 @@
         pricing_free_desc: '基础壁纸库、网站标签管理、数据同步',
         pricing_premium_title: 'Premium · 高级版',
         pricing_premium_desc: '自定义主题/字体、上传壁纸（最多 50 张）、优先支持',
-        pricing_cta: '在应用内升级'
+        pricing_cta: '进入Newtab'
       },
       en: {
         open_newtab: 'Open NewTab',
         hero_title: 'Turn your new tab<br>into a<br>hand-drawn desk',
         hero_desc: 'Manage sites, wallpapers and themes effortlessly. Like paper & pen, but faster.',
         hero_enter: 'Open NewTab',
-        hero_note: 'Tip: / is the app entry, this page is /landing',
+        hero_note: 'Our website is constantly improving. Early purchasers may be eligible for lifetime membership.',
         mock_title: '(Preview placeholder)',
-        mock_desc: 'Put your screenshot at landing/screenshot.png',
+        mock_desc: '',
         features_title: 'Three small things that feel good',
         features_desc: 'Quiet, simple, and useful every single day',
         feat_sites_title: 'Your go-to sites, right there',
@@ -800,13 +800,13 @@
         feat_theme_title: 'Themes & fonts',
         feat_theme_desc: 'Separate light/dark setups. Tune colors and fonts until it quietly feels like yours.',
         cta_title: 'Newsletter',
-        cta_desc: 'Get updates, releases, and feature previews. Configure the form action in code.',
+        cta_desc: 'Get updates, releases, and feature previews.',
         cta_submit: 'Subscribe',
         cta_hint: 'Without an endpoint configured, this is a local-only demo (no submission).',
         subscribed_ok: 'Got it. We will start collecting once the service is configured.',
         subscribed_need_cfg: 'Newsletter endpoint not configured: set NEWSLETTER_ACTION_URL in landing/index.html.',
         pricing_title: 'Pricing',
-        pricing_subtitle: 'Free is enough. Premium unlocks deeper personalization.',
+        pricing_subtitle: 'Premium unlocks deeper personalization.',
         pricing_price_row_free: 'Free · $0',
         pricing_price_row_premium: 'Premium · $4.99/mo · $49.99/yr',
         pricing_free_icon: 'FREE',
@@ -815,7 +815,7 @@
         pricing_free_desc: 'Basic wallpapers, sites & tags, sync',
         pricing_premium_title: 'Premium',
         pricing_premium_desc: 'Custom theme & fonts, upload wallpapers (50), priority support',
-        pricing_cta: 'Upgrade in the app'
+        pricing_cta: 'Open Newtab'
       }
     };
 
@@ -864,7 +864,7 @@
       heroPreview.src = src;
     }
 
-    const NEWSLETTER_ACTION_URL = '';
+    const NEWSLETTER_ACTION_URL = '/api/newsletter-subscribe';
 
     const pathname = window.location.pathname || '/';
     const isPricingPath = pathname === '/pricing' || pathname === '/pricing/';
