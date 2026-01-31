@@ -575,10 +575,10 @@
       <section class="page" data-page="0">
         <div class="wrap hero">
           <div>
-            <h1 data-i18n="hero_title">把新标签页<br>变成你的<br>手绘工作台</h1>
+            <h1 data-i18n="hero_title">把新标签页<br>变成你的<br>每日工作台</h1>
             <p data-i18n="hero_desc">轻松管理常用网站、壁纸与主题。更像一张纸、一支笔，但更高效。</p>
             <div class="hero-actions">
-              <a class="btn btn-primary" href="/" data-i18n="hero_enter">进入 NewTab</a>
+              <a class="btn btn-primary" href="http://newtab.online" data-i18n="hero_enter">进入 NewTab</a>
             </div>
             <div class="hero-note" data-i18n="hero_note">提示：/ 为主站入口（应用），本页面为 /intro</div>
           </div>
@@ -624,7 +624,7 @@
           </div>
 
           <div class="page-cta">
-            <a class="btn btn-primary" href="/" data-i18n="open_newtab">进入 NewTab</a>
+            <a class="btn btn-primary" href="http://newtab.online" data-i18n="open_newtab">进入 NewTab</a>
           </div>
         </div>
       </section>
@@ -646,13 +646,14 @@
             </div>
 
             <div class="page-cta">
-              <a class="btn btn-primary" href="/" data-i18n="open_newtab">进入 NewTab</a>
+              <a class="btn btn-primary" href="http://newtab.online" data-i18n="open_newtab">进入 NewTab</a>
             </div>
 
             <footer>
               <div class="footer-inner">
                 <div> NewTab</div>
                 <div class="footer-links">
+                  <a href="/pricing">Pricing</a>
                   <a href="/terms">Terms</a>
                   <a href="/privacy">Privacy</a>
                 </div>
@@ -837,39 +838,6 @@
 
     prevBtn.addEventListener('click', prevPage);
     nextBtn.addEventListener('click', nextPage);
-
-    const badgeDownloadBtn = document.getElementById('badgeDownloadBtn');
-    badgeDownloadBtn?.addEventListener('click', async () => {
-      try {
-        const res = await fetch('/intro/badge.svg', { cache: 'no-cache' });
-        const svgText = await res.text();
-        const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(svgBlob);
-        const img = new Image();
-        img.decoding = 'async';
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          canvas.width = 256;
-          canvas.height = 256;
-          const ctx = canvas.getContext('2d');
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          canvas.toBlob((blob) => {
-            if (!blob) return;
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'newtab-badge.png';
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            URL.revokeObjectURL(a.href);
-          }, 'image/png');
-          URL.revokeObjectURL(url);
-        };
-        img.src = url;
-      } catch (_) {
-      }
-    });
 
     dots.forEach(d => {
       d.addEventListener('click', () => {
