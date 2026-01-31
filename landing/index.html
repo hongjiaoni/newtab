@@ -553,9 +553,9 @@
 <body>
   <header>
     <div class="wrap header-inner">
-      <a class="brand" href="/" aria-label="Go to app">
+      <a class="brand" href="/" aria-label="Go to app" id="brandHome">
         <span class="brand-badge">
-          <img class="brand-badge-img" src="/intro/badge.svg" alt="NewTab badge" />
+          <img class="brand-badge-img" src="/landing/badge.svg" alt="NewTab badge" />
         </span>
         <span>NewTab</span>
       </a>
@@ -570,7 +570,7 @@
     </div>
   </header>
 
-  <main id="top" class="viewport" aria-label="Intro">
+  <main id="top" class="viewport" aria-label="Landing">
     <div class="pages" id="pages">
       <section class="page" data-page="0">
         <div class="wrap hero">
@@ -580,7 +580,7 @@
             <div class="hero-actions">
               <a class="btn btn-primary" href="http://newtab.online" data-i18n="hero_enter">进入 NewTab</a>
             </div>
-            <div class="hero-note" data-i18n="hero_note">提示：/ 为主站入口（应用），本页面为 /intro</div>
+            <div class="hero-note" data-i18n="hero_note">提示：/ 为主站入口（应用），本页面为 /landing</div>
           </div>
 
           <div class="sketch-card mock">
@@ -653,13 +653,50 @@
               <div class="footer-inner">
                 <div> NewTab</div>
                 <div class="footer-links">
-                  <a href="/pricing">Pricing</a>
                   <a href="/terms">Terms</a>
                   <a href="/privacy">Privacy</a>
                 </div>
               </div>
             </footer>
           </div>
+        </div>
+      </section>
+
+      <section class="page" data-page="3">
+        <div class="wrap">
+          <div class="section-title">
+            <h2 data-i18n="pricing_title">Pricing</h2>
+            <p data-i18n="pricing_subtitle">免费版够用，高级版解锁更深度的个性化</p>
+          </div>
+
+          <div class="grid">
+            <div class="sketch-card feat">
+              <div class="icon">🆓</div>
+              <h3 data-i18n="pricing_free_title">Free · 免费版</h3>
+              <p data-i18n="pricing_free_price">$0</p>
+              <p data-i18n="pricing_free_desc">基础壁纸库、网站标签管理、数据同步</p>
+            </div>
+            <div class="sketch-card feat">
+              <div class="icon">⭐</div>
+              <h3 data-i18n="pricing_premium_title">Premium · 高级版</h3>
+              <p data-i18n="pricing_premium_price">$4.99/月 · $49.99/年</p>
+              <p data-i18n="pricing_premium_desc">自定义主题/字体、上传壁纸（最多 50 张）、优先支持</p>
+            </div>
+          </div>
+
+          <div class="page-cta">
+            <a class="btn btn-primary" href="http://newtab.online" data-i18n="pricing_cta">在应用内升级</a>
+          </div>
+
+          <footer>
+            <div class="footer-inner">
+              <div> NewTab</div>
+              <div class="footer-links">
+                <a href="/terms">Terms</a>
+                <a href="/privacy">Privacy</a>
+              </div>
+            </div>
+          </footer>
         </div>
       </section>
     </div>
@@ -669,6 +706,7 @@
         <button class="dotbtn active" type="button" data-goto="0" aria-label="Page 1"></button>
         <button class="dotbtn" type="button" data-goto="1" aria-label="Page 2"></button>
         <button class="dotbtn" type="button" data-goto="2" aria-label="Page 3"></button>
+        <button class="dotbtn" type="button" data-goto="3" aria-label="Page 4"></button>
       </div>
       <div class="arrows" aria-label="Arrows">
         <button class="arrow" type="button" id="prevBtn" aria-label="Previous">‹</button>
@@ -678,9 +716,9 @@
   </main>
 
   <script>
-    const STORAGE_LANG = 'intro_lang';
-    const STORAGE_THEME = 'intro_theme';
-    const STORAGE_PAGE = 'intro_page';
+    const STORAGE_LANG = 'landing_lang';
+    const STORAGE_THEME = 'landing_theme';
+    const STORAGE_PAGE = 'landing_page';
 
     const T = {
       zh: {
@@ -688,7 +726,7 @@
         hero_title: '把新标签页<br>变成你的<br>手绘工作台',
         hero_desc: '轻松管理常用网站、壁纸与主题。更像一张纸、一支笔，但更高效。',
         hero_enter: '进入 NewTab',
-        hero_note: '提示：/ 为主站入口（应用），本页面为 /intro',
+        hero_note: '提示：/ 为主站入口（应用），本页面为 /landing',
         mock_title: '（预览图占位）',
         mock_desc: '你可以把截图放到 landing/screenshot.png',
         features_title: '三个让你更舒服的细节',
@@ -704,14 +742,23 @@
         cta_submit: '订阅',
         cta_hint: '未配置提交地址时将只做本地提示（不会真的提交）。',
         subscribed_ok: '已收到：我们会在服务配置完成后开始收集订阅。',
-        subscribed_need_cfg: '订阅接口未配置：请在 landing/index.html 里设置 NEWSLETTER_ACTION_URL。'
+        subscribed_need_cfg: '订阅接口未配置：请在 landing/index.html 里设置 NEWSLETTER_ACTION_URL。',
+        pricing_title: 'Pricing',
+        pricing_subtitle: '免费版够用，高级版解锁更深度的个性化',
+        pricing_free_title: 'Free · 免费版',
+        pricing_free_price: '$0',
+        pricing_free_desc: '基础壁纸库、网站标签管理、数据同步',
+        pricing_premium_title: 'Premium · 高级版',
+        pricing_premium_price: '$4.99/月 · $49.99/年',
+        pricing_premium_desc: '自定义主题/字体、上传壁纸（最多 50 张）、优先支持',
+        pricing_cta: '在应用内升级'
       },
       en: {
         open_newtab: 'Open NewTab',
         hero_title: 'Turn your new tab<br>into a<br>hand-drawn desk',
         hero_desc: 'Manage sites, wallpapers and themes effortlessly. Like paper & pen, but faster.',
         hero_enter: 'Open NewTab',
-        hero_note: 'Tip: / is the app entry, this page is /intro',
+        hero_note: 'Tip: / is the app entry, this page is /landing',
         mock_title: '(Preview placeholder)',
         mock_desc: 'Put your screenshot at landing/screenshot.png',
         features_title: 'Three small things that feel good',
@@ -727,7 +774,16 @@
         cta_submit: 'Subscribe',
         cta_hint: 'Without an endpoint configured, this is a local-only demo (no submission).',
         subscribed_ok: 'Got it. We will start collecting once the service is configured.',
-        subscribed_need_cfg: 'Newsletter endpoint not configured: set NEWSLETTER_ACTION_URL in landing/index.html.'
+        subscribed_need_cfg: 'Newsletter endpoint not configured: set NEWSLETTER_ACTION_URL in landing/index.html.',
+        pricing_title: 'Pricing',
+        pricing_subtitle: 'Free is enough. Premium unlocks deeper personalization.',
+        pricing_free_title: 'Free',
+        pricing_free_price: '$0',
+        pricing_free_desc: 'Basic wallpapers, sites & tags, sync',
+        pricing_premium_title: 'Premium',
+        pricing_premium_price: '$4.99/mo · $49.99/yr',
+        pricing_premium_desc: 'Custom theme & fonts, upload wallpapers (50), priority support',
+        pricing_cta: 'Upgrade in the app'
       }
     };
 
@@ -761,7 +817,7 @@
     function pickHeroPreviewSrc() {
       const lang = document.documentElement.lang === 'en' ? 'en' : 'zh';
       const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-      return `/intro/screenshot-${lang}-${theme}.png`;
+      return `/landing/screenshot-${lang}-${theme}.png`;
     }
 
     function updateHeroPreview() {
@@ -780,9 +836,26 @@
 
     const NEWSLETTER_ACTION_URL = '';
 
-    let currentPage = Math.max(0, Math.min(2, parseInt(localStorage.getItem(STORAGE_PAGE) || '0', 10) || 0));
+    const pathname = window.location.pathname || '/';
+    const isPricingPath = pathname === '/pricing' || pathname === '/pricing/';
+    const storedPage = parseInt(localStorage.getItem(STORAGE_PAGE) || '0', 10) || 0;
+
+    let currentPage = isPricingPath
+      ? 3
+      : Math.max(0, Math.min(3, storedPage));
     let currentLang = (localStorage.getItem(STORAGE_LANG) || 'zh') === 'en' ? 'en' : 'zh';
     let currentTheme = (localStorage.getItem(STORAGE_THEME) || 'light') === 'dark' ? 'dark' : 'light';
+
+    function syncUrlForPage(page) {
+      const p = Number.isFinite(page) ? page : currentPage;
+      const desired = p === 3 ? '/pricing' : '/landing';
+      if ((window.location.pathname || '/') !== desired) {
+        try {
+          window.history.replaceState({}, document.title, desired);
+        } catch (_) {
+        }
+      }
+    }
 
     function applyI18n() {
       const dict = T[currentLang];
@@ -803,10 +876,11 @@
     }
 
     function setPage(next) {
-      const clamped = Math.max(0, Math.min(2, next));
+      const clamped = Math.max(0, Math.min(3, next));
       if (clamped === currentPage) return;
       currentPage = clamped;
       localStorage.setItem(STORAGE_PAGE, String(currentPage));
+      syncUrlForPage(currentPage);
       pagesEl.classList.add('is-flipping');
       pagesEl.style.transform = `translateX(-${currentPage * 100}vw)`;
       dots.forEach((d, idx) => d.classList.toggle('active', idx === currentPage));
@@ -844,6 +918,12 @@
         const i = parseInt(d.getAttribute('data-goto') || '0', 10) || 0;
         setPage(i);
       });
+    });
+
+    const brandHome = document.getElementById('brandHome');
+    brandHome?.addEventListener('click', (e) => {
+      e.preventDefault();
+      setPage(0);
     });
 
     langToggle.addEventListener('click', () => {
@@ -892,6 +972,8 @@
     applyI18n();
     refreshPage();
     updateHeroPreview();
+
+    syncUrlForPage(currentPage);
   </script>
 </body>
 </html>

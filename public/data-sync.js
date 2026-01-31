@@ -5,7 +5,16 @@ const SYNC_DEBOUNCE_MS = 500;
 const LOCAL_UPDATED_AT_KEY = 'home_config_updated_at';
 const PENDING_HOME_SYNC_KEY = 'home_config_pending_home_sync';
 const SETTINGS_SCHEMA_VERSION = 1;
+const USER_CACHE_VERSION = 1;
+const USER_CACHE_THEME_PREFIX = `user_cache_theme_v${USER_CACHE_VERSION}_`;
+const USER_CACHE_FONT_PREFIX = `user_cache_font_v${USER_CACHE_VERSION}_`;
+const USER_CACHE_HOME_PREFIX = `user_cache_home_v${USER_CACHE_VERSION}_`;
 let flushPendingInProgress = false;
+
+function getUserCacheKey(prefix, uid) {
+    if (!uid) return null;
+    return `${prefix}${uid}`;
+}
 
 function parseIsoToMs(v) {
     if (!v) return 0;
@@ -32,6 +41,20 @@ function setPendingHomeSync(obj) {
         return;
     }
     localStorage.setItem(PENDING_HOME_SYNC_KEY, JSON.stringify(obj));
+}
+
+function getLocalUpdatedAt() {
+    const v = localStorage.getItem(LOCAL_UPDATED_AT_KEY);
+    const t = v ? Date.parse(v) : 0;
+    return Number.isFinite(t) ? t : 0;
+}
+
+function setLocalUpdatedAt(isoString) {
+    if (!isoString) {
+        localStorage.removeItem(LOCAL_UPDATED_AT_KEY);
+        return;
+    }
+    localStorage.setItem(LOCAL_UPDATED_AT_KEY, isoString);
 }
 
 function queueHomeSync(payload, reason = 'unknown') {
@@ -80,7 +103,6 @@ async function flushPendingProfileSync() {
 
     const pending = getPendingHomeSync();
     if (!pending || !pending.payload) return;
-
     if (!navigator.onLine) return;
 
     flushPendingInProgress = true;
@@ -94,14 +116,14 @@ async function flushPendingProfileSync() {
         if (ok) {
             setPendingHomeSync(null);
             return { status: 'flushed' };
-        } else {
-            const latest = getPendingHomeSync();
-            if (latest) {
-                latest.attempts = (latest.attempts || 0) + 1;
-                setPendingHomeSync(latest);
-            }
-            return { status: 'failed' };
         }
+
+        const latest = getPendingHomeSync();
+        if (latest) {
+            latest.attempts = (latest.attempts || 0) + 1;
+            setPendingHomeSync(latest);
+        }
+        return { status: 'failed' };
     } finally {
         flushPendingInProgress = false;
     }
@@ -120,7 +142,6 @@ function migrateSettings(rawSettings) {
         if (typeof s.colorMode !== 'string') s.colorMode = (localStorage.getItem('theme') || 'light');
         if (typeof s.locale !== 'string') s.locale = (localStorage.getItem('locale') || 'zh');
         if (!Object.prototype.hasOwnProperty.call(s, 'wallpaper')) s.wallpaper = (localStorage.getItem('selectedWallpaper') || null);
-
         s.schema_version = SETTINGS_SCHEMA_VERSION;
     } else if (v !== SETTINGS_SCHEMA_VERSION) {
         s.schema_version = SETTINGS_SCHEMA_VERSION;
@@ -129,30 +150,159 @@ function migrateSettings(rawSettings) {
     return s;
 }
 
-function getLocalUpdatedAt() {
-    const v = localStorage.getItem(LOCAL_UPDATED_AT_KEY);
-    const t = v ? Date.parse(v) : 0;
-    return Number.isFinite(t) ? t : 0;
+function getCachedUserHomeConfig(uid) {
+    const key = getUserCacheKey(USER_CACHE_HOME_PREFIX, uid);
+    if (!key) return null;
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    try {
+        const obj = JSON.parse(raw);
+        if (!obj || typeof obj !== 'object') return null;
+        return obj;
+    } catch {
+        return null;
+    }
 }
 
-function setLocalUpdatedAt(isoString) {
-    if (!isoString) {
-        localStorage.removeItem(LOCAL_UPDATED_AT_KEY);
+function setCachedUserHomeConfig(uid, homeConfig) {
+    const key = getUserCacheKey(USER_CACHE_HOME_PREFIX, uid);
+    if (!key) return;
+    if (!homeConfig || typeof homeConfig !== 'object') {
+        localStorage.removeItem(key);
         return;
     }
-    localStorage.setItem(LOCAL_UPDATED_AT_KEY, isoString);
+    localStorage.setItem(key, JSON.stringify(homeConfig));
+}
+
+function getCachedUserThemeSettings(uid) {
+    const key = getUserCacheKey(USER_CACHE_THEME_PREFIX, uid);
+    if (!key) return null;
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    try {
+        const obj = JSON.parse(raw);
+        if (!obj || typeof obj !== 'object') return null;
+        return obj;
+    } catch {
+        return null;
+    }
+}
+
+function setCachedUserThemeSettings(uid, themeSettings) {
+    const key = getUserCacheKey(USER_CACHE_THEME_PREFIX, uid);
+    if (!key) return;
+    if (!themeSettings || typeof themeSettings !== 'object' || Object.keys(themeSettings).length === 0) {
+        localStorage.removeItem(key);
+        return;
+    }
+    localStorage.setItem(key, JSON.stringify(themeSettings));
+}
+
+function getCachedUserFontSettings(uid) {
+    const key = getUserCacheKey(USER_CACHE_FONT_PREFIX, uid);
+    if (!key) return null;
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    try {
+        const obj = JSON.parse(raw);
+        if (!obj || typeof obj !== 'object') return null;
+        return obj;
+    } catch {
+        return null;
+    }
+}
+
+function setCachedUserFontSettings(uid, fontSettings) {
+    const key = getUserCacheKey(USER_CACHE_FONT_PREFIX, uid);
+    if (!key) return;
+    if (!fontSettings || typeof fontSettings !== 'object' || Object.keys(fontSettings).length === 0) {
+        localStorage.removeItem(key);
+        return;
+    }
+    localStorage.setItem(key, JSON.stringify(fontSettings));
+}
+
+function applyCachedHomeConfig(homeConfig) {
+    if (!homeConfig || typeof homeConfig !== 'object') return;
+
+    const sites = Array.isArray(homeConfig.sites) ? homeConfig.sites : null;
+    const tags = Array.isArray(homeConfig.tags) ? homeConfig.tags : null;
+    const siteOrder = Array.isArray(homeConfig.site_order) ? homeConfig.site_order : null;
+    const tagOrder = Array.isArray(homeConfig.tag_order) ? homeConfig.tag_order : null;
+    const settings = (homeConfig.settings && typeof homeConfig.settings === 'object') ? homeConfig.settings : null;
+
+    if (sites) state.sites = sites;
+    if (tags) state.tags = tags;
+    if (siteOrder) state.siteOrder = siteOrder;
+    if (tagOrder) state.tagOrder = tagOrder;
+
+    if (settings) {
+        if (typeof settings.viewMode === 'string') state.viewMode = settings.viewMode;
+        if (Number.isFinite(settings.engineIndex)) state.engineIndex = settings.engineIndex;
+        if (Number.isFinite(settings.dateFormatIndex)) state.dateFormatIndex = settings.dateFormatIndex;
+        if (typeof settings.timeFormat === 'string') state.timeFormat = settings.timeFormat;
+
+        if (typeof settings.locale === 'string') {
+            if (typeof i18n !== 'undefined' && i18n.setLocale) {
+                i18n.setLocale(settings.locale, false);
+            } else {
+                localStorage.setItem('locale', settings.locale);
+            }
+        }
+
+        if (Object.prototype.hasOwnProperty.call(settings, 'wallpaper') && window.applyWallpaper) {
+            window.applyWallpaper(settings.wallpaper);
+        }
+
+        if (typeof settings.theme === 'string') {
+            state.currentTheme = settings.theme;
+        }
+
+        if (typeof settings.colorMode === 'string') {
+            const mode = settings.colorMode === 'dark' ? 'dark' : 'light';
+            document.body.classList.toggle('dark', mode === 'dark');
+            document.body.classList.toggle('light', mode !== 'dark');
+            localStorage.setItem('theme', mode);
+            window.applyCustomThemeForCurrentMode?.();
+        }
+    }
+}
+
+function applyCachedUserData({ uid, effectiveTier } = {}) {
+    if (!uid) return;
+    const tier = Number(effectiveTier || window.membershipState?.tier || 1);
+
+    const cachedHome = getCachedUserHomeConfig(uid);
+    if (cachedHome) {
+        applyCachedHomeConfig(cachedHome);
+    }
+
+    if (tier >= 2) {
+        const cachedTheme = getCachedUserThemeSettings(uid);
+        if (cachedTheme && window.applyThemeSettings) {
+            window.applyThemeSettings(cachedTheme);
+            window.applyCustomThemeForCurrentMode?.();
+        }
+
+        const cachedFont = getCachedUserFontSettings(uid);
+        if (cachedFont && window.applyFontSettings) {
+            window.applyFontSettings(cachedFont);
+        }
+    }
+
+    window.renderHome?.();
+    window.renderSearchEngine?.();
+    window.updateTime?.();
 }
 
 function markHomeConfigUpdated() {
     const now = new Date().toISOString();
     setLocalUpdatedAt(now);
-
     if (window.authState && window.authState.isLoggedIn) {
         saveUserDataToBackend();
     }
 }
 
-// Load user data from Supabase
 async function loadUserData() {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
         console.log('Not logged in, skipping data load');
@@ -163,8 +313,9 @@ async function loadUserData() {
         console.log('Loading user data from Supabase...');
 
         const uid = window.authState.user.id;
+        const effectiveTier = window.membershipState?.tier || 1;
 
-        const loadThemeAndFontSettings = async (effectiveTier) => {
+        const loadThemeAndFontSettings = async () => {
             if (effectiveTier >= 2) {
                 const [themeRes, fontRes] = await Promise.all([
                     supabase.from('user_theme_settings').select('theme_settings').eq('user_id', uid).single(),
@@ -175,34 +326,24 @@ async function loadUserData() {
                 const fontSettings = fontRes.error ? null : fontRes.data?.font_settings;
 
                 if (themeSettings && Object.keys(themeSettings).length > 0) {
-                    if (window.applyThemeSettings) {
-                        window.applyThemeSettings(themeSettings);
-                    }
-                    if (window.applyCustomThemeForCurrentMode) {
-                        window.applyCustomThemeForCurrentMode();
-                    }
+                    setCachedUserThemeSettings(uid, themeSettings);
+                    window.applyThemeSettings?.(themeSettings);
+                    window.applyCustomThemeForCurrentMode?.();
                 } else {
-                    if (window.clearCustomThemeSettings) {
-                        window.clearCustomThemeSettings();
-                    }
+                    setCachedUserThemeSettings(uid, null);
+                    window.clearCustomThemeSettings?.();
                 }
 
                 if (fontSettings && Object.keys(fontSettings).length > 0) {
-                    if (window.applyFontSettings) {
-                        window.applyFontSettings(fontSettings);
-                    }
+                    setCachedUserFontSettings(uid, fontSettings);
+                    window.applyFontSettings?.(fontSettings);
                 } else {
-                    if (window.clearCustomFontSettings) {
-                        window.clearCustomFontSettings();
-                    }
+                    setCachedUserFontSettings(uid, null);
+                    window.clearCustomFontSettings?.();
                 }
             } else {
-                if (window.clearCustomThemeSettings) {
-                    window.clearCustomThemeSettings();
-                }
-                if (window.clearCustomFontSettings) {
-                    window.clearCustomFontSettings();
-                }
+                window.clearCustomThemeSettings?.();
+                window.clearCustomFontSettings?.();
             }
         };
 
@@ -221,7 +362,6 @@ async function loadUserData() {
         }
 
         const home = homeRes.data || null;
-        const effectiveTier = window.membershipState?.tier || 1;
         const serverUpdatedAt = parseIsoToMs(home?.updated_at);
         const localUpdatedAt = getLocalUpdatedAt();
         const pending = getPendingHomeSync();
@@ -234,13 +374,10 @@ async function loadUserData() {
 
         if (localUpdatedAt > 0 && serverUpdatedAt > 0 && localUpdatedAt > serverUpdatedAt) {
             if (pending) {
-                console.log('Local pending changes are newer than server, flushing pending payload first...');
                 await flushPendingProfileSync();
             }
-            console.log('Local data is newer than server, pushing local data to Supabase...');
             await saveUserDataToBackend({ immediate: true });
-
-            await loadThemeAndFontSettings(effectiveTier);
+            await loadThemeAndFontSettings();
             return;
         }
 
@@ -270,7 +407,6 @@ async function loadUserData() {
         const orderedTags = Array.isArray(tagOrderRes.data) ? tagOrderRes.data.map(r => r.tag_name) : [];
         state.tagOrder = orderedTags.length ? orderedTags : [...state.tags];
 
-        // Load settings
         const serverSettings = migrateSettings({
             viewMode: home?.view_mode,
             engineIndex: home?.engine_index,
@@ -282,63 +418,72 @@ async function loadUserData() {
             colorMode: home?.color_mode,
             schema_version: home?.schema_version
         });
-            if (serverSettings) {
-                if (typeof serverSettings.viewMode === 'string') {
-                    state.viewMode = serverSettings.viewMode;
-                }
-                if (serverSettings.engineIndex !== undefined) {
-                    state.engineIndex = serverSettings.engineIndex;
-                }
-                if (serverSettings.dateFormatIndex !== undefined) {
-                    state.dateFormatIndex = serverSettings.dateFormatIndex;
-                }
-                if (typeof serverSettings.timeFormat === 'string') {
-                    state.timeFormat = serverSettings.timeFormat;
-                }
-                if (typeof serverSettings.locale === 'string') {
-                    if (typeof i18n !== 'undefined' && i18n.setLocale) {
-                        i18n.setLocale(serverSettings.locale, false);
-                    } else {
-                        localStorage.setItem('locale', serverSettings.locale);
-                    }
-                }
-                if (Object.prototype.hasOwnProperty.call(serverSettings, 'wallpaper')) {
-                    if (window.applyWallpaper) {
-                        window.applyWallpaper(serverSettings.wallpaper);
-                    }
-                }
-                if (typeof serverSettings.theme === 'string') {
-                    state.currentTheme = serverSettings.theme;
-                }
-                if (typeof serverSettings.colorMode === 'string') {
-                    const mode = serverSettings.colorMode === 'dark' ? 'dark' : 'light';
-                    document.body.classList.toggle('dark', mode === 'dark');
-                    document.body.classList.toggle('light', mode !== 'dark');
-                    localStorage.setItem('theme', mode);
-                    if (window.applyCustomThemeForCurrentMode) {
-                        window.applyCustomThemeForCurrentMode();
-                    }
+
+        if (serverSettings) {
+            if (typeof serverSettings.viewMode === 'string') state.viewMode = serverSettings.viewMode;
+            if (serverSettings.engineIndex !== undefined) state.engineIndex = serverSettings.engineIndex;
+            if (serverSettings.dateFormatIndex !== undefined) state.dateFormatIndex = serverSettings.dateFormatIndex;
+            if (typeof serverSettings.timeFormat === 'string') state.timeFormat = serverSettings.timeFormat;
+
+            if (typeof serverSettings.locale === 'string') {
+                if (typeof i18n !== 'undefined' && i18n.setLocale) {
+                    i18n.setLocale(serverSettings.locale, false);
+                } else {
+                    localStorage.setItem('locale', serverSettings.locale);
                 }
             }
 
-            await loadThemeAndFontSettings(effectiveTier);
+            if (Object.prototype.hasOwnProperty.call(serverSettings, 'wallpaper')) {
+                window.applyWallpaper?.(serverSettings.wallpaper);
+            }
 
-            // Save to localStorage for offline access
-            saveData(false); // Don't trigger sync back
-            setLocalUpdatedAt(home?.updated_at || new Date().toISOString());
+            if (typeof serverSettings.theme === 'string') {
+                state.currentTheme = serverSettings.theme;
+            }
 
-            // Re-render UI
-            if (window.renderHome) window.renderHome();
-            if (window.renderSearchEngine) window.renderSearchEngine();
-            if (window.updateTime) window.updateTime();
+            if (typeof serverSettings.colorMode === 'string') {
+                const mode = serverSettings.colorMode === 'dark' ? 'dark' : 'light';
+                document.body.classList.toggle('dark', mode === 'dark');
+                document.body.classList.toggle('light', mode !== 'dark');
+                localStorage.setItem('theme', mode);
+                window.applyCustomThemeForCurrentMode?.();
+            }
+        }
 
-            console.log('User data loaded successfully');
+        setCachedUserHomeConfig(uid, {
+            sites: state.sites,
+            tags: state.tags,
+            site_order: state.siteOrder,
+            tag_order: state.tagOrder,
+            settings: {
+                viewMode: state.viewMode,
+                engineIndex: state.engineIndex,
+                dateFormatIndex: state.dateFormatIndex,
+                timeFormat: state.timeFormat,
+                locale: (typeof i18n !== 'undefined' && i18n.currentLocale) ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'),
+                wallpaper: window.wallpaperState?.selectedWallpaper || null,
+                theme: state.currentTheme || 'handdrawn',
+                colorMode: document.body.classList.contains('dark') ? 'dark' : 'light',
+                schema_version: SETTINGS_SCHEMA_VERSION
+            },
+            updated_at: home?.updated_at || new Date().toISOString()
+        });
+
+        await loadThemeAndFontSettings();
+
+        saveData(false);
+        setLocalUpdatedAt(home?.updated_at || new Date().toISOString());
+
+        window.renderHome?.();
+        window.renderSearchEngine?.();
+        window.updateTime?.();
+
+        console.log('User data loaded successfully');
     } catch (err) {
         console.error('Error loading user data:', err);
     }
 }
 
-// Save user data to Supabase (with debouncing)
 async function saveUserDataToBackend(options = {}) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
         console.log('Not logged in, skipping save');
@@ -348,8 +493,6 @@ async function saveUserDataToBackend(options = {}) {
     const doSync = async () => {
         let payload = null;
         try {
-            console.log('Syncing data to Supabase...');
-
             const colorMode = document.body.classList.contains('dark') ? 'dark' : 'light';
             const updatedAt = new Date().toISOString();
 
@@ -378,9 +521,11 @@ async function saveUserDataToBackend(options = {}) {
                 updated_at: updatedAt
             };
 
+            setCachedUserHomeConfig(window.authState.user.id, payload);
+
             const { ok } = await syncHomeConfigWithRetry(payload, { queueReason: 'saveUserDataToBackend_failed' });
             if (ok) {
-                console.log('Data synced successfully');
+                return;
             }
         } catch (err) {
             console.error('Error syncing data:', err);
@@ -392,7 +537,6 @@ async function saveUserDataToBackend(options = {}) {
         }
     };
 
-    // Clear existing timer
     if (syncDebounceTimer) {
         clearTimeout(syncDebounceTimer);
     }
@@ -402,13 +546,11 @@ async function saveUserDataToBackend(options = {}) {
         return;
     }
 
-    // Debounce: wait 500ms before actually saving
     syncDebounceTimer = setTimeout(async () => {
         await doSync();
     }, SYNC_DEBOUNCE_MS);
 }
 
-// Save theme settings (tier 2+ only)
 async function saveThemeSettings(themeSettings) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
         throw new Error('Not logged in');
@@ -429,6 +571,8 @@ async function saveThemeSettings(themeSettings) {
             console.error('Failed to save theme settings:', error);
             throw error;
         }
+
+        setCachedUserThemeSettings(window.authState.user.id, themeSettings);
         return { ok: true };
     } catch (err) {
         console.error('Error saving theme settings:', err);
@@ -436,7 +580,6 @@ async function saveThemeSettings(themeSettings) {
     }
 }
 
-// Save font settings (tier 2+ only)
 async function saveFontSettings(fontSettings) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
         throw new Error('Not logged in');
@@ -457,6 +600,8 @@ async function saveFontSettings(fontSettings) {
             console.error('Failed to save font settings:', error);
             throw error;
         }
+
+        setCachedUserFontSettings(window.authState.user.id, fontSettings);
         return { ok: true };
     } catch (err) {
         console.error('Error saving font settings:', err);
@@ -482,12 +627,14 @@ async function resetThemeCustomization() {
         await supabase
             .from('user_font_settings')
             .upsert({ user_id: window.authState.user.id, font_settings: {}, updated_at: updatedAt }, { onConflict: 'user_id' });
+
+        setCachedUserThemeSettings(window.authState.user.id, null);
+        setCachedUserFontSettings(window.authState.user.id, null);
     } catch (err) {
         console.error('Error resetting theme customization:', err);
     }
 }
 
-// Export functions
 window.loadUserData = loadUserData;
 window.saveUserDataToBackend = saveUserDataToBackend;
 window.saveThemeSettings = saveThemeSettings;
@@ -495,6 +642,7 @@ window.saveFontSettings = saveFontSettings;
 window.resetThemeCustomizationOnBackend = resetThemeCustomization;
 window.markHomeConfigUpdated = markHomeConfigUpdated;
 window.flushPendingProfileSync = flushPendingProfileSync;
+window.applyCachedUserData = applyCachedUserData;
 
 window.addEventListener('online', () => {
     if (window.authState && window.authState.isLoggedIn) {
