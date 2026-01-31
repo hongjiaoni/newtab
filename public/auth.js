@@ -336,19 +336,14 @@ window.openUserProfile = function () {
   const tier = window.membershipState?.tier || 1;
 
   const tierIcon = tier === 3 ? '👑' : (tier === 2 ? '⭐' : '');
-  const tierText = tierIcon ? tierIcon : (isZh ? '普通' : 'Basic');
 
   content.innerHTML = `
     <div style="text-align: center; padding: 20px;">
         <img src="${avatarUrl}" style="width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--border-color); margin-bottom: 10px;">
-        <h3 style="margin: 0;">${name}</h3>
+        <h3 style="margin: 0; display:flex; align-items:center; justify-content:center; gap: 8px;">${name}${tierIcon ? `<span style=\"font-size:18px; line-height:1;\">${tierIcon}</span>` : ''}</h3>
         <p style="opacity: 0.7; margin: 5px 0;">${authState.user.email}</p>
     </div>
     <div style="padding: 0 20px 20px; display: grid; gap: 12px;">
-      <div style="display:flex; justify-content: space-between; align-items:center; padding: 10px 12px; border: 2px solid var(--border-color); border-radius: 10px; background: var(--input-bg);">
-        <span style="opacity:0.8;">${isZh ? '会员等级' : 'Membership tier'}</span>
-        <strong style="font-size: 18px; line-height: 1;">${tierText}</strong>
-      </div>
       <button class="primary-btn sketchy-border" style="width: 100%;" onclick="openSubscriptionRecords()">
         ${isZh ? '订阅记录' : 'Subscription records'}
       </button>

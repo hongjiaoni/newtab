@@ -230,10 +230,10 @@ function createThemeModal() {
                   <label>${isZh ? '强调' : 'Accent'}</label>
                   <input type="color" id="accentColorInput" value="${themeState.customSettings.accentColor}" onchange="updateThemePreview()">
                 </div>
-              </div>
-              <div class="theme-color-row" style="margin-top: 10px;">
-                <label>${isZh ? '阴影' : 'Shadow'}</label>
-                <input type="color" id="shadowColorInput" value="${toHexColor(themeState.customSettings.shadowColor)}" onchange="updateThemePreview()">
+                <div class="theme-color-item">
+                  <label>${isZh ? '阴影' : 'Shadow'}</label>
+                  <input type="color" id="shadowColorInput" value="${toHexColor(themeState.customSettings.shadowColor)}" onchange="updateThemePreview()">
+                </div>
               </div>
             </div>
 
@@ -272,10 +272,10 @@ function createThemeModal() {
                   <label>${isZh ? '强调' : 'Accent'}</label>
                   <input type="color" id="accentColorDarkInput" value="${themeState.customSettings.darkMode.accentColor}" onchange="updateThemePreview()">
                 </div>
-              </div>
-              <div class="theme-color-row" style="margin-top: 10px;">
-                <label>${isZh ? '阴影' : 'Shadow'}</label>
-                <input type="color" id="shadowColorDarkInput" value="${toHexColor(themeState.customSettings.darkMode.shadowColor)}" onchange="updateThemePreview()">
+                <div class="theme-color-item">
+                  <label>${isZh ? '阴影' : 'Shadow'}</label>
+                  <input type="color" id="shadowColorDarkInput" value="${toHexColor(themeState.customSettings.darkMode.shadowColor)}" onchange="updateThemePreview()">
+                </div>
               </div>
             </div>
           </div>
@@ -451,10 +451,6 @@ function renderThemePreview() {
         <div class="content-area" style="max-width: 520px;">
           <div class="chip">Google</div>
           <div class="chip tag">Work</div>
-        </div>
-
-        <div style="display:flex; justify-content:center; margin-top: 14px;">
-          <div style="width: 220px; height: 44px; border: 2px solid var(--border-color); border-radius: 10px; background: var(--card-bg); box-shadow: 6px 6px 0 var(--shadow-color);"></div>
         </div>
 
         <div style="display:flex; justify-content:center; gap: 10px; margin-top: 18px;">

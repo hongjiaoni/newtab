@@ -8,6 +8,12 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/$1" },
 
+    { "src": "/favicon.svg", "dest": "/landing/favicon.svg" },
+    { "src": "/favicon.png", "dest": "/landing/favicon.png" },
+    { "src": "/favicon.ico", "dest": "/landing/favicon.png" },
+    { "src": "/badge.svg", "dest": "/landing/badge.svg" },
+    { "src": "/screenshot.png", "dest": "/landing/screenshot.png" },
+
     { "src": "/$", "dest": "/public/index.html" },
     { "src": "/landing/?$", "dest": "/landing/index.html" },
     { "src": "/landing/(.*)", "dest": "/landing/$1" },

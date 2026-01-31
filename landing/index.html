@@ -205,7 +205,7 @@
 
     .pages {
       height: 100%;
-      width: 300vw;
+      width: 400vw;
       display: flex;
       transform: translateX(0);
       transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -555,7 +555,7 @@
     <div class="wrap header-inner">
       <a class="brand" href="/" aria-label="Go to app" id="brandHome">
         <span class="brand-badge">
-          <img class="brand-badge-img" src="/landing/badge.svg" alt="NewTab badge" />
+          <img class="brand-badge-img" src="/badge.svg" alt="NewTab badge" />
         </span>
         <span>NewTab</span>
       </a>
@@ -815,9 +815,7 @@
     }
 
     function pickHeroPreviewSrc() {
-      const lang = document.documentElement.lang === 'en' ? 'en' : 'zh';
-      const theme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
-      return `/landing/screenshot-${lang}-${theme}.png`;
+      return `/screenshot.png`;
     }
 
     function updateHeroPreview() {
@@ -838,20 +836,22 @@
 
     const pathname = window.location.pathname || '/';
     const isPricingPath = pathname === '/pricing' || pathname === '/pricing/';
+    const hash = window.location.hash || '';
+    const isPricingHash = hash === '#pricing';
     const storedPage = parseInt(localStorage.getItem(STORAGE_PAGE) || '0', 10) || 0;
 
-    let currentPage = isPricingPath
+    let currentPage = (isPricingPath || isPricingHash)
       ? 3
       : Math.max(0, Math.min(3, storedPage));
     let currentLang = (localStorage.getItem(STORAGE_LANG) || 'zh') === 'en' ? 'en' : 'zh';
     let currentTheme = (localStorage.getItem(STORAGE_THEME) || 'light') === 'dark' ? 'dark' : 'light';
 
-    function syncUrlForPage(page) {
+    function syncHashForPage(page) {
       const p = Number.isFinite(page) ? page : currentPage;
-      const desired = p === 3 ? '/pricing' : '/landing';
-      if ((window.location.pathname || '/') !== desired) {
+      const desiredHash = p === 3 ? '#pricing' : '';
+      if ((window.location.hash || '') !== desiredHash) {
         try {
-          window.history.replaceState({}, document.title, desired);
+          window.history.replaceState({}, document.title, `${window.location.pathname}${window.location.search}${desiredHash}`);
         } catch (_) {
         }
       }
@@ -880,7 +880,7 @@
       if (clamped === currentPage) return;
       currentPage = clamped;
       localStorage.setItem(STORAGE_PAGE, String(currentPage));
-      syncUrlForPage(currentPage);
+      syncHashForPage(currentPage);
       pagesEl.classList.add('is-flipping');
       pagesEl.style.transform = `translateX(-${currentPage * 100}vw)`;
       dots.forEach((d, idx) => d.classList.toggle('active', idx === currentPage));
@@ -973,7 +973,7 @@
     refreshPage();
     updateHeroPreview();
 
-    syncUrlForPage(currentPage);
+    syncHashForPage(currentPage);
   </script>
 </body>
 </html>
