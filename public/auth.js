@@ -83,7 +83,7 @@ async function ensureProfileExists(user) {
     // Profile doesn't exist, create it
     if (fetchError && fetchError.code === 'PGRST116') {
       console.log('Creating new profile for user:', user.id);
-      
+
       const meta = user.user_metadata || {};
       const { error: insertError } = await supabase
         .from('profiles')
@@ -300,12 +300,17 @@ function updateAuthUI() {
     const avatarUrl = authState.user.user_metadata.avatar_url || authState.user.user_metadata.picture || 'https://via.placeholder.com/32';
     const name = getUserNickname();
 
+    const tier = window.membershipState?.tier || 1;
+    const badge = (tier > 1 && window.MEMBERSHIP_CONFIG) ? window.MEMBERSHIP_CONFIG[tier].badge : '';
+    const badgeHtml = badge ? `<span class="membership-badge" title="${tier}" style="margin-left:6px; font-size:1.2em;">${badge}</span>` : '';
+
     // Show user info
     authMenuContainer.innerHTML = `
       <div class="settings-menu-item" onclick="openUserProfile()">
         <div class="user-info-menu">
             <img src="${avatarUrl}" alt="Avatar" style="width:24px;height:24px;border-radius:50%;margin-right:8px;">
             <span>${name}</span>
+            ${badgeHtml}
         </div>
       </div>
     `;
@@ -429,11 +434,11 @@ async function openSubscriptionRecords() {
     content.innerHTML = `
       <div style="padding: 16px; display: grid; gap: 12px;">
         ${rows.map((r) => {
-          const paidAt = formatTime(r.created_at);
-          const period = periodText(r.started_at, r.ends_at);
-          const product = (isZh ? `会员等级 ${r.tier}` : `Tier ${r.tier}`);
-          const status = String(r.status || '').toLowerCase() || '-';
-          return `
+      const paidAt = formatTime(r.created_at);
+      const period = periodText(r.started_at, r.ends_at);
+      const product = (isZh ? `会员等级 ${r.tier}` : `Tier ${r.tier}`);
+      const status = String(r.status || '').toLowerCase() || '-';
+      return `
             <div style="border: 2px solid var(--border-color); border-radius: 12px; padding: 12px; background: var(--card-bg);">
               <div style="display:flex; justify-content: space-between; gap: 12px; align-items: baseline;">
                 <strong>${product}</strong>
@@ -455,7 +460,7 @@ async function openSubscriptionRecords() {
               </div>
             </div>
           `;
-        }).join('')}
+    }).join('')}
       </div>
     `;
   } catch (err) {

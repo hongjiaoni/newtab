@@ -843,7 +843,6 @@ function openEngineModal() {
 
 function closeEngineModal() {
   document.getElementById('engineModal').classList.add('hidden');
-  document.getElementById('modalOverlay').classList.add('hidden');
 }
 
 function toggleEngineSelection(id) {
