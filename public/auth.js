@@ -364,6 +364,13 @@ async function openSubscriptionRecords() {
   const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
   const isZh = currentLocale === 'zh';
 
+  const titleEl = document.getElementById('subscriptionRecordsTitle');
+  if (titleEl && typeof i18n !== 'undefined') titleEl.textContent = i18n.t('subscriptionRecords');
+  const backBtnText = document.getElementById('backToUserProfile');
+  if (backBtnText && typeof i18n !== 'undefined') backBtnText.textContent = i18n.t('back');
+  const closeBtnText = document.getElementById('closeSubscriptionRecords');
+  if (closeBtnText && typeof i18n !== 'undefined') closeBtnText.textContent = i18n.t('close');
+
   const profileModal = document.getElementById('userProfileModal');
   const recordsModal = document.getElementById('subscriptionRecordsModal');
   const content = document.getElementById('subscriptionRecordsContent');

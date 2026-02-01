@@ -79,24 +79,10 @@ async function initializeMembership() {
 
 // Update UI based on membership tier
 function updateMembershipUI() {
-    // Add membership badge to settings menu
-    const authContainer = document.getElementById('authMenuContainer');
-    if (authContainer && membershipState.tier > 1) {
-        const badge = MEMBERSHIP_CONFIG[membershipState.tier].badge;
-        // Try to find the user info container first
-        const userInfo = authContainer.querySelector('.user-info-menu h3');
-        if (userInfo) {
-            const existingBadge = userInfo.querySelector('.membership-badge');
-            if (!existingBadge) {
-                const badgeEl = document.createElement('span');
-                badgeEl.className = 'membership-badge';
-                badgeEl.textContent = badge;
-                badgeEl.title = MEMBERSHIP_CONFIG[membershipState.tier].name;
-                badgeEl.style.marginLeft = '6px';
-                badgeEl.style.fontSize = '1.2em';
-                userInfo.appendChild(badgeEl);
-            }
-        }
+    // Re-render auth menu so membership badge appears in the top-right menu.
+    // (auth.js owns the DOM structure of the auth menu)
+    if (window.updateAuthUI) {
+        window.updateAuthUI();
     }
 
     // Show/hide premium features

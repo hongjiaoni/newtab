@@ -99,6 +99,10 @@ const translations = {
     addByLink: '添加链接',
     subscriptionRecords: '订阅记录',
     back: '返回',
+    addEngine: '新增',
+    remove: '移除',
+    engineModalTitle: '搜索引擎',
+    engineSearchPlaceholder: '搜索引擎（支持模糊搜索）',
     days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
     months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
   },
@@ -185,6 +189,8 @@ const translations = {
     back: 'Back',
     addEngine: 'Add engine',
     remove: 'Remove',
+    engineModalTitle: 'Search engines',
+    engineSearchPlaceholder: 'Search engines (fuzzy search)',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   }
@@ -207,7 +213,8 @@ function normalizeLocale(input) {
 let enginePageState = {
   page: 1,
   pageSize: 12,
-  selectedIds: []
+  selectedIds: [],
+  query: ''
 };
 
 function getLangFromUrl() {
@@ -276,7 +283,7 @@ const i18n = {
 };
 
 // Update all text elements with current locale
-window.updateAllText = function () {
+window.updateAllText = function updateAllText() {
   // Update search input placeholder
   searchInput.placeholder = i18n.t('search');
 
@@ -475,6 +482,12 @@ window.updateAllText = function () {
   const closeRecordsBtn = document.getElementById('closeSubscriptionRecords');
   if (closeRecordsBtn) closeRecordsBtn.textContent = i18n.t('close');
 
+  // Search engine modal
+  const engineModalTitle = document.getElementById('engineModalTitle');
+  if (engineModalTitle) engineModalTitle.textContent = i18n.t('engineModalTitle');
+  const engineSearchInput = document.getElementById('engineSearchInput');
+  if (engineSearchInput) engineSearchInput.placeholder = i18n.t('engineSearchPlaceholder');
+
   // Re-render content to update any dynamic text
   renderHome();
 
@@ -484,51 +497,39 @@ window.updateAllText = function () {
 
 // ===== Data & State =====
 const ENGINE_CATALOG = [
-  // Global / General
   { id: 'google', name: { zh: '谷歌', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
   { id: 'bing', name: { zh: '必应', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
-  { id: 'duckduckgo', name: { zh: 'DuckDuckGo', en: 'DuckDuckGo' }, url: 'https://duckduckgo.com/?q=', icon: 'https://duckduckgo.com/favicon.ico' },
   { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://search.yahoo.com/favicon.ico' },
+  { id: 'duckduckgo', name: { zh: 'DuckDuckGo', en: 'DuckDuckGo' }, url: 'https://duckduckgo.com/?q=', icon: 'https://duckduckgo.com/favicon.ico' },
   { id: 'yandex', name: { zh: 'Yandex', en: 'Yandex' }, url: 'https://yandex.com/search/?text=', icon: 'https://yandex.com/favicon.ico' },
-  { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
-  { id: 'brave', name: { zh: 'Brave', en: 'Brave' }, url: 'https://search.brave.com/search?q=', icon: 'https://brave.com/static-assets/images/brave-logo-sans-text.svg' },
-  { id: 'startpage', name: { zh: 'Startpage', en: 'Startpage' }, url: 'https://www.startpage.com/sp/search?query=', icon: 'https://www.startpage.com/favicon.ico' },
-
-  // Chinese Specific
   { id: 'baidu', name: { zh: '百度', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
   { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: 'https://www.sogou.com/favicon.ico' },
   { id: 'so360', name: { zh: '360 搜索', en: '360 Search' }, url: 'https://www.so.com/s?q=', icon: 'https://www.so.com/favicon.ico' },
-  { id: 'zhihu', name: { zh: '知乎', en: 'Zhihu' }, url: 'https://www.zhihu.com/search?q=', icon: 'https://static.zhihu.com/heifetz/favicon.ico' },
-  { id: 'bilibili', name: { zh: 'B站', en: 'Bilibili' }, url: 'https://search.bilibili.com/all?keyword=', icon: 'https://www.bilibili.com/favicon.ico' },
-  { id: 'xiaohongshu', name: { zh: '小红书', en: 'Xiaohongshu' }, url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: 'https://www.xiaohongshu.com/favicon.ico' },
-  { id: 'weibo', name: { zh: '微博', en: 'Weibo' }, url: 'https://s.weibo.com/weibo?q=', icon: 'https://weibo.com/favicon.ico' },
-  { id: 'douban', name: { zh: '豆瓣', en: 'Douban' }, url: 'https://www.douban.com/search?q=', icon: 'https://img3.doubanio.com/favicon.ico' },
-
-  // Dev / Tech
-  { id: 'github', name: { zh: 'GitHub', en: 'GitHub' }, url: 'https://github.com/search?q=', icon: 'https://github.com/favicon.ico' },
-  { id: 'stackoverflow', name: { zh: 'StackOverflow', en: 'StackOverflow' }, url: 'https://stackoverflow.com/search?q=', icon: 'https://stackoverflow.com/favicon.ico' },
-  { id: 'npm', name: { zh: 'NPM', en: 'NPM' }, url: 'https://www.npmjs.com/search?q=', icon: 'https://static.npmjs.com/b0f1a8318363185cc2ea6a40ac23eeb2.png' },
-  { id: 'mdn', name: { zh: 'MDN', en: 'MDN' }, url: 'https://developer.mozilla.org/search?q=', icon: 'https://developer.mozilla.org/favicon.ico' },
-
-  // Social / Media
-  { id: 'youtube', name: { zh: 'YouTube', en: 'YouTube' }, url: 'https://www.youtube.com/results?search_query=', icon: 'https://www.youtube.com/favicon.ico' },
-  { id: 'twitter', name: { zh: 'Twitter', en: 'Twitter' }, url: 'https://twitter.com/search?q=', icon: 'https://abs.twimg.com/favicons/twitter.2.ico' },
-  { id: 'reddit', name: { zh: 'Reddit', en: 'Reddit' }, url: 'https://www.reddit.com/search/?q=', icon: 'https://www.reddit.com/favicon.ico' },
-  { id: 'pinterest', name: { zh: 'Pinterest', en: 'Pinterest' }, url: 'https://www.pinterest.com/search/pins/?q=', icon: 'https://www.pinterest.com/favicon.ico' },
-  { id: 'instagram', name: { zh: 'Instagram', en: 'Instagram' }, url: 'https://www.instagram.com/explore/tags/', icon: 'https://www.instagram.com/favicon.ico' },
-
-  // Knowledge
-  { id: 'wikipedia', name: { zh: '维基百科', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: 'https://en.wikipedia.org/favicon.ico' },
+  { id: 'shenma', name: { zh: '神马', en: 'Shenma' }, url: 'https://m.sm.cn/s?q=', icon: 'https://m.sm.cn/favicon.ico' },
+  { id: 'naver', name: { zh: 'Naver', en: 'Naver' }, url: 'https://search.naver.com/search.naver?query=', icon: 'https://www.naver.com/favicon.ico' },
+  { id: 'daum', name: { zh: 'Daum', en: 'Daum' }, url: 'https://search.daum.net/search?q=', icon: 'https://www.daum.net/favicon.ico' },
+  { id: 'qwant', name: { zh: 'Qwant', en: 'Qwant' }, url: 'https://www.qwant.com/?q=', icon: 'https://www.qwant.com/favicon.ico' },
+  { id: 'startpage', name: { zh: 'Startpage', en: 'Startpage' }, url: 'https://www.startpage.com/sp/search?query=', icon: 'https://www.startpage.com/favicon.ico' },
+  { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
+  { id: 'brave', name: { zh: 'Brave', en: 'Brave' }, url: 'https://search.brave.com/search?q=', icon: 'https://brave.com/static-assets/images/brave-logo-sans-text.svg' },
+  { id: 'swisscows', name: { zh: 'Swisscows', en: 'Swisscows' }, url: 'https://swisscows.com/web?query=', icon: 'https://swisscows.com/favicon.ico' },
+  { id: 'mojeek', name: { zh: 'Mojeek', en: 'Mojeek' }, url: 'https://www.mojeek.com/search?q=', icon: 'https://www.mojeek.com/favicon.ico' },
+  { id: 'metager', name: { zh: 'MetaGer', en: 'MetaGer' }, url: 'https://metager.org/meta/meta.ger3?eingabe=', icon: 'https://metager.org/favicon.ico' },
+  { id: 'searx', name: { zh: 'SearX', en: 'SearX' }, url: 'https://searx.be/search?q=', icon: 'https://searx.be/favicon.ico' },
+  { id: 'ask', name: { zh: 'Ask', en: 'Ask' }, url: 'https://www.ask.com/web?q=', icon: 'https://www.ask.com/favicon.ico' },
+  { id: 'aol', name: { zh: 'AOL', en: 'AOL' }, url: 'https://search.aol.com/aol/search?q=', icon: 'https://www.aol.com/favicon.ico' },
+  { id: 'lycos', name: { zh: 'Lycos', en: 'Lycos' }, url: 'https://search.lycos.com/web/?q=', icon: 'https://www.lycos.com/favicon.ico' },
+  { id: 'excite', name: { zh: 'Excite', en: 'Excite' }, url: 'https://results.excite.com/serp?q=', icon: 'https://www.excite.com/favicon.ico' },
+  { id: 'dogpile', name: { zh: 'Dogpile', en: 'Dogpile' }, url: 'https://www.dogpile.com/serp?q=', icon: 'https://www.dogpile.com/favicon.ico' },
+  { id: 'webcrawler', name: { zh: 'WebCrawler', en: 'WebCrawler' }, url: 'https://www.webcrawler.com/serp?q=', icon: 'https://www.webcrawler.com/favicon.ico' },
+  { id: 'gibiru', name: { zh: 'Gibiru', en: 'Gibiru' }, url: 'https://gibiru.com/results.html?q=', icon: 'https://gibiru.com/favicon.ico' },
+  { id: 'seznam', name: { zh: 'Seznam', en: 'Seznam' }, url: 'https://search.seznam.cz/?q=', icon: 'https://www.seznam.cz/favicon.ico' },
+  { id: 'rambler', name: { zh: 'Rambler', en: 'Rambler' }, url: 'https://nova.rambler.ru/search?query=', icon: 'https://www.rambler.ru/favicon.ico' },
   { id: 'wolframalpha', name: { zh: 'WolframAlpha', en: 'WolframAlpha' }, url: 'https://www.wolframalpha.com/input/?i=', icon: 'https://www.wolframalpha.com/favicon.ico' },
-  { id: 'scholar', name: { zh: '学术搜索', en: 'Scholar' }, url: 'https://scholar.google.com/scholar?q=', icon: 'https://scholar.google.com/favicon.ico' },
-
-  // Shopping
-  { id: 'amazon', name: { zh: '亚马逊', en: 'Amazon' }, url: 'https://www.amazon.com/s?k=', icon: 'https://www.amazon.com/favicon.ico' },
-  { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.taobao.com/favicon.ico' },
-  { id: 'jd', name: { zh: '京东', en: 'JD' }, url: 'https://search.jd.com/Search?keyword=', icon: 'https://www.jd.com/favicon.ico' }
+  { id: 'wikipedia', name: { zh: '维基百科', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: 'https://en.wikipedia.org/favicon.ico' }
 ];
 
-const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
+const DEFAULT_ENGINE_IDS = ['google', 'bing', 'duckduckgo', 'yahoo'];
 
 function getEngineName(engine) {
   const lang = (typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'en' : 'zh';
@@ -554,15 +555,10 @@ function getEnabledEngines(ids) {
   return ids.map((id) => ENGINE_CATALOG.find((e) => e.id === id)).filter(Boolean);
 }
 
-function getCatalogAddableEngines(enabledIds) {
-  const set = new Set(enabledIds);
-  return ENGINE_CATALOG.filter((e) => !set.has(e.id));
-}
-
 let state = {
   engineIndex: parseInt(localStorage.getItem('engineIndex')) || 0,
   engineId: localStorage.getItem('engineId') || '',
-  enabledEngineIds: loadEnabledEngineIds(),
+  enabledEngineIds: clampEnabledEngineIds(loadEnabledEngineIds()),
   dateFormatIndex: parseInt(localStorage.getItem('dateFormatIndex')) || 0, // 0: YMD, 1: MDY, 2: DMY
   timeFormat: localStorage.getItem('timeFormat') || '24h', // '24h' or '12h'
   sites: JSON.parse(localStorage.getItem('sites')) || [],
@@ -700,7 +696,7 @@ const searchForm = document.getElementById('searchForm');
 const searchInput = document.getElementById('searchInput');
 const searchEngineEl = document.getElementById('searchEngine');
 const engineIcon = document.getElementById('engineIcon');
-const engineMenu = document.getElementById('engineMenu');
+const engineQuickBar = document.getElementById('engineQuickBar');
 const contentEl = document.getElementById('content');
 const settingsToggle = document.getElementById('settingsToggle');
 const settingsMenu = document.getElementById('settingsMenu');
@@ -791,40 +787,36 @@ updateTime();
 
 // ===== Search Engine =====
 function renderSearchEngine() {
-  const enabledIds = state.enabledEngineIds || [];
-  const enabled = getEnabledEngines(enabledIds);
   const engine = getCurrentEngine();
 
   engineIcon.src = engine.icon;
   engineIcon.onerror = () => { engineIcon.src = 'https://www.google.com/favicon.ico'; };
 
-  const addable = getCatalogAddableEngines(enabledIds);
+  renderEngineQuickBar();
+}
+
+function renderEngineQuickBar() {
+  if (!engineQuickBar) return;
+
+  const enabledIds = clampEnabledEngineIds(state.enabledEngineIds || []);
+  const enabled = getEnabledEngines(enabledIds);
+  const current = getCurrentEngine();
   const addLabel = i18n.t('addEngine');
-  const removeLabel = i18n.t('remove');
 
-  engineMenu.innerHTML = `
-    <div class="engine-menu-section">
-      ${enabled.map((eng) => {
-    const name = getEngineName(eng);
-    const isCurrent = eng.id === engine.id;
-    return `
-          <div class="engine-option ${isCurrent ? 'active' : ''}" data-engine-id="${eng.id}">
-            <div class="engine-option-main" onclick="selectEngineById('${eng.id}')">
-              <img src="${eng.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
-              <span>${name}</span>
-            </div>
-            ${enabled.length > 1 ? `
-              <button class="engine-remove" type="button" title="${removeLabel}" onclick="removeEngineById('${eng.id}')">×</button>
-            ` : ''}
-          </div>
-        `;
-  }).join('')}
-    </div>
-
-    <div class="engine-menu-divider"></div>
-    <div class="engine-add">
-      <button class="engine-add-btn" type="button" onclick="openEngineModal()">+ ${addLabel}</button>
-    </div>
+  engineQuickBar.innerHTML = `
+    ${enabled.map((eng) => {
+      const name = getEngineName(eng);
+      const active = eng.id === current.id;
+      return `
+        <div class="engine-pill ${active ? 'active' : ''}">
+          <button class="engine-pill-main" type="button" onclick="selectEngineById('${eng.id}')" title="${name}">
+            <img src="${eng.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
+          </button>
+          ${enabled.length > 1 ? `<button class=\"engine-pill-remove\" type=\"button\" onclick=\"removeEngineById('${eng.id}')\" aria-label=\"remove\">×</button>` : ''}
+        </div>
+      `;
+    }).join('')}
+    ${enabled.length < 5 ? `<button class="engine-pill-add" type="button" onclick="openEngineModal()">+ ${addLabel}</button>` : ''}
   `;
 }
 
@@ -834,15 +826,18 @@ function openEngineModal() {
   document.getElementById('engineModal').classList.remove('hidden');
   document.getElementById('modalOverlay').classList.remove('hidden');
 
+  const input = document.getElementById('engineSearchInput');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  enginePageState.query = '';
+
   // Clone current enabled IDs to working state
-  enginePageState.selectedIds = [...(state.enabledEngineIds || [])];
+  enginePageState.selectedIds = [...clampEnabledEngineIds(state.enabledEngineIds || [])];
   enginePageState.page = 1;
 
   renderEngineModal();
-}
-
-function closeEngineModal() {
-  document.getElementById('engineModal').classList.add('hidden');
 }
 
 function toggleEngineSelection(id) {
@@ -867,13 +862,29 @@ function setEnginePage(p) {
   renderEngineModal();
 }
 
+function setEngineSearchQuery(v) {
+  enginePageState.query = String(v || '');
+  enginePageState.page = 1;
+  renderEngineModal();
+}
+
 function renderEngineModal() {
   const grid = document.getElementById('engineList');
   const pag = document.getElementById('enginePagination');
   const hint = document.getElementById('engineCountHint');
 
-  const total = ENGINE_CATALOG.length;
-  const totalPages = Math.ceil(total / enginePageState.pageSize);
+  const q = String(enginePageState.query || '').trim().toLowerCase();
+  const filtered = q
+    ? ENGINE_CATALOG.filter((eng) => {
+      const nameZh = String(eng?.name?.zh || '').toLowerCase();
+      const nameEn = String(eng?.name?.en || '').toLowerCase();
+      const id = String(eng?.id || '').toLowerCase();
+      return nameZh.includes(q) || nameEn.includes(q) || id.includes(q);
+    })
+    : ENGINE_CATALOG;
+
+  const total = filtered.length;
+  const totalPages = Math.max(1, Math.ceil(total / enginePageState.pageSize));
 
   // Ensure page validity
   if (enginePageState.page < 1) enginePageState.page = 1;
@@ -881,9 +892,13 @@ function renderEngineModal() {
 
   const start = (enginePageState.page - 1) * enginePageState.pageSize;
   const end = start + enginePageState.pageSize;
-  const items = ENGINE_CATALOG.slice(start, end);
 
-  grid.innerHTML = items.map(eng => {
+  const items = filtered.slice(start, end);
+
+  if (!items.length) {
+    grid.innerHTML = `<div style="opacity:0.7; padding: 20px;">${i18n.currentLocale === 'zh' ? '没有匹配的搜索引擎' : 'No matching engines'}</div>`;
+  } else {
+    grid.innerHTML = items.map(eng => {
     const isSelected = enginePageState.selectedIds.includes(eng.id);
     const name = getEngineName(eng);
     return `
@@ -893,7 +908,8 @@ function renderEngineModal() {
         <span>${name}</span>
       </div>
     `;
-  }).join('');
+    }).join('');
+  }
 
   // Pagination
   let pageHtml = `
@@ -925,6 +941,9 @@ function renderEngineModal() {
 
 // Bind events
 document.getElementById('closeEngineModal').onclick = closeEngineModal;
+document.getElementById('engineSearchInput')?.addEventListener('input', (e) => {
+  setEngineSearchQuery(e.target?.value);
+});
 document.getElementById('saveEngineSelection').onclick = () => {
   if (enginePageState.selectedIds.length === 0) {
     // Prevent empty selection? logic says at least one
@@ -932,7 +951,7 @@ document.getElementById('saveEngineSelection').onclick = () => {
     enginePageState.selectedIds = [...DEFAULT_ENGINE_IDS];
   }
 
-  state.enabledEngineIds = [...enginePageState.selectedIds];
+  state.enabledEngineIds = clampEnabledEngineIds(enginePageState.selectedIds);
   saveData();
 
   // Ensure current engine is still valid
@@ -953,20 +972,13 @@ window.selectEngineById = (id) => {
   state.engineIndex = idx;
   saveData();
   renderSearchEngine();
-  engineMenu.classList.add('hidden');
-};
-
-window.toggleEngineAddMenu = () => {
-  const el = document.getElementById('engineAddMenu');
-  if (!el) return;
-  el.classList.toggle('hidden');
 };
 
 window.addEngineById = (id) => {
   if (!ENGINE_CATALOG.some((e) => e.id === id)) return;
   const set = new Set(state.enabledEngineIds || []);
   if (set.has(id)) return;
-  state.enabledEngineIds = [...(state.enabledEngineIds || []), id];
+  state.enabledEngineIds = clampEnabledEngineIds([...(state.enabledEngineIds || []), id]);
   saveData();
   renderSearchEngine();
 };
@@ -975,7 +987,7 @@ window.removeEngineById = (id) => {
   const current = String(state.engineId || '');
   const list = (state.enabledEngineIds || []).filter((x) => x !== id);
   if (list.length < 1) return;
-  state.enabledEngineIds = list;
+  state.enabledEngineIds = clampEnabledEngineIds(list);
   if (current === id) {
     const nextEngine = getEnabledEngines(list)[0];
     if (nextEngine) {
@@ -992,16 +1004,11 @@ window.removeEngineById = (id) => {
 };
 
 searchEngineEl.addEventListener('click', (e) => {
+  e.preventDefault();
   e.stopPropagation();
-  if (e.target && e.target.closest && e.target.closest('#engineMenu')) {
-    return;
-  }
-  engineMenu.classList.toggle('hidden');
+  openEngineModal();
 });
 
-document.addEventListener('click', () => {
-  engineMenu.classList.add('hidden');
-});
 
 searchForm.addEventListener('submit', (e) => {
   e.preventDefault();
