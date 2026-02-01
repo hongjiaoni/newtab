@@ -15,7 +15,7 @@
 /* Global Custom Cursor */
 body,
 html {
-  cursor: url('/cursor.png') 2 2, auto;
+  cursor: url('/cursor.svg') 2 2, auto;
 }
 
 a,
@@ -27,7 +27,7 @@ textarea,
 .engine-option,
 .site-card,
 .tag-pill {
-  cursor: url('/cursor.png') 2 2, pointer;
+  cursor: url('/cursor.svg') 2 2, pointer;
 }
 
 @import url('https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css');

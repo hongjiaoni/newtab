@@ -527,16 +527,12 @@ const ENGINE_CATALOG = [
 
   // Knowledge
   { id: 'wikipedia', name: { zh: '维基百科', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: 'https://en.wikipedia.org/favicon.ico' },
-  { id: 'wolframalpha', name: { zh: 'WolframAlpha', en: 'WolframAlpha' }, url: 'https://www.wolframalpha.com/input/?i=', icon: 'https://www.wolframalpha.com/favicon.ico' },
   { id: 'scholar', name: { zh: '学术搜索', en: 'Scholar' }, url: 'https://scholar.google.com/scholar?q=', icon: 'https://scholar.google.com/favicon.ico' },
 
   // Shopping
   { id: 'amazon', name: { zh: '亚马逊', en: 'Amazon' }, url: 'https://www.amazon.com/s?k=', icon: 'https://www.amazon.com/favicon.ico' },
   { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.taobao.com/favicon.ico' },
   { id: 'jd', name: { zh: '京东', en: 'JD' }, url: 'https://search.jd.com/Search?keyword=', icon: 'https://www.jd.com/favicon.ico' },
-
-  // Extra common
-  { id: 'naver', name: { zh: 'Naver', en: 'Naver' }, url: 'https://search.naver.com/search.naver?query=', icon: 'https://www.naver.com/favicon.ico' }
 ];
 
 const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
@@ -551,10 +547,10 @@ function loadEnabledEngineIds() {
     const raw = localStorage.getItem('enabledEngineIds');
     const parsed = raw ? JSON.parse(raw) : null;
     const list = Array.isArray(parsed) ? parsed.filter((id) => ENGINE_CATALOG.some((e) => e.id === id)) : null;
-    if (list && list.length) return list;
+    if (list && list.length) return list.slice(0, 5);
   } catch {
   }
-  return [...DEFAULT_ENGINE_IDS];
+  return [...DEFAULT_ENGINE_IDS].slice(0, 5);
 }
 
 function saveEnabledEngineIds(ids) {
@@ -944,7 +940,7 @@ document.getElementById('saveEngineSelection').onclick = () => {
     enginePageState.selectedIds = [...DEFAULT_ENGINE_IDS];
   }
 
-  state.enabledEngineIds = [...enginePageState.selectedIds];
+  state.enabledEngineIds = [...enginePageState.selectedIds].slice(0, 5);
   saveData();
 
   // Ensure current engine is still valid
@@ -978,7 +974,12 @@ window.addEngineById = (id) => {
   if (!ENGINE_CATALOG.some((e) => e.id === id)) return;
   const set = new Set(state.enabledEngineIds || []);
   if (set.has(id)) return;
-  state.enabledEngineIds = [...(state.enabledEngineIds || []), id];
+  if ((state.enabledEngineIds || []).length >= 5) {
+    const msg = i18n.currentLocale === 'zh' ? '最多只能选择 5 个搜索引擎' : 'You can select up to 5 search engines';
+    if (window.showNotification) window.showNotification(msg, 'info');
+    return;
+  }
+  state.enabledEngineIds = [...(state.enabledEngineIds || []), id].slice(0, 5);
   saveData();
   renderSearchEngine();
 };
