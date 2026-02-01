@@ -693,7 +693,7 @@ button:active {
   width: 32px;
   height: 32px;
   border: 2px solid var(--border-color);
-  border-radius: 50%;
+  border-radius: 8px;
   background: var(--card-bg);
   cursor: pointer;
   display: flex;

@@ -33,6 +33,8 @@ const MEMBERSHIP_CONFIG = {
     }
 };
 
+window.MEMBERSHIP_CONFIG = MEMBERSHIP_CONFIG;
+
 // Initialize membership from profile
 async function initializeMembership() {
     if (!window.authState || !window.authState.isLoggedIn) {
