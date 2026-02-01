@@ -79,9 +79,8 @@ async function initializeMembership() {
 
 // Update UI based on membership tier
 function updateMembershipUI() {
-    // Re-render auth menu so membership badge appears in the top-right menu.
-    // (auth.js owns the DOM structure of the auth menu)
-    if (window.updateAuthUI) {
+    // Ensure the settings menu user row (rendered by auth.js) reflects the latest tier/badge
+    if (typeof window.updateAuthUI === 'function') {
         window.updateAuthUI();
     }
 

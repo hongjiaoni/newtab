@@ -97,10 +97,10 @@ const translations = {
     chooseUpload: '上传图片',
     chooseLink: '填写链接',
     addByLink: '添加链接',
-    subscriptionRecords: '订阅记录',
-    back: '返回',
     addEngine: '新增',
     remove: '移除',
+    subscriptionRecords: '订阅记录',
+    back: '返回',
     days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
     months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
   },
@@ -209,8 +209,7 @@ function normalizeLocale(input) {
 let enginePageState = {
   page: 1,
   pageSize: 12,
-  selectedIds: [],
-  query: ''
+  selectedIds: []
 };
 
 function getLangFromUrl() {
@@ -483,52 +482,60 @@ window.updateAllText = function () {
 
   // Search engine menu contains localized names
   renderSearchEngine();
+
+  // Engine add button label
+  const engineAddBtn = document.getElementById('engineAddBtn');
+  if (engineAddBtn) {
+    engineAddBtn.textContent = i18n.currentLocale === 'zh' ? '新增' : 'Add';
+  }
 }
 
 // ===== Data & State =====
 const ENGINE_CATALOG = [
   // Global / General
-  { id: 'google', name: { zh: 'Google', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
-  { id: 'bing', name: { zh: 'Bing', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
-  { id: 'yahoo', name: { zh: 'Yahoo', en: 'Yahoo' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://search.yahoo.com/favicon.ico' },
+  { id: 'google', name: { zh: '谷歌', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
+  { id: 'bing', name: { zh: '必应', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
   { id: 'duckduckgo', name: { zh: 'DuckDuckGo', en: 'DuckDuckGo' }, url: 'https://duckduckgo.com/?q=', icon: 'https://duckduckgo.com/favicon.ico' },
+  { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://search.yahoo.com/favicon.ico' },
   { id: 'yandex', name: { zh: 'Yandex', en: 'Yandex' }, url: 'https://yandex.com/search/?text=', icon: 'https://yandex.com/favicon.ico' },
-  { id: 'baidu', name: { zh: 'Baidu', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
-  { id: 'naver', name: { zh: 'Naver', en: 'Naver' }, url: 'https://search.naver.com/search.naver?query=', icon: 'https://www.naver.com/favicon.ico' },
-  { id: 'daum', name: { zh: 'Daum', en: 'Daum' }, url: 'https://search.daum.net/search?q=', icon: 'https://www.daum.net/favicon.ico' },
-
-  // Chinese Specific
   { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
   { id: 'brave', name: { zh: 'Brave', en: 'Brave' }, url: 'https://search.brave.com/search?q=', icon: 'https://brave.com/static-assets/images/brave-logo-sans-text.svg' },
   { id: 'startpage', name: { zh: 'Startpage', en: 'Startpage' }, url: 'https://www.startpage.com/sp/search?query=', icon: 'https://www.startpage.com/favicon.ico' },
-  { id: 'qwant', name: { zh: 'Qwant', en: 'Qwant' }, url: 'https://www.qwant.com/?q=', icon: 'https://www.qwant.com/favicon.ico' },
-  { id: 'swisscows', name: { zh: 'Swisscows', en: 'Swisscows' }, url: 'https://swisscows.com/web?query=', icon: 'https://swisscows.com/favicon.ico' },
-  { id: 'mojeek', name: { zh: 'Mojeek', en: 'Mojeek' }, url: 'https://www.mojeek.com/search?q=', icon: 'https://www.mojeek.com/favicon.ico' },
-  { id: 'metager', name: { zh: 'MetaGer', en: 'MetaGer' }, url: 'https://metager.org/meta/meta.ger3?eingabe=', icon: 'https://metager.org/favicon.ico' },
-  { id: 'seznam', name: { zh: 'Seznam', en: 'Seznam' }, url: 'https://search.seznam.cz/?q=', icon: 'https://www.seznam.cz/favicon.ico' },
-  { id: 'rambler', name: { zh: 'Rambler', en: 'Rambler' }, url: 'https://nova.rambler.ru/search?query=', icon: 'https://nova.rambler.ru/favicon.ico' },
+
+  // Chinese Specific
+  { id: 'baidu', name: { zh: '百度', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
+  { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: 'https://www.sogou.com/favicon.ico' },
+  { id: 'so360', name: { zh: '360 搜索', en: '360 Search' }, url: 'https://www.so.com/s?q=', icon: 'https://www.so.com/favicon.ico' },
+  { id: 'zhihu', name: { zh: '知乎', en: 'Zhihu' }, url: 'https://www.zhihu.com/search?q=', icon: 'https://static.zhihu.com/heifetz/favicon.ico' },
+  { id: 'bilibili', name: { zh: 'B站', en: 'Bilibili' }, url: 'https://search.bilibili.com/all?keyword=', icon: 'https://www.bilibili.com/favicon.ico' },
+  { id: 'xiaohongshu', name: { zh: '小红书', en: 'Xiaohongshu' }, url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: 'https://www.xiaohongshu.com/favicon.ico' },
+  { id: 'weibo', name: { zh: '微博', en: 'Weibo' }, url: 'https://s.weibo.com/weibo?q=', icon: 'https://weibo.com/favicon.ico' },
+  { id: 'douban', name: { zh: '豆瓣', en: 'Douban' }, url: 'https://www.douban.com/search?q=', icon: 'https://img3.doubanio.com/favicon.ico' },
 
   // Dev / Tech
-  { id: 'ask', name: { zh: 'Ask', en: 'Ask' }, url: 'https://www.ask.com/web?q=', icon: 'https://www.ask.com/favicon.ico' },
-  { id: 'aol', name: { zh: 'AOL', en: 'AOL' }, url: 'https://search.aol.com/aol/search?q=', icon: 'https://search.aol.com/favicon.ico' },
-  { id: 'lycos', name: { zh: 'Lycos', en: 'Lycos' }, url: 'https://search.lycos.com/web/?q=', icon: 'https://www.lycos.com/favicon.ico' },
-  { id: 'dogpile', name: { zh: 'Dogpile', en: 'Dogpile' }, url: 'https://www.dogpile.com/serp?q=', icon: 'https://www.dogpile.com/favicon.ico' },
-  { id: 'webcrawler', name: { zh: 'WebCrawler', en: 'WebCrawler' }, url: 'https://www.webcrawler.com/serp?q=', icon: 'https://www.webcrawler.com/favicon.ico' },
+  { id: 'github', name: { zh: 'GitHub', en: 'GitHub' }, url: 'https://github.com/search?q=', icon: 'https://github.com/favicon.ico' },
+  { id: 'stackoverflow', name: { zh: 'StackOverflow', en: 'StackOverflow' }, url: 'https://stackoverflow.com/search?q=', icon: 'https://stackoverflow.com/favicon.ico' },
+  { id: 'npm', name: { zh: 'NPM', en: 'NPM' }, url: 'https://www.npmjs.com/search?q=', icon: 'https://static.npmjs.com/b0f1a8318363185cc2ea6a40ac23eeb2.png' },
+  { id: 'mdn', name: { zh: 'MDN', en: 'MDN' }, url: 'https://developer.mozilla.org/search?q=', icon: 'https://developer.mozilla.org/favicon.ico' },
 
   // Social / Media
-  { id: 'you', name: { zh: 'You.com', en: 'You.com' }, url: 'https://you.com/search?q=', icon: 'https://you.com/favicon.ico' },
-  { id: 'kagi', name: { zh: 'Kagi', en: 'Kagi' }, url: 'https://kagi.com/search?q=', icon: 'https://kagi.com/favicon.ico' },
-  { id: 'perplexity', name: { zh: 'Perplexity', en: 'Perplexity' }, url: 'https://www.perplexity.ai/search?q=', icon: 'https://www.perplexity.ai/favicon.ico' },
-  { id: 'wolframalpha', name: { zh: 'WolframAlpha', en: 'WolframAlpha' }, url: 'https://www.wolframalpha.com/input/?i=', icon: 'https://www.wolframalpha.com/favicon.ico' },
-  { id: 'scholar', name: { zh: 'Google Scholar', en: 'Google Scholar' }, url: 'https://scholar.google.com/scholar?q=', icon: 'https://scholar.google.com/favicon.ico' },
+  { id: 'youtube', name: { zh: 'YouTube', en: 'YouTube' }, url: 'https://www.youtube.com/results?search_query=', icon: 'https://www.youtube.com/favicon.ico' },
+  { id: 'twitter', name: { zh: 'Twitter', en: 'Twitter' }, url: 'https://twitter.com/search?q=', icon: 'https://abs.twimg.com/favicons/twitter.2.ico' },
+  { id: 'reddit', name: { zh: 'Reddit', en: 'Reddit' }, url: 'https://www.reddit.com/search/?q=', icon: 'https://www.reddit.com/favicon.ico' },
+  { id: 'pinterest', name: { zh: 'Pinterest', en: 'Pinterest' }, url: 'https://www.pinterest.com/search/pins/?q=', icon: 'https://www.pinterest.com/favicon.ico' },
+  { id: 'instagram', name: { zh: 'Instagram', en: 'Instagram' }, url: 'https://www.instagram.com/explore/tags/', icon: 'https://www.instagram.com/favicon.ico' },
 
   // Knowledge
-  { id: 'wikipedia', name: { zh: 'Wikipedia', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: 'https://en.wikipedia.org/favicon.ico' },
-  { id: 'gigablast', name: { zh: 'Gigablast', en: 'Gigablast' }, url: 'https://www.gigablast.com/search?q=', icon: 'https://www.gigablast.com/favicon.ico' },
-  { id: 'gibiru', name: { zh: 'Gibiru', en: 'Gibiru' }, url: 'https://gibiru.com/results.html?q=', icon: 'https://gibiru.com/favicon.ico' },
+  { id: 'wikipedia', name: { zh: '维基百科', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: 'https://en.wikipedia.org/favicon.ico' },
+  { id: 'scholar', name: { zh: '学术搜索', en: 'Scholar' }, url: 'https://scholar.google.com/scholar?q=', icon: 'https://scholar.google.com/favicon.ico' },
+
+  // Shopping
+  { id: 'amazon', name: { zh: '亚马逊', en: 'Amazon' }, url: 'https://www.amazon.com/s?k=', icon: 'https://www.amazon.com/favicon.ico' },
+  { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.taobao.com/favicon.ico' },
+  { id: 'jd', name: { zh: '京东', en: 'JD' }, url: 'https://search.jd.com/Search?keyword=', icon: 'https://www.jd.com/favicon.ico' },
 ];
 
-const DEFAULT_ENGINE_IDS = ['google', 'bing', 'duckduckgo', 'yahoo'];
+const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
 
 function getEngineName(engine) {
   const lang = (typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'en' : 'zh';
@@ -540,10 +547,10 @@ function loadEnabledEngineIds() {
     const raw = localStorage.getItem('enabledEngineIds');
     const parsed = raw ? JSON.parse(raw) : null;
     const list = Array.isArray(parsed) ? parsed.filter((id) => ENGINE_CATALOG.some((e) => e.id === id)) : null;
-    if (list && list.length) return list;
+    if (list && list.length) return list.slice(0, 5);
   } catch {
   }
-  return [...DEFAULT_ENGINE_IDS];
+  return [...DEFAULT_ENGINE_IDS].slice(0, 5);
 }
 
 function saveEnabledEngineIds(ids) {
@@ -562,7 +569,7 @@ function getCatalogAddableEngines(enabledIds) {
 let state = {
   engineIndex: parseInt(localStorage.getItem('engineIndex')) || 0,
   engineId: localStorage.getItem('engineId') || '',
-  enabledEngineIds: clampEnabledEngineIds(loadEnabledEngineIds()),
+  enabledEngineIds: loadEnabledEngineIds(),
   dateFormatIndex: parseInt(localStorage.getItem('dateFormatIndex')) || 0, // 0: YMD, 1: MDY, 2: DMY
   timeFormat: localStorage.getItem('timeFormat') || '24h', // '24h' or '12h'
   sites: JSON.parse(localStorage.getItem('sites')) || [],
@@ -571,11 +578,6 @@ let state = {
   siteOrder: JSON.parse(localStorage.getItem('siteOrder')) || [],
   viewMode: localStorage.getItem('viewMode') || 'general' // 'general' or 'minimalist'
 };
-
-if (!state.enabledEngineIds.length) {
-  state.enabledEngineIds = clampEnabledEngineIds([...DEFAULT_ENGINE_IDS]);
-  saveEnabledEngineIds(state.enabledEngineIds);
-}
 
 // Backward compatibility: map old engineIndex to new engineId on first run
 if (!state.engineId) {
@@ -706,6 +708,7 @@ const searchInput = document.getElementById('searchInput');
 const searchEngineEl = document.getElementById('searchEngine');
 const engineIcon = document.getElementById('engineIcon');
 const engineMenu = document.getElementById('engineMenu');
+const engineAddBtn = document.getElementById('engineAddBtn');
 const contentEl = document.getElementById('content');
 const settingsToggle = document.getElementById('settingsToggle');
 const settingsMenu = document.getElementById('settingsMenu');
@@ -803,66 +806,51 @@ function renderSearchEngine() {
   engineIcon.src = engine.icon;
   engineIcon.onerror = () => { engineIcon.src = 'https://www.google.com/favicon.ico'; };
 
-  if (engineMenu) {
-    engineMenu.classList.add('hidden');
-    engineMenu.innerHTML = '';
-    engineMenu.style.display = 'none';
-  }
-  renderEngineQuickBar();
-}
+  const addable = getCatalogAddableEngines(enabledIds);
+  const addLabel = i18n.t('addEngine');
+  const removeLabel = i18n.t('remove');
 
-function renderEngineQuickBar() {
-  if (!engineQuickBar) return;
-  const enabledIds = clampEnabledEngineIds(state.enabledEngineIds || []);
-  const enabled = getEnabledEngines(enabledIds);
-  const current = getCurrentEngine();
-  const addLabel = i18n.currentLocale === 'zh' ? '新增' : 'Add';
+  engineMenu.innerHTML = `
+    <div class="engine-menu-section">
+      ${enabled.map((eng) => {
+    const name = getEngineName(eng);
+    const isCurrent = eng.id === engine.id;
+    return `
+          <div class="engine-option ${isCurrent ? 'active' : ''}" data-engine-id="${eng.id}">
+            <div class="engine-option-main" onclick="selectEngineById('${eng.id}')">
+              <img src="${eng.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
+              <span>${name}</span>
+            </div>
+            ${enabled.length > 1 ? `
+              <button class="engine-remove" type="button" title="${removeLabel}" onclick="removeEngineById('${eng.id}')">×</button>
+            ` : ''}
+          </div>
+        `;
+  }).join('')}
+    </div>
 
-  engineQuickBar.innerHTML = `
-    ${enabled.map((eng) => {
-      const name = getEngineName(eng);
-      const active = eng.id === current.id;
-      return `
-        <div class="engine-pill ${active ? 'active' : ''}">
-          <button class="engine-pill-main" type="button" onclick="selectEngineById('${eng.id}')" title="${name}">
-            <img src="${eng.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
-          </button>
-          ${enabled.length > 1 ? `<button class=\"engine-pill-remove\" type=\"button\" onclick=\"removeEngineById('${eng.id}')\" aria-label=\"remove\">×</button>` : ''}
-        </div>
-      `;
-    }).join('')}
-    ${enabled.length < 5 ? `<button class="engine-pill-add" type="button" onclick="openEngineModal()">+ ${addLabel}</button>` : ''}
+    <div class="engine-menu-divider"></div>
+    <div class="engine-add">
+      <button class="engine-add-btn" type="button" onclick="openEngineModal()">+ ${addLabel}</button>
+    </div>
   `;
 }
 
-// Engine Modal Logic
+// ===== Search Engine Modal Logic =====
+
 function openEngineModal() {
   document.getElementById('engineModal').classList.remove('hidden');
   document.getElementById('modalOverlay').classList.remove('hidden');
 
   // Clone current enabled IDs to working state
-  enginePageState.selectedIds = [...clampEnabledEngineIds(state.enabledEngineIds || [])];
+  enginePageState.selectedIds = [...(state.enabledEngineIds || [])];
   enginePageState.page = 1;
-  enginePageState.query = '';
-
-  const searchEl = document.getElementById('engineSearchInput');
-  if (searchEl) {
-    searchEl.value = '';
-    searchEl.placeholder = (i18n.currentLocale === 'zh') ? '搜索引擎…' : 'Search engines…';
-    searchEl.oninput = (e) => {
-      enginePageState.query = String(e.target.value || '');
-      enginePageState.page = 1;
-      renderEngineModal();
-    };
-    searchEl.focus();
-  }
 
   renderEngineModal();
 }
 
 function closeEngineModal() {
   document.getElementById('engineModal').classList.add('hidden');
-  document.getElementById('modalOverlay').classList.add('hidden');
 }
 
 function toggleEngineSelection(id) {
@@ -892,20 +880,8 @@ function renderEngineModal() {
   const pag = document.getElementById('enginePagination');
   const hint = document.getElementById('engineCountHint');
 
-  const q = String(enginePageState.query || '').trim().toLowerCase();
-  const filtered = q
-    ? ENGINE_CATALOG.filter((eng) => {
-      const hay = [
-        eng?.id,
-        eng?.name?.zh,
-        eng?.name?.en
-      ].filter(Boolean).join(' ').toLowerCase();
-      return hay.includes(q);
-    })
-    : ENGINE_CATALOG;
-
-  const total = filtered.length;
-  const totalPages = Math.max(1, Math.ceil(total / enginePageState.pageSize));
+  const total = ENGINE_CATALOG.length;
+  const totalPages = Math.ceil(total / enginePageState.pageSize);
 
   // Ensure page validity
   if (enginePageState.page < 1) enginePageState.page = 1;
@@ -913,27 +889,19 @@ function renderEngineModal() {
 
   const start = (enginePageState.page - 1) * enginePageState.pageSize;
   const end = start + enginePageState.pageSize;
-  const items = filtered.slice(start, end);
+  const items = ENGINE_CATALOG.slice(start, end);
 
-  if (!items.length) {
-    grid.innerHTML = `
-      <div style="grid-column: 1 / -1; padding: 18px; opacity: 0.7;">
-        ${i18n.currentLocale === 'zh' ? '没有匹配的搜索引擎' : 'No matching search engines'}
+  grid.innerHTML = items.map(eng => {
+    const isSelected = enginePageState.selectedIds.includes(eng.id);
+    const name = getEngineName(eng);
+    return `
+      <div class="engine-item ${isSelected ? 'selected' : ''}" onclick="toggleEngineSelection('${eng.id}')">
+        <div class="engine-check">✓</div>
+        <img src="${eng.icon}" onerror="this.src='https://www.google.com/favicon.ico'">
+        <span>${name}</span>
       </div>
     `;
-  } else {
-    grid.innerHTML = items.map(eng => {
-      const isSelected = enginePageState.selectedIds.includes(eng.id);
-      const name = getEngineName(eng);
-      return `
-        <div class="engine-item ${isSelected ? 'selected' : ''}" onclick="toggleEngineSelection('${eng.id}')">
-          <div class="engine-check">✓</div>
-          <img src="${eng.icon}" onerror="this.src='https://www.google.com/favicon.ico'">
-          <span>${name}</span>
-        </div>
-      `;
-    }).join('');
-  }
+  }).join('');
 
   // Pagination
   let pageHtml = `
@@ -972,7 +940,7 @@ document.getElementById('saveEngineSelection').onclick = () => {
     enginePageState.selectedIds = [...DEFAULT_ENGINE_IDS];
   }
 
-  state.enabledEngineIds = [...enginePageState.selectedIds];
+  state.enabledEngineIds = [...enginePageState.selectedIds].slice(0, 5);
   saveData();
 
   // Ensure current engine is still valid
@@ -1006,7 +974,12 @@ window.addEngineById = (id) => {
   if (!ENGINE_CATALOG.some((e) => e.id === id)) return;
   const set = new Set(state.enabledEngineIds || []);
   if (set.has(id)) return;
-  state.enabledEngineIds = [...(state.enabledEngineIds || []), id];
+  if ((state.enabledEngineIds || []).length >= 5) {
+    const msg = i18n.currentLocale === 'zh' ? '最多只能选择 5 个搜索引擎' : 'You can select up to 5 search engines';
+    if (window.showNotification) window.showNotification(msg, 'info');
+    return;
+  }
+  state.enabledEngineIds = [...(state.enabledEngineIds || []), id].slice(0, 5);
   saveData();
   renderSearchEngine();
 };
@@ -1033,8 +1006,19 @@ window.removeEngineById = (id) => {
 
 searchEngineEl.addEventListener('click', (e) => {
   e.stopPropagation();
-  openEngineModal();
+  if (e.target && e.target.closest && e.target.closest('#engineMenu')) {
+    return;
+  }
+  engineMenu.classList.toggle('hidden');
 });
+
+if (engineAddBtn) {
+  engineAddBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openEngineModal();
+  });
+}
 
 document.addEventListener('click', () => {
   engineMenu.classList.add('hidden');

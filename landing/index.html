@@ -50,14 +50,11 @@
       color: var(--text);
       line-height: 1.6;
       overflow: hidden;
-      cursor: url('cursor.png'), auto;
-    }
-
-    button, a {
-      cursor: url('cursor.png'), pointer;
+      cursor: url('/cursor.svg') 2 2, auto;
     }
 
     a,
+    button,
     .btn,
     .pill,
     .brand-badge-btn,
@@ -66,7 +63,7 @@
     textarea,
     .sketch-card,
     .engine-option {
-      cursor: url('cursor.png'), pointer;
+      cursor: url('/cursor.svg') 2 2, pointer;
     }
 
     a {
@@ -126,19 +123,20 @@
     }
 
     .brand-badge {
-      width: 34px;
-      height: 34px;
+      width: 40px;
+      height: 40px;
       border: none !important;
       border-radius: 0;
       display: grid;
       place-items: center;
+      overflow: visible;
       background: transparent !important;
       box-shadow: none !important;
     }
 
     .brand-badge-img {
-      width: 34px;
-      height: 34px;
+      width: 40px;
+      height: 40px;
       display: block;
       object-fit: contain;
     }
