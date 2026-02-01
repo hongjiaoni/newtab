@@ -547,6 +547,30 @@ function loadEnabledEngineIds() {
   return [...DEFAULT_ENGINE_IDS];
 }
 
+function clampEnabledEngineIds(ids) {
+  const arr = Array.isArray(ids) ? ids : [];
+  const validSet = new Set(ENGINE_CATALOG.map((e) => e.id));
+  const out = [];
+
+  for (const id of arr) {
+    const s = String(id || '');
+    if (!s) continue;
+    if (!validSet.has(s)) continue;
+    if (out.includes(s)) continue;
+    out.push(s);
+    if (out.length >= 5) break;
+  }
+
+  if (out.length === 0) {
+    for (const id of DEFAULT_ENGINE_IDS) {
+      if (validSet.has(id)) out.push(id);
+      if (out.length >= 5) break;
+    }
+  }
+
+  return out;
+}
+
 function saveEnabledEngineIds(ids) {
   localStorage.setItem('enabledEngineIds', JSON.stringify(ids));
 }
