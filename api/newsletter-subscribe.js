@@ -14,13 +14,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const body = typeof req.body === 'string'
-      ? (() => {
-        try { return JSON.parse(req.body); } catch { return {}; }
-      })()
-      : (req.body || {});
-
-    const { email } = body;
+    const { email } = req.body;
 
     // Validate email
     if (!email || !isValidEmail(email)) {
@@ -71,10 +65,10 @@ async function storeSubscription(email) {
   // await supabase.from('newsletter_subscriptions').insert({ email, created_at: new Date() });
 
   // Option 2: Store in a file (for development only)
+  const fs = require('fs').promises;
+  const path = require('path');
+  
   try {
-    const { default: path } = await import('path');
-    const fs = await import('fs/promises');
-
     const filePath = path.join(process.cwd(), 'newsletter-subscriptions.json');
     let subscriptions = [];
     
@@ -97,5 +91,6 @@ async function storeSubscription(email) {
     }
   } catch (error) {
     console.error('Error storing subscription:', error);
+    throw error;
   }
 }

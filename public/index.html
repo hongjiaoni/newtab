@@ -97,6 +97,9 @@
     <form id="searchForm" class="search-box">
       <div id="searchEngine" class="search-engine">
         <img id="engineIcon" src="" alt="Engine" />
+        <div id="engineMenu" class="engine-menu hidden">
+          <!-- Populated by JS -->
+        </div>
       </div>
       <input id="searchInput" type="text" placeholder="想要搜点什么吗？" autocomplete="off" />
     </form>
@@ -143,7 +146,9 @@
   <div id="engineModal" class="modal-overlay hidden">
     <div class="modal" style="max-width: 800px; width: 90%;">
       <h3 id="engineModalTitle">搜索引擎</h3>
-      <input id="engineSearchInput" class="modal-input" type="text" placeholder="搜索..." autocomplete="off" />
+      <div style="margin: 12px 0;">
+        <input id="engineSearchInput" class="modal-input" type="text" placeholder="" autocomplete="off" />
+      </div>
       <div id="engineList" class="engine-grid">
         <!-- Populated by JS -->
       </div>
