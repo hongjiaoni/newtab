@@ -9,7 +9,8 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@300;400;500;700&family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap"
+  <link
+    href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@300;400;500;700&family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="wallpaper-modal.css" />
@@ -139,6 +140,24 @@
     </div>
   </div>
 
+  <!-- Search Engine Selection Modal -->
+  <div id="engineModal" class="modal-overlay hidden">
+    <div class="modal" style="max-width: 800px; width: 90%;">
+      <h3 id="engineModalTitle">搜索引擎</h3>
+      <div id="engineList" class="engine-grid">
+        <!-- Populated by JS -->
+      </div>
+      <div class="pagination-controls" id="enginePagination">
+        <!-- Populated by JS -->
+      </div>
+      <div class="modal-actions">
+        <span id="engineCountHint" style="margin-right: auto; opacity: 0.7; font-size: 14px;"></span>
+        <button id="closeEngineModal" class="cancel-btn">关闭</button>
+        <button id="saveEngineSelection" class="primary-btn">保存</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modals -->
   <div id="modalOverlay" class="modal-overlay hidden">
     <!-- Add/Edit Modal -->
@@ -245,8 +264,7 @@
           </button>
         </div>
         <div style="margin-top: 30px; font-size: 13px; opacity: 0.6;">
-          <a href="https://www.newtab.online" target="_blank" style="color: inherit;" id="officialWebsiteLink">官网</a> · 
-          <a href="https://github.com/hongjiaoni/newtab" target="_blank" style="color: inherit;">GitHub</a> · 
+          <a href="https://www.newtab.online" target="_blank" style="color: inherit;" id="officialWebsiteLink">官网</a> ·
           v1.0.0
         </div>
       </div>
@@ -269,8 +287,8 @@
           <button class="coffee-amount-btn" data-amount="10" onclick="selectCoffeeAmount(10)">$10</button>
         </div>
         <div style="text-align: center;">
-          <input type="number" id="coffeeCustomAmount" min="1" max="100" placeholder="自定义金额" 
-            class="modal-input" style="width: 150px; text-align: center;">
+          <input type="number" id="coffeeCustomAmount" min="1" max="100" placeholder="自定义金额" class="modal-input"
+            style="width: 150px; text-align: center;">
         </div>
       </div>
       <div class="modal-actions">
@@ -295,8 +313,8 @@
         </div>
         <div class="modal-section">
           <label class="section-label" id="feedbackContentLabel">反馈内容</label>
-          <textarea id="feedbackContent" class="modal-input" rows="5" 
-            placeholder="请描述你的问题或建议..." style="resize: vertical;"></textarea>
+          <textarea id="feedbackContent" class="modal-input" rows="5" placeholder="请描述你的问题或建议..."
+            style="resize: vertical;"></textarea>
         </div>
         <div class="modal-section">
           <label class="section-label" id="feedbackEmailLabel">联系邮箱（可选）</label>

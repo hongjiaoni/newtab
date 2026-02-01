@@ -81,13 +81,19 @@ function updateMembershipUI() {
     const authContainer = document.getElementById('authMenuContainer');
     if (authContainer && membershipState.tier > 1) {
         const badge = MEMBERSHIP_CONFIG[membershipState.tier].badge;
-        const existingBadge = authContainer.querySelector('.membership-badge');
-        if (!existingBadge) {
-            const badgeEl = document.createElement('span');
-            badgeEl.className = 'membership-badge';
-            badgeEl.textContent = badge;
-            badgeEl.title = MEMBERSHIP_CONFIG[membershipState.tier].name;
-            authContainer.querySelector('.settings-menu-item')?.appendChild(badgeEl);
+        // Try to find the user info container first
+        const userInfo = authContainer.querySelector('.user-info-menu h3');
+        if (userInfo) {
+            const existingBadge = userInfo.querySelector('.membership-badge');
+            if (!existingBadge) {
+                const badgeEl = document.createElement('span');
+                badgeEl.className = 'membership-badge';
+                badgeEl.textContent = badge;
+                badgeEl.title = MEMBERSHIP_CONFIG[membershipState.tier].name;
+                badgeEl.style.marginLeft = '6px';
+                badgeEl.style.fontSize = '1.2em';
+                userInfo.appendChild(badgeEl);
+            }
         }
     }
 

@@ -97,6 +97,8 @@ const translations = {
     chooseUpload: '上传图片',
     chooseLink: '填写链接',
     addByLink: '添加链接',
+    subscriptionRecords: '订阅记录',
+    back: '返回',
     days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
     months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
   },
@@ -200,6 +202,13 @@ function normalizeLocale(input) {
   if (Object.prototype.hasOwnProperty.call(translations, lower)) return lower;
   return 'zh';
 }
+
+// Global variable for search engine pagination
+let enginePageState = {
+  page: 1,
+  pageSize: 12,
+  selectedIds: []
+};
 
 function getLangFromUrl() {
   try {
@@ -382,10 +391,10 @@ window.updateAllText = function () {
   // Update About menu and modals
   const aboutText = document.getElementById('aboutText');
   if (aboutText) aboutText.textContent = i18n.t('about');
-  
+
   const aboutModalTitle = document.getElementById('aboutModalTitle');
   if (aboutModalTitle) aboutModalTitle.textContent = i18n.t('aboutTitle');
-  
+
   const aboutDesc = document.getElementById('aboutDesc');
   if (aboutDesc) aboutDesc.textContent = i18n.t('aboutDesc');
 
@@ -394,61 +403,61 @@ window.updateAllText = function () {
 
   const aboutCloseBtn = document.getElementById('aboutCloseBtn');
   if (aboutCloseBtn) aboutCloseBtn.textContent = i18n.t('close');
-  
+
   const coffeeBtn = document.getElementById('coffeeBtn');
   if (coffeeBtn) coffeeBtn.textContent = i18n.t('buyMeCoffee');
-  
+
   const feedbackBtn = document.getElementById('feedbackBtn');
   if (feedbackBtn) feedbackBtn.textContent = i18n.t('feedback');
-  
+
   const coffeeTitle = document.getElementById('coffeeTitle');
   if (coffeeTitle) coffeeTitle.textContent = i18n.t('buyMeCoffee');
-  
+
   const coffeeDesc = document.getElementById('coffeeDesc');
   if (coffeeDesc) coffeeDesc.textContent = i18n.t('coffeeDesc');
-  
+
   const feedbackTitle = document.getElementById('feedbackTitle');
   if (feedbackTitle) feedbackTitle.textContent = i18n.t('feedback');
-  
+
   const feedbackTypeLabel = document.getElementById('feedbackTypeLabel');
   if (feedbackTypeLabel) feedbackTypeLabel.textContent = i18n.t('feedbackType');
-  
+
   const feedbackContentLabel = document.getElementById('feedbackContentLabel');
   if (feedbackContentLabel) feedbackContentLabel.textContent = i18n.t('feedbackContent');
-  
+
   const feedbackEmailLabel = document.getElementById('feedbackEmailLabel');
   if (feedbackEmailLabel) feedbackEmailLabel.textContent = i18n.t('feedbackEmail');
-  
+
   const feedbackContent = document.getElementById('feedbackContent');
   if (feedbackContent) feedbackContent.placeholder = i18n.t('feedbackPlaceholder');
-  
+
   const coffeeCustomAmount = document.getElementById('coffeeCustomAmount');
   if (coffeeCustomAmount) coffeeCustomAmount.placeholder = i18n.t('customAmount');
 
   // Update right-click context menu
   const ctxAddSite = document.getElementById('ctxAddSite');
   if (ctxAddSite) ctxAddSite.textContent = i18n.t('addSite');
-  
+
   const ctxAddTag = document.getElementById('ctxAddTag');
   if (ctxAddTag) ctxAddTag.textContent = i18n.t('addTag');
-  
+
   const ctxWallpaper = document.getElementById('ctxWallpaper');
   if (ctxWallpaper) ctxWallpaper.textContent = i18n.t('changeWallpaper');
 
   // Update coffee modal buttons
   const coffeeCancelBtn = document.getElementById('coffeeCancelBtn');
   if (coffeeCancelBtn) coffeeCancelBtn.textContent = i18n.t('cancel');
-  
+
   const coffeePayBtn = document.getElementById('coffeePayBtn');
   if (coffeePayBtn) coffeePayBtn.textContent = i18n.t('pay');
-  
+
   // Update feedback modal buttons
   const feedbackCancelBtn = document.getElementById('feedbackCancelBtn');
   if (feedbackCancelBtn) feedbackCancelBtn.textContent = i18n.t('cancel');
-  
+
   const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
   if (submitFeedbackBtn) submitFeedbackBtn.textContent = i18n.t('submit');
-  
+
   // Update feedback type options
   const feedbackTypeSelect = document.getElementById('feedbackType');
   if (feedbackTypeSelect) {
@@ -475,16 +484,48 @@ window.updateAllText = function () {
 
 // ===== Data & State =====
 const ENGINE_CATALOG = [
+  // Global / General
   { id: 'google', name: { zh: '谷歌', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
   { id: 'bing', name: { zh: '必应', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
-  { id: 'baidu', name: { zh: '百度', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
   { id: 'duckduckgo', name: { zh: 'DuckDuckGo', en: 'DuckDuckGo' }, url: 'https://duckduckgo.com/?q=', icon: 'https://duckduckgo.com/favicon.ico' },
   { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://search.yahoo.com/favicon.ico' },
   { id: 'yandex', name: { zh: 'Yandex', en: 'Yandex' }, url: 'https://yandex.com/search/?text=', icon: 'https://yandex.com/favicon.ico' },
+  { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
+  { id: 'brave', name: { zh: 'Brave', en: 'Brave' }, url: 'https://search.brave.com/search?q=', icon: 'https://brave.com/static-assets/images/brave-logo-sans-text.svg' },
+  { id: 'startpage', name: { zh: 'Startpage', en: 'Startpage' }, url: 'https://www.startpage.com/sp/search?query=', icon: 'https://www.startpage.com/favicon.ico' },
+
+  // Chinese Specific
+  { id: 'baidu', name: { zh: '百度', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
   { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: 'https://www.sogou.com/favicon.ico' },
   { id: 'so360', name: { zh: '360 搜索', en: '360 Search' }, url: 'https://www.so.com/s?q=', icon: 'https://www.so.com/favicon.ico' },
-  { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
-  { id: 'xiaohongshu', name: { zh: '小红书', en: 'Xiaohongshu' }, url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: 'https://www.xiaohongshu.com/favicon.ico' }
+  { id: 'zhihu', name: { zh: '知乎', en: 'Zhihu' }, url: 'https://www.zhihu.com/search?q=', icon: 'https://static.zhihu.com/heifetz/favicon.ico' },
+  { id: 'bilibili', name: { zh: 'B站', en: 'Bilibili' }, url: 'https://search.bilibili.com/all?keyword=', icon: 'https://www.bilibili.com/favicon.ico' },
+  { id: 'xiaohongshu', name: { zh: '小红书', en: 'Xiaohongshu' }, url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: 'https://www.xiaohongshu.com/favicon.ico' },
+  { id: 'weibo', name: { zh: '微博', en: 'Weibo' }, url: 'https://s.weibo.com/weibo?q=', icon: 'https://weibo.com/favicon.ico' },
+  { id: 'douban', name: { zh: '豆瓣', en: 'Douban' }, url: 'https://www.douban.com/search?q=', icon: 'https://img3.doubanio.com/favicon.ico' },
+
+  // Dev / Tech
+  { id: 'github', name: { zh: 'GitHub', en: 'GitHub' }, url: 'https://github.com/search?q=', icon: 'https://github.com/favicon.ico' },
+  { id: 'stackoverflow', name: { zh: 'StackOverflow', en: 'StackOverflow' }, url: 'https://stackoverflow.com/search?q=', icon: 'https://stackoverflow.com/favicon.ico' },
+  { id: 'npm', name: { zh: 'NPM', en: 'NPM' }, url: 'https://www.npmjs.com/search?q=', icon: 'https://static.npmjs.com/b0f1a8318363185cc2ea6a40ac23eeb2.png' },
+  { id: 'mdn', name: { zh: 'MDN', en: 'MDN' }, url: 'https://developer.mozilla.org/search?q=', icon: 'https://developer.mozilla.org/favicon.ico' },
+
+  // Social / Media
+  { id: 'youtube', name: { zh: 'YouTube', en: 'YouTube' }, url: 'https://www.youtube.com/results?search_query=', icon: 'https://www.youtube.com/favicon.ico' },
+  { id: 'twitter', name: { zh: 'Twitter', en: 'Twitter' }, url: 'https://twitter.com/search?q=', icon: 'https://abs.twimg.com/favicons/twitter.2.ico' },
+  { id: 'reddit', name: { zh: 'Reddit', en: 'Reddit' }, url: 'https://www.reddit.com/search/?q=', icon: 'https://www.reddit.com/favicon.ico' },
+  { id: 'pinterest', name: { zh: 'Pinterest', en: 'Pinterest' }, url: 'https://www.pinterest.com/search/pins/?q=', icon: 'https://www.pinterest.com/favicon.ico' },
+  { id: 'instagram', name: { zh: 'Instagram', en: 'Instagram' }, url: 'https://www.instagram.com/explore/tags/', icon: 'https://www.instagram.com/favicon.ico' },
+
+  // Knowledge
+  { id: 'wikipedia', name: { zh: '维基百科', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: 'https://en.wikipedia.org/favicon.ico' },
+  { id: 'wolframalpha', name: { zh: 'WolframAlpha', en: 'WolframAlpha' }, url: 'https://www.wolframalpha.com/input/?i=', icon: 'https://www.wolframalpha.com/favicon.ico' },
+  { id: 'scholar', name: { zh: '学术搜索', en: 'Scholar' }, url: 'https://scholar.google.com/scholar?q=', icon: 'https://scholar.google.com/favicon.ico' },
+
+  // Shopping
+  { id: 'amazon', name: { zh: '亚马逊', en: 'Amazon' }, url: 'https://www.amazon.com/s?k=', icon: 'https://www.amazon.com/favicon.ico' },
+  { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.taobao.com/favicon.ico' },
+  { id: 'jd', name: { zh: '京东', en: 'JD' }, url: 'https://search.jd.com/Search?keyword=', icon: 'https://www.jd.com/favicon.ico' }
 ];
 
 const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
@@ -764,40 +805,146 @@ function renderSearchEngine() {
   engineMenu.innerHTML = `
     <div class="engine-menu-section">
       ${enabled.map((eng) => {
-        const name = getEngineName(eng);
-        const isCurrent = eng.id === engine.id;
-        const canRemove = enabled.length > 1;
-        return `
+    const name = getEngineName(eng);
+    const isCurrent = eng.id === engine.id;
+    return `
           <div class="engine-option ${isCurrent ? 'active' : ''}" data-engine-id="${eng.id}">
             <div class="engine-option-main" onclick="selectEngineById('${eng.id}')">
               <img src="${eng.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
               <span>${name}</span>
             </div>
-            ${canRemove ? `<button class=\"engine-remove\" type=\"button\" title=\"${removeLabel}\" onclick=\"removeEngineById('${eng.id}')\">×</button>` : `<span class=\"engine-remove-placeholder\"></span>`}
+            ${enabled.length > 1 ? `
+              <button class="engine-remove" type="button" title="${removeLabel}" onclick="removeEngineById('${eng.id}')">×</button>
+            ` : ''}
           </div>
         `;
-      }).join('')}
+  }).join('')}
     </div>
 
     <div class="engine-menu-divider"></div>
     <div class="engine-add">
-      <button class="engine-add-btn" type="button" onclick="toggleEngineAddMenu()">+ ${addLabel}</button>
-      <div id="engineAddMenu" class="engine-add-menu hidden">
-        ${addable.length
-          ? addable.map((eng) => {
-              const name = getEngineName(eng);
-              return `
-                <div class="engine-option" onclick="addEngineById('${eng.id}')">
-                  <img src="${eng.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
-                  <span>${name}</span>
-                </div>
-              `;
-            }).join('')
-          : `<div class="engine-empty">${i18n.currentLocale === 'zh' ? '已添加全部引擎' : 'All engines added'}</div>`}
-      </div>
+      <button class="engine-add-btn" type="button" onclick="openEngineModal()">+ ${addLabel}</button>
     </div>
   `;
 }
+
+// ===== Search Engine Modal Logic =====
+
+function openEngineModal() {
+  document.getElementById('engineModal').classList.remove('hidden');
+  document.getElementById('modalOverlay').classList.remove('hidden');
+
+  // Clone current enabled IDs to working state
+  enginePageState.selectedIds = [...(state.enabledEngineIds || [])];
+  enginePageState.page = 1;
+
+  renderEngineModal();
+}
+
+function closeEngineModal() {
+  document.getElementById('engineModal').classList.add('hidden');
+  document.getElementById('modalOverlay').classList.add('hidden');
+}
+
+function toggleEngineSelection(id) {
+  const index = enginePageState.selectedIds.indexOf(id);
+  if (index > -1) {
+    // Deselect
+    enginePageState.selectedIds.splice(index, 1);
+  } else {
+    // Select
+    if (enginePageState.selectedIds.length >= 5) {
+      const msg = i18n.currentLocale === 'zh' ? '最多只能选择 5 个搜索引擎' : 'You can select up to 5 search engines';
+      if (window.showNotification) window.showNotification(msg, 'info');
+      return;
+    }
+    enginePageState.selectedIds.push(id);
+  }
+  renderEngineModal();
+}
+
+function setEnginePage(p) {
+  enginePageState.page = p;
+  renderEngineModal();
+}
+
+function renderEngineModal() {
+  const grid = document.getElementById('engineList');
+  const pag = document.getElementById('enginePagination');
+  const hint = document.getElementById('engineCountHint');
+
+  const total = ENGINE_CATALOG.length;
+  const totalPages = Math.ceil(total / enginePageState.pageSize);
+
+  // Ensure page validity
+  if (enginePageState.page < 1) enginePageState.page = 1;
+  if (enginePageState.page > totalPages) enginePageState.page = totalPages;
+
+  const start = (enginePageState.page - 1) * enginePageState.pageSize;
+  const end = start + enginePageState.pageSize;
+  const items = ENGINE_CATALOG.slice(start, end);
+
+  grid.innerHTML = items.map(eng => {
+    const isSelected = enginePageState.selectedIds.includes(eng.id);
+    const name = getEngineName(eng);
+    return `
+      <div class="engine-item ${isSelected ? 'selected' : ''}" onclick="toggleEngineSelection('${eng.id}')">
+        <div class="engine-check">✓</div>
+        <img src="${eng.icon}" onerror="this.src='https://www.google.com/favicon.ico'">
+        <span>${name}</span>
+      </div>
+    `;
+  }).join('');
+
+  // Pagination
+  let pageHtml = `
+    <button class="page-btn" ${enginePageState.page === 1 ? 'disabled' : ''} onclick="setEnginePage(${enginePageState.page - 1})">‹</button>
+  `;
+
+  for (let i = 1; i <= totalPages; i++) {
+    // Show first, last, current, and surrounding
+    if (i === 1 || i === totalPages || (i >= enginePageState.page - 1 && i <= enginePageState.page + 1)) {
+      pageHtml += `<button class="page-btn ${i === enginePageState.page ? 'active' : ''}" onclick="setEnginePage(${i})">${i}</button>`;
+    } else if (i === enginePageState.page - 2 || i === enginePageState.page + 2) {
+      pageHtml += `<span style="opacity:0.5">...</span>`;
+    }
+  }
+
+  pageHtml += `
+    <button class="page-btn" ${enginePageState.page === totalPages ? 'disabled' : ''} onclick="setEnginePage(${enginePageState.page + 1})">›</button>
+  `;
+
+  pag.innerHTML = pageHtml;
+
+  // Hint text
+  const count = enginePageState.selectedIds.length;
+  const text = i18n.currentLocale === 'zh'
+    ? `已选 ${count}/5`
+    : `Selected ${count}/5`;
+  hint.textContent = text;
+}
+
+// Bind events
+document.getElementById('closeEngineModal').onclick = closeEngineModal;
+document.getElementById('saveEngineSelection').onclick = () => {
+  if (enginePageState.selectedIds.length === 0) {
+    // Prevent empty selection? logic says at least one
+    // Fallback to default if empty
+    enginePageState.selectedIds = [...DEFAULT_ENGINE_IDS];
+  }
+
+  state.enabledEngineIds = [...enginePageState.selectedIds];
+  saveData();
+
+  // Ensure current engine is still valid
+  if (!state.enabledEngineIds.includes(state.engineId)) {
+    state.engineId = state.enabledEngineIds[0];
+    saveData();
+  }
+
+  renderSearchEngine();
+  closeEngineModal();
+};
 
 window.selectEngineById = (id) => {
   const enabled = getEnabledEngines(state.enabledEngineIds || []);
@@ -1521,7 +1668,7 @@ function selectCoffeeAmount(amount) {
 function processCoffeePayment() {
   const customAmount = parseInt(document.getElementById('coffeeCustomAmount').value);
   const amount = customAmount > 0 ? customAmount : selectedCoffeeAmount;
-  
+
   if (amount < 1 || amount > 100) {
     showNotification(i18n.currentLocale === 'zh' ? '请输入 1-100 之间的金额' : 'Please enter amount between 1-100', 'error');
     return;
@@ -1530,8 +1677,8 @@ function processCoffeePayment() {
   // Check if Paddle is configured
   if (!window.PADDLE_CLIENT_TOKEN) {
     showNotification(
-      i18n.currentLocale === 'zh' 
-        ? '支付功能尚未配置，请联系开发者' 
+      i18n.currentLocale === 'zh'
+        ? '支付功能尚未配置，请联系开发者'
         : 'Payment not configured. Please contact the developer.',
       'warning'
     );
@@ -1542,8 +1689,8 @@ function processCoffeePayment() {
   // Check if Paddle SDK is loaded
   if (typeof Paddle === 'undefined') {
     showNotification(
-      i18n.currentLocale === 'zh' 
-        ? '支付模块加载失败，请刷新页面重试' 
+      i18n.currentLocale === 'zh'
+        ? '支付模块加载失败，请刷新页面重试'
         : 'Payment module failed to load. Please refresh and try again.',
       'error'
     );
@@ -1554,13 +1701,13 @@ function processCoffeePayment() {
   // Since Paddle doesn't support arbitrary amounts without custom prices,
   // we'll redirect to a donation page or show a message
   showNotification(
-    i18n.currentLocale === 'zh' 
-      ? '感谢你的支持意向！捐赠功能即将上线' 
+    i18n.currentLocale === 'zh'
+      ? '感谢你的支持意向！捐赠功能即将上线'
       : 'Thank you for your interest! Donation feature coming soon.',
     'info'
   );
   closeCoffeeModal();
-  
+
   // TODO: When ready, create donation prices in Paddle and use:
   // window.openPaddleCheckout?.('donation', amount);
 }
@@ -1638,7 +1785,7 @@ let currentContextItem = null; // Store reference to the item being right-clicke
 function showPageContextMenu(e) {
   // Always prevent default browser context menu
   e.preventDefault();
-  
+
   // Hide any existing context menus first
   hideAllContextMenus();
 
@@ -1655,25 +1802,25 @@ function showPageContextMenu(e) {
   if (e.target.closest('.chip') || e.target.closest('.tag-link-item') || e.target.closest('#contextMenu')) {
     return;
   }
-  
+
   // Check if right-clicking on a site or tag card
   const siteCard = e.target.closest('.site-card');
   const tagCard = e.target.closest('.tag-card');
-  
+
   if (siteCard || tagCard) {
     // Show item edit menu for sites/tags
     currentContextItem = siteCard || tagCard;
     showItemContextMenu(e, siteCard ? 'site' : 'tag');
     return;
   }
-  
+
   // Check if on modal or other non-applicable areas
   const skipSelectors = [
     '.modal', '.modal-overlay:not(.hidden)', '.settings-menu', '.settings-btn',
     '.context-menu', '.page-context-menu', '.item-context-menu',
     '.add-card'
   ];
-  
+
   const shouldSkip = skipSelectors.some(sel => e.target.closest(sel));
   if (shouldSkip) {
     return;
@@ -1696,20 +1843,20 @@ function showPageContextMenu(e) {
 
 function showItemContextMenu(e, type) {
   if (!itemContextMenu) return;
-  
+
   // Update menu content based on type
   const editLabel = document.getElementById('ctxEditItem');
   const deleteLabel = document.getElementById('ctxDeleteItem');
-  
+
   if (editLabel) {
-    editLabel.textContent = i18n.currentLocale === 'zh' 
+    editLabel.textContent = i18n.currentLocale === 'zh'
       ? (type === 'site' ? '编辑网站' : '编辑标签')
       : (type === 'site' ? 'Edit Site' : 'Edit Tag');
   }
   if (deleteLabel) {
     deleteLabel.textContent = i18n.currentLocale === 'zh' ? '删除' : 'Delete';
   }
-  
+
   itemContextMenu.dataset.type = type;
   itemContextMenu.style.left = e.clientX + 'px';
   itemContextMenu.style.top = e.clientY + 'px';
@@ -1768,9 +1915,9 @@ function openWallpaperFromContext() {
 function editItemFromContext() {
   hideAllContextMenus();
   if (!currentContextItem) return;
-  
+
   const type = document.getElementById('itemContextMenu')?.dataset.type;
-  
+
   if (type === 'site') {
     const siteId = currentContextItem.dataset.id;
     if (siteId) {
@@ -1788,12 +1935,12 @@ function editItemFromContext() {
 function deleteItemFromContext() {
   hideAllContextMenus();
   if (!currentContextItem) return;
-  
+
   const type = document.getElementById('itemContextMenu')?.dataset.type;
   const confirmMsg = i18n.currentLocale === 'zh' ? '确定要删除吗？' : 'Are you sure you want to delete?';
-  
+
   if (!confirm(confirmMsg)) return;
-  
+
   if (type === 'site') {
     const siteId = currentContextItem.dataset.id;
     if (siteId) {

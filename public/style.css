@@ -3,16 +3,31 @@
 }
 
 :root {
-  /* Pencil Sketch / Paper Theme Variables */
-  --bg-color: #f9f9f9;
-  --text-color: #333333;
+  --bg-color: #f0f0f0;
   --card-bg: #ffffff;
-  --modal-bg: #ffffff;
-  --input-bg: #ffffff;
-  --border-color: #444444;
-  --hover-bg: #f0f0f0;
-  --shadow-color: rgba(0, 0, 0, 0.2);
+  --text-color: #333333;
+  --border-color: #222222;
   --accent-color: #4A90E2;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --sketch-shadow: 2px 3px 0px rgba(0, 0, 0, 0.15);
+}
+
+/* Global Custom Cursor */
+body,
+html {
+  cursor: url('cursor.png'), auto;
+}
+
+a,
+button,
+input,
+select,
+textarea,
+.clickable,
+.engine-option,
+.site-card,
+.tag-pill {
+  cursor: url('cursor.png'), pointer;
 }
 
 @import url('https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css');
@@ -595,6 +610,111 @@ button:active {
 .logout-btn:hover {
   background-color: #ff6b6b;
   /* Solid color no change */
+}
+
+/* Search Engine Modal */
+.engine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 15px;
+  padding: 20px 0;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.engine-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: var(--card-bg);
+  position: relative;
+}
+
+.engine-item:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--sketch-shadow);
+}
+
+.engine-item.selected {
+  border-color: var(--accent-color);
+  background: color-mix(in srgb, var(--accent-color) 10%, var(--card-bg));
+}
+
+.engine-item img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.engine-item span {
+  font-size: 14px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.engine-check {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-color);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.2s;
+}
+
+.engine-item.selected .engine-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 15px;
+  align-items: center;
+}
+
+.page-btn {
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  background: var(--card-bg);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn.active {
+  background: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Modal sizing fix */
+.wallpaper-modal {
+  max-width: 900px !important;
 }
 
 /* Wallpaper Color Circles - Sketchy */
