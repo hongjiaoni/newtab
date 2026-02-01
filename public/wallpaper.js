@@ -2,6 +2,8 @@
 
 const wallpaperState = {
   selectedWallpaper: localStorage.getItem('selectedWallpaper') || null,
+  pendingWallpaper: undefined,
+  baseWallpaper: null,
   activeCategory: null,
   categories: [],
   wallpapers: [],
@@ -22,6 +24,24 @@ async function initializeWallpaper() {
   // Apply saved selection
   if (wallpaperState.selectedWallpaper) {
     applyWallpaper(wallpaperState.selectedWallpaper);
+  }
+}
+
+function previewWallpaper(wallpaperId) {
+  if (!wallpaperId) {
+    document.body.style.backgroundImage = '';
+    document.body.style.backgroundColor = '';
+    return;
+  }
+
+  if (wallpaperId.startsWith('#') || wallpaperId.startsWith('rgb')) {
+    document.body.style.backgroundColor = wallpaperId;
+    document.body.style.backgroundImage = '';
+  } else {
+    document.body.style.backgroundImage = `url('${wallpaperId}')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundAttachment = 'fixed';
   }
 }
 
@@ -63,10 +83,20 @@ async function loadWallpapers() {
   try {
     wallpaperState.isLoading = true;
 
-    const { data, error } = await supabase
+    let query = supabase
       .from('wallpapers')
       .select('*')
       .order('created_at', { ascending: false });
+
+    const userId = window.authState?.user?.id;
+    if (userId) {
+      // Custom wallpapers are only visible to their uploader
+      query = query.or(`category.neq.Custom,user_id.eq.${userId}`);
+    } else {
+      query = query.neq('category', 'Custom');
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       console.error('Load wallpapers error:', error);
@@ -130,6 +160,8 @@ function applyWallpaper(wallpaperId) {
 function openWallpaperModal() {
   const modal = document.getElementById('wallpaperModal');
   if (modal) {
+    wallpaperState.baseWallpaper = wallpaperState.selectedWallpaper;
+    wallpaperState.pendingWallpaper = wallpaperState.selectedWallpaper;
     modal.classList.remove('hidden');
     renderWallpaperUI();
   }
@@ -139,6 +171,12 @@ function openWallpaperModal() {
 function closeWallpaperModal() {
   const modal = document.getElementById('wallpaperModal');
   if (modal) {
+    // Revert preview if user didn't save
+    if (wallpaperState.pendingWallpaper !== undefined && wallpaperState.pendingWallpaper !== wallpaperState.selectedWallpaper) {
+      previewWallpaper(wallpaperState.selectedWallpaper);
+    }
+    wallpaperState.pendingWallpaper = undefined;
+    wallpaperState.baseWallpaper = null;
     modal.classList.add('hidden');
   }
 }
@@ -322,8 +360,11 @@ function renderWallpaperUI() {
         ${currentLocale === 'zh' ? '该分类下暂无壁纸' : 'No wallpapers in this category'}
     </div>`;
   } else {
+    const currentSelected = wallpaperState.pendingWallpaper !== undefined
+      ? wallpaperState.pendingWallpaper
+      : wallpaperState.selectedWallpaper;
     gridContainer.innerHTML = filteredWallpapers.map(w => `
-      <div class="wallpaper-item" onclick="selectWallpaper('${w.url}')">
+      <div class="wallpaper-item ${currentSelected === w.url ? 'selected' : ''}" onclick="selectWallpaper('${w.url}')">
         <img src="${w.url}" alt="Wallpaper" title="Wallpaper">
       </div>
     `).join('');
@@ -577,6 +618,8 @@ async function handleUserWallpaperUpload(event) {
 
     // Reload wallpapers and re-render
     await loadWallpapers();
+    wallpaperState.pendingWallpaper = urlData.publicUrl;
+    previewWallpaper(urlData.publicUrl);
     renderWallpaperUI();
 
     // Reset file input
@@ -668,18 +711,15 @@ async function compressImage(file) {
 
 // Select wallpaper
 function selectWallpaper(wallpaperId) {
-  applyWallpaper(wallpaperId);
-  closeWallpaperModal();
-  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
-  showNotification(currentLocale === 'zh' ? '壁纸已更换' : 'Wallpaper changed', 'success');
+  wallpaperState.pendingWallpaper = wallpaperId;
+  previewWallpaper(wallpaperId);
+  renderWallpaperUI();
 }
 
 function restoreDefaultWallpaper() {
-  applyWallpaper(null);
-
-  closeWallpaperModal();
-  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
-  showNotification(currentLocale === 'zh' ? '已恢复默认壁纸' : 'Restored default wallpaper', 'success');
+  wallpaperState.pendingWallpaper = null;
+  previewWallpaper(null);
+  renderWallpaperUI();
 }
 
 // Setup wallpaper event listeners
@@ -688,10 +728,24 @@ function setupWallpaperEventListeners() {
   const closeWallpaperModalBtn = document.getElementById('closeWallpaperModal');
   const wallpaperModal = document.getElementById('wallpaperModal');
   const restoreBtn = document.getElementById('restoreDefaultWallpaper');
+  const saveBtn = document.getElementById('saveWallpaperSelection');
 
   if (wallpaperBtn) wallpaperBtn.addEventListener('click', openWallpaperModal);
   if (closeWallpaperModalBtn) closeWallpaperModalBtn.addEventListener('click', closeWallpaperModal);
   if (restoreBtn) restoreBtn.addEventListener('click', restoreDefaultWallpaper);
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => {
+      const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+      const next = wallpaperState.pendingWallpaper;
+
+      applyWallpaper(next || null);
+      wallpaperState.pendingWallpaper = undefined;
+      wallpaperState.baseWallpaper = null;
+
+      closeWallpaperModal();
+      showNotification(typeof i18n !== 'undefined' ? i18n.t('wallpaperChanged') : (currentLocale === 'zh' ? '壁纸已更换' : 'Wallpaper changed'), 'success');
+    });
+  }
 
   if (wallpaperModal) {
     wallpaperModal.addEventListener('click', (e) => {

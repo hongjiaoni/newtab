@@ -17,6 +17,10 @@
     { "src": "/screenshot-light.png", "dest": "/landing/screenshot-light.png" },
     { "src": "/screenshot-dark.png", "dest": "/landing/screenshot-dark.png" },
     { "src": "/cursor.svg", "dest": "/landing/cursor.svg" },
+    { "src": "/cursor-light.svg", "dest": "/landing/cursor-light.svg" },
+    { "src": "/cursor-dark.svg", "dest": "/landing/cursor-dark.svg" },
+    { "src": "/pointer-light.svg", "dest": "/landing/pointer-light.svg" },
+    { "src": "/pointer-dark.svg", "dest": "/landing/pointer-dark.svg" },
 
     { "src": "/$", "dest": "/public/index.html" },
     { "src": "/landing/?$", "dest": "/landing/index.html" },

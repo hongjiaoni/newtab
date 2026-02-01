@@ -99,6 +99,7 @@ const translations = {
     addByLink: '添加链接',
     addEngine: '新增',
     remove: '移除',
+    searchEngines: '搜索引擎',
     subscriptionRecords: '订阅记录',
     back: '返回',
     days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
@@ -187,6 +188,7 @@ const translations = {
     back: 'Back',
     addEngine: 'Add engine',
     remove: 'Remove',
+    searchEngines: 'Search engines',
     days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   }
@@ -368,6 +370,7 @@ window.updateAllText = function () {
   const wallpaperModalTitle = document.getElementById('wallpaperModalTitle');
   const closeWallpaperModal = document.getElementById('closeWallpaperModal');
   const restoreWallpaperBtn = document.getElementById('restoreDefaultWallpaper');
+  const saveWallpaperBtn = document.getElementById('saveWallpaperSelection');
 
   if (landscapeTabText) landscapeTabText.textContent = i18n.t('landscape');
   if (solidTabText) solidTabText.textContent = i18n.t('solid');
@@ -375,6 +378,7 @@ window.updateAllText = function () {
   if (wallpaperModalTitle) wallpaperModalTitle.textContent = i18n.t('wallpaperTitle');
   if (closeWallpaperModal) closeWallpaperModal.textContent = i18n.t('cancel');
   if (restoreWallpaperBtn) restoreWallpaperBtn.textContent = i18n.t('restoreDefault');
+  if (saveWallpaperBtn) saveWallpaperBtn.textContent = i18n.t('save');
 
   // Update Profile Modal
   const userProfileTitle = document.getElementById('userProfileTitle');
@@ -483,11 +487,13 @@ window.updateAllText = function () {
   // Search engine menu contains localized names
   renderSearchEngine();
 
-  // Engine add button label
-  const engineAddBtn = document.getElementById('engineAddBtn');
-  if (engineAddBtn) {
-    engineAddBtn.textContent = i18n.currentLocale === 'zh' ? '新增' : 'Add';
-  }
+  // Engine modal
+  const engineModalTitle = document.getElementById('engineModalTitle');
+  if (engineModalTitle) engineModalTitle.textContent = i18n.t('searchEngines');
+  const closeEngineModalBtn = document.getElementById('closeEngineModal');
+  if (closeEngineModalBtn) closeEngineModalBtn.textContent = i18n.t('close');
+  const saveEngineSelectionBtn = document.getElementById('saveEngineSelection');
+  if (saveEngineSelectionBtn) saveEngineSelectionBtn.textContent = i18n.t('save');
 }
 
 // ===== Data & State =====
@@ -708,7 +714,6 @@ const searchInput = document.getElementById('searchInput');
 const searchEngineEl = document.getElementById('searchEngine');
 const engineIcon = document.getElementById('engineIcon');
 const engineMenu = document.getElementById('engineMenu');
-const engineAddBtn = document.getElementById('engineAddBtn');
 const contentEl = document.getElementById('content');
 const settingsToggle = document.getElementById('settingsToggle');
 const settingsMenu = document.getElementById('settingsMenu');
@@ -839,8 +844,20 @@ function renderSearchEngine() {
 // ===== Search Engine Modal Logic =====
 
 function openEngineModal() {
-  document.getElementById('engineModal').classList.remove('hidden');
-  document.getElementById('modalOverlay').classList.remove('hidden');
+  const engineModal = document.getElementById('engineModal');
+  if (!engineModal) return;
+  engineModal.classList.remove('hidden');
+
+  // Ensure the shared overlay is not blocking clicks
+  document.getElementById('modalOverlay')?.classList.add('hidden');
+
+  // Localize modal title/buttons on open
+  const engineModalTitle = document.getElementById('engineModalTitle');
+  if (engineModalTitle && typeof i18n !== 'undefined') engineModalTitle.textContent = i18n.t('searchEngines');
+  const closeEngineModalBtn = document.getElementById('closeEngineModal');
+  if (closeEngineModalBtn && typeof i18n !== 'undefined') closeEngineModalBtn.textContent = i18n.t('close');
+  const saveEngineSelectionBtn = document.getElementById('saveEngineSelection');
+  if (saveEngineSelectionBtn && typeof i18n !== 'undefined') saveEngineSelectionBtn.textContent = i18n.t('save');
 
   // Clone current enabled IDs to working state
   enginePageState.selectedIds = [...(state.enabledEngineIds || [])];
@@ -851,6 +868,9 @@ function openEngineModal() {
 
 function closeEngineModal() {
   document.getElementById('engineModal').classList.add('hidden');
+
+  // Defensive: old versions also opened the shared modal overlay
+  document.getElementById('modalOverlay')?.classList.add('hidden');
 }
 
 function toggleEngineSelection(id) {
@@ -1011,14 +1031,6 @@ searchEngineEl.addEventListener('click', (e) => {
   }
   engineMenu.classList.toggle('hidden');
 });
-
-if (engineAddBtn) {
-  engineAddBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    openEngineModal();
-  });
-}
 
 document.addEventListener('click', () => {
   engineMenu.classList.add('hidden');
