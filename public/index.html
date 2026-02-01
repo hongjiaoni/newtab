@@ -101,10 +101,11 @@
           <!-- Populated by JS -->
         </div>
       </div>
+      <button id="engineAddBtn" class="engine-add-inline" type="button">新增</button>
       <input id="searchInput" type="text" placeholder="想要搜点什么吗？" autocomplete="off" />
     </form>
 
-    <div id="engineQuickBar" class="engine-quick-bar"></div>
+    <div id="engineQuickList" class="engine-quick-list"></div>
 
     <!-- Content Area: pinned sites and tags -->
     <div id="content" class="content-area"></div>
@@ -146,9 +147,6 @@
   <div id="engineModal" class="modal-overlay hidden">
     <div class="modal" style="max-width: 800px; width: 90%;">
       <h3 id="engineModalTitle">搜索引擎</h3>
-      <div style="margin: 12px 0;">
-        <input id="engineSearchInput" class="modal-input" type="text" placeholder="" autocomplete="off" />
-      </div>
       <div id="engineList" class="engine-grid">
         <!-- Populated by JS -->
       </div>

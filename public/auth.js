@@ -364,19 +364,25 @@ async function openSubscriptionRecords() {
   const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
   const isZh = currentLocale === 'zh';
 
-  const titleEl = document.getElementById('subscriptionRecordsTitle');
-  if (titleEl && typeof i18n !== 'undefined') titleEl.textContent = i18n.t('subscriptionRecords');
-  const backBtnText = document.getElementById('backToUserProfile');
-  if (backBtnText && typeof i18n !== 'undefined') backBtnText.textContent = i18n.t('back');
-  const closeBtnText = document.getElementById('closeSubscriptionRecords');
-  if (closeBtnText && typeof i18n !== 'undefined') closeBtnText.textContent = i18n.t('close');
-
   const profileModal = document.getElementById('userProfileModal');
   const recordsModal = document.getElementById('subscriptionRecordsModal');
   const content = document.getElementById('subscriptionRecordsContent');
+  const titleEl = document.getElementById('subscriptionRecordsTitle');
+  const backBtn = document.getElementById('backToUserProfile');
+  const closeBtn = document.getElementById('closeSubscriptionRecords');
 
   if (!authState.user) return;
   if (!recordsModal || !content) return;
+
+  if (typeof i18n !== 'undefined') {
+    if (titleEl) titleEl.textContent = i18n.t('subscriptionRecords');
+    if (backBtn) backBtn.textContent = i18n.t('back');
+    if (closeBtn) closeBtn.textContent = i18n.t('close');
+  } else {
+    if (titleEl) titleEl.textContent = isZh ? '订阅记录' : 'Subscription records';
+    if (backBtn) backBtn.textContent = isZh ? '返回' : 'Back';
+    if (closeBtn) closeBtn.textContent = isZh ? '关闭' : 'Close';
+  }
 
   if (profileModal) profileModal.classList.add('hidden');
   recordsModal.classList.remove('hidden');

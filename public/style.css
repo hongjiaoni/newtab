@@ -15,7 +15,7 @@
 /* Global Custom Cursor */
 body,
 html {
-  cursor: url('cursor.png'), auto;
+  cursor: url('/cursor.png') 2 2, auto;
 }
 
 a,
@@ -27,7 +27,7 @@ textarea,
 .engine-option,
 .site-card,
 .tag-pill {
-  cursor: url('cursor.png'), pointer;
+  cursor: url('/cursor.png') 2 2, pointer;
 }
 
 @import url('https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css');
@@ -240,75 +240,71 @@ body.dark {
   display: flex;
   align-items: center;
   padding-right: 12px;
-  background: transparent;
+  border-right: 2px solid var(--border-color);
+  margin-right: 12px;
+  cursor: pointer;
+  position: relative;
 }
 
-.engine-quick-bar {
+.engine-add-inline {
+  border: 2px solid var(--border-color);
+  background: var(--card-bg);
+  color: var(--text-color);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 700;
+  box-shadow: 2px 2px 0 var(--shadow-color);
+  margin-right: 10px;
+}
+
+.engine-add-inline:hover {
+  background: var(--hover-bg);
+}
+
+.engine-quick-list {
+  margin-top: 10px;
   display: flex;
-  align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 10px;
   flex-wrap: wrap;
 }
 
-.engine-pill {
-  position: relative;
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
+.engine-quick-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   border: 2px solid var(--border-color);
   background: var(--card-bg);
-  box-shadow: 3px 3px 0 var(--shadow-color);
-  display: grid;
-  place-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  box-shadow: 2px 2px 0 var(--shadow-color);
 }
 
-.engine-pill.active {
+.engine-quick-item.active {
   border-color: var(--accent-color);
-  background: color-mix(in srgb, var(--accent-color) 10%, var(--card-bg));
 }
 
-.engine-pill-main {
-  width: 100%;
-  height: 100%;
-  border: none;
-  background: transparent;
-  padding: 6px;
-  display: grid;
-  place-items: center;
-}
-
-.engine-pill-main img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-}
-
-.engine-pill-remove {
-  position: absolute;
-  top: -7px;
-  right: -7px;
+.engine-quick-item img {
   width: 18px;
   height: 18px;
-  border-radius: 999px;
-  border: 2px solid var(--border-color);
-  background: var(--card-bg);
-  box-shadow: 2px 2px 0 var(--shadow-color);
-  font-weight: 900;
-  font-size: 12px;
-  line-height: 1;
-  display: grid;
-  place-items: center;
+  border-radius: 4px;
 }
 
-.engine-pill-add {
-  border: 2px dashed var(--border-color);
-  background: transparent;
+.engine-quick-remove {
+  border: 2px solid var(--border-color);
+  background: var(--card-bg);
   color: var(--text-color);
-  font-weight: 800;
-  padding: 10px 12px;
   border-radius: 999px;
+  width: 22px;
+  height: 20px;
+  line-height: 14px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  box-shadow: 2px 2px 0 var(--shadow-color);
 }
 
 #engineIcon {
@@ -644,18 +640,6 @@ button:active {
 }
 
 /* Specific button overrides */
-.primary-btn {
-  background: var(--text-color);
-  color: var(--bg-color);
-  border-color: var(--text-color);
-}
-
-.primary-btn:hover {
-  background: var(--hover-bg);
-  color: var(--text-color);
-  border-color: var(--border-color);
-}
-
 .modal-actions .primary-btn {
   background: var(--text-color);
   color: var(--bg-color);
