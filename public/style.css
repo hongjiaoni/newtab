@@ -656,6 +656,18 @@ button:active {
   border-color: var(--border-color);
 }
 
+.modal-actions .primary-btn {
+  background: var(--text-color);
+  color: var(--bg-color);
+  border-color: var(--text-color);
+}
+
+.modal-actions .primary-btn:hover {
+  background: var(--hover-bg);
+  color: var(--text-color);
+  border-color: var(--border-color);
+}
+
 .modal-actions .cancel-btn {
   background: transparent;
   color: var(--text-color);
