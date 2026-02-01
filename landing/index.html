@@ -50,7 +50,7 @@
       color: var(--text);
       line-height: 1.6;
       overflow: hidden;
-      cursor: url('/cursor.svg') 2 2, auto;
+      cursor: url('/cursor-light.svg') 2 2, auto;
     }
 
     a,
@@ -63,7 +63,24 @@
     textarea,
     .sketch-card,
     .engine-option {
-      cursor: url('/cursor.svg') 2 2, pointer;
+      cursor: url('/pointer-light.svg') 2 2, pointer;
+    }
+
+    html[data-theme="dark"] body {
+      cursor: url('/cursor-dark.svg') 2 2, auto;
+    }
+
+    html[data-theme="dark"] a,
+    html[data-theme="dark"] button,
+    html[data-theme="dark"] .btn,
+    html[data-theme="dark"] .pill,
+    html[data-theme="dark"] .brand-badge-btn,
+    html[data-theme="dark"] input,
+    html[data-theme="dark"] select,
+    html[data-theme="dark"] textarea,
+    html[data-theme="dark"] .sketch-card,
+    html[data-theme="dark"] .engine-option {
+      cursor: url('/pointer-dark.svg') 2 2, pointer;
     }
 
     a {

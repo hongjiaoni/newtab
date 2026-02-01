@@ -15,7 +15,7 @@
 /* Global Custom Cursor */
 body,
 html {
-  cursor: url('/cursor.svg') 2 2, auto;
+  cursor: url('/cursor-light.svg') 2 2, auto;
 }
 
 a,
@@ -26,8 +26,46 @@ textarea,
 .clickable,
 .engine-option,
 .site-card,
-.tag-pill {
-  cursor: url('/cursor.svg') 2 2, pointer;
+.tag-pill,
+.settings-menu-item,
+.settings-submenu div,
+.context-menu-item,
+.page-context-menu .context-menu-item,
+.search-engine,
+.date,
+.time,
+.wallpaper-item,
+.wallpaper-tab,
+.page-btn,
+.engine-item {
+  cursor: url('/pointer-light.svg') 2 2, pointer;
+}
+
+body.dark {
+  cursor: url('/cursor-dark.svg') 2 2, auto;
+}
+
+body.dark a,
+body.dark button,
+body.dark input,
+body.dark select,
+body.dark textarea,
+body.dark .clickable,
+body.dark .engine-option,
+body.dark .site-card,
+body.dark .tag-pill,
+body.dark .settings-menu-item,
+body.dark .settings-submenu div,
+body.dark .context-menu-item,
+body.dark .page-context-menu .context-menu-item,
+body.dark .search-engine,
+body.dark .date,
+body.dark .time,
+body.dark .wallpaper-item,
+body.dark .wallpaper-tab,
+body.dark .page-btn,
+body.dark .engine-item {
+  cursor: url('/pointer-dark.svg') 2 2, pointer;
 }
 
 @import url('https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css');
@@ -813,6 +851,10 @@ button:active {
   background: var(--card-bg);
   padding: 4px;
   box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.wallpaper-item.selected {
+  border-color: var(--accent-color);
 }
 
 .wallpaper-item:hover {
