@@ -16,6 +16,8 @@ const API_CONFIG = {
 
 // Supabase Configuration
 const PROD_HOSTNAMES = [
+  'newtab.online',
+  'www.newtab.online',
   'newtab-rfyoq591j-hongjiaonis-projects.vercel.app'
 ];
 
@@ -28,7 +30,7 @@ const APP_ENV_CONFIG = {
   production: {
     googleClientId: '608226137663-n7g5fqo6268rqs51nu6iv4m9d202phah.apps.googleusercontent.com',
     siteUrl: 'https://newtab.online',
-    oauthRedirectUrl: 'https://jmexpjhpqrydmswxiomt.supabase.co/auth/v1/callback',
+    oauthRedirectUrl: 'https://newtab.online',
     supabase: {
       url: 'https://jmexpjhpqrydmswxiomt.supabase.co',
       anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptZXhwamhwcXJ5ZG1zd3hpb210Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzMjI3OTMsImV4cCI6MjA4NDg5ODc5M30.cwM-m8TCKpOLsCaT6xUEjEtSNH8KnQ7nawD9GvLEMWk'
@@ -47,7 +49,7 @@ const APP_ENV_CONFIG = {
   staging: {
     googleClientId: '608226137663-lpjl8odq86ded8d8qc07ipvrjd1pq6iu.apps.googleusercontent.com',
     siteUrl: 'https://staging.newtab.online',
-    oauthRedirectUrl: 'https://nxvcophrnhxtewqsewps.supabase.co/auth/v1/callback',
+    oauthRedirectUrl: 'https://staging.newtab.online',
     supabase: {
       url: 'https://nxvcophrnhxtewqsewps.supabase.co',
       anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im54dmNvcGhybmh4dGV3cXNld3BzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5MjQyNzgsImV4cCI6MjA4NTUwMDI3OH0.bPrRNyuKlZSPcfz5dzoft0jNNZrH7N4VJTEByj_1Lek'
