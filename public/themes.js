@@ -37,7 +37,7 @@ const CYBER_PRESET = {
   inputBg: '#ffffff',
   hoverBg: '#eeeeee',
   shadowColor: 'rgba(0, 0, 0, 0.18)',
-  accentColor: '#2f6dff',
+  accentColor: '#1f49d8',
   darkMode: {
     bgColor: '#0f0f10',
     borderColor: '#3a3a3d',
@@ -47,7 +47,7 @@ const CYBER_PRESET = {
     inputBg: '#141416',
     hoverBg: '#1b1b1e',
     shadowColor: 'rgba(0, 0, 0, 0.55)',
-    accentColor: '#79a6ff'
+    accentColor: '#2c5cff'
   }
 };
 
@@ -89,14 +89,14 @@ function setCyberTrailEnabled(enabled) {
     window.setTimeout(() => {
       dots.delete(el);
       el.remove();
-    }, 520);
+    }, 780);
   };
 
   const onMove = (ev) => {
     if (!document.body || document.body.dataset.style !== 'cyber') return;
 
     const now = performance.now();
-    if (now - lastAt < 14) return;
+    if (now - lastAt < 10) return;
 
     const x = ev.clientX;
     const y = ev.clientY;
@@ -111,7 +111,7 @@ function setCyberTrailEnabled(enabled) {
       const mag = Math.max(1, Math.sqrt(dist2));
       const nx = ddx / mag;
       const ny = ddy / mag;
-      const offset = 26;
+      const offset = 42;
       createDot(x, y, -nx * offset, -ny * offset);
     } else {
       createDot(x, y, 0, 0);
