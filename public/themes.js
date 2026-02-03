@@ -29,27 +29,111 @@ const themeState = {
 };
 
 const CYBER_PRESET = {
-  bgColor: '#0b0014',
-  borderColor: '#b400ff',
-  textColor: '#f7e9ff',
-  cardBg: '#120024',
-  modalBg: '#120024',
-  inputBg: '#120024',
-  hoverBg: '#1a0033',
-  shadowColor: 'rgba(180, 0, 255, 0.35)',
-  accentColor: '#b400ff',
+  bgColor: '#f6f6f6',
+  borderColor: '#2a2a2a',
+  textColor: '#141414',
+  cardBg: '#ffffff',
+  modalBg: '#ffffff',
+  inputBg: '#ffffff',
+  hoverBg: '#eeeeee',
+  shadowColor: 'rgba(0, 0, 0, 0.18)',
+  accentColor: '#1f49d8',
   darkMode: {
-    bgColor: '#05000a',
-    borderColor: '#d35bff',
-    textColor: '#f7e9ff',
-    cardBg: '#0d001a',
-    modalBg: '#0d001a',
-    inputBg: '#0d001a',
-    hoverBg: '#15002a',
-    shadowColor: 'rgba(180, 0, 255, 0.55)',
-    accentColor: '#b400ff'
+    bgColor: '#0f0f10',
+    borderColor: '#3a3a3d',
+    textColor: '#f4f4f5',
+    cardBg: '#141416',
+    modalBg: '#141416',
+    inputBg: '#141416',
+    hoverBg: '#1b1b1e',
+    shadowColor: 'rgba(0, 0, 0, 0.55)',
+    accentColor: '#2c5cff'
   }
 };
+
+let cyberTrailCleanup = null;
+
+function setCyberTrailEnabled(enabled) {
+  const next = Boolean(enabled);
+  if (next && cyberTrailCleanup) return;
+  if (!next && !cyberTrailCleanup) return;
+
+  if (!next && cyberTrailCleanup) {
+    try {
+      cyberTrailCleanup();
+    } finally {
+      cyberTrailCleanup = null;
+    }
+    return;
+  }
+
+  const dots = new Set();
+  let lastX = null;
+  let lastY = null;
+  let lastAt = 0;
+
+  const createDot = (x, y, dx, dy) => {
+    const el = document.createElement('div');
+    el.className = 'cyber-trail-dot';
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+    el.style.setProperty('--trail-dx', `${dx}px`);
+    el.style.setProperty('--trail-dy', `${dy}px`);
+    document.body.appendChild(el);
+    dots.add(el);
+
+    requestAnimationFrame(() => {
+      el.classList.add('fade');
+    });
+
+    window.setTimeout(() => {
+      dots.delete(el);
+      el.remove();
+    }, 780);
+  };
+
+  const onMove = (ev) => {
+    if (!document.body || document.body.dataset.style !== 'cyber') return;
+
+    const now = performance.now();
+    if (now - lastAt < 10) return;
+
+    const x = ev.clientX;
+    const y = ev.clientY;
+    if (typeof x !== 'number' || typeof y !== 'number') return;
+
+    if (lastX != null && lastY != null) {
+      const ddx = x - lastX;
+      const ddy = y - lastY;
+      const dist2 = ddx * ddx + ddy * ddy;
+      if (dist2 < 64) return;
+
+      const mag = Math.max(1, Math.sqrt(dist2));
+      const nx = ddx / mag;
+      const ny = ddy / mag;
+      const offset = 42;
+      createDot(x, y, -nx * offset, -ny * offset);
+    } else {
+      createDot(x, y, 0, 0);
+    }
+
+    lastX = x;
+    lastY = y;
+    lastAt = now;
+  };
+
+  window.addEventListener('pointermove', onMove, { passive: true });
+  cyberTrailCleanup = () => {
+    window.removeEventListener('pointermove', onMove);
+    dots.forEach((el) => {
+      try {
+        el.remove();
+      } catch (_err) {
+      }
+    });
+    dots.clear();
+  };
+}
 
 const DEFAULT_CUSTOM_SETTINGS = JSON.parse(JSON.stringify(themeState.customSettings));
 
@@ -110,6 +194,7 @@ function toHexColor(color) {
 function applyStyleTheme(style) {
   const v = String(style || 'handdrawn');
   document.body.dataset.style = v;
+  setCyberTrailEnabled(v === 'cyber');
 }
 
 // Open theme customization modal
@@ -193,7 +278,7 @@ function createThemeModal() {
                     ${isZh ? '手绘（默认）' : 'Hand-drawn (Default)'}
                   </option>
                   <option value="cyber" ${themeState.currentTheme === 'cyber' ? 'selected' : ''}>
-                    ${isZh ? '赛博（紫色）' : 'Cyber (Purple)'}
+                    ${isZh ? '赛博（黑白）' : 'Cyber (Mono)'}
                   </option>
                 </select>
               </div>
