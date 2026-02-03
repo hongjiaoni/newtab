@@ -28,6 +28,29 @@ const themeState = {
   }
 };
 
+const CYBER_PRESET = {
+  bgColor: '#0b0014',
+  borderColor: '#b400ff',
+  textColor: '#f7e9ff',
+  cardBg: '#120024',
+  modalBg: '#120024',
+  inputBg: '#120024',
+  hoverBg: '#1a0033',
+  shadowColor: 'rgba(180, 0, 255, 0.35)',
+  accentColor: '#b400ff',
+  darkMode: {
+    bgColor: '#05000a',
+    borderColor: '#d35bff',
+    textColor: '#f7e9ff',
+    cardBg: '#0d001a',
+    modalBg: '#0d001a',
+    inputBg: '#0d001a',
+    hoverBg: '#15002a',
+    shadowColor: 'rgba(180, 0, 255, 0.55)',
+    accentColor: '#b400ff'
+  }
+};
+
 const DEFAULT_CUSTOM_SETTINGS = JSON.parse(JSON.stringify(themeState.customSettings));
 
 // Available fonts
@@ -82,6 +105,11 @@ function toHexColor(color) {
     return `#${[r, g, b].map(n => n.toString(16).padStart(2, '0')).join('')}`;
   }
   return '#000000';
+}
+
+function applyStyleTheme(style) {
+  const v = String(style || 'handdrawn');
+  document.body.dataset.style = v;
 }
 
 // Open theme customization modal
@@ -163,6 +191,9 @@ function createThemeModal() {
                 <select id="themeStyleSelect" class="modal-input" onchange="updateThemePreview()">
                   <option value="handdrawn" ${themeState.currentTheme === 'handdrawn' ? 'selected' : ''}>
                     ${isZh ? '手绘（默认）' : 'Hand-drawn (Default)'}
+                  </option>
+                  <option value="cyber" ${themeState.currentTheme === 'cyber' ? 'selected' : ''}>
+                    ${isZh ? '赛博（紫色）' : 'Cyber (Purple)'}
                   </option>
                 </select>
               </div>
@@ -336,6 +367,8 @@ function handleThemeModalOverlayClick(event) {
 // Preview mode state
 let previewMode = 'light';
 
+let lastStyleValue = themeState.currentTheme;
+
 function setPreviewMode(mode) {
   previewMode = mode;
   document.getElementById('previewLightBtn')?.classList.toggle('active', mode === 'light');
@@ -490,9 +523,45 @@ function updateThemePreview() {
   const shadowLightBase = shadowColorEl?.value || toHexColor(themeState.customSettings.shadowColor);
   const shadowDarkBase = shadowColorDarkEl?.value || toHexColor(themeState.customSettings.darkMode?.shadowColor);
 
+  const nextStyle = styleEl?.value || themeState.currentTheme;
+  if (nextStyle !== lastStyleValue && nextStyle === 'cyber') {
+    const keepFonts = {
+      fontChinese: themeState.customSettings.fontChinese,
+      fontEnglish: themeState.customSettings.fontEnglish
+    };
+
+    themeState.customSettings = {
+      ...themeState.customSettings,
+      ...CYBER_PRESET,
+      ...keepFonts
+    };
+
+    if (bgColorEl) bgColorEl.value = CYBER_PRESET.bgColor;
+    if (cardBgEl) cardBgEl.value = CYBER_PRESET.cardBg;
+    if (inputBgEl) inputBgEl.value = CYBER_PRESET.inputBg;
+    if (borderColorEl) borderColorEl.value = CYBER_PRESET.borderColor;
+    if (textColorEl) textColorEl.value = CYBER_PRESET.textColor;
+    if (modalBgEl) modalBgEl.value = CYBER_PRESET.modalBg;
+    if (hoverBgEl) hoverBgEl.value = CYBER_PRESET.hoverBg;
+    if (accentColorEl) accentColorEl.value = CYBER_PRESET.accentColor;
+    if (shadowColorEl) shadowColorEl.value = toHexColor(CYBER_PRESET.shadowColor);
+
+    if (bgColorDarkEl) bgColorDarkEl.value = CYBER_PRESET.darkMode.bgColor;
+    if (cardBgDarkEl) cardBgDarkEl.value = CYBER_PRESET.darkMode.cardBg;
+    if (inputBgDarkEl) inputBgDarkEl.value = CYBER_PRESET.darkMode.inputBg;
+    if (borderColorDarkEl) borderColorDarkEl.value = CYBER_PRESET.darkMode.borderColor;
+    if (textColorDarkEl) textColorDarkEl.value = CYBER_PRESET.darkMode.textColor;
+    if (modalBgDarkEl) modalBgDarkEl.value = CYBER_PRESET.darkMode.modalBg;
+    if (hoverBgDarkEl) hoverBgDarkEl.value = CYBER_PRESET.darkMode.hoverBg;
+    if (accentColorDarkEl) accentColorDarkEl.value = CYBER_PRESET.darkMode.accentColor;
+    if (shadowColorDarkEl) shadowColorDarkEl.value = toHexColor(CYBER_PRESET.darkMode.shadowColor);
+  }
+
+  lastStyleValue = nextStyle;
+
   const draft = {
     ...themeState.customSettings,
-    style: styleEl?.value || themeState.currentTheme,
+    style: nextStyle,
     fontChinese: fontChineseEl?.value || themeState.customSettings.fontChinese,
     fontEnglish: fontEnglishEl?.value || themeState.customSettings.fontEnglish,
     bgColor: bgColorEl?.value || themeState.customSettings.bgColor,
@@ -559,6 +628,15 @@ async function saveThemeCustomization() {
 
   themeState.currentTheme = settings.style;
 
+  applyStyleTheme(themeState.currentTheme);
+  try {
+    if (typeof state !== 'undefined') {
+      state.currentTheme = themeState.currentTheme;
+    }
+    localStorage.setItem('currentTheme', themeState.currentTheme);
+  } catch (_err) {
+  }
+
   // Apply to current page (respect current mode)
   applyThemeSettings(settings);
   applyCustomThemeForCurrentMode();
@@ -579,6 +657,10 @@ async function saveThemeCustomization() {
         fontChinese: settings.fontChinese,
         fontEnglish: settings.fontEnglish
       });
+    }
+
+    if (window.markHomeConfigUpdated) {
+      window.markHomeConfigUpdated();
     }
 
     closeThemeModal();
@@ -639,6 +721,8 @@ function applyCustomThemeForCurrentMode() {
   if (s.fontEnglish || s.fontChinese) {
     document.body.style.fontFamily = `"${s.fontEnglish || 'Patrick Hand'}", "${s.fontChinese || '优设好身体'}", sans-serif`;
   }
+
+  applyStyleTheme(themeState.currentTheme || s.style || 'handdrawn');
 }
 
 function clearCustomThemeSettings() {
@@ -683,6 +767,16 @@ async function resetThemeCustomization() {
 
   themeState.currentTheme = 'handdrawn';
   themeState.customSettings = JSON.parse(JSON.stringify(DEFAULT_CUSTOM_SETTINGS));
+
+  lastStyleValue = themeState.currentTheme;
+  applyStyleTheme(themeState.currentTheme);
+  try {
+    if (typeof state !== 'undefined') {
+      state.currentTheme = themeState.currentTheme;
+    }
+    localStorage.setItem('currentTheme', themeState.currentTheme);
+  } catch (_err) {
+  }
 
   applyThemeSettings(themeState.customSettings);
   applyCustomThemeForCurrentMode();
@@ -764,3 +858,4 @@ window.saveThemeCustomization = saveThemeCustomization;
 window.resetThemeCustomization = resetThemeCustomization;
 window.themeState = themeState;
 window.handleThemeFontChange = handleThemeFontChange;
+window.applyStyleTheme = applyStyleTheme;
