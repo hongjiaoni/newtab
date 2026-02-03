@@ -497,7 +497,7 @@ window.updateAllText = function () {
 }
 
 // ===== Data & State =====
-const ENGINE_CATALOG = [
+let ENGINE_CATALOG = [
   // Global / General
   { id: 'google', name: { zh: '谷歌', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
   { id: 'bing', name: { zh: '必应', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
@@ -539,13 +539,108 @@ const ENGINE_CATALOG = [
   { id: 'amazon', name: { zh: '亚马逊', en: 'Amazon' }, url: 'https://www.amazon.com/s?k=', icon: 'https://www.amazon.com/favicon.ico' },
   { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.taobao.com/favicon.ico' },
   { id: 'jd', name: { zh: '京东', en: 'JD' }, url: 'https://search.jd.com/Search?keyword=', icon: 'https://www.jd.com/favicon.ico' },
+
 ];
 
 const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
 
 function getEngineName(engine) {
-  const lang = (typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'en' : 'zh';
+  const lang = (typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh') === 'en' ? 'en' : 'zh';
   return engine?.name?.[lang] || engine?.name?.en || engine?.id || '';
+}
+
+function reconcileEngineStateAfterCatalogLoad() {
+  const exists = (id) => ENGINE_CATALOG.some((e) => e.id === id);
+  const prevEnabled = Array.isArray(state.enabledEngineIds) ? state.enabledEngineIds : [];
+  let nextEnabled = prevEnabled.filter((id) => exists(id));
+
+  if (!nextEnabled.length) {
+    nextEnabled = DEFAULT_ENGINE_IDS.filter((id) => exists(id)).slice(0, 5);
+  }
+
+  if (!nextEnabled.length && ENGINE_CATALOG.length) {
+    nextEnabled = [ENGINE_CATALOG[0].id];
+  }
+
+  state.enabledEngineIds = nextEnabled.slice(0, 5);
+
+  if (!state.enabledEngineIds.includes(state.engineId) && state.enabledEngineIds.length) {
+    state.engineId = state.enabledEngineIds[0];
+    state.engineIndex = 0;
+  } else {
+    const enabled = getEnabledEngines(state.enabledEngineIds);
+    const idx = enabled.findIndex((e) => e.id === state.engineId);
+    state.engineIndex = idx >= 0 ? idx : 0;
+  }
+
+  saveData(false);
+}
+
+async function loadGlobalEngineCatalog() {
+  if (!window.supabase) return false;
+
+  try {
+    const { data, error } = await window.supabase
+      .from('search_engines')
+      .select('id,name_en,name_zh,url,icon,is_active,sort_order')
+      .order('sort_order', { ascending: true });
+
+    if (error) {
+      console.warn('Failed to load global search engines:', error);
+      return false;
+    }
+
+    const rows = Array.isArray(data) ? data : [];
+    const list = rows
+      .filter((r) => r && r.id && r.url)
+      .filter((r) => r.is_active !== false)
+      .map((r) => ({
+        id: String(r.id),
+        name: {
+          zh: String(r.name_zh || r.name_en || r.id),
+          en: String(r.name_en || r.name_zh || r.id)
+        },
+        url: String(r.url),
+        icon: String(r.icon || 'https://www.google.com/favicon.ico')
+      }));
+
+    if (!list.length) return false;
+    ENGINE_CATALOG = list;
+    return true;
+  } catch (err) {
+    console.warn('Failed to load global search engines:', err);
+    return false;
+  }
+}
+
+async function logSearchQueryToSupabase(query, engine) {
+  if (!window.supabase) return;
+  if (!window.authState || !window.authState.isLoggedIn || !window.authState.user) return;
+
+  const userId = window.authState.user.id;
+  if (!userId) return;
+
+  const locale = (typeof i18n !== 'undefined' ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'));
+  const payload = {
+    user_id: userId,
+    query: String(query || ''),
+    engine_id: String(engine?.id || ''),
+    engine_url: String(engine?.url || ''),
+    locale: String(locale || 'zh')
+  };
+
+  try {
+    const insertPromise = window.supabase.from('search_logs').insert(payload);
+    const res = await Promise.race([
+      insertPromise,
+      new Promise((resolve) => setTimeout(() => resolve(null), 350))
+    ]);
+    if (res && res.error) {
+      console.warn('Failed to log search:', res.error);
+    }
+  } catch (err) {
+    console.warn('Failed to log search:', err);
+  }
 }
 
 function loadEnabledEngineIds() {
@@ -582,7 +677,8 @@ let state = {
   tags: JSON.parse(localStorage.getItem('tags')) || [],
   tagOrder: JSON.parse(localStorage.getItem('tagOrder')) || [],
   siteOrder: JSON.parse(localStorage.getItem('siteOrder')) || [],
-  viewMode: localStorage.getItem('viewMode') || 'general' // 'general' or 'minimalist'
+  viewMode: localStorage.getItem('viewMode') || 'general', // 'general' or 'minimalist'
+  currentTheme: localStorage.getItem('currentTheme') || 'handdrawn'
 };
 
 // Backward compatibility: map old engineIndex to new engineId on first run
@@ -689,6 +785,7 @@ function saveData(syncToBackend = true) {
   localStorage.setItem('dateFormatIndex', state.dateFormatIndex);
   localStorage.setItem('timeFormat', state.timeFormat);
   localStorage.setItem('viewMode', state.viewMode);
+  localStorage.setItem('currentTheme', state.currentTheme || 'handdrawn');
 
   if (syncToBackend && window.authState && window.authState.isLoggedIn) {
     if (window.markHomeConfigUpdated) {
@@ -1041,10 +1138,91 @@ searchForm.addEventListener('submit', (e) => {
   const query = searchInput.value.trim();
   if (!query) return;
   const engine = getCurrentEngine();
-  window.location.href = engine.url + encodeURIComponent(query);
+  (async () => {
+    await logSearchQueryToSupabase(query, engine);
+    window.location.href = engine.url + encodeURIComponent(query);
+  })();
 });
 
 renderSearchEngine();
+
+(async () => {
+  const ok = await loadGlobalEngineCatalog();
+  if (ok) {
+    reconcileEngineStateAfterCatalogLoad();
+    renderSearchEngine();
+  }
+})();
+
+let homeFooterConfig = null;
+
+async function loadHomeFooterConfig() {
+  if (!window.supabase) {
+    homeFooterConfig = null;
+    return false;
+  }
+
+  try {
+    const { data, error } = await window.supabase
+      .from('app_settings')
+      .select('key,value')
+      .eq('key', 'home_footer')
+      .maybeSingle();
+
+    if (error) {
+      console.warn('Failed to load home footer config:', error);
+      homeFooterConfig = null;
+      return false;
+    }
+
+    const v = data?.value;
+    if (!v || typeof v !== 'object') {
+      homeFooterConfig = null;
+      return false;
+    }
+
+    homeFooterConfig = v;
+    return true;
+  } catch (err) {
+    console.warn('Failed to load home footer config:', err);
+    homeFooterConfig = null;
+    return false;
+  }
+}
+
+function renderHomeFooter() {
+  const el = document.getElementById('homeFooter');
+  if (!el) return;
+
+  const cfg = homeFooterConfig;
+  if (!cfg) {
+    el.style.display = 'none';
+    el.innerHTML = '';
+    return;
+  }
+
+  const locale = (typeof i18n !== 'undefined' ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'));
+  const text = String((locale === 'en' ? cfg.text_en : cfg.text_zh) || cfg.text_en || cfg.text_zh || '').trim();
+  const url = String(cfg.url || '').trim();
+
+  if (!text) {
+    el.style.display = 'none';
+    el.innerHTML = '';
+    return;
+  }
+
+  if (url) {
+    el.innerHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
+  } else {
+    el.textContent = text;
+  }
+  el.style.display = 'block';
+}
+
+(async () => {
+  await loadHomeFooterConfig();
+  renderHomeFooter();
+})();
 
 // ===== Context Menu Functions =====
 function showContextMenu(event, item, type) {
@@ -2009,6 +2187,13 @@ document.getElementById('feedbackModal')?.addEventListener('click', (e) => {
   if (e.target.id === 'feedbackModal') closeFeedbackModal();
 });
 
+
+if (window.applyStyleTheme) {
+  try {
+    window.applyStyleTheme(state.currentTheme || 'handdrawn');
+  } catch (_err) {
+  }
+}
 // ===== Initialize =====
 searchInput.focus();
 updateAllText();
