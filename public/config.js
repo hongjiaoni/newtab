@@ -15,11 +15,34 @@ const API_CONFIG = {
 };
 
 // Supabase Configuration
-const SUPABASE_URL = 'https://jmexpjhpqrydmswxiomt.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptZXhwamhwcXJ5ZG1zd3hpb210Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzMjI3OTMsImV4cCI6MjA4NDg5ODc5M30.cwM-m8TCKpOLsCaT6xUEjEtSNH8KnQ7nawD9GvLEMWk';
+const PROD_HOSTNAMES = [
+  'newtab-rfyoq591j-hongjiaonis-projects.vercel.app'
+];
+
+const APP_ENV = (() => {
+  const host = String(window.location.hostname || '').toLowerCase();
+  return PROD_HOSTNAMES.includes(host) ? 'production' : 'staging';
+})();
+
+const SUPABASE_ENV = {
+  production: {
+    url: 'https://jmexpjhpqrydmswxiomt.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImptZXhwamhwcXJ5ZG1zd3hpb210Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjkzMjI3OTMsImV4cCI6MjA4NDg5ODc5M30.cwM-m8TCKpOLsCaT6xUEjEtSNH8KnQ7nawD9GvLEMWk'
+  },
+  staging: {
+    url: 'YOUR_STAGING_SUPABASE_URL',
+    anonKey: 'YOUR_STAGING_SUPABASE_ANON_KEY'
+  }
+};
+
+const resolvedSupabase = SUPABASE_ENV[APP_ENV] || SUPABASE_ENV.staging;
+const SUPABASE_URL = resolvedSupabase.url;
+const SUPABASE_ANON_KEY = resolvedSupabase.anonKey;
 
 const SITE_URL = '';
-const OAUTH_REDIRECT_URL = 'https://newtab-rfyoq591j-hongjiaonis-projects.vercel.app';
+const OAUTH_REDIRECT_URL = APP_ENV === 'production'
+  ? 'https://newtab-rfyoq591j-hongjiaonis-projects.vercel.app'
+  : '';
 
 // Paddle Configuration
 // Replace with your actual Paddle credentials from Paddle Dashboard

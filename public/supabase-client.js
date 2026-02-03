@@ -3,7 +3,15 @@
 let supabaseClient; // Use a distinct name for the instance
 
 if (typeof supabase !== 'undefined' && supabase.createClient) {
-    if (SUPABASE_URL === 'YOUR_SUPABASE_URL' || SUPABASE_ANON_KEY === 'YOUR_SUPABASE_ANON_KEY') {
+    const looksLikePlaceholder = (v) => {
+        const s = String(v || '').trim();
+        return !s || s.includes('YOUR_');
+    };
+
+    const prodUrl = 'https://jmexpjhpqrydmswxiomt.supabase.co';
+    if (typeof APP_ENV !== 'undefined' && APP_ENV !== 'production' && String(SUPABASE_URL || '').trim() === prodUrl) {
+        console.error('Refusing to initialize Supabase: APP_ENV is not production but SUPABASE_URL points to production. Check config.js staging settings.');
+    } else if (looksLikePlaceholder(SUPABASE_URL) || looksLikePlaceholder(SUPABASE_ANON_KEY)) {
         console.warn('Supabase credentials not set in config.js');
     } else {
         // Correct SDK usage: supabase.createClient
