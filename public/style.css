@@ -12,22 +12,124 @@
   --sketch-shadow: 2px 3px 0px rgba(0, 0, 0, 0.15);
 }
 
-/* Cyber theme (visual only; content unchanged) */
+/* Cyber theme (browser.company-inspired mono aesthetic) */
 body[data-style="cyber"] {
   background-image:
-    radial-gradient(800px 600px at 50% 25%, rgba(180, 0, 255, 0.18), rgba(0, 0, 0, 0) 60%),
-    radial-gradient(900px 700px at 50% 90%, rgba(120, 0, 255, 0.14), rgba(0, 0, 0, 0) 60%);
-  background-blend-mode: screen;
+    radial-gradient(900px 620px at 50% 15%, rgba(0, 0, 0, 0.10), rgba(0, 0, 0, 0) 58%),
+    radial-gradient(1200px 880px at 50% 110%, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0) 62%);
+  background-blend-mode: multiply;
 }
 
-body[data-style="cyber"] .modal,
+body[data-style="cyber"] .time {
+  letter-spacing: 0.05em;
+}
+
+body[data-style="cyber"] .date {
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.78;
+}
+
+body[data-style="cyber"] .search-box,
+body[data-style="cyber"] .settings-menu,
+body[data-style="cyber"] .site-card,
+body[data-style="cyber"] .chip,
+body[data-style="cyber"] .modal {
+  border-radius: 10px !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.14) !important;
+}
+
 body[data-style="cyber"] .search-box,
 body[data-style="cyber"] .settings-menu,
 body[data-style="cyber"] .site-card,
 body[data-style="cyber"] .chip {
-  box-shadow:
-    0 0 0 2px color-mix(in srgb, var(--accent-color) 60%, transparent),
-    0 10px 30px rgba(0, 0, 0, 0.35);
+  border-width: 1px !important;
+}
+
+body[data-style="cyber"] .settings-btn,
+body[data-style="cyber"] .engine-add-inline,
+body[data-style="cyber"] .engine-quick-list,
+body[data-style="cyber"] .engine-quick-remove,
+body[data-style="cyber"] .engine-remove,
+body[data-style="cyber"] .engine-add-btn,
+body[data-style="cyber"] .wallpaper-tab,
+body[data-style="cyber"] .theme-tab-btn {
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+body[data-style="cyber"] .chip:hover,
+body[data-style="cyber"] .wallpaper-tab:hover,
+body[data-style="cyber"] .settings-btn:hover {
+  transform: translate(0, 0) !important;
+}
+
+body[data-style="cyber"] .modal {
+  border-width: 1px !important;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.22) !important;
+}
+
+body[data-style="cyber"] .settings-menu-item {
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+body[data-style="cyber"] .settings-menu-divider,
+body[data-style="cyber"] .engine-menu-divider,
+body[data-style="cyber"] .page-context-menu .context-menu-divider {
+  height: 1px !important;
+  opacity: 0.25;
+}
+
+body[data-style="cyber"] .site-card {
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+body[data-style="cyber"] .site-card:hover {
+  border-color: color-mix(in srgb, var(--border-color) 65%, var(--accent-color));
+}
+
+body[data-style="cyber"] .search-box {
+  padding: 10px 16px;
+}
+
+body[data-style="cyber"] .search-engine {
+  border-right-width: 1px !important;
+}
+
+body[data-style="cyber"] input,
+body[data-style="cyber"] select,
+body[data-style="cyber"] textarea {
+  border-width: 1px !important;
+  border-radius: 10px !important;
+}
+
+body[data-style="cyber"] .sketchy-border,
+body[data-style="cyber"] .sketchy-border::before {
+  border-radius: 10px !important;
+}
+
+.cyber-trail-dot {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  margin-left: -5px;
+  margin-top: -5px;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--accent-color) 85%, transparent);
+  opacity: 0.0;
+  transform: translate3d(var(--trail-dx, 0px), var(--trail-dy, 0px), 0) scale(1.0);
+  transition:
+    transform 480ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 520ms ease;
+  will-change: transform, opacity;
+}
+
+.cyber-trail-dot.fade {
+  opacity: 0.55;
+  transform: translate3d(0px, 0px, 0) scale(0.65);
 }
 
 .home-footer {
