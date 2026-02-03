@@ -824,6 +824,28 @@ insert into public.app_settings (key, value) values
 ('home_footer', '{"text_zh":"欢迎使用 NewTab","text_en":"Welcome to NewTab","url":"https://www.newtab.online"}'::jsonb)
 on conflict (key) do nothing;
 
+create table if not exists public.newsletter_subscriptions (
+  email text primary key,
+  source text,
+  locale text,
+  created_at timestamp with time zone default timezone('utc'::text, now())
+);
+
+alter table public.newsletter_subscriptions enable row level security;
+
+drop policy if exists "Anyone can subscribe newsletter." on public.newsletter_subscriptions;
+drop policy if exists "Only service_role can read newsletter subscriptions." on public.newsletter_subscriptions;
+
+create policy "Anyone can subscribe newsletter."
+  on public.newsletter_subscriptions for insert
+  with check ( true );
+
+create policy "Only service_role can read newsletter subscriptions."
+  on public.newsletter_subscriptions for select
+  using ( auth.role() = 'service_role' );
+
+create index if not exists idx_newsletter_subscriptions_created_at on public.newsletter_subscriptions(created_at);
+
 -- =============================
 -- 10) Generic updated_at trigger helper
 -- =============================
