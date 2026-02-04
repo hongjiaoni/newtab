@@ -6,6 +6,7 @@ const LOCAL_UPDATED_AT_KEY = 'home_config_updated_at';
 const PENDING_HOME_SYNC_KEY = 'home_config_pending_home_sync';
 const SETTINGS_SCHEMA_VERSION = 2;
 const USER_CACHE_VERSION = 1;
+const USER_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 const USER_CACHE_THEME_PREFIX = `user_cache_theme_v${USER_CACHE_VERSION}_`;
 const USER_CACHE_FONT_PREFIX = `user_cache_font_v${USER_CACHE_VERSION}_`;
 const USER_CACHE_HOME_PREFIX = `user_cache_home_v${USER_CACHE_VERSION}_`;
@@ -330,7 +331,7 @@ function markHomeConfigUpdated() {
     }
 }
 
-async function loadUserData() {
+async function loadUserData(options = {}) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
         console.log('Not logged in, skipping data load');
         return;
@@ -341,6 +342,24 @@ async function loadUserData() {
 
         const uid = window.authState.user.id;
         const effectiveTier = window.membershipState?.tier || 1;
+
+        if (!options.force) {
+            const cachedHome = getCachedUserHomeConfig(uid);
+            const cachedHomeAt = parseIsoToMs(cachedHome?.updated_at);
+            const localUpdatedAt = getLocalUpdatedAt();
+            const hasPending = !!getPendingHomeSync();
+            const isFresh = cachedHomeAt > 0 && (Date.now() - cachedHomeAt) < USER_CACHE_TTL_MS;
+
+            let hasPremiumCaches = true;
+            if (Number(effectiveTier || 1) >= 2) {
+                hasPremiumCaches = !!getCachedUserThemeSettings(uid) && !!getCachedUserFontSettings(uid);
+            }
+
+            if (cachedHome && isFresh && !hasPending && (localUpdatedAt === 0 || cachedHomeAt >= localUpdatedAt) && hasPremiumCaches) {
+                console.log('Using cached user data, skipping Supabase load');
+                return;
+            }
+        }
 
         const loadThemeAndFontSettings = async () => {
             if (effectiveTier >= 2) {

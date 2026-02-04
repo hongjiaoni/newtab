@@ -585,7 +585,7 @@ create policy "Tier 2+ can upload custom wallpapers."
 create or replace function public.enforce_profile_update_restrictions()
 returns trigger as $$
 begin
-  if auth.role() = 'service_role' then
+  if auth.role() is null or auth.role() = 'service_role' then
     return new;
   end if;
 

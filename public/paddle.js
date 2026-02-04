@@ -54,6 +54,15 @@ function handlePaddleEvent(event) {
       );
     }
 
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('paddle_status', 'success');
+      window.location.assign(url.toString());
+      return;
+    } catch (_err) {
+      // fallthrough
+    }
+
     // Refresh membership after webhook processes (give it time)
     setTimeout(() => {
       window.initializeMembership?.();
@@ -95,6 +104,28 @@ async function createCheckoutSession(tier = 2, billingCycle = 'monthly') {
   const userId = window.authState.user.id;
   const userEmail = window.authState.user.email || '';
 
+  const successUrl = (() => {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('paddle_status', 'success');
+      url.searchParams.set('paddle_tier', String(tier));
+      return url.toString();
+    } catch (_err) {
+      return window.location.origin + '/?paddle_status=success';
+    }
+  })();
+
+  const cancelUrl = (() => {
+    try {
+      const url = new URL(window.location.href);
+      url.searchParams.set('paddle_status', 'cancel');
+      url.searchParams.set('paddle_tier', String(tier));
+      return url.toString();
+    } catch (_err) {
+      return window.location.origin + '/?paddle_status=cancel';
+    }
+  })();
+
   // Open Paddle Checkout overlay
   try {
     Paddle.Checkout.open({
@@ -111,7 +142,9 @@ async function createCheckoutSession(tier = 2, billingCycle = 'monthly') {
         displayMode: 'overlay',
         theme: 'light',
         locale: (typeof i18n !== 'undefined' && i18n.currentLocale === 'zh') ? 'zh' : 'en',
-        allowLogout: false
+        allowLogout: false,
+        successUrl,
+        cancelUrl
       }
     });
   } catch (err) {
@@ -136,6 +169,11 @@ function handlePaddleReturn() {
         );
       }
 
+      try {
+        window.closeUpgradeModal?.();
+      } catch (_err) {
+      }
+
       setTimeout(() => {
         window.initializeMembership?.();
       }, 2000);
@@ -147,6 +185,7 @@ function handlePaddleReturn() {
 
     // Clean URL
     url.searchParams.delete('paddle_status');
+    url.searchParams.delete('paddle_tier');
     url.searchParams.delete('transaction_id');
     window.history.replaceState({}, document.title, url.toString());
   } catch (_err) {
