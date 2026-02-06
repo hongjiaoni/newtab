@@ -22,12 +22,17 @@ body[data-style="cyber"] {
 
 body[data-style="cyber"] .time {
   letter-spacing: 0.05em;
+  font-size: 56px;
+  font-weight: 650;
+  text-shadow: none;
 }
 
 body[data-style="cyber"] .date {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   opacity: 0.78;
+  font-size: 14px;
+  margin-bottom: 22px;
 }
 
 body[data-style="cyber"] .search-box,
@@ -43,6 +48,10 @@ body[data-style="cyber"] .search-box,
 body[data-style="cyber"] .settings-menu,
 body[data-style="cyber"] .site-card,
 body[data-style="cyber"] .chip {
+  border-width: 1px !important;
+}
+
+body[data-style="cyber"] .modal {
   border-width: 1px !important;
 }
 
@@ -91,10 +100,122 @@ body[data-style="cyber"] .site-card:hover {
 
 body[data-style="cyber"] .search-box {
   padding: 10px 16px;
+  max-width: 460px;
+  margin: 0 auto 38px;
 }
 
 body[data-style="cyber"] .search-engine {
   border-right-width: 1px !important;
+}
+
+body[data-style="cyber"] input {
+  font-size: 15px;
+  font-weight: 560;
+  padding: 8px 0;
+}
+
+body[data-style="cyber"] .top-right-controls {
+  top: 18px;
+  left: 18px;
+  right: auto;
+  gap: 10px;
+}
+
+body[data-style="cyber"] .container {
+  padding: 18px;
+  max-width: 560px;
+}
+
+body[data-style="cyber"] .content-area {
+  gap: 14px;
+  max-width: 520px;
+}
+
+body[data-style="cyber"] .engine-menu,
+body[data-style="cyber"] .settings-submenu,
+body[data-style="cyber"] .page-context-menu {
+  border-width: 1px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.22) !important;
+}
+
+body[data-style="cyber"] .context-menu {
+  border-width: 1px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 14px 42px rgba(0, 0, 0, 0.22) !important;
+}
+
+body[data-style="cyber"] .tier-card {
+  border-width: 1px !important;
+}
+
+body[data-style="cyber"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.46);
+}
+
+body[data-style="cyber"] .modal h3 {
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+  letter-spacing: 0.02em;
+}
+
+body[data-style="cyber"] .modal-input {
+  border-width: 1px !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+body[data-style="cyber"] .settings-menu {
+  top: 56px;
+  right: auto;
+  left: 0;
+}
+
+body[data-style="cyber"] button {
+  border-width: 1px !important;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+body[data-style="cyber"] button:hover,
+body[data-style="cyber"] button:active {
+  box-shadow: none !important;
+  transform: translate(0, 0) !important;
+}
+
+body[data-style="cyber"] .engine-item,
+body[data-style="cyber"] .page-btn,
+body[data-style="cyber"] .wallpaper-item,
+body[data-style="cyber"] .coffee-amount-btn {
+  border-width: 1px !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.14) !important;
+}
+
+body[data-style="cyber"] .engine-item:hover,
+body[data-style="cyber"] .wallpaper-item:hover,
+body[data-style="cyber"] .coffee-amount-btn:hover {
+  transform: translate(0, 0) !important;
+  box-shadow: 0 14px 38px rgba(0, 0, 0, 0.18) !important;
+}
+
+body[data-style="cyber"] .page-btn {
+  box-shadow: none !important;
+}
+
+body[data-style="cyber"] .page-btn:hover {
+  background: var(--hover-bg);
+}
+
+body[data-style="cyber"] .wallpaper-item img {
+  border-bottom-width: 1px !important;
+}
+
+body[data-style="cyber"] .wallpaper-tabs {
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 60%, transparent);
+}
+
+body[data-style="cyber"] .wallpaper-tab.active {
+  text-decoration-thickness: 2px;
 }
 
 body[data-style="cyber"] input,
@@ -120,7 +241,7 @@ body[data-style="cyber"] .sketchy-border::before {
   border-radius: 2px;
   background: color-mix(in srgb, var(--accent-color) 85%, transparent);
   opacity: 0.0;
-  transform: translate3d(var(--trail-dx, 0px), var(--trail-dy, 0px), 0) scale(1.0);
+  transform: translate3d(var(--trail-dx, 0px), var(--trail-dy, 0px), 0) scale(var(--trail-scale, 1.0));
   transition:
     transform 740ms cubic-bezier(0.2, 0.8, 0.2, 1),
     opacity 780ms ease;
@@ -128,8 +249,8 @@ body[data-style="cyber"] .sketchy-border::before {
 }
 
 .cyber-trail-dot.fade {
-  opacity: 0.78;
-  transform: translate3d(0px, 0px, 0) scale(0.65);
+  opacity: var(--trail-opacity, 0.78);
+  transform: translate3d(0px, 0px, 0) scale(calc(var(--trail-scale, 0.85) * 0.72));
 }
 
 .home-footer {
@@ -154,7 +275,7 @@ body[data-style="cyber"] .sketchy-border::before {
 @import url('https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css');
 @import url('https://chinese-fonts-cdn.deno.dev/packages/zhbtt/dist/result.css');
 @import url('https://chinese-fonts-cdn.deno.dev/packages/ysbth/dist/result.css');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Roboto:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Newsreader:wght@300;400;600;700&family=Anonymous+Pro:wght@400;700&display=swap');
 
 body {
   margin: 0;

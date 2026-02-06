@@ -72,13 +72,15 @@ function setCyberTrailEnabled(enabled) {
   let lastY = null;
   let lastAt = 0;
 
-  const createDot = (x, y, dx, dy) => {
+  const createDot = (x, y, dx, dy, opacity, scale) => {
     const el = document.createElement('div');
     el.className = 'cyber-trail-dot';
     el.style.left = `${x}px`;
     el.style.top = `${y}px`;
     el.style.setProperty('--trail-dx', `${dx}px`);
     el.style.setProperty('--trail-dy', `${dy}px`);
+    if (typeof opacity === 'number') el.style.setProperty('--trail-opacity', String(opacity));
+    if (typeof scale === 'number') el.style.setProperty('--trail-scale', String(scale));
     document.body.appendChild(el);
     dots.add(el);
 
@@ -96,7 +98,7 @@ function setCyberTrailEnabled(enabled) {
     if (!document.body || document.body.dataset.style !== 'cyber') return;
 
     const now = performance.now();
-    if (now - lastAt < 10) return;
+    if (now - lastAt < 8) return;
 
     const x = ev.clientX;
     const y = ev.clientY;
@@ -106,15 +108,28 @@ function setCyberTrailEnabled(enabled) {
       const ddx = x - lastX;
       const ddy = y - lastY;
       const dist2 = ddx * ddx + ddy * ddy;
-      if (dist2 < 64) return;
+      if (dist2 < 36) return;
 
       const mag = Math.max(1, Math.sqrt(dist2));
       const nx = ddx / mag;
       const ny = ddy / mag;
-      const offset = 42;
-      createDot(x, y, -nx * offset, -ny * offset);
+      const offset = 48;
+
+      const steps = Math.max(1, Math.min(7, Math.floor(mag / 14)));
+      for (let i = 1; i <= steps; i++) {
+        const t = i / steps;
+        const px = lastX + ddx * t;
+        const py = lastY + ddy * t;
+
+        const trail = (1 - t);
+        const dx = -nx * offset * trail;
+        const dy = -ny * offset * trail;
+        const op = 0.86 - trail * 0.22;
+        const sc = 0.95 - trail * 0.25;
+        createDot(px, py, dx, dy, op, sc);
+      }
     } else {
-      createDot(x, y, 0, 0);
+      createDot(x, y, 0, 0, 0.86, 0.95);
     }
 
     lastX = x;
@@ -147,10 +162,11 @@ const AVAILABLE_FONTS = {
   english: [
     { name: 'Patrick Hand', value: 'Patrick Hand', google: true },
     { name: 'Quicksand', value: 'Quicksand', google: true },
-    { name: 'Roboto', value: 'Roboto', google: true },
     { name: 'Inter', value: 'Inter', google: true },
+    { name: 'Newsreader', value: 'Newsreader', google: true },
     { name: 'Poppins', value: 'Poppins', google: true },
-    { name: 'Nunito', value: 'Nunito', google: true }
+    { name: 'Nunito', value: 'Nunito', google: true },
+    { name: 'Anonymous Pro', value: 'Anonymous Pro', google: true }
   ]
 };
 

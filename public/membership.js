@@ -66,7 +66,7 @@ async function initializeMembership() {
             // If tier changed (e.g. upgrade completed) reload user data so premium settings load/clear correctly.
             if (membershipState.tier !== prevTier) {
                 try {
-                    await window.loadUserData?.();
+                    await window.loadUserData?.({ force: true });
                 } catch (err) {
                     console.error('Failed to reload user data after membership update:', err);
                 }
