@@ -942,6 +942,30 @@ function renderSearchEngine() {
   `;
 }
 
+// ===== Search Engine Quick List (Bottom) =====
+function renderEngineQuickList() {
+  const quickListEl = document.getElementById('engineQuickList');
+  if (!quickListEl) return;
+  
+  // Default quick engines: Google, Bing, DuckDuckGo
+  const quickEngineIds = ['google', 'bing', 'duckduckgo'];
+  const currentEngine = getCurrentEngine();
+  const lang = (typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh') === 'en' ? 'en' : 'zh';
+  
+  quickListEl.innerHTML = quickEngineIds.map(id => {
+    const engine = ENGINE_CATALOG.find(e => e.id === id);
+    if (!engine) return '';
+    const name = engine.name?.[lang] || engine.name?.en || engine.id;
+    const isActive = engine.id === currentEngine.id;
+    return `
+      <div class="engine-quick-item ${isActive ? 'active' : ''}" onclick="selectEngineById('${engine.id}')" title="${name}">
+        <img src="${engine.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
+        <span>${name}</span>
+      </div>
+    `;
+  }).join('');
+}
+
 // ===== Search Engine Modal Logic =====
 
 function openEngineModal() {
@@ -1071,6 +1095,7 @@ document.getElementById('saveEngineSelection').onclick = () => {
   }
 
   renderSearchEngine();
+  renderEngineQuickList();
   closeEngineModal();
 };
 
@@ -1082,6 +1107,7 @@ window.selectEngineById = (id) => {
   state.engineIndex = idx;
   saveData();
   renderSearchEngine();
+  renderEngineQuickList();
   engineMenu.classList.add('hidden');
 };
 
@@ -1123,6 +1149,7 @@ window.removeEngineById = (id) => {
   }
   saveData();
   renderSearchEngine();
+  renderEngineQuickList();
 };
 
 searchEngineEl.addEventListener('click', (e) => {
@@ -2202,3 +2229,4 @@ if (window.applyStyleTheme) {
 searchInput.focus();
 updateAllText();
 renderHome();
+renderEngineQuickList();
