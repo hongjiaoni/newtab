@@ -768,6 +768,27 @@ if (oldLinks && oldLinks.length > 0 && state.sites.length === 0) {
   saveData();
 }
 
+// Initialize default sites if empty (first visit)
+if (state.sites.length === 0) {
+  const defaultSites = [
+    { name: 'GitHub', url: 'https://github.com', icon: 'https://github.com/favicon.ico' },
+    { name: 'Google', url: 'https://google.com', icon: 'https://www.google.com/favicon.ico' },
+    { name: 'YouTube', url: 'https://youtube.com', icon: 'https://www.youtube.com/favicon.ico' },
+    { name: 'Twitter', url: 'https://twitter.com', icon: 'https://abs.twimg.com/favicons/twitter.2.ico' },
+    { name: 'Gmail', url: 'https://mail.google.com', icon: 'https://ssl.gstatic.com/mail/ static/images/icons/versions/mail_favicon_2.png' }
+  ];
+  state.sites = defaultSites.map((s, i) => ({
+    id: `default-${i}`,
+    name: s.name,
+    url: s.url,
+    icon: s.icon,
+    tags: [],
+    showOnHome: true
+  }));
+  state.siteOrder = state.sites.map(s => s.id);
+  saveData();
+}
+
 // Initialize order arrays if empty (data migration)
 if (state.tagOrder.length === 0 && state.tags.length > 0) {
   state.tagOrder = [...state.tags];
