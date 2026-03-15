@@ -4,12 +4,17 @@
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont;
+  /* 字体加载优化：添加完整的回退字体链 */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.3s, color 0.3s;
+  /* 提升渲染性能 */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 
@@ -23,6 +28,9 @@ body {
 .time {
   font-size: 64px;
   margin-bottom: 24px;
+  /* 优化时间显示性能 */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -2px;
 }
 
 input {
@@ -44,6 +52,8 @@ input:focus {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
   gap: 12px;
+  /* 提升渲染性能 */
+  contain: layout style;
 }
 
 .link-item {
@@ -54,6 +64,9 @@ input:focus {
   cursor: pointer;
   text-align: center;
   transition: background 0.2s, transform 0.2s;
+  /* 提升渲染性能 */
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .link-item:hover {
@@ -72,6 +85,7 @@ input:focus {
   color: #888;
   cursor: pointer;
 }
+
 /* 深色主题（默认） */
 body.dark {
   background: #0f0f0f;
@@ -104,14 +118,25 @@ body.light input {
   opacity: 0.6;
 }
 
+/* 拖拽排序性能优化 */
 .link-item.dragging {
   opacity: 0.5;
   transform: scale(0.95);
+  /* 使用 GPU 加速 */
+  transform: translateZ(0);
+  transition: none;
 }
 
+/* 空状态 */
 .empty {
   grid-column: 1 / -1;
   opacity: 0.5;
   font-size: 14px;
   line-height: 1.6;
+}
+
+/* 加载状态 */
+.loading {
+  opacity: 0.5;
+  pointer-events: none;
 }
