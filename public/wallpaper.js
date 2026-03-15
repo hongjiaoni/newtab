@@ -296,8 +296,9 @@ function renderWallpaperUI() {
     }
   }
 
-  // Render Tabs
-  tabsContainer.innerHTML = wallpaperState.categories.map(cat => `
+  // Render Tabs - filter out Custom category
+  const filteredCategories = wallpaperState.categories.filter(cat => cat.name !== 'Custom');
+  tabsContainer.innerHTML = filteredCategories.map(cat => `
     <button class="wallpaper-tab ${wallpaperState.activeCategory === cat.name ? 'active' : ''}" 
             onclick="switchWallpaperTab('${cat.name}')">
       <span>${currentLocale === 'zh' ? i18n.t(cat.name.toLowerCase()) : (cat.name_en || cat.name)}</span>
