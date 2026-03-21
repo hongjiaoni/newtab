@@ -244,6 +244,8 @@ function openThemeCustomization() {
 
   console.log('Opening theme customization modal');
   createThemeModal();
+  // Store original theme for restore on cancel
+  originalThemeOnOpen = themeState.currentTheme;
   document.getElementById('themeCustomizationModal').classList.remove('hidden');
   renderThemePreview();
 }
@@ -663,15 +665,13 @@ function updateThemePreview() {
 
   lastStyleValue = nextStyle;
 
-  // Apply theme immediately for real-time preview
-  themeState.currentTheme = nextStyle;
-  applyStyleTheme(nextStyle);
-  
-  // Apply font changes immediately too
-  const fontEnglish = fontEnglishEl?.value || themeState.customSettings.fontEnglish;
-  const fontChinese = fontChineseEl?.value || themeState.customSettings.fontChinese;
-  if (fontEnglish) document.body.style.setProperty('--font-english', fontEnglish);
-  if (fontChinese) document.body.style.setProperty('--font-chinese', fontChinese);
+  // Apply to preview container and body for live preview
+  // The original theme will be restored when modal closes (via closeThemeModal)
+  const previewContainer = document.getElementById('themePreviewContainer');
+  if (previewContainer) {
+    previewContainer.dataset.style = nextStyle;
+  }
+  document.body.dataset.style = nextStyle;
 
   const draft = {
     ...themeState.customSettings,
@@ -778,6 +778,9 @@ async function saveThemeCustomization() {
     }
 
     closeThemeModal();
+    
+    // Clear original theme tracker
+    originalThemeOnOpen = null;
 
     if (window.showNotification) {
       window.showNotification(
@@ -955,9 +958,23 @@ async function resetThemeCustomization() {
   }
 }
 
-// Close theme modal
+// Store original theme for restore
+let originalThemeOnOpen = null;
+
+// Close theme modal and restore original theme
 function closeThemeModal() {
+  // Restore original theme if changed
+  if (originalThemeOnOpen !== null) {
+    themeState.currentTheme = originalThemeOnOpen;
+    applyStyleTheme(originalThemeOnOpen);
+    originalThemeOnOpen = null;
+  }
   document.getElementById('themeCustomizationModal')?.classList.add('hidden');
+}
+
+// Before opening modal, store the original theme
+function storeOriginalTheme() {
+  originalThemeOnOpen = themeState.currentTheme;
 }
 
 // Export functions

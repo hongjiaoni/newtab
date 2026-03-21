@@ -1488,8 +1488,8 @@ body[data-style="comic"] .search-box input {
 }
 
 body[data-style="comic"] .chip {
-  border: 2px solid #333;
-  border-radius: 50% !important;
+  border: 2px solid #333 !important;
+  border-radius: 8px !important;
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.15) !important;
   font-weight: 600;
 }
@@ -1497,6 +1497,16 @@ body[data-style="comic"] .chip {
 body[data-style="comic"] .chip:hover {
   transform: translate(-2px, -2px) !important;
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Remove rainbow colors for comic theme - use black border always */
+body[data-style="comic"] .chip:nth-child(6n+1),
+body[data-style="comic"] .chip:nth-child(6n+2),
+body[data-style="comic"] .chip:nth-child(6n+3),
+body[data-style="comic"] .chip:nth-child(6n+4),
+body[data-style="comic"] .chip:nth-child(6n+5),
+body[data-style="comic"] .chip:nth-child(6n) {
+  border-color: #333 !important;
 }
 
 body[data-style="comic"] .site-card {
