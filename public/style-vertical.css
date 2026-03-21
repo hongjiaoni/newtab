@@ -1,0 +1,260 @@
+/* ===== 垂直时间风格样式 ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg-primary: #0d0d0d;
+  --text-primary: #ffffff;
+  --text-secondary: #555555;
+  --accent: #1a1a1a;
+  --search-bg: #161616;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* 主题 */
+body.dark {
+  --bg-primary: #0d0d0d;
+  --text-primary: #ffffff;
+  --text-secondary: #555555;
+  --accent: #1a1a1a;
+  --search-bg: #161616;
+}
+
+body.light {
+  --bg-primary: #fafafa;
+  --text-primary: #0d0d0d;
+  --text-secondary: #999999;
+  --accent: #f0f0f0;
+  --search-bg: #ffffff;
+}
+
+.container {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: 1fr auto 1fr;
+  padding: 40px;
+  gap: 20px;
+}
+
+/* 左侧时间 */
+.time-section {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 20px;
+}
+
+.hours, .minutes {
+  font-size: 140px;
+  font-weight: 100;
+  letter-spacing: -10px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.separator {
+  font-size: 140px;
+  font-weight: 100;
+  animation: blink 1s infinite;
+  margin: 0 5px;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+/* 中间搜索框 */
+.search-section {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#searchForm {
+  width: 100%;
+}
+
+#searchInput {
+  width: 320px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 300;
+  background: var(--search-bg);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  color: var(--text-primary);
+  outline: none;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+#searchInput::placeholder {
+  color: var(--text-secondary);
+}
+
+#searchInput:focus {
+  border-color: var(--text-secondary);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* 右侧日期 */
+.date-section {
+  grid-column: 3;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding-right: 30px;
+  text-align: right;
+}
+
+.date {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 2px;
+}
+
+.month-year {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  letter-spacing: 1px;
+}
+
+/* 底部快捷链接 */
+.links-section {
+  grid-column: 1 / -1;
+  grid-row: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 30px;
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: 700px;
+}
+
+.link-item {
+  padding: 10px 18px;
+  background: var(--accent);
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.link-item:hover {
+  color: var(--text-primary);
+  background: var(--search-bg);
+  transform: translateY(-2px);
+}
+
+.add-btn {
+  margin-top: 16px;
+  padding: 8px 24px;
+  background: none;
+  border: 1px solid var(--text-secondary);
+  border-radius: 20px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-btn:hover {
+  border-color: var(--text-primary);
+  color: var(--text-primary);
+}
+
+/* 主题切换 */
+.theme-toggle {
+  position: fixed;
+  top: 30px;
+  right: 30px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 22px;
+  cursor: pointer;
+  opacity: 0.4;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle:hover {
+  opacity: 1;
+}
+
+/* 空状态 */
+.empty {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 13px;
+  padding: 20px;
+}
+
+/* 响应式 */
+@media (max-width: 900px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px 20px;
+    gap: 30px;
+  }
+  
+  .time-section {
+    padding-left: 0;
+  }
+  
+  .hours, .minutes, .separator {
+    font-size: 80px;
+    letter-spacing: -5px;
+  }
+  
+  .date-section {
+    align-items: center;
+    padding-right: 0;
+    text-align: center;
+  }
+  
+  .date {
+    font-size: 24px;
+  }
+  
+  #searchInput {
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .links-section {
+    position: relative;
+    bottom: auto;
+  }
+}

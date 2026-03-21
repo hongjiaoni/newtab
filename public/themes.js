@@ -1,7 +1,7 @@
 // ===== Theme Customization Module =====
 
 const themeState = {
-  currentTheme: 'handdrawn', // handdrawn, minimal, modern, glassmorphism
+  currentTheme: typeof localStorage !== 'undefined' ? localStorage.getItem('currentTheme') || 'handdrawn' : 'handdrawn', // handdrawn, minimal, modern, glassmorphism
   customSettings: {
     fontChinese: '优设好身体',
     fontEnglish: 'Patrick Hand',
@@ -483,11 +483,6 @@ function setPreviewMode(mode) {
 }
 
 function handleThemeFontChange() {
-  const fontChinese = document.getElementById('fontChineseSelect')?.value;
-  const fontEnglish = document.getElementById('fontEnglishSelect')?.value;
-  if (fontChinese) themeState.customSettings.fontChinese = fontChinese;
-  if (fontEnglish) themeState.customSettings.fontEnglish = fontEnglish;
-  applyCustomThemeForCurrentMode();
   renderThemePreview();
 }
 
@@ -665,46 +660,11 @@ function updateThemePreview() {
 
   lastStyleValue = nextStyle;
 
-  // Apply to preview container AND body for live preview
-  // The original theme will be restored when modal closes (via closeThemeModal)
-  const previewContainer = document.getElementById('themePreviewContainer');
-  if (previewContainer) {
-    previewContainer.dataset.style = nextStyle;
+  const preview = document.getElementById('themePreview');
+  if (preview) {
+    preview.dataset.style = nextStyle;
   }
-  // Also apply to body for preview
-  document.body.dataset.style = nextStyle;
-  applyStyleTheme(nextStyle);
 
-  const draft = {
-    ...themeState.customSettings,
-    style: nextStyle,
-    fontChinese: fontChineseEl?.value || themeState.customSettings.fontChinese,
-    fontEnglish: fontEnglishEl?.value || themeState.customSettings.fontEnglish,
-    bgColor: bgColorEl?.value || themeState.customSettings.bgColor,
-    cardBg: cardBgEl?.value || themeState.customSettings.cardBg,
-    inputBg: inputBgEl?.value || themeState.customSettings.inputBg,
-    borderColor: borderColorEl?.value || themeState.customSettings.borderColor,
-    textColor: textColorEl?.value || themeState.customSettings.textColor,
-    modalBg: modalBgEl?.value || themeState.customSettings.modalBg,
-    hoverBg: hoverBgEl?.value || themeState.customSettings.hoverBg,
-    accentColor: accentColorEl?.value || themeState.customSettings.accentColor,
-    shadowColor: hexToRgba(shadowLightBase, 0.2),
-    darkMode: {
-      ...(themeState.customSettings.darkMode || {}),
-      bgColor: bgColorDarkEl?.value || themeState.customSettings.darkMode?.bgColor,
-      cardBg: cardBgDarkEl?.value || themeState.customSettings.darkMode?.cardBg,
-      inputBg: inputBgDarkEl?.value || themeState.customSettings.darkMode?.inputBg,
-      borderColor: borderColorDarkEl?.value || themeState.customSettings.darkMode?.borderColor,
-      textColor: textColorDarkEl?.value || themeState.customSettings.darkMode?.textColor,
-      modalBg: modalBgDarkEl?.value || themeState.customSettings.darkMode?.modalBg,
-      hoverBg: hoverBgDarkEl?.value || themeState.customSettings.darkMode?.hoverBg,
-      accentColor: accentColorDarkEl?.value || themeState.customSettings.darkMode?.accentColor,
-      shadowColor: hexToRgba(shadowDarkBase, 0.5)
-    }
-  };
-
-  applyThemeSettings(draft);
-  applyCustomThemeForCurrentMode();
   renderThemePreview();
 }
 

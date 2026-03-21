@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newtab - 垂直时间风格</title>
+  <link rel="stylesheet" href="style-vertical.css">
+</head>
+<body>
+  <div class="container">
+    <!-- 左侧时间 -->
+    <div class="time-section">
+      <span id="hours" class="hours">00</span>
+      <span class="separator">:</span>
+      <span id="minutes" class="minutes">00</span>
+    </div>
+
+    <!-- 中间搜索框 -->
+    <div class="search-section">
+      <form id="searchForm">
+        <input type="text" id="searchInput" placeholder="Type to search..." autocomplete="off" autofocus>
+      </form>
+    </div>
+
+    <!-- 右侧日期 -->
+    <div class="date-section">
+      <div class="date" id="date">Monday</div>
+      <div class="month-year" id="monthYear">January 2024</div>
+    </div>
+
+    <!-- 底部快捷链接 -->
+    <div class="links-section">
+      <div class="links" id="links"></div>
+      <button class="add-btn" id="addLinkBtn">+</button>
+    </div>
+  </div>
+
+  <!-- 主题切换 -->
+  <button class="theme-toggle" id="themeToggle">◐</button>
+
+  <script src="time-display.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
