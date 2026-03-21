@@ -665,12 +665,15 @@ function updateThemePreview() {
 
   lastStyleValue = nextStyle;
 
-  // Apply to preview container only - not to body globally
-  // This allows user to preview theme before saving
+  // Apply to preview container AND body for live preview
+  // The original theme will be restored when modal closes (via closeThemeModal)
   const previewContainer = document.getElementById('themePreviewContainer');
   if (previewContainer) {
     previewContainer.dataset.style = nextStyle;
   }
+  // Also apply to body for preview
+  document.body.dataset.style = nextStyle;
+  applyStyleTheme(nextStyle);
 
   const draft = {
     ...themeState.customSettings,
