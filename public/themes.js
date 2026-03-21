@@ -229,7 +229,7 @@ function openThemeCustomization() {
   }
 
   // Then check membership tier
-  if (!window.membershipState || window.membershipState.tier < 1) {
+  if (!window.membershipState || window.membershipState.tier < 2) {
     console.log('Tier insufficient, showing upgrade modal');
     const settingsMenu = document.getElementById('settingsMenu');
     if (settingsMenu) settingsMenu.classList.add('hidden');
@@ -665,13 +665,12 @@ function updateThemePreview() {
 
   lastStyleValue = nextStyle;
 
-  // Apply to preview container and body for live preview
-  // The original theme will be restored when modal closes (via closeThemeModal)
+  // Apply to preview container only - not to body globally
+  // This allows user to preview theme before saving
   const previewContainer = document.getElementById('themePreviewContainer');
   if (previewContainer) {
     previewContainer.dataset.style = nextStyle;
   }
-  document.body.dataset.style = nextStyle;
 
   const draft = {
     ...themeState.customSettings,
@@ -760,7 +759,7 @@ async function saveThemeCustomization() {
     if (window.initializeMembership) {
       await window.initializeMembership();
     }
-    if (!window.membershipState || window.membershipState.tier < 1) {
+    if (!window.membershipState || window.membershipState.tier < 2) {
       throw new Error('premium membership required');
     }
     if (window.saveThemeSettings) {
