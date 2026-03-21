@@ -7,23 +7,25 @@ const themeState = {
     fontEnglish: 'Patrick Hand',
     bgColor: '#f9f9f9',
     borderColor: '#444444',
-    textColor: '#333333',
-    cardBg: '#ffffff',
+    textColor: '#141414',
+    textActiveColor: '#ffffff',
+    buttonBg: '#ffffff',
     modalBg: '#ffffff',
     inputBg: '#ffffff',
     hoverBg: '#f0f0f0',
-    shadowColor: 'rgba(0, 0, 0, 0.2)',
-    accentColor: '#8B7355', // Gray-brown for hand-drawn theme
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
+    accentColor: '#141414',
     darkMode: {
       bgColor: '#1e1e1e',
       borderColor: '#ecf0f1',
-      textColor: '#ecf0f1',
-      cardBg: '#2c2c2c',
+      textColor: '#f4f4f5',
+      textActiveColor: '#1e1e1e',
+      buttonBg: '#2c2c2c',
       modalBg: '#2c2c2c',
       inputBg: '#1e1e1e',
       hoverBg: '#383838',
-      shadowColor: 'rgba(0, 0, 0, 0.5)',
-      accentColor: '#A89070' // Lighter gray-brown for dark mode
+      shadowColor: 'rgba(0, 0, 0, 0.1)',
+      accentColor: '#f4f4f5'
     }
   }
 };
@@ -32,21 +34,23 @@ const CYBER_PRESET = {
   bgColor: '#f6f6f6',
   borderColor: '#2a2a2a',
   textColor: '#141414',
-  cardBg: '#ffffff',
+  textActiveColor: '#ffffff',
+  buttonBg: '#ffffff',
   modalBg: '#ffffff',
   inputBg: '#ffffff',
   hoverBg: '#eeeeee',
-  shadowColor: 'rgba(0, 0, 0, 0.18)',
+  shadowColor: 'rgba(0, 0, 0, 0.1)',
   accentColor: '#1f49d8',
   darkMode: {
     bgColor: '#0f0f10',
     borderColor: '#3a3a3d',
     textColor: '#f4f4f5',
-    cardBg: '#141416',
+    textActiveColor: '#1e1e1e',
+    buttonBg: '#141416',
     modalBg: '#141416',
     inputBg: '#141416',
     hoverBg: '#1b1b1e',
-    shadowColor: 'rgba(0, 0, 0, 0.55)',
+    shadowColor: 'rgba(0, 0, 0, 0.1)',
     accentColor: '#2c5cff'
   }
 };
@@ -340,8 +344,8 @@ function createThemeModal() {
                   <input type="color" id="bgColorInput" value="${themeState.customSettings.bgColor}" onchange="updateThemePreview()">
                 </div>
                 <div class="theme-color-item">
-                  <label>${isZh ? '卡片' : 'Card'}</label>
-                  <input type="color" id="cardBgInput" value="${themeState.customSettings.cardBg}" onchange="updateThemePreview()">
+                  <label>${isZh ? '按钮' : 'Button'}</label>
+                  <input type="color" id="buttonBgInput" value="${themeState.customSettings.buttonBg}" onchange="updateThemePreview()">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '输入框' : 'Input'}</label>
@@ -354,6 +358,10 @@ function createThemeModal() {
                 <div class="theme-color-item">
                   <label>${isZh ? '文字' : 'Text'}</label>
                   <input type="color" id="textColorInput" value="${themeState.customSettings.textColor}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '文字(按下)' : 'Text Active'}</label>
+                  <input type="color" id="textActiveColorInput" value="${themeState.customSettings.textActiveColor}" onchange="updateThemePreview()">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '弹窗' : 'Modal'}</label>
@@ -382,8 +390,8 @@ function createThemeModal() {
                   <input type="color" id="bgColorDarkInput" value="${themeState.customSettings.darkMode.bgColor}" onchange="updateThemePreview()">
                 </div>
                 <div class="theme-color-item">
-                  <label>${isZh ? '卡片' : 'Card'}</label>
-                  <input type="color" id="cardBgDarkInput" value="${themeState.customSettings.darkMode.cardBg}" onchange="updateThemePreview()">
+                  <label>${isZh ? '按钮' : 'Button'}</label>
+                  <input type="color" id="buttonBgDarkInput" value="${themeState.customSettings.darkMode.buttonBg}" onchange="updateThemePreview()">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '输入框' : 'Input'}</label>
@@ -396,6 +404,10 @@ function createThemeModal() {
                 <div class="theme-color-item">
                   <label>${isZh ? '文字' : 'Text'}</label>
                   <input type="color" id="textColorDarkInput" value="${themeState.customSettings.darkMode.textColor}" onchange="updateThemePreview()">
+                </div>
+                <div class="theme-color-item">
+                  <label>${isZh ? '文字(按下)' : 'Text Active'}</label>
+                  <input type="color" id="textActiveColorDarkInput" value="${themeState.customSettings.darkMode.textActiveColor}" onchange="updateThemePreview()">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '弹窗' : 'Modal'}</label>
@@ -496,9 +508,9 @@ function renderThemePreview() {
   const bgColor = previewMode === 'light'
     ? (document.getElementById('bgColorInput')?.value || themeState.customSettings.bgColor)
     : (document.getElementById('bgColorDarkInput')?.value || themeState.customSettings.darkMode.bgColor);
-  const cardBg = previewMode === 'light'
-    ? (document.getElementById('cardBgInput')?.value || themeState.customSettings.cardBg)
-    : (document.getElementById('cardBgDarkInput')?.value || themeState.customSettings.darkMode.cardBg);
+  const buttonBg = previewMode === 'light'
+    ? (document.getElementById('buttonBgInput')?.value || themeState.customSettings.buttonBg)
+    : (document.getElementById('buttonBgDarkInput')?.value || themeState.customSettings.darkMode.buttonBg);
   const inputBg = previewMode === 'light'
     ? (document.getElementById('inputBgInput')?.value || themeState.customSettings.inputBg)
     : (document.getElementById('inputBgDarkInput')?.value || themeState.customSettings.darkMode.inputBg);
@@ -525,17 +537,17 @@ function renderThemePreview() {
     : shadowBase;
 
   preview.style.setProperty('--bg-color', bgColor);
-  preview.style.setProperty('--card-bg', cardBg);
+  preview.style.setProperty('--button-bg', buttonBg);
   preview.style.setProperty('--modal-bg', modalBg);
   preview.style.setProperty('--input-bg', inputBg);
   preview.style.setProperty('--border-color', borderColor);
   preview.style.setProperty('--text-color', textColor);
   preview.style.setProperty('--hover-bg', hoverBg);
-  preview.style.setProperty('--shadow-color', shadowColor);
-  preview.style.setProperty('--accent-color', accentColor);
-  preview.style.fontFamily = `"${fontEnglish}", "${fontChinese}", sans-serif`;
-  preview.style.backgroundColor = 'var(--bg-color)';
-  preview.style.color = 'var(--text-color)';
+  preview.style.setProperty('--text-color', textColor);
+  const textActiveColor = previewMode === 'light'
+    ? (document.getElementById('textActiveColorInput')?.value || themeState.customSettings.textActiveColor)
+    : (document.getElementById('textActiveColorDarkInput')?.value || themeState.customSettings.darkMode.textActiveColor);
+  preview.style.setProperty('--text-active-color', textActiveColor);
 
   preview.innerHTML = `
     <style>
@@ -546,7 +558,7 @@ function renderThemePreview() {
         cursor: pointer;
         font-weight: 700;
         font-size: 14px;
-        background: var(--card-bg);
+        background: var(--button-bg);
         color: var(--text-color);
         box-shadow: 3px 3px 0 var(--shadow-color);
         transition: all 0.2s ease;
@@ -602,20 +614,22 @@ function updateThemePreview() {
   const fontChineseEl = document.getElementById('fontChineseSelect');
   const fontEnglishEl = document.getElementById('fontEnglishSelect');
   const bgColorEl = document.getElementById('bgColorInput');
-  const cardBgEl = document.getElementById('cardBgInput');
+  const buttonBgEl = document.getElementById('buttonBgInput');
   const inputBgEl = document.getElementById('inputBgInput');
   const borderColorEl = document.getElementById('borderColorInput');
   const textColorEl = document.getElementById('textColorInput');
+  const textActiveColorEl = document.getElementById('textActiveColorInput');
   const modalBgEl = document.getElementById('modalBgInput');
   const hoverBgEl = document.getElementById('hoverBgInput');
   const accentColorEl = document.getElementById('accentColorInput');
   const shadowColorEl = document.getElementById('shadowColorInput');
 
   const bgColorDarkEl = document.getElementById('bgColorDarkInput');
-  const cardBgDarkEl = document.getElementById('cardBgDarkInput');
+  const buttonBgDarkEl = document.getElementById('buttonBgDarkInput');
   const inputBgDarkEl = document.getElementById('inputBgDarkInput');
   const borderColorDarkEl = document.getElementById('borderColorDarkInput');
   const textColorDarkEl = document.getElementById('textColorDarkInput');
+  const textActiveColorDarkEl = document.getElementById('textActiveColorDarkInput');
   const modalBgDarkEl = document.getElementById('modalBgDarkInput');
   const hoverBgDarkEl = document.getElementById('hoverBgDarkInput');
   const accentColorDarkEl = document.getElementById('accentColorDarkInput');
@@ -638,20 +652,22 @@ function updateThemePreview() {
     };
 
     if (bgColorEl) bgColorEl.value = CYBER_PRESET.bgColor;
-    if (cardBgEl) cardBgEl.value = CYBER_PRESET.cardBg;
+    if (buttonBgEl) buttonBgEl.value = CYBER_PRESET.buttonBg;
     if (inputBgEl) inputBgEl.value = CYBER_PRESET.inputBg;
     if (borderColorEl) borderColorEl.value = CYBER_PRESET.borderColor;
     if (textColorEl) textColorEl.value = CYBER_PRESET.textColor;
+    if (textActiveColorEl) textActiveColorEl.value = CYBER_PRESET.textActiveColor;
     if (modalBgEl) modalBgEl.value = CYBER_PRESET.modalBg;
     if (hoverBgEl) hoverBgEl.value = CYBER_PRESET.hoverBg;
     if (accentColorEl) accentColorEl.value = CYBER_PRESET.accentColor;
     if (shadowColorEl) shadowColorEl.value = toHexColor(CYBER_PRESET.shadowColor);
 
     if (bgColorDarkEl) bgColorDarkEl.value = CYBER_PRESET.darkMode.bgColor;
-    if (cardBgDarkEl) cardBgDarkEl.value = CYBER_PRESET.darkMode.cardBg;
+    if (buttonBgDarkEl) buttonBgDarkEl.value = CYBER_PRESET.darkMode.buttonBg;
     if (inputBgDarkEl) inputBgDarkEl.value = CYBER_PRESET.darkMode.inputBg;
     if (borderColorDarkEl) borderColorDarkEl.value = CYBER_PRESET.darkMode.borderColor;
     if (textColorDarkEl) textColorDarkEl.value = CYBER_PRESET.darkMode.textColor;
+    if (textActiveColorDarkEl) textActiveColorDarkEl.value = CYBER_PRESET.darkMode.textActiveColor;
     if (modalBgDarkEl) modalBgDarkEl.value = CYBER_PRESET.darkMode.modalBg;
     if (hoverBgDarkEl) hoverBgDarkEl.value = CYBER_PRESET.darkMode.hoverBg;
     if (accentColorDarkEl) accentColorDarkEl.value = CYBER_PRESET.darkMode.accentColor;
@@ -681,24 +697,26 @@ async function saveThemeCustomization() {
     fontChinese: document.getElementById('fontChineseSelect').value,
     fontEnglish: document.getElementById('fontEnglishSelect').value,
     bgColor: document.getElementById('bgColorInput').value,
-    cardBg: document.getElementById('cardBgInput').value,
+    buttonBg: document.getElementById('buttonBgInput').value,
     inputBg: document.getElementById('inputBgInput').value,
     borderColor: document.getElementById('borderColorInput').value,
     textColor: document.getElementById('textColorInput').value,
+    textActiveColor: document.getElementById('textActiveColorInput').value,
     modalBg: document.getElementById('modalBgInput').value,
     hoverBg: document.getElementById('hoverBgInput').value,
     accentColor: document.getElementById('accentColorInput').value,
-    shadowColor: hexToRgba(shadowLightHex, 0.2),
+    shadowColor: hexToRgba(shadowLightHex, 0.1),
     darkMode: {
       bgColor: document.getElementById('bgColorDarkInput').value,
-      cardBg: document.getElementById('cardBgDarkInput').value,
+      buttonBg: document.getElementById('buttonBgDarkInput').value,
       inputBg: document.getElementById('inputBgDarkInput').value,
       borderColor: document.getElementById('borderColorDarkInput').value,
       textColor: document.getElementById('textColorDarkInput').value,
+      textActiveColor: document.getElementById('textActiveColorDarkInput').value,
       modalBg: document.getElementById('modalBgDarkInput').value,
       hoverBg: document.getElementById('hoverBgDarkInput').value,
       accentColor: document.getElementById('accentColorDarkInput').value,
-      shadowColor: hexToRgba(shadowDarkHex, 0.5)
+      shadowColor: hexToRgba(shadowDarkHex, 0.1)
     }
   };
 
@@ -778,21 +796,27 @@ function applyCustomThemeForCurrentMode() {
   const bodyEl = document.body;
 
   if (modeSettings.bgColor) rootEl.style.setProperty('--bg-color', modeSettings.bgColor);
-  if (modeSettings.cardBg) rootEl.style.setProperty('--card-bg', modeSettings.cardBg);
+  if (modeSettings.buttonBg) rootEl.style.setProperty('--button-bg', modeSettings.buttonBg);
   if (modeSettings.modalBg) rootEl.style.setProperty('--modal-bg', modeSettings.modalBg);
   if (modeSettings.inputBg) rootEl.style.setProperty('--input-bg', modeSettings.inputBg);
   if (modeSettings.borderColor) rootEl.style.setProperty('--border-color', modeSettings.borderColor);
-  if (modeSettings.textColor) rootEl.style.setProperty('--text-color', modeSettings.textColor);
+  if (modeSettings.textColor) {
+    rootEl.style.setProperty('--text-color', modeSettings.textColor);
+    rootEl.style.setProperty('--text-active-color', modeSettings.textActiveColor || '#ffffff');
+  }
   if (modeSettings.hoverBg) rootEl.style.setProperty('--hover-bg', modeSettings.hoverBg);
   if (modeSettings.shadowColor) rootEl.style.setProperty('--shadow-color', modeSettings.shadowColor);
   if (modeSettings.accentColor) rootEl.style.setProperty('--accent-color', modeSettings.accentColor);
 
   if (modeSettings.bgColor) bodyEl.style.setProperty('--bg-color', modeSettings.bgColor);
-  if (modeSettings.cardBg) bodyEl.style.setProperty('--card-bg', modeSettings.cardBg);
+  if (modeSettings.buttonBg) bodyEl.style.setProperty('--button-bg', modeSettings.buttonBg);
   if (modeSettings.modalBg) bodyEl.style.setProperty('--modal-bg', modeSettings.modalBg);
   if (modeSettings.inputBg) bodyEl.style.setProperty('--input-bg', modeSettings.inputBg);
   if (modeSettings.borderColor) bodyEl.style.setProperty('--border-color', modeSettings.borderColor);
-  if (modeSettings.textColor) bodyEl.style.setProperty('--text-color', modeSettings.textColor);
+  if (modeSettings.textColor) {
+    bodyEl.style.setProperty('--text-color', modeSettings.textColor);
+    bodyEl.style.setProperty('--text-active-color', modeSettings.textActiveColor || '#ffffff');
+  }
   if (modeSettings.hoverBg) bodyEl.style.setProperty('--hover-bg', modeSettings.hoverBg);
   if (modeSettings.shadowColor) bodyEl.style.setProperty('--shadow-color', modeSettings.shadowColor);
   if (modeSettings.accentColor) bodyEl.style.setProperty('--accent-color', modeSettings.accentColor);
@@ -807,9 +831,10 @@ function applyCustomThemeForCurrentMode() {
 function clearCustomThemeSettings() {
   const rootEl = document.documentElement;
   rootEl.style.removeProperty('--bg-color');
-  rootEl.style.removeProperty('--card-bg');
+  rootEl.style.removeProperty('--button-bg');
   rootEl.style.removeProperty('--border-color');
   rootEl.style.removeProperty('--text-color');
+  rootEl.style.removeProperty('--text-active-color');
   rootEl.style.removeProperty('--modal-bg');
   rootEl.style.removeProperty('--input-bg');
   rootEl.style.removeProperty('--hover-bg');
@@ -817,9 +842,10 @@ function clearCustomThemeSettings() {
   rootEl.style.removeProperty('--accent-color');
 
   document.body.style.removeProperty('--bg-color');
-  document.body.style.removeProperty('--card-bg');
+  document.body.style.removeProperty('--button-bg');
   document.body.style.removeProperty('--border-color');
   document.body.style.removeProperty('--text-color');
+  document.body.style.removeProperty('--text-active-color');
   document.body.style.removeProperty('--modal-bg');
   document.body.style.removeProperty('--input-bg');
   document.body.style.removeProperty('--hover-bg');
@@ -866,7 +892,7 @@ async function resetThemeCustomization() {
   if (fontZh) fontZh.value = themeState.customSettings.fontChinese;
 
   const bg = document.getElementById('bgColorInput');
-  const card = document.getElementById('cardBgInput');
+  const card = document.getElementById('buttonBgInput');
   const input = document.getElementById('inputBgInput');
   const border = document.getElementById('borderColorInput');
   const text = document.getElementById('textColorInput');
@@ -876,30 +902,33 @@ async function resetThemeCustomization() {
   const shadow = document.getElementById('shadowColorInput');
 
   if (bg) bg.value = themeState.customSettings.bgColor;
-  if (card) card.value = themeState.customSettings.cardBg;
+  if (card) card.value = themeState.customSettings.buttonBg;
   if (input) input.value = themeState.customSettings.inputBg;
   if (border) border.value = themeState.customSettings.borderColor;
   if (text) text.value = themeState.customSettings.textColor;
+  if (textActive) textActive.value = themeState.customSettings.textActiveColor; // Added
   if (modal) modal.value = themeState.customSettings.modalBg;
   if (hover) hover.value = themeState.customSettings.hoverBg;
   if (accent) accent.value = themeState.customSettings.accentColor;
   if (shadow) shadow.value = toHexColor(themeState.customSettings.shadowColor);
 
   const bgD = document.getElementById('bgColorDarkInput');
-  const cardD = document.getElementById('cardBgDarkInput');
+  const cardD = document.getElementById('buttonBgDarkInput');
   const inputD = document.getElementById('inputBgDarkInput');
   const borderD = document.getElementById('borderColorDarkInput');
   const textD = document.getElementById('textColorDarkInput');
+  const textActiveD = document.getElementById('textActiveColorDarkInput'); // Added
   const modalD = document.getElementById('modalBgDarkInput');
   const hoverD = document.getElementById('hoverBgDarkInput');
   const accentD = document.getElementById('accentColorDarkInput');
   const shadowD = document.getElementById('shadowColorDarkInput');
 
   if (bgD) bgD.value = themeState.customSettings.darkMode.bgColor;
-  if (cardD) cardD.value = themeState.customSettings.darkMode.cardBg;
+  if (cardD) cardD.value = themeState.customSettings.darkMode.buttonBg;
   if (inputD) inputD.value = themeState.customSettings.darkMode.inputBg;
   if (borderD) borderD.value = themeState.customSettings.darkMode.borderColor;
   if (textD) textD.value = themeState.customSettings.darkMode.textColor;
+  if (textActiveD) textActiveD.value = themeState.customSettings.darkMode.textActiveColor; // Added
   if (modalD) modalD.value = themeState.customSettings.darkMode.modalBg;
   if (hoverD) hoverD.value = themeState.customSettings.darkMode.hoverBg;
   if (accentD) accentD.value = themeState.customSettings.darkMode.accentColor;

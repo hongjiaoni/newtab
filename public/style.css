@@ -4,7 +4,7 @@
 
 :root {
   --bg-color: #f0f0f0;
-  --card-bg: #ffffff;
+  --button-bg: #ffffff;
   --text-color: #333333;
   --border-color: #222222;
   --accent-color: #4A90E2;
@@ -57,6 +57,7 @@
 
 [data-style="cyber"] .settings-btn,
 [data-style="cyber"] .engine-add-inline,
+[data-style="cyber"] button,
 [data-style="cyber"] .engine-quick-list,
 [data-style="cyber"] .engine-quick-remove,
 [data-style="cyber"] .engine-remove,
@@ -69,6 +70,7 @@
   text-transform: uppercase;
   font-size: 12px;
   font-weight: 650;
+  transition: all 0.2s ease;
 }
 
 /* Cyber theme tab buttons */
@@ -78,7 +80,7 @@
 
 [data-style="cyber"] .theme-tab-btn.active {
   background: var(--text-color);
-  color: var(--bg-color);
+  color: var(--text-active-color);
   border-color: var(--text-color);
 }
 
@@ -310,7 +312,7 @@ body {
 body.dark {
   --bg-color: #1e1e1e;
   --text-color: #ecf0f1;
-  --card-bg: #2c2c2c;
+  --button-bg: #2c2c2c;
   --modal-bg: #2c2c2c;
   --input-bg: #1e1e1e;
   --border-color: #ecf0f1;
@@ -327,7 +329,7 @@ body.dark {
   position: absolute;
   right: 100%;
   top: 0;
-  background: var(--card-bg);
+  background: var(--button-bg);
   border: 2px solid var(--border-color);
   min-width: 100px;
   z-index: 101;
@@ -378,7 +380,7 @@ body.dark {
 }
 
 .settings-btn {
-  background: var(--card-bg);
+  background: var(--button-bg);
   border: 2px solid var(--border-color);
   font-size: 24px;
   cursor: pointer;
@@ -476,7 +478,7 @@ body.dark {
 
 /* Search Box Container */
 .search-box {
-  background: var(--card-bg);
+  background: var(--input-bg);
   border: 2px solid var(--border-color);
   border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
   display: flex;
@@ -522,7 +524,7 @@ body.dark {
 
 .engine-add-inline {
   border: 2px solid var(--border-color);
-  background: var(--card-bg);
+  background: var(--button-bg);
   color: var(--text-color);
   border-radius: 999px;
   padding: 6px 10px;
@@ -551,7 +553,7 @@ body.dark {
   align-items: center;
   gap: 6px;
   border: 2px solid var(--border-color);
-  background: var(--card-bg);
+  background: var(--button-bg);
   border-radius: 999px;
   padding: 5px 12px;
   box-shadow: 2px 2px 0 var(--shadow-color);
@@ -578,7 +580,7 @@ body.dark {
 
 .engine-quick-remove {
   border: 2px solid var(--border-color);
-  background: var(--card-bg);
+  background: var(--button-bg);
   color: var(--text-color);
   border-radius: 999px;
   width: 22px;
@@ -603,7 +605,7 @@ body.dark {
   position: absolute;
   top: 130%;
   left: 0;
-  background: var(--card-bg);
+  background: var(--button-bg);
   border: 2px solid var(--border-color);
   border-radius: 4px;
   /* Standard rect for menu */
@@ -656,7 +658,7 @@ body.dark {
 .engine-remove,
 .engine-add-btn {
   border: 2px solid var(--border-color);
-  background: var(--card-bg);
+  background: var(--button-bg);
   color: var(--text-color);
   border-radius: 8px;
   cursor: pointer;
@@ -754,7 +756,7 @@ textarea:-ms-input-placeholder {
 .chip {
   padding: 8px 16px;
   border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-  background: var(--card-bg);
+  background: var(--button-bg);
   border: 2px solid var(--border-color);
   color: var(--text-color);
   font-size: 14px;
@@ -867,7 +869,7 @@ input[type="color"] {
   padding: 0;
   border: 2px solid var(--border-color);
   border-radius: 10px;
-  background: var(--card-bg);
+  background: var(--button-bg);
   box-shadow: 2px 2px 0 var(--shadow-color);
   cursor: pointer;
 }
@@ -907,7 +909,7 @@ button {
   cursor: pointer;
   font-weight: 700;
   font-size: 16px;
-  background: var(--card-bg);
+  background: var(--button-bg);
   color: var(--text-color);
   box-shadow: 3px 3px 0 var(--shadow-color);
   transition: all 0.2s ease;
@@ -927,7 +929,7 @@ button:active {
 /* Specific button overrides */
 .modal-actions .primary-btn {
   background: var(--text-color);
-  color: var(--bg-color);
+  color: var(--text-active-color);
   border-color: var(--text-color);
 }
 
@@ -978,7 +980,7 @@ button:active {
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.2s;
-  background: var(--card-bg);
+  background: var(--button-bg);
   position: relative;
 }
 
@@ -989,7 +991,7 @@ button:active {
 
 .engine-item.selected {
   border-color: var(--accent-color);
-  background: color-mix(in srgb, var(--accent-color) 10%, var(--card-bg));
+  background: color-mix(in srgb, var(--accent-color) 10%, var(--button-bg));
 }
 
 .engine-item img {
@@ -1040,7 +1042,7 @@ button:active {
   height: 32px;
   border: 2px solid var(--border-color);
   border-radius: 8px;
-  background: var(--card-bg);
+  background: var(--button-bg);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1095,7 +1097,7 @@ button:active {
   border: 2px solid var(--border-color);
   width: 100%;
   text-align: center;
-  background: var(--card-bg);
+  background: var(--button-bg);
   padding: 4px;
   box-shadow: 3px 3px 0 var(--shadow-color);
 }
@@ -1156,7 +1158,7 @@ button:active {
 /* Context Menu */
 .context-menu {
   position: absolute;
-  background: var(--card-bg);
+  background: var(--button-bg);
   border: 2px solid var(--border-color);
   box-shadow: 4px 4px 0 var(--shadow-color);
   border-radius: 4px;
@@ -1227,7 +1229,7 @@ input[type="checkbox"] {
   width: 20px;
   height: 20px;
   border: 2px solid var(--border-color);
-  background: var(--card-bg);
+  background: var(--button-bg);
   cursor: pointer;
   position: relative;
   vertical-align: middle;
@@ -1241,7 +1243,7 @@ input[type="radio"] {
 
 input[type="radio"]:checked {
   background: var(--text-color);
-  box-shadow: inset 0 0 0 3px var(--card-bg);
+  box-shadow: inset 0 0 0 3px var(--button-bg);
 }
 
 /* Checkbox: Box */
@@ -1280,7 +1282,7 @@ input:disabled {
 .coffee-amount-btn {
   padding: 12px 20px;
   border: 2px solid var(--border-color);
-  background: var(--card-bg);
+  background: var(--button-bg);
   color: var(--text-color);
   border-radius: 8px;
   cursor: pointer;
@@ -1418,7 +1420,7 @@ input:disabled {
   cursor: pointer;
   font-weight: 700;
   font-size: 14px;
-  background: var(--card-bg);
+  background: var(--button-bg);
   color: var(--text-color);
   box-shadow: 2px 2px 0 var(--shadow-color);
   transition: all 0.2s ease;
