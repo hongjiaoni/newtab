@@ -91,14 +91,14 @@ function setCyberTrailEnabled(enabled) {
     window.setTimeout(() => {
       dots.delete(el);
       el.remove();
-    }, 780);
+    }, 500);
   };
 
   const onMove = (ev) => {
     if (!document.body || document.body.dataset.style !== 'cyber') return;
 
     const now = performance.now();
-    if (now - lastAt < 8) return;
+    if (now - lastAt < 6) return;
 
     const x = ev.clientX;
     const y = ev.clientY;
@@ -662,6 +662,16 @@ function updateThemePreview() {
   }
 
   lastStyleValue = nextStyle;
+
+  // Apply theme immediately for real-time preview
+  themeState.currentTheme = nextStyle;
+  applyStyleTheme(nextStyle);
+  
+  // Apply font changes immediately too
+  const fontEnglish = fontEnglishEl?.value || themeState.customSettings.fontEnglish;
+  const fontChinese = fontChineseEl?.value || themeState.customSettings.fontChinese;
+  if (fontEnglish) document.body.style.setProperty('--font-english', fontEnglish);
+  if (fontChinese) document.body.style.setProperty('--font-chinese', fontChinese);
 
   const draft = {
     ...themeState.customSettings,
