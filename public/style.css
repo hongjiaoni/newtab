@@ -1612,6 +1612,12 @@ body[data-style="comic"] .wallpaper-tab:hover {
   box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2) !important;
 }
 
+body[data-style="comic"] .wallpaper-tab.active {
+  background: #333;
+  color: #fff;
+  border-color: #333;
+}
+
 /* Comic theme tab buttons */
 body[data-style="comic"] .theme-tab-btn {
   border: 2px solid #333;
