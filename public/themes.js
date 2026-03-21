@@ -13,7 +13,7 @@ const themeState = {
     inputBg: '#ffffff',
     hoverBg: '#f0f0f0',
     shadowColor: 'rgba(0, 0, 0, 0.2)',
-    accentColor: '#4A90E2',
+    accentColor: '#8B7355', // Gray-brown for hand-drawn theme
     darkMode: {
       bgColor: '#1e1e1e',
       borderColor: '#ecf0f1',
@@ -23,7 +23,7 @@ const themeState = {
       inputBg: '#1e1e1e',
       hoverBg: '#383838',
       shadowColor: 'rgba(0, 0, 0, 0.5)',
-      accentColor: '#4A90E2'
+      accentColor: '#A89070' // Lighter gray-brown for dark mode
     }
   }
 };
@@ -229,7 +229,7 @@ function openThemeCustomization() {
   }
 
   // Then check membership tier
-  if (!window.membershipState || window.membershipState.tier < 2) {
+  if (!window.membershipState || window.membershipState.tier < 1) {
     console.log('Tier insufficient, showing upgrade modal');
     const settingsMenu = document.getElementById('settingsMenu');
     if (settingsMenu) settingsMenu.classList.add('hidden');
@@ -244,6 +244,8 @@ function openThemeCustomization() {
 
   console.log('Opening theme customization modal');
   createThemeModal();
+  // Store original theme for restore on cancel
+  originalThemeOnOpen = themeState.currentTheme;
   document.getElementById('themeCustomizationModal').classList.remove('hidden');
   renderThemePreview();
 }
@@ -663,15 +665,13 @@ function updateThemePreview() {
 
   lastStyleValue = nextStyle;
 
-  // Apply theme immediately for real-time preview
-  themeState.currentTheme = nextStyle;
-  applyStyleTheme(nextStyle);
-  
-  // Apply font changes immediately too
-  const fontEnglish = fontEnglishEl?.value || themeState.customSettings.fontEnglish;
-  const fontChinese = fontChineseEl?.value || themeState.customSettings.fontChinese;
-  if (fontEnglish) document.body.style.setProperty('--font-english', fontEnglish);
-  if (fontChinese) document.body.style.setProperty('--font-chinese', fontChinese);
+  // Apply to preview container and body for live preview
+  // The original theme will be restored when modal closes (via closeThemeModal)
+  const previewContainer = document.getElementById('themePreviewContainer');
+  if (previewContainer) {
+    previewContainer.dataset.style = nextStyle;
+  }
+  document.body.dataset.style = nextStyle;
 
   const draft = {
     ...themeState.customSettings,
@@ -760,7 +760,7 @@ async function saveThemeCustomization() {
     if (window.initializeMembership) {
       await window.initializeMembership();
     }
-    if (!window.membershipState || window.membershipState.tier < 2) {
+    if (!window.membershipState || window.membershipState.tier < 1) {
       throw new Error('premium membership required');
     }
     if (window.saveThemeSettings) {
@@ -778,6 +778,9 @@ async function saveThemeCustomization() {
     }
 
     closeThemeModal();
+    
+    // Clear original theme tracker
+    originalThemeOnOpen = null;
 
     if (window.showNotification) {
       window.showNotification(
@@ -955,9 +958,23 @@ async function resetThemeCustomization() {
   }
 }
 
-// Close theme modal
+// Store original theme for restore
+let originalThemeOnOpen = null;
+
+// Close theme modal and restore original theme
 function closeThemeModal() {
+  // Restore original theme if changed
+  if (originalThemeOnOpen !== null) {
+    themeState.currentTheme = originalThemeOnOpen;
+    applyStyleTheme(originalThemeOnOpen);
+    originalThemeOnOpen = null;
+  }
   document.getElementById('themeCustomizationModal')?.classList.add('hidden');
+}
+
+// Before opening modal, store the original theme
+function storeOriginalTheme() {
+  originalThemeOnOpen = themeState.currentTheme;
 }
 
 // Export functions
