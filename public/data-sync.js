@@ -305,7 +305,7 @@ function applyCachedUserData({ uid, effectiveTier } = {}) {
         applyCachedHomeConfig(cachedHome);
     }
 
-    if (tier >= 2) {
+    if (tier >= 1) {
         const cachedTheme = getCachedUserThemeSettings(uid);
         if (cachedTheme && window.applyThemeSettings) {
             window.applyThemeSettings(cachedTheme);
@@ -362,7 +362,7 @@ async function loadUserData(options = {}) {
         }
 
         const loadThemeAndFontSettings = async () => {
-            if (effectiveTier >= 2) {
+            if (effectiveTier >= 1) {
                 const [themeRes, fontRes] = await Promise.all([
                     supabase.from('user_theme_settings').select('theme_settings').eq('user_id', uid).single(),
                     supabase.from('user_font_settings').select('font_settings').eq('user_id', uid).single()
@@ -612,7 +612,7 @@ async function saveThemeSettings(themeSettings) {
         throw new Error('Not logged in');
     }
 
-    if (!window.membershipState || window.membershipState.tier < 2) {
+    if (!window.membershipState || window.membershipState.tier < 1) {
         console.warn('Theme customization requires premium membership');
         throw new Error('premium membership required');
     }
@@ -641,7 +641,7 @@ async function saveFontSettings(fontSettings) {
         throw new Error('Not logged in');
     }
 
-    if (!window.membershipState || window.membershipState.tier < 2) {
+    if (!window.membershipState || window.membershipState.tier < 1) {
         console.warn('Font customization requires premium membership');
         throw new Error('premium membership required');
     }
@@ -670,7 +670,7 @@ async function resetThemeCustomization() {
         return;
     }
 
-    if (!window.membershipState || window.membershipState.tier < 2) {
+    if (!window.membershipState || window.membershipState.tier < 1) {
         console.warn('Theme customization requires premium membership');
         return;
     }

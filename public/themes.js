@@ -229,7 +229,7 @@ function openThemeCustomization() {
   }
 
   // Then check membership tier
-  if (!window.membershipState || window.membershipState.tier < 2) {
+  if (!window.membershipState || window.membershipState.tier < 1) {
     console.log('Tier insufficient, showing upgrade modal');
     const settingsMenu = document.getElementById('settingsMenu');
     if (settingsMenu) settingsMenu.classList.add('hidden');
@@ -759,7 +759,7 @@ async function saveThemeCustomization() {
     if (window.initializeMembership) {
       await window.initializeMembership();
     }
-    if (!window.membershipState || window.membershipState.tier < 2) {
+    if (!window.membershipState || window.membershipState.tier < 1) {
       throw new Error('premium membership required');
     }
     if (window.saveThemeSettings) {
