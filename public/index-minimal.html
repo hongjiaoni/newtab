@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newtab - 极简风格</title>
+  <link rel="stylesheet" href="style-minimal.css">
+</head>
+<body>
+  <div class="container">
+    <!-- 左侧大时间 -->
+    <div class="time-container">
+      <span id="time" class="time">00:00</span>
+    </div>
+
+    <!-- 中间搜索框 -->
+    <div class="search-container">
+      <form id="searchForm">
+        <input type="text" id="searchInput" placeholder="Search..." autocomplete="off" autofocus>
+      </form>
+    </div>
+
+    <!-- 底部快捷链接 -->
+    <div class="links-container">
+      <div class="links" id="links"></div>
+      <button class="add-btn" id="addLinkBtn">+</button>
+    </div>
+  </div>
+
+  <!-- 主题切换 -->
+  <button class="theme-toggle" id="themeToggle">◐</button>
+
+  <script src="time-display.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

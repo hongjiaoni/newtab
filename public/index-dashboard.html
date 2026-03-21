@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newtab - 仪表盘风格</title>
+  <link rel="stylesheet" href="style-dashboard.css">
+</head>
+<body>
+  <!-- 背景图片 -->
+  <div class="wallpaper" id="wallpaper"></div>
+  <div class="overlay"></div>
+
+  <div class="container">
+    <!-- 顶部信息栏 -->
+    <header class="header">
+      <div class="datetime">
+        <span class="date" id="date">Monday, Jan 1</span>
+        <span class="time" id="time">00:00</span>
+      </div>
+      <div class="weather">
+        <span id="weather">☀️ 22°C</span>
+      </div>
+    </header>
+
+    <!-- 中间搜索框 -->
+    <main class="main">
+      <div class="search-container">
+        <form id="searchForm">
+          <input type="text" id="searchInput" placeholder="Search the web..." autocomplete="off" autofocus>
+        </form>
+      </div>
+    </main>
+
+    <!-- 底部内容区 -->
+    <footer class="footer">
+      <!-- 左侧快捷链接 -->
+      <div class="links-section">
+        <h3 class="section-title">Bookmarks</h3>
+        <div class="links" id="links"></div>
+        <button class="add-btn" id="addLinkBtn">+ Add</button>
+      </div>
+
+      <!-- 右侧统计 -->
+      <div class="stats-section">
+        <h3 class="section-title">Focus</h3>
+        <div class="stats">
+          <div class="stat-item">
+            <span class="stat-value" id="focusTime">0:00</span>
+            <span class="stat-label">Focus Time</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="tasksDone">0</span>
+            <span class="stat-label">Tasks Done</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value" id="linesCode">0</span>
+            <span class="stat-label">Lines of Code</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- 主题切换 -->
+  <button class="theme-toggle" id="themeToggle">◐</button>
+
+  <script src="time-display.js"></script>
+  <script src="script.js"></script>
+  <script src="dashboard-stats.js"></script>
+</body>
+</html>

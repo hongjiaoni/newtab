@@ -284,6 +284,7 @@ function applyCachedHomeConfig(homeConfig) {
         if (typeof settings.theme === 'string') {
             state.currentTheme = settings.theme;
             window.applyStyleTheme?.(state.currentTheme);
+            if (window.themeState) window.themeState.currentTheme = state.currentTheme;
         }
 
         if (typeof settings.colorMode === 'string') {
@@ -491,6 +492,7 @@ async function loadUserData(options = {}) {
             if (typeof serverSettings.theme === 'string') {
                 state.currentTheme = serverSettings.theme;
                 window.applyStyleTheme?.(state.currentTheme);
+                if (window.themeState) window.themeState.currentTheme = state.currentTheme;
             }
 
             if (typeof serverSettings.colorMode === 'string') {
