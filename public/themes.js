@@ -293,6 +293,9 @@ function createThemeModal() {
                   <option value="handdrawn" ${themeState.currentTheme === 'handdrawn' ? 'selected' : ''}>
                     ${isZh ? '手绘（默认）' : 'Hand-drawn (Default)'}
                   </option>
+                  <option value="comic" ${themeState.currentTheme === 'comic' ? 'selected' : ''}>
+                    ${isZh ? '漫画' : 'Comic'}
+                  </option>
                   <option value="cyber" ${themeState.currentTheme === 'cyber' ? 'selected' : ''}>
                     ${isZh ? '赛博（黑白）' : 'Cyber (Mono)'}
                   </option>
