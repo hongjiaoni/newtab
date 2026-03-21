@@ -356,7 +356,7 @@ async function uploadCustomWallpaperFromUrl() {
     return;
   }
 
-  if (!window.membershipState || window.membershipState.tier < 2) {
+  if (!window.membershipState || window.membershipState.tier < 1) {
     showNotification(currentLocale === 'zh' ? '上传壁纸需要高级会员' : 'Premium membership required for uploads', 'error');
     window.showUpgradeModal?.('wallpaper');
     return;
@@ -518,7 +518,7 @@ async function addCustomWallpaperByUrl() {
     return;
   }
 
-  if (!window.membershipState || window.membershipState.tier < 2) {
+  if (!window.membershipState || window.membershipState.tier < 1) {
     showNotification(currentLocale === 'zh' ? '自定义壁纸需要高级会员' : 'Premium membership required', 'error');
     window.showUpgradeModal?.('wallpaper');
     return;
@@ -606,7 +606,7 @@ async function handleUserWallpaperUpload(event) {
   }
 
   // Check membership tier
-  if (!window.membershipState || window.membershipState.tier < 2) {
+  if (!window.membershipState || window.membershipState.tier < 1) {
     // Close wallpaper modal first
     if (window.closeWallpaperModal) {
       window.closeWallpaperModal();
