@@ -93,7 +93,7 @@ function updateFeatureLocks() {
     // Theme customization (tier 2+)
     const themeBtn = document.getElementById('themeCustomizationBtn');
     if (themeBtn) {
-        if (membershipState.tier < 2) {
+        if (membershipState.tier < 1) {
             themeBtn.classList.add('locked-feature');
             themeBtn.onclick = () => {
                 if (!window.authState || !window.authState.isLoggedIn) {
@@ -111,7 +111,7 @@ function updateFeatureLocks() {
     // Custom wallpaper category
     const customCategory = document.querySelector('[data-category="Custom"]');
     if (customCategory) {
-        if (membershipState.tier < 2) {
+        if (membershipState.tier < 1) {
             customCategory.classList.add('locked-feature');
             customCategory.onclick = (e) => {
                 e.preventDefault();

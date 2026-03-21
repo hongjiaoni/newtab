@@ -13,7 +13,7 @@ const themeState = {
     inputBg: '#ffffff',
     hoverBg: '#f0f0f0',
     shadowColor: 'rgba(0, 0, 0, 0.2)',
-    accentColor: '#4A90E2',
+    accentColor: '#8B7355', // Gray-brown for hand-drawn theme
     darkMode: {
       bgColor: '#1e1e1e',
       borderColor: '#ecf0f1',
@@ -23,7 +23,7 @@ const themeState = {
       inputBg: '#1e1e1e',
       hoverBg: '#383838',
       shadowColor: 'rgba(0, 0, 0, 0.5)',
-      accentColor: '#4A90E2'
+      accentColor: '#A89070' // Lighter gray-brown for dark mode
     }
   }
 };
@@ -229,7 +229,7 @@ function openThemeCustomization() {
   }
 
   // Then check membership tier
-  if (!window.membershipState || window.membershipState.tier < 2) {
+  if (!window.membershipState || window.membershipState.tier < 1) {
     console.log('Tier insufficient, showing upgrade modal');
     const settingsMenu = document.getElementById('settingsMenu');
     if (settingsMenu) settingsMenu.classList.add('hidden');
@@ -760,7 +760,7 @@ async function saveThemeCustomization() {
     if (window.initializeMembership) {
       await window.initializeMembership();
     }
-    if (!window.membershipState || window.membershipState.tier < 2) {
+    if (!window.membershipState || window.membershipState.tier < 1) {
       throw new Error('premium membership required');
     }
     if (window.saveThemeSettings) {

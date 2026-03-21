@@ -612,7 +612,7 @@ async function saveThemeSettings(themeSettings) {
         throw new Error('Not logged in');
     }
 
-    if (!window.membershipState || window.membershipState.tier < 2) {
+    if (!window.membershipState || window.membershipState.tier < 1) {
         console.warn('Theme customization requires premium membership');
         throw new Error('premium membership required');
     }
@@ -641,7 +641,7 @@ async function saveFontSettings(fontSettings) {
         throw new Error('Not logged in');
     }
 
-    if (!window.membershipState || window.membershipState.tier < 2) {
+    if (!window.membershipState || window.membershipState.tier < 1) {
         console.warn('Font customization requires premium membership');
         throw new Error('premium membership required');
     }
@@ -670,7 +670,7 @@ async function resetThemeCustomization() {
         return;
     }
 
-    if (!window.membershipState || window.membershipState.tier < 2) {
+    if (!window.membershipState || window.membershipState.tier < 1) {
         console.warn('Theme customization requires premium membership');
         return;
     }

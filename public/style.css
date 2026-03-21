@@ -103,6 +103,7 @@ body[data-style="cyber"] .engine-menu-divider,
 body[data-style="cyber"] .page-context-menu .context-menu-divider {
   height: 1px !important;
   opacity: 0.25;
+  background: var(--border-color);
 }
 
 body[data-style="cyber"] .site-card {
@@ -1518,6 +1519,29 @@ body[data-style="comic"] .settings-menu {
 
 body[data-style="comic"] .settings-menu {
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Comic theme dividers */
+body[data-style="comic"] .settings-menu-divider,
+body[data-style="comic"] .engine-menu-divider {
+  height: 2px !important;
+  background: #333 !important;
+  border-radius: 0 !important;
+  opacity: 1;
+}
+
+/* Comic theme inputs and selects */
+body[data-style="comic"] .modal-input,
+body[data-style="comic"] input,
+body[data-style="comic"] select {
+  border: 2px solid #333 !important;
+  border-radius: 8px !important;
+  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.15) !important;
+}
+
+body[data-style="comic"] input:focus,
+body[data-style="comic"] select:focus {
+  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.2) !important;
 }
 
 body[data-style="comic"] .modal {
