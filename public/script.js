@@ -1909,6 +1909,7 @@ function applyAppearanceSnapshotFallback() {
   document.body.classList.toggle('light', mode !== 'dark');
 
   if (snapshot.currentTheme && typeof window.applyStyleTheme !== 'function') {
+    document.documentElement.dataset.style = snapshot.currentTheme;
     document.body.dataset.style = snapshot.currentTheme;
   }
 
@@ -2007,29 +2008,77 @@ ensureThemeCustomizationLoaded().then((loaded) => {
   window.applyCustomThemeForCurrentMode?.();
 });
 
+function isElementVisible(element) {
+  return !!element && !element.classList.contains('hidden');
+}
+
+function hasOpenTransientUi() {
+  return [
+    settingsMenu,
+    document.getElementById('languageSubmenu'),
+    document.getElementById('wallpaperModal'),
+    document.getElementById('themeCustomizationModal'),
+    document.getElementById('aboutModal'),
+    document.getElementById('coffeeModal'),
+    document.getElementById('feedbackModal'),
+    modalOverlay,
+    engineModal,
+    pageContextMenu,
+    itemContextMenu
+  ].some(isElementVisible);
+}
+
+function closeTransientUi() {
+  settingsMenu?.classList.add('hidden');
+  document.getElementById('languageSubmenu')?.classList.add('hidden');
+  window.closeWallpaperModal?.();
+  window.closeThemeModal?.(false);
+  closeModals?.();
+  closeEngineModal?.();
+  window.closeAboutModal?.();
+  window.closeCoffeeModal?.();
+  window.closeFeedbackModal?.();
+  pageContextMenu?.classList.add('hidden');
+  itemContextMenu?.classList.add('hidden');
+}
+
+document.addEventListener('click', (e) => {
+  if (!hasOpenTransientUi()) return;
+
+  const insideInteractiveLayer = e.target.closest(
+    '.modal, .settings-menu, .settings-btn, .page-context-menu, .item-context-menu, .context-menu'
+  );
+
+  if (insideInteractiveLayer) return;
+
+  closeTransientUi();
+  e.preventDefault();
+  e.stopPropagation();
+}, true);
+
 document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) => {
   e.preventDefault();
   e.stopPropagation();
   settingsMenu.classList.add('hidden');
-
-  if (typeof window.handleThemeCustomizationMenuClick === 'function') {
-    window.handleThemeCustomizationMenuClick(e);
-    return;
-  }
 
   if (typeof window.openThemeCustomization === 'function') {
     window.openThemeCustomization();
     return;
   }
 
+  if (typeof window.handleThemeCustomizationMenuClick === 'function') {
+    window.handleThemeCustomizationMenuClick(e);
+    return;
+  }
+
   ensureThemeCustomizationLoaded().then((loaded) => {
-    if (loaded && typeof window.handleThemeCustomizationMenuClick === 'function') {
-      window.handleThemeCustomizationMenuClick(e);
+    if (loaded && typeof window.openThemeCustomization === 'function') {
+      window.openThemeCustomization();
       return;
     }
 
-    if (loaded && typeof window.openThemeCustomization === 'function') {
-      window.openThemeCustomization();
+    if (loaded && typeof window.handleThemeCustomizationMenuClick === 'function') {
+      window.handleThemeCustomizationMenuClick(e);
       return;
     }
 
