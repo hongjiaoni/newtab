@@ -1601,6 +1601,10 @@ input:disabled {
   background: #fff;
 }
 
+[data-style="comic"] .search-box:focus-within {
+  box-shadow: none !important;
+}
+
 [data-style="comic"] .search-box input {
   border: none !important;
   background: transparent;
@@ -1804,6 +1808,10 @@ input:disabled {
 [data-style="comic"].dark .search-box {
   background: #3d3d3d;
   border-color: #f5f0e1;
+  box-shadow: none !important;
+}
+
+[data-style="comic"].dark .search-box:focus-within {
   box-shadow: none !important;
 }
 

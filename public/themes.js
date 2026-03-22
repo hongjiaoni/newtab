@@ -300,7 +300,6 @@ function createThemeModal() {
                   </option>
                 </select>
               </div>
-              <div id="themeStyleStatus" style="font-size: 12px; margin-bottom: 10px; opacity: 0.8;"></div>
               <div style="font-size: 12px; opacity: 0.7; line-height: 1.4;">
                 ${isZh ? '更多付费风格后续会陆续上线。' : 'More premium styles will be available later.'}
               </div>
@@ -451,7 +450,6 @@ function createThemeModal() {
       item.remove();
     }
   });
-  updateThemeStyleStatus();
 }
 
 function getThemeDisplayName(style) {
@@ -522,6 +520,7 @@ function handleThemeFontChange() {
 function renderThemePreview() {
   const preview = document.getElementById('themePreview');
   if (!preview) return;
+  const previewStyle = document.getElementById('themeStyleSelect')?.value || themeState.currentTheme || 'handdrawn';
 
   const fontChinese = document.getElementById('fontChineseSelect')?.value || themeState.customSettings.fontChinese;
   const fontEnglish = document.getElementById('fontEnglishSelect')?.value || themeState.customSettings.fontEnglish;
@@ -565,6 +564,9 @@ function renderThemePreview() {
     ? (document.getElementById('textActiveColorInput')?.value || themeState.customSettings.textActiveColor)
     : (document.getElementById('textActiveColorDarkInput')?.value || themeState.customSettings.darkMode.textActiveColor);
   preview.style.setProperty('--text-active-color', textActiveColor);
+  preview.dataset.style = previewStyle;
+  preview.classList.toggle('dark', previewMode === 'dark');
+  preview.classList.toggle('light', previewMode !== 'dark');
 
   preview.innerHTML = `
     <style>
@@ -579,6 +581,54 @@ function renderThemePreview() {
       #themePreview .chip,
       #themePreview .preview-btn {
         transition: none !important;
+      }
+
+      #themePreview .time,
+      #themePreview .date,
+      #themePreview .chip,
+      #themePreview .tag,
+      #themePreview .search-engine,
+      #themePreview .preview-search-icon {
+        color: var(--text-color) !important;
+      }
+
+      #themePreview .search-box {
+        display: flex;
+        align-items: center;
+      }
+
+      #themePreview .search-engine {
+        display: flex;
+        align-items: center;
+        flex: 0 0 auto;
+      }
+
+      #themePreview .preview-search-icon {
+        width: 28px;
+        height: 28px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        background: transparent;
+      }
+
+      #themePreview .search-box input {
+        flex: 1;
+        min-width: 0;
+        opacity: 1 !important;
+        color: var(--text-color) !important;
+        border: none !important;
+        outline: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+      }
+
+      #themePreview .search-box input::placeholder {
+        color: var(--text-color) !important;
+        opacity: 0.68 !important;
       }
 
       #themePreview .preview-btn {
@@ -615,7 +665,7 @@ function renderThemePreview() {
         <div class="date" style="margin-bottom: 22px;">2026/01/25 Sat</div>
         <div class="search-box" style="margin: 0 auto 26px; max-width: 420px;">
           <div class="search-engine" style="border-right: 2px solid var(--border-color); margin-right: 12px; padding-right: 12px;">
-            <div style="width: 28px; height: 28px; border: 1px solid var(--border-color); border-radius: 4px; display:flex; align-items:center; justify-content:center; font-weight:700;">G</div>
+            <div class="preview-search-icon">G</div>
           </div>
           <input type="text" placeholder="${(typeof i18n !== 'undefined' && i18n.currentLocale === 'en') ? 'Search...' : '想要搜点什么吗？'}" readonly tabindex="-1" style="opacity:1; border:none; outline:none; background:transparent;" />
         </div>
@@ -697,8 +747,6 @@ function updateThemePreview() {
   }
 
   lastStyleValue = nextStyle;
-  updateThemeStyleStatus();
-
   const preview = document.getElementById('themePreview');
   if (preview) {
     preview.dataset.style = nextStyle;
