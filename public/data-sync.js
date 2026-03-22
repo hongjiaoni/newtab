@@ -2,6 +2,58 @@
 
 let syncDebounceTimer = null;
 const SYNC_DEBOUNCE_MS = 500;
+const HOME_CONFIG_KEY_PREFIX = 'user_home_config_';
+const COLOR_CONFIG_KEY_PREFIX = 'user_color_config_';
+const CONFIG_META_KEY_PREFIX = 'user_config_meta_';
+
+function getHomeConfigCacheKey(uid) {
+    return HOME_CONFIG_KEY_PREFIX + uid;
+}
+
+function getColorConfigCacheKey(uid) {
+    return COLOR_CONFIG_KEY_PREFIX + uid;
+}
+
+function parseTimestamp(value) {
+    if (!value) return 0;
+    const parsed = Date.parse(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function getConfigMeta(uid) {
+    if (!uid) return {};
+    try {
+        return JSON.parse(localStorage.getItem(CONFIG_META_KEY_PREFIX + uid) || '{}') || {};
+    } catch (_err) {
+        return {};
+    }
+}
+
+function setConfigMeta(uid, nextMeta) {
+    if (!uid) return;
+    localStorage.setItem(CONFIG_META_KEY_PREFIX + uid, JSON.stringify(nextMeta || {}));
+}
+
+function updateConfigMeta(uid, section, patch) {
+    if (!uid || !section) return;
+    const meta = getConfigMeta(uid);
+    meta[section] = {
+        ...(meta[section] || {}),
+        ...(patch || {})
+    };
+    setConfigMeta(uid, meta);
+}
+
+function shouldApplyRemoteConfig(uid, section, remoteUpdatedAt) {
+    const sectionMeta = getConfigMeta(uid)[section] || {};
+    const remoteTs = parseTimestamp(remoteUpdatedAt);
+    const localTs = parseTimestamp(sectionMeta.localUpdatedAt);
+
+    if (!remoteTs) return !sectionMeta.pending;
+    if (sectionMeta.pending && localTs >= remoteTs) return false;
+    if (localTs > remoteTs) return false;
+    return true;
+}
 
 function normalizeEngineId(input) {
     if (!input) return '';
@@ -43,11 +95,12 @@ function applyHomeConfig(config) {
     }
 
     if (Object.prototype.hasOwnProperty.call(s, 'wallpaper') && window.applyWallpaper) {
-        window.applyWallpaper(s.wallpaper);
+        window.applyWallpaper(s.wallpaper, { sync: false });
     }
 
     if (typeof s.theme === 'string') {
         state.currentTheme = s.theme;
+        localStorage.setItem('currentTheme', s.theme);
         window.applyStyleTheme?.(state.currentTheme);
         if (window.themeState) window.themeState.currentTheme = state.currentTheme;
     }
@@ -100,8 +153,8 @@ async function loadUserData(options = {}) {
 
     // === Phase 1: Local Cache Immediate Hydration ===
     try {
-        const localHome = localStorage.getItem('user_home_config_' + uid);
-        const localColor = localStorage.getItem('user_color_config_' + uid);
+        const localHome = localStorage.getItem(getHomeConfigCacheKey(uid));
+        const localColor = localStorage.getItem(getColorConfigCacheKey(uid));
         
         if (localHome) applyHomeConfig(JSON.parse(localHome));
         if (localColor) applyColorConfig(JSON.parse(localColor));
@@ -117,21 +170,39 @@ async function loadUserData(options = {}) {
     try {
         console.log('Fetching remote configs from Supabase...');
         const [homeRes, colorRes] = await Promise.all([
-            supabase.from('user_home_config').select('config').eq('user_id', uid).single(),
-            supabase.from('user_color_config').select('config').eq('user_id', uid).single()
+            supabase.from('user_home_config').select('config, updated_at').eq('user_id', uid).single(),
+            supabase.from('user_color_config').select('config, updated_at').eq('user_id', uid).single()
         ]);
 
         let requiresRender = false;
 
         if (homeRes.data && homeRes.data.config) {
-            localStorage.setItem('user_home_config_' + uid, JSON.stringify(homeRes.data.config));
-            applyHomeConfig(homeRes.data.config);
-            requiresRender = true;
+            if (shouldApplyRemoteConfig(uid, 'home', homeRes.data.updated_at)) {
+                localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(homeRes.data.config));
+                updateConfigMeta(uid, 'home', {
+                    localUpdatedAt: homeRes.data.updated_at,
+                    remoteUpdatedAt: homeRes.data.updated_at,
+                    pending: false
+                });
+                applyHomeConfig(homeRes.data.config);
+                requiresRender = true;
+            } else {
+                console.log('Skipping stale remote home config');
+            }
         }
 
         if (colorRes.data && colorRes.data.config) {
-            localStorage.setItem('user_color_config_' + uid, JSON.stringify(colorRes.data.config));
-            applyColorConfig(colorRes.data.config);
+            if (shouldApplyRemoteConfig(uid, 'color', colorRes.data.updated_at)) {
+                localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(colorRes.data.config));
+                updateConfigMeta(uid, 'color', {
+                    localUpdatedAt: colorRes.data.updated_at,
+                    remoteUpdatedAt: colorRes.data.updated_at,
+                    pending: false
+                });
+                applyColorConfig(colorRes.data.config);
+            } else {
+                console.log('Skipping stale remote color config');
+            }
         }
 
         if (requiresRender) {
@@ -153,6 +224,7 @@ async function saveUserDataToBackend(immediate = false) {
         try {
             const uid = window.authState.user.id;
             const colorMode = document.body.classList.contains('dark') ? 'dark' : 'light';
+            const syncedAt = new Date().toISOString();
             
             const payload = {
                 sites: (state.sites || []).map(s => ({
@@ -182,14 +254,24 @@ async function saveUserDataToBackend(immediate = false) {
             };
 
             // 1. Cache Locally
-            localStorage.setItem('user_home_config_' + uid, JSON.stringify(payload));
+            localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(payload));
+            updateConfigMeta(uid, 'home', {
+                localUpdatedAt: syncedAt,
+                pending: true
+            });
 
             // 2. Overwrite Remotely
             await supabase.from('user_home_config').upsert({
                 user_id: uid,
                 config: payload,
-                updated_at: new Date().toISOString()
+                updated_at: syncedAt
             }, { onConflict: 'user_id' });
+
+            updateConfigMeta(uid, 'home', {
+                localUpdatedAt: syncedAt,
+                remoteUpdatedAt: syncedAt,
+                pending: false
+            });
 
         } catch (err) {
             console.error('Error saving home config:', err);
@@ -213,6 +295,7 @@ async function saveThemeSettings(settings) {
 
     try {
         const uid = window.authState.user.id;
+        const syncedAt = new Date().toISOString();
         
         // Settings object usually contains fonts & strings like 'style', but we want to strip those.
         // We separate them into light and dark structural buckets.
@@ -225,17 +308,27 @@ async function saveThemeSettings(settings) {
         delete colorPayload.light.darkMode; // Keep hygiene
 
         // 1. Cache Locally
-        localStorage.setItem('user_color_config_' + uid, JSON.stringify(colorPayload));
+        localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(colorPayload));
+        updateConfigMeta(uid, 'color', {
+            localUpdatedAt: syncedAt,
+            pending: true
+        });
 
         // 2. Overwrite Remotely
         await supabase.from('user_color_config').upsert({
             user_id: uid,
             config: colorPayload,
-            updated_at: new Date().toISOString()
+            updated_at: syncedAt
         }, { onConflict: 'user_id' });
 
-        // Since settings contained fonts and styles, we force a home config save too (debounced)
-        saveUserDataToBackend();
+        updateConfigMeta(uid, 'color', {
+            localUpdatedAt: syncedAt,
+            remoteUpdatedAt: syncedAt,
+            pending: false
+        });
+
+        // Theme style and fonts are stored with the home config as well.
+        await saveUserDataToBackend(true);
 
     } catch (e) {
         console.error('Error saving color config:', e);
@@ -252,12 +345,19 @@ async function resetThemeCustomizationOnBackend() {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) return;
     try {
         const uid = window.authState.user.id;
-        localStorage.removeItem('user_color_config_' + uid);
+        const syncedAt = new Date().toISOString();
+        localStorage.removeItem(getColorConfigCacheKey(uid));
         await supabase.from('user_color_config').upsert({
             user_id: uid,
             config: {},
-            updated_at: new Date().toISOString()
+            updated_at: syncedAt
         }, { onConflict: 'user_id' });
+
+        updateConfigMeta(uid, 'color', {
+            localUpdatedAt: syncedAt,
+            remoteUpdatedAt: syncedAt,
+            pending: false
+        });
         
         window.clearCustomThemeSettings?.();
     } catch (e) {
@@ -282,8 +382,8 @@ function applyCachedUserData() {
     if (window.authState && window.authState.user) {
         const uid = window.authState.user.id;
         try {
-            const h = localStorage.getItem('user_home_config_' + uid);
-            const c = localStorage.getItem('user_color_config_' + uid);
+            const h = localStorage.getItem(getHomeConfigCacheKey(uid));
+            const c = localStorage.getItem(getColorConfigCacheKey(uid));
             if (h) applyHomeConfig(JSON.parse(h));
             if (c) applyColorConfig(JSON.parse(c));
         } catch(e){}

@@ -746,21 +746,8 @@ async function saveThemeCustomization() {
     if (window.saveThemeSettings) {
       await window.saveThemeSettings(settings);
     }
-    if (window.saveFontSettings) {
-      await window.saveFontSettings({
-        fontChinese: settings.fontChinese,
-        fontEnglish: settings.fontEnglish
-      });
-    }
-
-    if (window.markHomeConfigUpdated) {
-      window.markHomeConfigUpdated();
-    }
-
-    closeThemeModal();
-    
-    // Clear original theme tracker
     originalThemeOnOpen = null;
+    closeThemeModal(false);
 
     if (window.showNotification) {
       window.showNotification(
@@ -768,11 +755,6 @@ async function saveThemeCustomization() {
         'success'
       );
     }
-    
-    // Automatically reload the page to apply massive style & DOM updates instantly
-    setTimeout(() => {
-      window.location.reload();
-    }, 400);
   } catch (err) {
     console.error('Failed to persist theme customization:', err);
     if (window.showNotification) {
@@ -977,9 +959,9 @@ async function resetThemeCustomization() {
 let originalThemeOnOpen = null;
 
 // Close theme modal and restore original theme
-function closeThemeModal() {
+function closeThemeModal(restoreOriginal = true) {
   // Restore original theme if changed
-  if (originalThemeOnOpen !== null) {
+  if (restoreOriginal && originalThemeOnOpen !== null) {
     themeState.currentTheme = originalThemeOnOpen;
     applyStyleTheme(originalThemeOnOpen);
     originalThemeOnOpen = null;
