@@ -159,6 +159,7 @@
   border-width: 1px !important;
   border-radius: 10px !important;
   box-shadow: 0 14px 42px rgba(0, 0, 0, 0.22) !important;
+  background-color: var(--modal-bg) !important;
 }
 
 [data-style="cyber"] .context-menu {
@@ -310,7 +311,7 @@ body.dark {
   position: absolute;
   right: 100%;
   top: 0;
-  background: var(--button-bg);
+  background-color: var(--modal-bg);
   border: 2px solid var(--border-color);
   min-width: 100px;
   z-index: 101;
@@ -318,12 +319,16 @@ body.dark {
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 4px 4px 0 var(--shadow-color);
+  opacity: 1;
+  backdrop-filter: none;
+  color: var(--text-color);
 }
 
 .settings-submenu div {
   padding: 10px 15px;
-  cursor: pointer;
   white-space: nowrap;
+  background-color: transparent;
+  color: inherit;
 }
 
 .settings-submenu div:hover {
@@ -422,11 +427,27 @@ body.dark {
 }
 
 .settings-menu-divider {
-  height: 2px;
-  background: var(--border-color);
-  margin: 8px 0;
-  opacity: 0.5;
-  border-radius: 100%;
+  height: 0;
+  border-top: 2px dashed color-mix(in srgb, var(--border-color) 78%, transparent);
+  margin: 8px 4px;
+  opacity: 0.55;
+  border-radius: 0;
+}
+
+[data-style="cyber"] .settings-menu-divider,
+[data-style="cyber"] .engine-menu-divider,
+[data-style="cyber"] .page-context-menu .context-menu-divider {
+  border-top-style: solid;
+  border-top-width: 1px;
+  opacity: 0.35;
+}
+
+[data-style="comic"] .settings-menu-divider,
+[data-style="comic"] .engine-menu-divider,
+[data-style="comic"] .page-context-menu .context-menu-divider {
+  border-top-style: solid;
+  border-top-width: 2px;
+  opacity: 1;
 }
 
 .settings-menu-item span:first-child {
@@ -1029,21 +1050,23 @@ button:active {
   right: 8px;
   width: 20px;
   height: 20px;
-  background: var(--text-color);
-  color: var(--text-active-color);
+  background: var(--button-bg);
+  color: transparent;
+  border: 2px solid var(--text-color);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  opacity: 0;
-  transform: scale(0.8);
+  opacity: 1;
+  transform: scale(1);
   transition: all 0.2s;
 }
 
 .engine-item.selected .engine-check {
-  opacity: 1;
-  transform: scale(1);
+  background: var(--text-color);
+  color: var(--text-active-color);
+  box-shadow: inset 0 0 0 2px var(--text-color);
 }
 
 .pagination-controls {
@@ -1541,12 +1564,15 @@ input:disabled {
 }
 
 [data-style="comic"] .settings-btn,
-[data-style="comic"] .settings-menu {
+[data-style="comic"] .settings-menu,
+[data-style="comic"] .settings-submenu {
   border: 2px solid #333;
   border-radius: 8px !important;
+  background-color: var(--modal-bg) !important;
 }
 
-[data-style="comic"] .settings-menu {
+[data-style="comic"] .settings-menu,
+[data-style="comic"] .settings-submenu {
   box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2) !important;
 }
 
