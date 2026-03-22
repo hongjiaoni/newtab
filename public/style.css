@@ -5,9 +5,13 @@
 :root {
   --bg-color: #f0f0f0;
   --button-bg: #ffffff;
+  --modal-bg: #ffffff;
+  --input-bg: #ffffff;
   --text-color: #333333;
+  --text-active-color: #ffffff;
   --border-color: #222222;
   --accent-color: var(--text-color);
+  --hover-bg: #f3f3f3;
   --shadow-color: rgba(0, 0, 0, 0.1);
   --sketch-shadow: 2px 3px 0px rgba(0, 0, 0, 0.15);
 }
