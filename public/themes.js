@@ -1017,14 +1017,41 @@ function bindThemeCustomizationTrigger() {
   }
 }
 
-bootstrapThemeAppearance();
+function publishThemeCustomizationGlobals() {
+  // Publish globals before any bootstrap work so the menu entry still works
+  // even if later initialization throws during file evaluation.
+  window.openThemeCustomization = openThemeCustomization;
+  window.closeThemeModal = closeThemeModal;
+  window.applyThemeSettings = applyThemeSettings;
+  window.applyCustomThemeForCurrentMode = applyCustomThemeForCurrentMode;
+  window.clearCustomThemeSettings = clearCustomThemeSettings;
+  window.applyFontSettings = applyFontSettings;
+  window.clearCustomFontSettings = clearCustomFontSettings;
+  window.saveThemeCustomization = saveThemeCustomization;
+  window.resetThemeCustomization = resetThemeCustomization;
+  window.themeState = themeState;
+  window.handleThemeFontChange = handleThemeFontChange;
+  window.applyStyleTheme = applyStyleTheme;
+  window.switchThemeTab = switchThemeTab;
+  window.handleThemeModalOverlayClick = handleThemeModalOverlayClick;
+  window.setPreviewMode = setPreviewMode;
+  window.updateThemePreview = updateThemePreview;
+  window.handleThemeCustomizationMenuClick = handleThemeCustomizationMenuClick;
+}
 
-document.addEventListener('click', handleThemeCustomizationTrigger, true);
+publishThemeCustomizationGlobals();
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', bindThemeCustomizationTrigger);
-} else {
-  bindThemeCustomizationTrigger();
+try {
+  bootstrapThemeAppearance();
+  document.addEventListener('click', handleThemeCustomizationTrigger, true);
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindThemeCustomizationTrigger);
+  } else {
+    bindThemeCustomizationTrigger();
+  }
+} catch (error) {
+  console.error('Theme bootstrap failed:', error);
 }
 
 // Export functions
