@@ -193,7 +193,8 @@ function openThemeCustomization() {
   }
 
   // Then check membership tier
-  if (!window.membershipState || window.membershipState.tier < 1) {
+  const effectiveTier = window.membershipState?.tier ?? window.authState?.profile?.membership_tier ?? 1;
+  if (effectiveTier < 1) {
     console.log('Tier insufficient, showing upgrade modal');
     const settingsMenu = document.getElementById('settingsMenu');
     if (settingsMenu) settingsMenu.classList.add('hidden');
@@ -207,6 +208,7 @@ function openThemeCustomization() {
   }
 
   console.log('Opening theme customization modal');
+  document.getElementById('settingsMenu')?.classList.add('hidden');
   createThemeModal();
   // Store original theme for restore on cancel
   originalThemeOnOpen = themeState.currentTheme;

@@ -12,6 +12,8 @@ const wallpaperState = {
   customAddMode: 'upload' // 'upload' | 'link'
 };
 
+window.wallpaperState = wallpaperState;
+
 const MAX_WALLPAPER_UPLOAD_BYTES = 15 * 1024 * 1024;
 const WALLPAPER_UPLOAD_COOLDOWN_MS = 10 * 1000;
 const LAST_WALLPAPER_UPLOAD_AT_KEY = 'wallpaper_last_upload_at';
@@ -119,19 +121,22 @@ async function loadWallpapers() {
 // Apply wallpaper to page
 function applyWallpaper(wallpaperId, options = {}) {
   const shouldSync = options.sync !== false;
+  const syncWallpaperSelection = () => {
+    if (!shouldSync || !window.authState || !window.authState.isLoggedIn) return;
+    if (window.saveUserDataToBackend) {
+      window.saveUserDataToBackend(true);
+    } else if (window.markHomeConfigUpdated) {
+      window.markHomeConfigUpdated();
+    }
+  };
+
   if (!wallpaperId) {
     document.body.style.backgroundImage = '';
     document.body.style.backgroundColor = '';
     wallpaperState.selectedWallpaper = null;
     localStorage.removeItem('selectedWallpaper');
 
-    if (shouldSync && window.authState && window.authState.isLoggedIn) {
-      if (window.markHomeConfigUpdated) {
-        window.markHomeConfigUpdated();
-      } else if (window.saveUserDataToBackend) {
-        window.saveUserDataToBackend();
-      }
-    }
+    syncWallpaperSelection();
     return;
   }
 
@@ -148,17 +153,12 @@ function applyWallpaper(wallpaperId, options = {}) {
   wallpaperState.selectedWallpaper = wallpaperId;
   localStorage.setItem('selectedWallpaper', wallpaperId);
 
-  if (shouldSync && window.authState && window.authState.isLoggedIn) {
-    if (window.markHomeConfigUpdated) {
-      window.markHomeConfigUpdated();
-    } else if (window.saveUserDataToBackend) {
-      window.saveUserDataToBackend();
-    }
-  }
+  syncWallpaperSelection();
 }
 
 // Open wallpaper selection modal
 function openWallpaperModal() {
+  document.getElementById('settingsMenu')?.classList.add('hidden');
   const modal = document.getElementById('wallpaperModal');
   if (modal) {
     wallpaperState.baseWallpaper = wallpaperState.selectedWallpaper;
