@@ -951,6 +951,17 @@ function bootstrapThemeAppearance() {
 
 bootstrapThemeAppearance();
 
+document.addEventListener('DOMContentLoaded', () => {
+  const themeCustomizationBtn = document.getElementById('themeCustomizationBtn');
+  if (themeCustomizationBtn) {
+    themeCustomizationBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      openThemeCustomization();
+    });
+  }
+});
+
 // Export functions
 window.openThemeCustomization = openThemeCustomization;
 window.closeThemeModal = closeThemeModal;
