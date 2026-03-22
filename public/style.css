@@ -1611,6 +1611,10 @@ input:disabled {
   box-shadow: none !important;
 }
 
+[data-style="comic"] .search-box input:focus {
+  box-shadow: none !important;
+}
+
 [data-style="comic"] .chip {
   border: 2px solid #333 !important;
   border-radius: 8px !important;
@@ -1817,6 +1821,10 @@ input:disabled {
 
 [data-style="comic"].dark .search-box input {
   color: #f5f0e1;
+  box-shadow: none !important;
+}
+
+[data-style="comic"].dark .search-box input:focus {
   box-shadow: none !important;
 }
 
