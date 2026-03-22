@@ -90,28 +90,13 @@ function updateMembershipUI() {
 
 // Update feature locks based on tier
 function updateFeatureLocks() {
-    // Theme customization (tier 1+)
+    // Theme customization is handled centrally in themes.js.
+    // Avoid rebinding click handlers here, otherwise the menu item can
+    // end up with competing listeners after auth/membership refreshes.
     const themeBtn = document.getElementById('themeCustomizationBtn');
     if (themeBtn) {
-        if (membershipState.tier < 1) {
-            themeBtn.classList.add('locked-feature');
-            themeBtn.onclick = (e) => {
-                e?.preventDefault?.();
-                e?.stopPropagation?.();
-                if (!window.authState || !window.authState.isLoggedIn) {
-                    window.openGoogleSignInModal?.();
-                    return;
-                }
-                showUpgradeModal('theme');
-            };
-        } else {
-            themeBtn.classList.remove('locked-feature');
-            themeBtn.onclick = (e) => {
-                e?.preventDefault?.();
-                e?.stopPropagation?.();
-                window.openThemeCustomization?.();
-            };
-        }
+        themeBtn.classList.remove('locked-feature');
+        themeBtn.onclick = null;
     }
 
     // Custom wallpaper category
