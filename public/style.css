@@ -318,9 +318,9 @@ body.dark {
   background-color: var(--modal-bg);
   background-image: none !important;
   border: 2px solid var(--border-color);
-  min-width: 100px;
+  min-width: 132px;
   z-index: 101;
-  margin-right: 5px;
+  margin-right: 8px;
   border-radius: 8px;
   overflow: hidden;
   box-shadow: 4px 4px 0 var(--shadow-color);
@@ -342,7 +342,7 @@ body.dark {
 }
 
 .settings-submenu div {
-  padding: 10px 15px;
+  padding: 11px 16px;
   white-space: nowrap;
   background-color: var(--modal-bg);
   color: inherit;
@@ -426,7 +426,7 @@ body.dark {
   border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
   isolation: isolate;
   background-clip: padding-box;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .settings-menu::before {
@@ -899,6 +899,25 @@ textarea:-ms-input-placeholder {
 
 .modal-section {
   margin-bottom: 18px;
+}
+
+.modal-type-switch {
+  display: flex;
+  gap: 24px;
+  margin: 8px 0 26px;
+  align-items: center;
+}
+
+.modal-type-switch label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 6px;
+}
+
+#siteForm,
+#tagForm {
+  margin-top: 8px;
 }
 
 .modal-input {
