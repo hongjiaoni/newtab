@@ -227,7 +227,13 @@ function openThemeCustomization() {
     createThemeModal();
     // Store original theme for restore on cancel
     originalThemeOnOpen = themeState.currentTheme;
-    document.getElementById('themeCustomizationModal')?.classList.remove('hidden');
+    const modal = document.getElementById('themeCustomizationModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+      modal.style.visibility = 'visible';
+      modal.style.opacity = '1';
+    }
     renderThemePreview();
   } catch (error) {
     console.error('Failed to open theme customization modal:', error);
@@ -986,6 +992,12 @@ function handleThemeCustomizationMenuClick(event) {
     event.preventDefault?.();
     event.stopPropagation?.();
   }
+  window.showNotification?.(
+    (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
+      ? 'Opening theme settings...'
+      : '正在打开主题设置...',
+    'info'
+  );
   openThemeCustomization();
   return false;
 }
