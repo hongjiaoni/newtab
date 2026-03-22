@@ -174,6 +174,7 @@ function toHexColor(color) {
 
 function applyStyleTheme(style) {
   const v = String(style || 'handdrawn');
+  document.documentElement.dataset.style = v;
   document.body.dataset.style = v;
 }
 
@@ -754,6 +755,10 @@ async function saveThemeCustomization() {
   // Apply to current page (respect current mode)
   applyThemeSettings(settings);
   applyCustomThemeForCurrentMode();
+  requestAnimationFrame(() => {
+    applyStyleTheme(themeState.currentTheme);
+    applyCustomThemeForCurrentMode();
+  });
 
   // Save to database
   try {
@@ -768,6 +773,10 @@ async function saveThemeCustomization() {
     }
     originalThemeOnOpen = null;
     closeThemeModal(false);
+    requestAnimationFrame(() => {
+      applyStyleTheme(themeState.currentTheme);
+      applyCustomThemeForCurrentMode();
+    });
 
     if (window.showNotification) {
       window.showNotification(
@@ -1012,8 +1021,6 @@ function bindThemeCustomizationTrigger() {
       openThemeCustomization();
     };
     trigger.addEventListener('click', openFromTrigger);
-    trigger.addEventListener('mousedown', openFromTrigger);
-    trigger.addEventListener('pointerdown', openFromTrigger);
   }
 }
 

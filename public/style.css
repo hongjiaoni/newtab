@@ -1251,6 +1251,7 @@ button:active {
   border: none;
   box-shadow: none;
   padding: 5px 10px;
+  color: var(--text-color);
   opacity: 0.6;
   border-radius: 0;
 }
@@ -1262,9 +1263,14 @@ button:active {
 }
 
 .wallpaper-tab.active {
+  background: color-mix(in srgb, var(--text-color) 12%, var(--button-bg));
+  color: var(--text-color);
+  opacity: 1;
+}
+
+body.dark .wallpaper-tab.active {
   background: var(--text-color);
   color: var(--text-active-color);
-  opacity: 1;
 }
 
 /* Context Menu */

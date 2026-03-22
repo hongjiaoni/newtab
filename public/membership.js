@@ -96,7 +96,7 @@ function updateFeatureLocks() {
     const themeBtn = document.getElementById('themeCustomizationBtn');
     if (themeBtn) {
         themeBtn.classList.remove('locked-feature');
-        themeBtn.onclick = (e) => window.handleThemeCustomizationMenuClick?.(e);
+        themeBtn.onclick = null;
     }
 
     // Custom wallpaper category
