@@ -1884,6 +1884,37 @@ document.getElementById('languageMenuItem').addEventListener('click', (e) => {
   document.getElementById('languageSubmenu').classList.toggle('hidden');
 });
 
+let themeScriptLoadPromise = null;
+
+function ensureThemeCustomizationLoaded() {
+  if (typeof window.handleThemeCustomizationMenuClick === 'function' || typeof window.openThemeCustomization === 'function') {
+    return Promise.resolve(true);
+  }
+
+  if (themeScriptLoadPromise) {
+    return themeScriptLoadPromise;
+  }
+
+  themeScriptLoadPromise = new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = `themes.js?reload=${Date.now()}`;
+    script.onload = () => {
+      themeScriptLoadPromise = null;
+      resolve(
+        typeof window.handleThemeCustomizationMenuClick === 'function'
+        || typeof window.openThemeCustomization === 'function'
+      );
+    };
+    script.onerror = () => {
+      themeScriptLoadPromise = null;
+      resolve(false);
+    };
+    document.body.appendChild(script);
+  });
+
+  return themeScriptLoadPromise;
+}
+
 document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) => {
   e.preventDefault();
   e.stopPropagation();
@@ -1899,12 +1930,24 @@ document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) 
     return;
   }
 
-  if (typeof window.showNotification === 'function') {
-    window.showNotification(
-      i18n.currentLocale === 'zh' ? '主题设置尚未加载完成，请稍后重试' : 'Theme settings are still loading. Please try again.',
-      'error'
-    );
-  }
+  ensureThemeCustomizationLoaded().then((loaded) => {
+    if (loaded && typeof window.handleThemeCustomizationMenuClick === 'function') {
+      window.handleThemeCustomizationMenuClick(e);
+      return;
+    }
+
+    if (loaded && typeof window.openThemeCustomization === 'function') {
+      window.openThemeCustomization();
+      return;
+    }
+
+    if (typeof window.showNotification === 'function') {
+      window.showNotification(
+        i18n.currentLocale === 'zh' ? '主题设置加载失败，请刷新后重试' : 'Theme settings failed to load. Please refresh and try again.',
+        'error'
+      );
+    }
+  });
 });
 
 document.addEventListener('click', (e) => {
