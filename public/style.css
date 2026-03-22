@@ -312,6 +312,7 @@ body.dark {
   right: 100%;
   top: 0;
   background-color: var(--modal-bg);
+  background-image: none !important;
   border: 2px solid var(--border-color);
   min-width: 100px;
   z-index: 101;
@@ -322,6 +323,8 @@ body.dark {
   opacity: 1;
   backdrop-filter: none;
   color: var(--text-color);
+  isolation: isolate;
+  background-clip: padding-box;
 }
 
 .settings-submenu div {
@@ -398,6 +401,7 @@ body.dark {
   top: 60px;
   right: 0;
   background: var(--modal-bg);
+  background-image: none !important;
   border: 2px solid var(--border-color);
   border-radius: 4px;
   box-shadow: 4px 4px 0 var(--shadow-color);
@@ -406,6 +410,8 @@ body.dark {
   z-index: 100;
   /* Sketchy box */
   border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  isolation: isolate;
+  background-clip: padding-box;
 }
 
 .settings-menu-item {
