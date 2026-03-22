@@ -297,7 +297,7 @@
 
 body {
   margin: 0;
-  font-family: "Patrick Hand", "优设好身体", "Quicksand", sans-serif;
+  font-family: inherit;
   height: 100vh;
   display: flex;
   align-items: center;
@@ -828,8 +828,18 @@ textarea:-ms-input-placeholder {
   box-shadow: 8px 8px 0 var(--shadow-color);
   text-align: left;
   font-size: 14px;
-  /* High opacity ensure readable */
   opacity: 1;
+  font-family: inherit;
+}
+
+.modal * {
+  font-family: inherit;
+}
+
+#themePreview {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
 }
 
 .hidden {
@@ -940,7 +950,7 @@ button:active {
 }
 
 .modal-actions .cancel-btn {
-  background: transparent;
+  background: var(--button-bg);
   color: var(--text-color);
   border-color: var(--border-color);
 }
@@ -1458,7 +1468,7 @@ input:disabled {
   background-image: 
     radial-gradient(circle at 20% 80%, rgba(255, 200, 100, 0.15) 0%, transparent 25%),
     radial-gradient(circle at 80% 20%, rgba(100, 200, 255, 0.1) 0%, transparent 20%);
-  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Patrick Hand', sans-serif;
+  font-family: inherit;
 }
 
 [data-style="comic"] .time {
@@ -1479,7 +1489,7 @@ input:disabled {
 [data-style="comic"] .search-box {
   border: 3px solid #333;
   border-radius: 50px !important;
-  box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.2) !important;
+  box-shadow: none !important;
   background: #fff;
 }
 
@@ -1624,7 +1634,7 @@ input:disabled {
   border: 2px solid #333;
   border-radius: 8px !important;
   box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.15) !important;
-  font-family: 'Comic Sans MS', 'Chalkboard SE', 'Patrick Hand', sans-serif;
+  font-family: inherit;
 }
 
 [data-style="comic"] .theme-tab-btn:hover {
@@ -1682,6 +1692,7 @@ input:disabled {
 [data-style="comic"].dark .search-box {
   background: #3d3d3d;
   border-color: #f5f0e1;
+  box-shadow: none !important;
 }
 
 [data-style="comic"].dark .search-box input {
