@@ -93,9 +93,11 @@ function updateFeatureLocks() {
     // Theme customization (tier 2+)
     const themeBtn = document.getElementById('themeCustomizationBtn');
     if (themeBtn) {
-        if (membershipState.tier < 1) {
+        if (membershipState.tier < 2) {
             themeBtn.classList.add('locked-feature');
-            themeBtn.onclick = () => {
+            themeBtn.onclick = (e) => {
+                e?.preventDefault?.();
+                e?.stopPropagation?.();
                 if (!window.authState || !window.authState.isLoggedIn) {
                     window.openGoogleSignInModal?.();
                     return;
@@ -104,14 +106,18 @@ function updateFeatureLocks() {
             };
         } else {
             themeBtn.classList.remove('locked-feature');
-            themeBtn.onclick = () => window.openThemeCustomization?.();
+            themeBtn.onclick = (e) => {
+                e?.preventDefault?.();
+                e?.stopPropagation?.();
+                window.openThemeCustomization?.();
+            };
         }
     }
 
     // Custom wallpaper category
     const customCategory = document.querySelector('[data-category="Custom"]');
     if (customCategory) {
-        if (membershipState.tier < 1) {
+        if (membershipState.tier < 2) {
             customCategory.classList.add('locked-feature');
             customCategory.onclick = (e) => {
                 e.preventDefault();

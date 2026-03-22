@@ -98,6 +98,154 @@ function normalizeEnabledEngineIds(input) {
     return cleaned.length ? cleaned : null;
 }
 
+function toColorPayloadFromLegacy(themeSettings) {
+    if (!themeSettings || typeof themeSettings !== 'object') return null;
+    if (themeSettings.light || themeSettings.dark) {
+        return {
+            light: { ...(themeSettings.light || {}) },
+            dark: { ...(themeSettings.dark || {}) }
+        };
+    }
+
+    const { style, fontChinese, fontEnglish, darkMode, ...light } = themeSettings;
+    return {
+        light,
+        dark: { ...(darkMode || {}) }
+    };
+}
+
+function toFontPayloadFromLegacy(fontSettings) {
+    if (!fontSettings || typeof fontSettings !== 'object') return {};
+    return {
+        fontChinese: fontSettings.fontChinese || '',
+        fontEnglish: fontSettings.fontEnglish || ''
+    };
+}
+
+function buildHomeConfigFromLegacy(legacy) {
+    if (!legacy || !legacy.settingsRow) return null;
+
+    const siteTagMap = new Map();
+    for (const row of legacy.siteTagsRows || []) {
+        if (!siteTagMap.has(row.site_id)) {
+            siteTagMap.set(row.site_id, []);
+        }
+        siteTagMap.get(row.site_id).push(row.tag_name);
+    }
+
+    const sites = (legacy.sitesRows || []).map((row) => ({
+        id: row.id,
+        name: row.name,
+        url: row.url,
+        showOnHome: row.show_on_home !== false,
+        tags: siteTagMap.get(row.id) || []
+    }));
+
+    const orderedSiteIds = (legacy.siteOrderRows || [])
+        .slice()
+        .sort((a, b) => (a.position || 0) - (b.position || 0))
+        .map((row) => row.site_id);
+
+    const orderedTagNames = (legacy.tagOrderRows || [])
+        .slice()
+        .sort((a, b) => (a.position || 0) - (b.position || 0))
+        .map((row) => row.tag_name);
+
+    const fontSettings = toFontPayloadFromLegacy(legacy.fontSettings);
+
+    return {
+        sites,
+        tags: (legacy.tagsRows || []).map((row) => row.name),
+        site_order: orderedSiteIds,
+        tag_order: orderedTagNames,
+        settings: {
+            viewMode: legacy.settingsRow.view_mode || 'general',
+            engineIndex: legacy.settingsRow.engine_index || 0,
+            engineId: legacy.settingsRow.engine_id || '',
+            enabledEngineIds: Array.isArray(legacy.settingsRow.enabled_engine_ids) ? legacy.settingsRow.enabled_engine_ids : [],
+            dateFormatIndex: legacy.settingsRow.date_format_index || 0,
+            timeFormat: legacy.settingsRow.time_format || '24h',
+            locale: legacy.settingsRow.locale || 'zh',
+            wallpaper: legacy.settingsRow.wallpaper || null,
+            theme: legacy.settingsRow.theme || 'handdrawn',
+            colorMode: legacy.settingsRow.color_mode || 'light',
+            fontChinese: fontSettings.fontChinese || undefined,
+            fontEnglish: fontSettings.fontEnglish || undefined
+        }
+    };
+}
+
+async function fetchLegacyConfigs(uid) {
+    const [
+        settingsRes,
+        sitesRes,
+        tagsRes,
+        siteTagsRes,
+        siteOrderRes,
+        tagOrderRes,
+        themeSettingsRes,
+        fontSettingsRes
+    ] = await Promise.all([
+        supabase.from('user_home_settings').select('*').eq('user_id', uid).single(),
+        supabase.from('user_sites').select('id,name,url,show_on_home').eq('user_id', uid),
+        supabase.from('user_tags').select('name').eq('user_id', uid),
+        supabase.from('user_site_tags').select('site_id,tag_name').eq('user_id', uid),
+        supabase.from('user_site_order').select('site_id,position').eq('user_id', uid),
+        supabase.from('user_tag_order').select('tag_name,position').eq('user_id', uid),
+        supabase.from('user_theme_settings').select('theme_settings, updated_at').eq('user_id', uid).single(),
+        supabase.from('user_font_settings').select('font_settings').eq('user_id', uid).single()
+    ]);
+
+    const homeConfig = buildHomeConfigFromLegacy({
+        settingsRow: settingsRes.data,
+        sitesRows: sitesRes.data,
+        tagsRows: tagsRes.data,
+        siteTagsRows: siteTagsRes.data,
+        siteOrderRows: siteOrderRes.data,
+        tagOrderRows: tagOrderRes.data,
+        fontSettings: fontSettingsRes.data?.font_settings
+    });
+
+    const colorConfig = toColorPayloadFromLegacy(themeSettingsRes.data?.theme_settings);
+
+    return {
+        homeConfig,
+        homeUpdatedAt: settingsRes.data?.updated_at,
+        colorConfig,
+        colorUpdatedAt: themeSettingsRes.data?.updated_at
+    };
+}
+
+async function saveLegacyHomeConfig(payload, syncedAt) {
+    const { error } = await supabase.rpc('sync_home_config', {
+        p_payload: {
+            ...payload,
+            updated_at: syncedAt
+        }
+    });
+    if (error) throw error;
+}
+
+async function saveLegacyThemeConfig(uid, settings, syncedAt) {
+    const [themeRes, fontRes] = await Promise.all([
+        supabase.from('user_theme_settings').upsert({
+            user_id: uid,
+            theme_settings: settings,
+            updated_at: syncedAt
+        }, { onConflict: 'user_id' }),
+        supabase.from('user_font_settings').upsert({
+            user_id: uid,
+            font_settings: {
+                fontChinese: settings.fontChinese || '',
+                fontEnglish: settings.fontEnglish || ''
+            },
+            updated_at: syncedAt
+        }, { onConflict: 'user_id' })
+    ]);
+    if (themeRes.error) throw themeRes.error;
+    if (fontRes.error) throw fontRes.error;
+}
+
 // Applies the parsed Home Config payload directly to internal running state
 function applyHomeConfig(config) {
     if (!config || typeof config !== 'object') return;
@@ -188,7 +336,10 @@ function applyColorConfig(config) {
     });
 }
 
-// 1. Initial Cached Load -> 2. Remote Fetch Overwrite 
+// 1. Initial Cached Load -> 2. Remote Fetch Overwrite
+// The app now standardizes on the normalized Supabase schema:
+// user_home_settings + user_sites + user_tags + user_site_tags + order tables
+// plus user_theme_settings / user_font_settings.
 async function loadUserData(options = {}) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
         console.log('Not logged in, skipping data load');
@@ -214,41 +365,34 @@ async function loadUserData(options = {}) {
 
     // === Phase 2: Remote DB Overwrite ===
     try {
-        console.log('Fetching remote configs from Supabase...');
-        const [homeRes, colorRes] = await Promise.all([
-            supabase.from('user_home_config').select('config, updated_at').eq('user_id', uid).single(),
-            supabase.from('user_color_config').select('config, updated_at').eq('user_id', uid).single()
-        ]);
+        console.log('Fetching remote configs from normalized Supabase tables...');
 
         let requiresRender = false;
+        const remoteRes = await fetchLegacyConfigs(uid);
 
-        if (homeRes.data && homeRes.data.config) {
-            if (shouldApplyRemoteConfig(uid, 'home', homeRes.data.updated_at)) {
-                localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(homeRes.data.config));
-                updateConfigMeta(uid, 'home', {
-                    localUpdatedAt: homeRes.data.updated_at,
-                    remoteUpdatedAt: homeRes.data.updated_at,
-                    pending: false
-                });
-                applyHomeConfig(homeRes.data.config);
-                requiresRender = true;
-            } else {
-                console.log('Skipping stale remote home config');
-            }
+        if (remoteRes.homeConfig && shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt)) {
+            localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(remoteRes.homeConfig));
+            updateConfigMeta(uid, 'home', {
+                localUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
+                remoteUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
+                pending: false
+            });
+            applyHomeConfig(remoteRes.homeConfig);
+            requiresRender = true;
+        } else if (remoteRes.homeConfig) {
+            console.log('Skipping stale remote home config');
         }
 
-        if (colorRes.data && colorRes.data.config) {
-            if (shouldApplyRemoteConfig(uid, 'color', colorRes.data.updated_at)) {
-                localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(colorRes.data.config));
-                updateConfigMeta(uid, 'color', {
-                    localUpdatedAt: colorRes.data.updated_at,
-                    remoteUpdatedAt: colorRes.data.updated_at,
-                    pending: false
-                });
-                applyColorConfig(colorRes.data.config);
-            } else {
-                console.log('Skipping stale remote color config');
-            }
+        if (remoteRes.colorConfig && shouldApplyRemoteConfig(uid, 'color', remoteRes.colorUpdatedAt)) {
+            localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(remoteRes.colorConfig));
+            updateConfigMeta(uid, 'color', {
+                localUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
+                remoteUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
+                pending: false
+            });
+            applyColorConfig(remoteRes.colorConfig);
+        } else if (remoteRes.colorConfig) {
+            console.log('Skipping stale remote color config');
         }
 
         if (requiresRender) {
@@ -315,12 +459,8 @@ async function saveUserDataToBackend(immediate = false) {
                 pending: true
             });
 
-            // 2. Overwrite Remotely
-            await supabase.from('user_home_config').upsert({
-                user_id: uid,
-                config: payload,
-                updated_at: syncedAt
-            }, { onConflict: 'user_id' });
+            // 2. Persist through the normalized sync RPC
+            await saveLegacyHomeConfig(payload, syncedAt);
 
             updateConfigMeta(uid, 'home', {
                 localUpdatedAt: syncedAt,
@@ -374,12 +514,8 @@ async function saveThemeSettings(settings) {
             pending: true
         });
 
-        // 2. Overwrite Remotely
-        await supabase.from('user_color_config').upsert({
-            user_id: uid,
-            config: colorPayload,
-            updated_at: syncedAt
-        }, { onConflict: 'user_id' });
+        // 2. Persist through normalized theme/font tables
+        await saveLegacyThemeConfig(uid, settings, syncedAt);
 
         updateConfigMeta(uid, 'color', {
             localUpdatedAt: syncedAt,
@@ -407,11 +543,7 @@ async function resetThemeCustomizationOnBackend() {
         const uid = window.authState.user.id;
         const syncedAt = new Date().toISOString();
         localStorage.removeItem(getColorConfigCacheKey(uid));
-        await supabase.from('user_color_config').upsert({
-            user_id: uid,
-            config: {},
-            updated_at: syncedAt
-        }, { onConflict: 'user_id' });
+        await saveLegacyThemeConfig(uid, {}, syncedAt);
 
         updateConfigMeta(uid, 'color', {
             localUpdatedAt: syncedAt,
