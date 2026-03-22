@@ -14,7 +14,6 @@ const themeState = {
     inputBg: '#ffffff',
     hoverBg: '#f0f0f0',
     shadowColor: 'rgba(0, 0, 0, 0.1)',
-    accentColor: '#141414',
     darkMode: {
       bgColor: '#1e1e1e',
       borderColor: '#ecf0f1',
@@ -24,11 +23,37 @@ const themeState = {
       modalBg: '#2c2c2c',
       inputBg: '#1e1e1e',
       hoverBg: '#383838',
-      shadowColor: 'rgba(0, 0, 0, 0.1)',
-      accentColor: '#f4f4f5'
+      shadowColor: 'rgba(0, 0, 0, 0.1)'
     }
   }
 };
+
+const APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
+
+function readAppearanceSnapshot() {
+  if (typeof localStorage === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(APPEARANCE_SNAPSHOT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function mergeThemeSettings(baseSettings, incomingSettings) {
+  if (!incomingSettings || typeof incomingSettings !== 'object') {
+    return JSON.parse(JSON.stringify(baseSettings));
+  }
+
+  return {
+    ...JSON.parse(JSON.stringify(baseSettings)),
+    ...incomingSettings,
+    darkMode: {
+      ...(baseSettings.darkMode || {}),
+      ...(incomingSettings.darkMode || {})
+    }
+  };
+}
 
 const CYBER_PRESET = {
   bgColor: '#f6f6f6',
@@ -40,7 +65,6 @@ const CYBER_PRESET = {
   inputBg: '#ffffff',
   hoverBg: '#eeeeee',
   shadowColor: 'rgba(0, 0, 0, 0.1)',
-  accentColor: '#1f49d8',
   darkMode: {
     bgColor: '#0f0f10',
     borderColor: '#3a3a3d',
@@ -50,111 +74,48 @@ const CYBER_PRESET = {
     modalBg: '#141416',
     inputBg: '#141416',
     hoverBg: '#1b1b1e',
-    shadowColor: 'rgba(0, 0, 0, 0.1)',
-    accentColor: '#2c5cff'
+    shadowColor: 'rgba(0, 0, 0, 0.1)'
   }
 };
 
-let cyberTrailCleanup = null;
+const DEFAULT_CUSTOM_SETTINGS = JSON.parse(JSON.stringify(themeState.customSettings));
+const bootstrapAppearance = readAppearanceSnapshot();
 
-function setCyberTrailEnabled(enabled) {
-  const next = Boolean(enabled);
-  if (next && cyberTrailCleanup) return;
-  if (!next && !cyberTrailCleanup) return;
-
-  if (!next && cyberTrailCleanup) {
-    try {
-      cyberTrailCleanup();
-    } finally {
-      cyberTrailCleanup = null;
+function normalizeThemeSettings(settings) {
+  const merged = mergeThemeSettings(DEFAULT_CUSTOM_SETTINGS, settings || {});
+  return {
+    fontChinese: merged.fontChinese,
+    fontEnglish: merged.fontEnglish,
+    bgColor: merged.bgColor,
+    borderColor: merged.borderColor,
+    textColor: merged.textColor,
+    textActiveColor: merged.textActiveColor,
+    buttonBg: merged.buttonBg,
+    modalBg: merged.modalBg,
+    inputBg: merged.inputBg,
+    hoverBg: merged.hoverBg,
+    shadowColor: merged.shadowColor,
+    darkMode: {
+      bgColor: merged.darkMode?.bgColor,
+      borderColor: merged.darkMode?.borderColor,
+      textColor: merged.darkMode?.textColor,
+      textActiveColor: merged.darkMode?.textActiveColor,
+      buttonBg: merged.darkMode?.buttonBg,
+      modalBg: merged.darkMode?.modalBg,
+      inputBg: merged.darkMode?.inputBg,
+      hoverBg: merged.darkMode?.hoverBg,
+      shadowColor: merged.darkMode?.shadowColor
     }
-    return;
-  }
-
-  const dots = new Set();
-  let lastX = null;
-  let lastY = null;
-  let lastAt = 0;
-
-  const createDot = (x, y, dx, dy, opacity, scale) => {
-    const el = document.createElement('div');
-    el.className = 'cyber-trail-dot';
-    el.style.left = `${x}px`;
-    el.style.top = `${y}px`;
-    el.style.setProperty('--trail-dx', `${dx}px`);
-    el.style.setProperty('--trail-dy', `${dy}px`);
-    if (typeof opacity === 'number') el.style.setProperty('--trail-opacity', String(opacity));
-    if (typeof scale === 'number') el.style.setProperty('--trail-scale', String(scale));
-    document.body.appendChild(el);
-    dots.add(el);
-
-    requestAnimationFrame(() => {
-      el.classList.add('fade');
-    });
-
-    window.setTimeout(() => {
-      dots.delete(el);
-      el.remove();
-    }, 500);
-  };
-
-  const onMove = (ev) => {
-    if (!document.body || document.body.dataset.style !== 'cyber') return;
-
-    const now = performance.now();
-    if (now - lastAt < 6) return;
-
-    const x = ev.clientX;
-    const y = ev.clientY;
-    if (typeof x !== 'number' || typeof y !== 'number') return;
-
-    if (lastX != null && lastY != null) {
-      const ddx = x - lastX;
-      const ddy = y - lastY;
-      const dist2 = ddx * ddx + ddy * ddy;
-      if (dist2 < 36) return;
-
-      const mag = Math.max(1, Math.sqrt(dist2));
-      const nx = ddx / mag;
-      const ny = ddy / mag;
-      const offset = 48;
-
-      const steps = Math.max(1, Math.min(7, Math.floor(mag / 14)));
-      for (let i = 1; i <= steps; i++) {
-        const t = i / steps;
-        const px = lastX + ddx * t;
-        const py = lastY + ddy * t;
-
-        const trail = (1 - t);
-        const dx = -nx * offset * trail;
-        const dy = -ny * offset * trail;
-        const op = 0.86 - trail * 0.22;
-        const sc = 0.95 - trail * 0.25;
-        createDot(px, py, dx, dy, op, sc);
-      }
-    } else {
-      createDot(x, y, 0, 0, 0.86, 0.95);
-    }
-
-    lastX = x;
-    lastY = y;
-    lastAt = now;
-  };
-
-  window.addEventListener('pointermove', onMove, { passive: true });
-  cyberTrailCleanup = () => {
-    window.removeEventListener('pointermove', onMove);
-    dots.forEach((el) => {
-      try {
-        el.remove();
-      } catch (_err) {
-      }
-    });
-    dots.clear();
   };
 }
 
-const DEFAULT_CUSTOM_SETTINGS = JSON.parse(JSON.stringify(themeState.customSettings));
+if (bootstrapAppearance?.currentTheme) {
+  themeState.currentTheme = bootstrapAppearance.currentTheme;
+}
+
+if (bootstrapAppearance?.customSettings) {
+  themeState.customSettings = normalizeThemeSettings(bootstrapAppearance.customSettings);
+}
 
 // Available fonts
 const AVAILABLE_FONTS = {
@@ -214,7 +175,6 @@ function toHexColor(color) {
 function applyStyleTheme(style) {
   const v = String(style || 'handdrawn');
   document.body.dataset.style = v;
-  setCyberTrailEnabled(v === 'cyber');
 }
 
 // Open theme customization modal
@@ -307,6 +267,7 @@ function createThemeModal() {
                   </option>
                 </select>
               </div>
+              <div id="themeStyleStatus" style="font-size: 12px; margin-bottom: 10px; opacity: 0.8;"></div>
               <div style="font-size: 12px; opacity: 0.7; line-height: 1.4;">
                 ${isZh ? '更多付费风格后续会陆续上线。' : 'More premium styles will be available later.'}
               </div>
@@ -373,7 +334,6 @@ function createThemeModal() {
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '强调' : 'Accent'}</label>
-                  <input type="color" id="accentColorInput" value="${themeState.customSettings.accentColor}" onchange="updateThemePreview()">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '阴影' : 'Shadow'}</label>
@@ -419,7 +379,6 @@ function createThemeModal() {
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '强调' : 'Accent'}</label>
-                  <input type="color" id="accentColorDarkInput" value="${themeState.customSettings.darkMode.accentColor}" onchange="updateThemePreview()">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '阴影' : 'Shadow'}</label>
@@ -454,6 +413,34 @@ function createThemeModal() {
   `;
 
   document.body.insertAdjacentHTML('beforeend', modalHTML);
+  document.querySelectorAll('#themeCustomizationModal .theme-color-item').forEach((item) => {
+    if (!item.querySelector('input')) {
+      item.remove();
+    }
+  });
+  updateThemeStyleStatus();
+}
+
+function getThemeDisplayName(style) {
+  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  const isZh = currentLocale === 'zh';
+  const names = {
+    handdrawn: isZh ? '手绘' : 'Hand-drawn',
+    comic: isZh ? '漫画' : 'Comic',
+    cyber: isZh ? 'Cyber' : 'Cyber'
+  };
+  return names[String(style || 'handdrawn')] || String(style || 'handdrawn');
+}
+
+function updateThemeStyleStatus() {
+  const status = document.getElementById('themeStyleStatus');
+  if (!status) return;
+  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  const selectedStyle = document.getElementById('themeStyleSelect')?.value || themeState.currentTheme;
+  const appliedStyle = themeState.currentTheme || 'handdrawn';
+  status.textContent = currentLocale === 'zh'
+    ? `当前生效：${getThemeDisplayName(appliedStyle)}；正在查看：${getThemeDisplayName(selectedStyle)}`
+    : `Applied: ${getThemeDisplayName(appliedStyle)}; Previewing: ${getThemeDisplayName(selectedStyle)}`;
 }
 
 // Switch theme tab
@@ -526,9 +513,6 @@ function renderThemePreview() {
   const hoverBg = previewMode === 'light'
     ? (document.getElementById('hoverBgInput')?.value || themeState.customSettings.hoverBg)
     : (document.getElementById('hoverBgDarkInput')?.value || themeState.customSettings.darkMode.hoverBg);
-  const accentColor = previewMode === 'light'
-    ? (document.getElementById('accentColorInput')?.value || themeState.customSettings.accentColor)
-    : (document.getElementById('accentColorDarkInput')?.value || themeState.customSettings.darkMode.accentColor);
   const shadowBase = previewMode === 'light'
     ? (document.getElementById('shadowColorInput')?.value || themeState.customSettings.shadowColor)
     : (document.getElementById('shadowColorDarkInput')?.value || themeState.customSettings.darkMode.shadowColor);
@@ -551,23 +535,32 @@ function renderThemePreview() {
 
   preview.innerHTML = `
     <style>
+      #themePreview,
+      #themePreview * {
+        animation: none !important;
+      }
+
+      #themePreview .container,
+      #themePreview .content-area,
+      #themePreview .search-box,
+      #themePreview .chip,
+      #themePreview .preview-btn {
+        transition: none !important;
+      }
+
       #themePreview .preview-btn {
         font-family: inherit;
         border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
         border: 2px solid var(--border-color);
-        cursor: pointer;
         font-weight: 700;
         font-size: 14px;
         background: var(--button-bg);
         color: var(--text-color);
         box-shadow: 3px 3px 0 var(--shadow-color);
-        transition: all 0.2s ease;
         padding: 8px 16px;
       }
 
       #themePreview .preview-btn:hover {
-        transform: translate(-2px, -2px);
-        box-shadow: 5px 5px 0 var(--shadow-color);
         background: var(--hover-bg);
       }
 
@@ -621,7 +614,6 @@ function updateThemePreview() {
   const textActiveColorEl = document.getElementById('textActiveColorInput');
   const modalBgEl = document.getElementById('modalBgInput');
   const hoverBgEl = document.getElementById('hoverBgInput');
-  const accentColorEl = document.getElementById('accentColorInput');
   const shadowColorEl = document.getElementById('shadowColorInput');
 
   const bgColorDarkEl = document.getElementById('bgColorDarkInput');
@@ -632,7 +624,6 @@ function updateThemePreview() {
   const textActiveColorDarkEl = document.getElementById('textActiveColorDarkInput');
   const modalBgDarkEl = document.getElementById('modalBgDarkInput');
   const hoverBgDarkEl = document.getElementById('hoverBgDarkInput');
-  const accentColorDarkEl = document.getElementById('accentColorDarkInput');
   const shadowColorDarkEl = document.getElementById('shadowColorDarkInput');
 
   const shadowLightBase = shadowColorEl?.value || toHexColor(themeState.customSettings.shadowColor);
@@ -659,7 +650,6 @@ function updateThemePreview() {
     if (textActiveColorEl) textActiveColorEl.value = CYBER_PRESET.textActiveColor;
     if (modalBgEl) modalBgEl.value = CYBER_PRESET.modalBg;
     if (hoverBgEl) hoverBgEl.value = CYBER_PRESET.hoverBg;
-    if (accentColorEl) accentColorEl.value = CYBER_PRESET.accentColor;
     if (shadowColorEl) shadowColorEl.value = toHexColor(CYBER_PRESET.shadowColor);
 
     if (bgColorDarkEl) bgColorDarkEl.value = CYBER_PRESET.darkMode.bgColor;
@@ -670,11 +660,11 @@ function updateThemePreview() {
     if (textActiveColorDarkEl) textActiveColorDarkEl.value = CYBER_PRESET.darkMode.textActiveColor;
     if (modalBgDarkEl) modalBgDarkEl.value = CYBER_PRESET.darkMode.modalBg;
     if (hoverBgDarkEl) hoverBgDarkEl.value = CYBER_PRESET.darkMode.hoverBg;
-    if (accentColorDarkEl) accentColorDarkEl.value = CYBER_PRESET.darkMode.accentColor;
     if (shadowColorDarkEl) shadowColorDarkEl.value = toHexColor(CYBER_PRESET.darkMode.shadowColor);
   }
 
   lastStyleValue = nextStyle;
+  updateThemeStyleStatus();
 
   const preview = document.getElementById('themePreview');
   if (preview) {
@@ -704,7 +694,6 @@ async function saveThemeCustomization() {
     textActiveColor: document.getElementById('textActiveColorInput').value,
     modalBg: document.getElementById('modalBgInput').value,
     hoverBg: document.getElementById('hoverBgInput').value,
-    accentColor: document.getElementById('accentColorInput').value,
     shadowColor: hexToRgba(shadowLightHex, 0.1),
     darkMode: {
       bgColor: document.getElementById('bgColorDarkInput').value,
@@ -715,7 +704,6 @@ async function saveThemeCustomization() {
       textActiveColor: document.getElementById('textActiveColorDarkInput').value,
       modalBg: document.getElementById('modalBgDarkInput').value,
       hoverBg: document.getElementById('hoverBgDarkInput').value,
-      accentColor: document.getElementById('accentColorDarkInput').value,
       shadowColor: hexToRgba(shadowDarkHex, 0.1)
     }
   };
@@ -768,7 +756,7 @@ async function saveThemeCustomization() {
 
 // Apply theme settings to page
 function applyThemeSettings(settings) {
-  themeState.customSettings = settings;
+  themeState.customSettings = normalizeThemeSettings(settings);
   window.themeState = themeState;
 }
 
@@ -793,7 +781,7 @@ function applyCustomThemeForCurrentMode() {
   }
   if (modeSettings.hoverBg) rootEl.style.setProperty('--hover-bg', modeSettings.hoverBg);
   if (modeSettings.shadowColor) rootEl.style.setProperty('--shadow-color', modeSettings.shadowColor);
-  if (modeSettings.accentColor) rootEl.style.setProperty('--accent-color', modeSettings.accentColor);
+  if (modeSettings.textColor) rootEl.style.setProperty('--accent-color', modeSettings.textColor);
 
   if (modeSettings.bgColor) bodyEl.style.setProperty('--bg-color', modeSettings.bgColor);
   if (modeSettings.buttonBg) bodyEl.style.setProperty('--button-bg', modeSettings.buttonBg);
@@ -806,30 +794,11 @@ function applyCustomThemeForCurrentMode() {
   }
   if (modeSettings.hoverBg) bodyEl.style.setProperty('--hover-bg', modeSettings.hoverBg);
   if (modeSettings.shadowColor) bodyEl.style.setProperty('--shadow-color', modeSettings.shadowColor);
-  if (modeSettings.accentColor) bodyEl.style.setProperty('--accent-color', modeSettings.accentColor);
+  if (modeSettings.textColor) bodyEl.style.setProperty('--accent-color', modeSettings.textColor);
 
   if (s.fontEnglish || s.fontChinese) {
     document.body.style.fontFamily = `"${s.fontEnglish || 'Patrick Hand'}", "${s.fontChinese || '优设好身体'}", sans-serif`;
   }
-
-  // Dynamic Accent Cursor
-  let cursorStyle = document.getElementById('dynamic-cursor-style');
-  if (!cursorStyle) {
-    cursorStyle = document.createElement('style');
-    cursorStyle.id = 'dynamic-cursor-style';
-    document.head.appendChild(cursorStyle);
-  }
-  const curColor = modeSettings.accentColor || '#141414';
-  const cursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="${curColor}" stroke="white" stroke-width="1.5"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.42c.45 0 .67-.54.35-.85L5.5 3.21z"/></svg>`;
-  const pointerSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="${curColor}" stroke="white" stroke-width="1.5"><path d="M14 8c0-1.1-1.34-2-2.5-2S9 6.9 9 8v3.5a2.5 2.5 0 0 0-4 0V15c0 2.7 2.2 5 5 5h3c2.7 0 5-2.2 5-5V11a2.5 2.5 0 0 0-4 0V8z"/></svg>`;
-  const cursorUrl = `url("data:image/svg+xml,${encodeURIComponent(cursorSvg)}") 0 0, auto`;
-  const pointerUrl = `url("data:image/svg+xml,${encodeURIComponent(pointerSvg)}") 6 2, pointer`;
-  
-  cursorStyle.innerHTML = `
-    body, .modal-overlay, .modal { cursor: ${cursorUrl}; }
-    a, button, [role="button"], input[type="submit"], input[type="button"], input[type="checkbox"], select, .clickable, .button, .engine-item, .chip, .date, .feature-card, .menu-item, .theme-color-item { cursor: ${pointerUrl} !important; }
-    input[type="text"], input[type="search"], textarea { cursor: text !important; }
-  `;
 
   applyStyleTheme(themeState.currentTheme || s.style || 'handdrawn');
 }
@@ -904,7 +873,6 @@ async function resetThemeCustomization() {
   const text = document.getElementById('textColorInput');
   const modal = document.getElementById('modalBgInput');
   const hover = document.getElementById('hoverBgInput');
-  const accent = document.getElementById('accentColorInput');
   const shadow = document.getElementById('shadowColorInput');
 
   if (bg) bg.value = themeState.customSettings.bgColor;
@@ -915,7 +883,6 @@ async function resetThemeCustomization() {
   if (textActive) textActive.value = themeState.customSettings.textActiveColor; // Added
   if (modal) modal.value = themeState.customSettings.modalBg;
   if (hover) hover.value = themeState.customSettings.hoverBg;
-  if (accent) accent.value = themeState.customSettings.accentColor;
   if (shadow) shadow.value = toHexColor(themeState.customSettings.shadowColor);
 
   const bgD = document.getElementById('bgColorDarkInput');
@@ -926,7 +893,6 @@ async function resetThemeCustomization() {
   const textActiveD = document.getElementById('textActiveColorDarkInput'); // Added
   const modalD = document.getElementById('modalBgDarkInput');
   const hoverD = document.getElementById('hoverBgDarkInput');
-  const accentD = document.getElementById('accentColorDarkInput');
   const shadowD = document.getElementById('shadowColorDarkInput');
 
   if (bgD) bgD.value = themeState.customSettings.darkMode.bgColor;
@@ -937,7 +903,6 @@ async function resetThemeCustomization() {
   if (textActiveD) textActiveD.value = themeState.customSettings.darkMode.textActiveColor; // Added
   if (modalD) modalD.value = themeState.customSettings.darkMode.modalBg;
   if (hoverD) hoverD.value = themeState.customSettings.darkMode.hoverBg;
-  if (accentD) accentD.value = themeState.customSettings.darkMode.accentColor;
   if (shadowD) shadowD.value = toHexColor(themeState.customSettings.darkMode.shadowColor);
 
   renderThemePreview();
@@ -973,6 +938,16 @@ function closeThemeModal(restoreOriginal = true) {
 function storeOriginalTheme() {
   originalThemeOnOpen = themeState.currentTheme;
 }
+
+function bootstrapThemeAppearance() {
+  const preferredMode = localStorage.getItem('theme') || bootstrapAppearance?.colorMode || 'light';
+  document.body.classList.toggle('dark', preferredMode === 'dark');
+  document.body.classList.toggle('light', preferredMode !== 'dark');
+  applyStyleTheme(themeState.currentTheme || 'handdrawn');
+  applyCustomThemeForCurrentMode();
+}
+
+bootstrapThemeAppearance();
 
 // Export functions
 window.openThemeCustomization = openThemeCustomization;

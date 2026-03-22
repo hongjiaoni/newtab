@@ -5,6 +5,7 @@ const SYNC_DEBOUNCE_MS = 500;
 const HOME_CONFIG_KEY_PREFIX = 'user_home_config_';
 const COLOR_CONFIG_KEY_PREFIX = 'user_color_config_';
 const CONFIG_META_KEY_PREFIX = 'user_config_meta_';
+const APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
 
 function getHomeConfigCacheKey(uid) {
     return HOME_CONFIG_KEY_PREFIX + uid;
@@ -53,6 +54,37 @@ function shouldApplyRemoteConfig(uid, section, remoteUpdatedAt) {
     if (sectionMeta.pending && localTs >= remoteTs) return false;
     if (localTs > remoteTs) return false;
     return true;
+}
+
+function mergeAppearanceSnapshot(partial) {
+    if (!partial || typeof partial !== 'object') return;
+
+    let current = {};
+    try {
+        current = JSON.parse(localStorage.getItem(APPEARANCE_SNAPSHOT_KEY) || '{}') || {};
+    } catch (_err) {
+        current = {};
+    }
+
+    const next = {
+        ...current,
+        ...partial
+    };
+
+    if (partial.customSettings || current.customSettings) {
+        const currentCustom = current.customSettings || {};
+        const partialCustom = partial.customSettings || {};
+        next.customSettings = {
+            ...currentCustom,
+            ...partialCustom,
+            darkMode: {
+                ...(currentCustom.darkMode || {}),
+                ...(partialCustom.darkMode || {})
+            }
+        };
+    }
+
+    localStorage.setItem(APPEARANCE_SNAPSHOT_KEY, JSON.stringify(next));
 }
 
 function normalizeEngineId(input) {
@@ -119,6 +151,15 @@ function applyHomeConfig(config) {
         localStorage.setItem('theme', mode);
         window.applyCustomThemeForCurrentMode?.();
     }
+
+    mergeAppearanceSnapshot({
+        currentTheme: state.currentTheme || 'handdrawn',
+        colorMode: typeof s.colorMode === 'string' ? (s.colorMode === 'dark' ? 'dark' : 'light') : (localStorage.getItem('theme') || 'light'),
+        customSettings: {
+            fontChinese: window.themeState?.customSettings?.fontChinese,
+            fontEnglish: window.themeState?.customSettings?.fontEnglish
+        }
+    });
 }
 
 // Applies the parsed Color Config payload directly to themeState
@@ -140,6 +181,11 @@ function applyColorConfig(config) {
     }
     
     window.applyCustomThemeForCurrentMode?.();
+    mergeAppearanceSnapshot({
+        currentTheme: window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
+        colorMode: document.body.classList.contains('dark') ? 'dark' : 'light',
+        customSettings: window.themeState?.customSettings || {}
+    });
 }
 
 // 1. Initial Cached Load -> 2. Remote Fetch Overwrite 
@@ -255,6 +301,15 @@ async function saveUserDataToBackend(immediate = false) {
 
             // 1. Cache Locally
             localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(payload));
+            mergeAppearanceSnapshot({
+                currentTheme: payload.settings.theme || 'handdrawn',
+                colorMode,
+                customSettings: {
+                    ...(window.themeState?.customSettings || {}),
+                    fontChinese: payload.settings.fontChinese,
+                    fontEnglish: payload.settings.fontEnglish
+                }
+            });
             updateConfigMeta(uid, 'home', {
                 localUpdatedAt: syncedAt,
                 pending: true
@@ -309,6 +364,11 @@ async function saveThemeSettings(settings) {
 
         // 1. Cache Locally
         localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(colorPayload));
+        mergeAppearanceSnapshot({
+            currentTheme: settings.style || window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
+            colorMode: document.body.classList.contains('dark') ? 'dark' : 'light',
+            customSettings: settings
+        });
         updateConfigMeta(uid, 'color', {
             localUpdatedAt: syncedAt,
             pending: true
