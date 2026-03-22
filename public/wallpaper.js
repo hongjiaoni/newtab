@@ -117,14 +117,15 @@ async function loadWallpapers() {
 }
 
 // Apply wallpaper to page
-function applyWallpaper(wallpaperId) {
+function applyWallpaper(wallpaperId, options = {}) {
+  const shouldSync = options.sync !== false;
   if (!wallpaperId) {
     document.body.style.backgroundImage = '';
     document.body.style.backgroundColor = '';
     wallpaperState.selectedWallpaper = null;
     localStorage.removeItem('selectedWallpaper');
 
-    if (window.authState && window.authState.isLoggedIn) {
+    if (shouldSync && window.authState && window.authState.isLoggedIn) {
       if (window.markHomeConfigUpdated) {
         window.markHomeConfigUpdated();
       } else if (window.saveUserDataToBackend) {
@@ -147,7 +148,7 @@ function applyWallpaper(wallpaperId) {
   wallpaperState.selectedWallpaper = wallpaperId;
   localStorage.setItem('selectedWallpaper', wallpaperId);
 
-  if (window.authState && window.authState.isLoggedIn) {
+  if (shouldSync && window.authState && window.authState.isLoggedIn) {
     if (window.markHomeConfigUpdated) {
       window.markHomeConfigUpdated();
     } else if (window.saveUserDataToBackend) {
