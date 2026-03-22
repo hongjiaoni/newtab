@@ -1897,7 +1897,7 @@ function ensureThemeCustomizationLoaded() {
 
   themeScriptLoadPromise = new Promise((resolve) => {
     const script = document.createElement('script');
-    script.src = `themes.js?reload=${Date.now()}`;
+    script.src = `themes.js?v=20260322-themefix-2&reload=${Date.now()}`;
     script.onload = () => {
       themeScriptLoadPromise = null;
       resolve(
