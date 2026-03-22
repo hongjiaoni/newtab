@@ -564,6 +564,8 @@ function renderThemePreview() {
     ? (document.getElementById('textActiveColorInput')?.value || themeState.customSettings.textActiveColor)
     : (document.getElementById('textActiveColorDarkInput')?.value || themeState.customSettings.darkMode.textActiveColor);
   preview.style.setProperty('--text-active-color', textActiveColor);
+  preview.style.background = bgColor;
+  preview.style.color = textColor;
   preview.dataset.style = previewStyle;
   preview.classList.toggle('dark', previewMode === 'dark');
   preview.classList.toggle('light', previewMode !== 'dark');
@@ -659,7 +661,7 @@ function renderThemePreview() {
         border-color: var(--border-color);
       }
     </style>
-    <div style="display:flex; justify-content:center;">
+    <div class="preview-stage" style="display:flex; justify-content:center; background: var(--bg-color); border-radius: 10px; padding: 10px;">
       <div class="container" style="max-width: 460px; width: 100%; padding: 12px;">
         <div class="time" style="font-size: 54px;">12:34</div>
         <div class="date" style="margin-bottom: 22px;">2026/01/25 Sat</div>
@@ -960,6 +962,7 @@ async function resetThemeCustomization() {
   const input = document.getElementById('inputBgInput');
   const border = document.getElementById('borderColorInput');
   const text = document.getElementById('textColorInput');
+  const textActive = document.getElementById('textActiveColorInput');
   const modal = document.getElementById('modalBgInput');
   const hover = document.getElementById('hoverBgInput');
   const shadow = document.getElementById('shadowColorInput');
@@ -996,7 +999,14 @@ async function resetThemeCustomization() {
 
   renderThemePreview();
 
-  if (window.resetThemeCustomizationOnBackend) {
+  const resetPayload = {
+    style: themeState.currentTheme,
+    ...JSON.parse(JSON.stringify(themeState.customSettings))
+  };
+
+  if (window.saveThemeSettings) {
+    await window.saveThemeSettings(resetPayload);
+  } else if (window.resetThemeCustomizationOnBackend) {
     await window.resetThemeCustomizationOnBackend();
   }
 

@@ -487,6 +487,7 @@ window.updateAllText = function () {
 
   // Re-render content to update any dynamic text
   renderHome();
+  renderHomeFooter();
 
   // Search engine menu contains localized names
   renderSearchEngine();
