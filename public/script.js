@@ -1885,6 +1885,74 @@ document.getElementById('languageMenuItem').addEventListener('click', (e) => {
 });
 
 let themeScriptLoadPromise = null;
+const THEME_SCRIPT_VERSION = '20260322-themefix-3';
+
+function getThemeScriptUrl() {
+  return new URL(`/themes.js?v=${THEME_SCRIPT_VERSION}`, window.location.origin).toString();
+}
+
+function readAppearanceSnapshotFallback() {
+  try {
+    const raw = localStorage.getItem('last_applied_appearance');
+    return raw ? JSON.parse(raw) : null;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function applyAppearanceSnapshotFallback() {
+  const snapshot = readAppearanceSnapshotFallback();
+  if (!snapshot) return;
+
+  const mode = snapshot.colorMode === 'dark' ? 'dark' : 'light';
+  document.body.classList.toggle('dark', mode === 'dark');
+  document.body.classList.toggle('light', mode !== 'dark');
+
+  if (snapshot.currentTheme && typeof window.applyStyleTheme !== 'function') {
+    document.body.dataset.style = snapshot.currentTheme;
+  }
+
+  const settings = snapshot.customSettings || {};
+  const modeSettings = mode === 'dark' ? (settings.darkMode || settings) : settings;
+  const rootEl = document.documentElement;
+  const bodyEl = document.body;
+  const styleMap = {
+    '--bg-color': modeSettings.bgColor,
+    '--button-bg': modeSettings.buttonBg,
+    '--modal-bg': modeSettings.modalBg,
+    '--input-bg': modeSettings.inputBg,
+    '--border-color': modeSettings.borderColor,
+    '--text-color': modeSettings.textColor,
+    '--text-active-color': modeSettings.textActiveColor,
+    '--hover-bg': modeSettings.hoverBg,
+    '--shadow-color': modeSettings.shadowColor,
+    '--accent-color': modeSettings.textColor
+  };
+
+  Object.entries(styleMap).forEach(([key, value]) => {
+    if (!value) return;
+    rootEl.style.setProperty(key, value);
+    bodyEl.style.setProperty(key, value);
+  });
+
+  if (settings.fontEnglish || settings.fontChinese) {
+    bodyEl.style.fontFamily = `"${settings.fontEnglish || 'Patrick Hand'}", "${settings.fontChinese || '优设好身体'}", sans-serif`;
+  }
+}
+
+async function evaluateThemeScriptFromSource(url) {
+  const response = await fetch(url, { cache: 'no-store' });
+  if (!response.ok) {
+    throw new Error(`Theme script fetch failed with ${response.status}`);
+  }
+  const source = await response.text();
+  const runner = new Function(`${source}\n//# sourceURL=themes.dynamic.js`);
+  runner();
+  return (
+    typeof window.handleThemeCustomizationMenuClick === 'function'
+    || typeof window.openThemeCustomization === 'function'
+  );
+}
 
 function ensureThemeCustomizationLoaded() {
   if (typeof window.handleThemeCustomizationMenuClick === 'function' || typeof window.openThemeCustomization === 'function') {
@@ -1896,24 +1964,48 @@ function ensureThemeCustomizationLoaded() {
   }
 
   themeScriptLoadPromise = new Promise((resolve) => {
+    const themeScriptUrl = getThemeScriptUrl();
     const script = document.createElement('script');
-    script.src = `themes.js?v=20260322-themefix-2&reload=${Date.now()}`;
-    script.onload = () => {
-      themeScriptLoadPromise = null;
-      resolve(
+    script.src = `${themeScriptUrl}&reload=${Date.now()}`;
+    script.onload = async () => {
+      let loaded = (
         typeof window.handleThemeCustomizationMenuClick === 'function'
         || typeof window.openThemeCustomization === 'function'
       );
-    };
-    script.onerror = () => {
+
+      if (!loaded) {
+        try {
+          loaded = await evaluateThemeScriptFromSource(themeScriptUrl);
+        } catch (error) {
+          console.error('Theme script post-load evaluation failed:', error);
+        }
+      }
+
       themeScriptLoadPromise = null;
-      resolve(false);
+      resolve(loaded);
+    };
+    script.onerror = async () => {
+      let loaded = false;
+      try {
+        loaded = await evaluateThemeScriptFromSource(themeScriptUrl);
+      } catch (error) {
+        console.error('Theme script reload failed:', error);
+      }
+      themeScriptLoadPromise = null;
+      resolve(loaded);
     };
     document.body.appendChild(script);
   });
 
   return themeScriptLoadPromise;
 }
+
+applyAppearanceSnapshotFallback();
+ensureThemeCustomizationLoaded().then((loaded) => {
+  if (!loaded) return;
+  window.applyStyleTheme?.(state.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn');
+  window.applyCustomThemeForCurrentMode?.();
+});
 
 document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) => {
   e.preventDefault();
