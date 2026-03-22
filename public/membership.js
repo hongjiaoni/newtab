@@ -90,10 +90,10 @@ function updateMembershipUI() {
 
 // Update feature locks based on tier
 function updateFeatureLocks() {
-    // Theme customization (tier 2+)
+    // Theme customization (tier 1+)
     const themeBtn = document.getElementById('themeCustomizationBtn');
     if (themeBtn) {
-        if (membershipState.tier < 2) {
+        if (membershipState.tier < 1) {
             themeBtn.classList.add('locked-feature');
             themeBtn.onclick = (e) => {
                 e?.preventDefault?.();
