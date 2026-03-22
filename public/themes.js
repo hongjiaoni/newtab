@@ -227,7 +227,13 @@ function openThemeCustomization() {
     createThemeModal();
     // Store original theme for restore on cancel
     originalThemeOnOpen = themeState.currentTheme;
-    document.getElementById('themeCustomizationModal')?.classList.remove('hidden');
+    const modal = document.getElementById('themeCustomizationModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+      modal.style.visibility = 'visible';
+      modal.style.opacity = '1';
+    }
     renderThemePreview();
   } catch (error) {
     console.error('Failed to open theme customization modal:', error);
@@ -981,15 +987,33 @@ function handleThemeCustomizationTrigger(event) {
   openThemeCustomization();
 }
 
+function handleThemeCustomizationMenuClick(event) {
+  if (event) {
+    event.preventDefault?.();
+    event.stopPropagation?.();
+  }
+  window.showNotification?.(
+    (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
+      ? 'Opening theme settings...'
+      : '正在打开主题设置...',
+    'info'
+  );
+  openThemeCustomization();
+  return false;
+}
+
 function bindThemeCustomizationTrigger() {
   const trigger = document.getElementById('themeCustomizationBtn');
   if (trigger && trigger.dataset.themeBound !== 'true') {
     trigger.dataset.themeBound = 'true';
-    trigger.addEventListener('click', (event) => {
+    const openFromTrigger = (event) => {
       event.preventDefault();
       event.stopPropagation();
       openThemeCustomization();
-    });
+    };
+    trigger.addEventListener('click', openFromTrigger);
+    trigger.addEventListener('mousedown', openFromTrigger);
+    trigger.addEventListener('pointerdown', openFromTrigger);
   }
 }
 
@@ -1020,3 +1044,4 @@ window.switchThemeTab = switchThemeTab;
 window.handleThemeModalOverlayClick = handleThemeModalOverlayClick;
 window.setPreviewMode = setPreviewMode;
 window.updateThemePreview = updateThemePreview;
+window.handleThemeCustomizationMenuClick = handleThemeCustomizationMenuClick;

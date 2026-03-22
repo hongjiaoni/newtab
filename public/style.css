@@ -380,6 +380,8 @@ body.dark {
   display: flex;
   gap: 12px;
   align-items: center;
+  z-index: 3000;
+  pointer-events: auto;
 }
 
 .settings-btn {
@@ -450,6 +452,9 @@ body.dark {
   color: var(--text-color);
   user-select: none;
   font-weight: bold;
+  position: relative;
+  z-index: 1;
+  pointer-events: auto;
 }
 
 .settings-menu-item:hover {
@@ -462,6 +467,16 @@ body.dark {
   backdrop-filter: none !important;
   mix-blend-mode: normal;
   opacity: 1;
+}
+
+#themeCustomizationBtn {
+  position: relative;
+  z-index: 5;
+  pointer-events: auto !important;
+}
+
+#themeCustomizationBtn * {
+  pointer-events: none;
 }
 
 .settings-menu-divider {
