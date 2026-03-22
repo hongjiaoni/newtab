@@ -182,12 +182,21 @@ function openThemeCustomization() {
   console.log('openThemeCustomization called');
   console.log('authState:', window.authState);
   console.log('membershipState:', window.membershipState);
+  document.getElementById('settingsMenu')?.classList.add('hidden');
 
   // Check login FIRST
   if (!window.authState || !window.authState.isLoggedIn) {
     console.log('Not logged in, showing login modal');
+    window.showNotification?.(
+      (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
+        ? 'Please login to customize theme'
+        : '请先登录后再设置主题',
+      'info'
+    );
     if (window.openGoogleSignInModal) {
       window.openGoogleSignInModal();
+    } else {
+      document.getElementById('googleSignInModal')?.classList.remove('hidden');
     }
     return;
   }
@@ -196,6 +205,12 @@ function openThemeCustomization() {
   const effectiveTier = window.membershipState?.tier ?? window.authState?.profile?.membership_tier ?? 1;
   if (effectiveTier < 1) {
     console.log('Tier insufficient, showing upgrade modal');
+    window.showNotification?.(
+      (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
+        ? 'Theme customization is not available for this account'
+        : '当前账号暂不可使用主题设置',
+      'info'
+    );
     const settingsMenu = document.getElementById('settingsMenu');
     if (settingsMenu) settingsMenu.classList.add('hidden');
 
@@ -208,12 +223,21 @@ function openThemeCustomization() {
   }
 
   console.log('Opening theme customization modal');
-  document.getElementById('settingsMenu')?.classList.add('hidden');
-  createThemeModal();
-  // Store original theme for restore on cancel
-  originalThemeOnOpen = themeState.currentTheme;
-  document.getElementById('themeCustomizationModal').classList.remove('hidden');
-  renderThemePreview();
+  try {
+    createThemeModal();
+    // Store original theme for restore on cancel
+    originalThemeOnOpen = themeState.currentTheme;
+    document.getElementById('themeCustomizationModal')?.classList.remove('hidden');
+    renderThemePreview();
+  } catch (error) {
+    console.error('Failed to open theme customization modal:', error);
+    window.showNotification?.(
+      (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
+        ? 'Theme panel failed to open'
+        : '主题设置面板打开失败',
+      'error'
+    );
+  }
 }
 
 // Current theme tab
@@ -949,18 +973,35 @@ function bootstrapThemeAppearance() {
   applyCustomThemeForCurrentMode();
 }
 
-bootstrapThemeAppearance();
+function handleThemeCustomizationTrigger(event) {
+  const trigger = event.target?.closest?.('#themeCustomizationBtn');
+  if (!trigger) return;
+  event.preventDefault();
+  event.stopPropagation();
+  openThemeCustomization();
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-  const themeCustomizationBtn = document.getElementById('themeCustomizationBtn');
-  if (themeCustomizationBtn) {
-    themeCustomizationBtn.addEventListener('click', (event) => {
+function bindThemeCustomizationTrigger() {
+  const trigger = document.getElementById('themeCustomizationBtn');
+  if (trigger && trigger.dataset.themeBound !== 'true') {
+    trigger.dataset.themeBound = 'true';
+    trigger.addEventListener('click', (event) => {
       event.preventDefault();
       event.stopPropagation();
       openThemeCustomization();
     });
   }
-});
+}
+
+bootstrapThemeAppearance();
+
+document.addEventListener('click', handleThemeCustomizationTrigger, true);
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bindThemeCustomizationTrigger);
+} else {
+  bindThemeCustomizationTrigger();
+}
 
 // Export functions
 window.openThemeCustomization = openThemeCustomization;
@@ -975,3 +1016,7 @@ window.resetThemeCustomization = resetThemeCustomization;
 window.themeState = themeState;
 window.handleThemeFontChange = handleThemeFontChange;
 window.applyStyleTheme = applyStyleTheme;
+window.switchThemeTab = switchThemeTab;
+window.handleThemeModalOverlayClick = handleThemeModalOverlayClick;
+window.setPreviewMode = setPreviewMode;
+window.updateThemePreview = updateThemePreview;

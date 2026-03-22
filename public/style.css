@@ -327,10 +327,20 @@ body.dark {
   background-clip: padding-box;
 }
 
+.settings-submenu::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--modal-bg);
+  opacity: 1;
+  z-index: -1;
+  border-radius: inherit;
+}
+
 .settings-submenu div {
   padding: 10px 15px;
   white-space: nowrap;
-  background-color: transparent;
+  background-color: var(--modal-bg);
   color: inherit;
 }
 
@@ -412,6 +422,17 @@ body.dark {
   border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
   isolation: isolate;
   background-clip: padding-box;
+  overflow: hidden;
+}
+
+.settings-menu::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--modal-bg);
+  opacity: 1;
+  z-index: -1;
+  border-radius: inherit;
 }
 
 .settings-menu-item {
@@ -430,6 +451,13 @@ body.dark {
 .settings-menu-item:hover {
   background: var(--hover-bg);
   border-radius: 4px;
+}
+
+.settings-menu-item,
+.settings-submenu div {
+  backdrop-filter: none !important;
+  mix-blend-mode: normal;
+  opacity: 1;
 }
 
 .settings-menu-divider {
