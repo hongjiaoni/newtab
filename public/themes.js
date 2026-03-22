@@ -981,6 +981,15 @@ function handleThemeCustomizationTrigger(event) {
   openThemeCustomization();
 }
 
+function handleThemeCustomizationMenuClick(event) {
+  if (event) {
+    event.preventDefault?.();
+    event.stopPropagation?.();
+  }
+  openThemeCustomization();
+  return false;
+}
+
 function bindThemeCustomizationTrigger() {
   const trigger = document.getElementById('themeCustomizationBtn');
   if (trigger && trigger.dataset.themeBound !== 'true') {
@@ -1020,3 +1029,4 @@ window.switchThemeTab = switchThemeTab;
 window.handleThemeModalOverlayClick = handleThemeModalOverlayClick;
 window.setPreviewMode = setPreviewMode;
 window.updateThemePreview = updateThemePreview;
+window.handleThemeCustomizationMenuClick = handleThemeCustomizationMenuClick;
