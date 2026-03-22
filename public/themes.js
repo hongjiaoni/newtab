@@ -768,6 +768,11 @@ async function saveThemeCustomization() {
         'success'
       );
     }
+    
+    // Automatically reload the page to apply massive style & DOM updates instantly
+    setTimeout(() => {
+      window.location.reload();
+    }, 400);
   } catch (err) {
     console.error('Failed to persist theme customization:', err);
     if (window.showNotification) {
@@ -824,6 +829,25 @@ function applyCustomThemeForCurrentMode() {
   if (s.fontEnglish || s.fontChinese) {
     document.body.style.fontFamily = `"${s.fontEnglish || 'Patrick Hand'}", "${s.fontChinese || '优设好身体'}", sans-serif`;
   }
+
+  // Dynamic Accent Cursor
+  let cursorStyle = document.getElementById('dynamic-cursor-style');
+  if (!cursorStyle) {
+    cursorStyle = document.createElement('style');
+    cursorStyle.id = 'dynamic-cursor-style';
+    document.head.appendChild(cursorStyle);
+  }
+  const curColor = modeSettings.accentColor || '#141414';
+  const cursorSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="${curColor}" stroke="white" stroke-width="1.5"><path d="M5.5 3.21V20.8c0 .45.54.67.85.35l4.86-4.86a.5.5 0 0 1 .35-.15h6.42c.45 0 .67-.54.35-.85L5.5 3.21z"/></svg>`;
+  const pointerSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="${curColor}" stroke="white" stroke-width="1.5"><path d="M14 8c0-1.1-1.34-2-2.5-2S9 6.9 9 8v3.5a2.5 2.5 0 0 0-4 0V15c0 2.7 2.2 5 5 5h3c2.7 0 5-2.2 5-5V11a2.5 2.5 0 0 0-4 0V8z"/></svg>`;
+  const cursorUrl = `url("data:image/svg+xml,${encodeURIComponent(cursorSvg)}") 0 0, auto`;
+  const pointerUrl = `url("data:image/svg+xml,${encodeURIComponent(pointerSvg)}") 6 2, pointer`;
+  
+  cursorStyle.innerHTML = `
+    body, .modal-overlay, .modal { cursor: ${cursorUrl}; }
+    a, button, [role="button"], input[type="submit"], input[type="button"], input[type="checkbox"], select, .clickable, .button, .engine-item, .chip, .date, .feature-card, .menu-item, .theme-color-item { cursor: ${pointerUrl} !important; }
+    input[type="text"], input[type="search"], textarea { cursor: text !important; }
+  `;
 
   applyStyleTheme(themeState.currentTheme || s.style || 'handdrawn');
 }
