@@ -1884,6 +1884,29 @@ document.getElementById('languageMenuItem').addEventListener('click', (e) => {
   document.getElementById('languageSubmenu').classList.toggle('hidden');
 });
 
+document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  settingsMenu.classList.add('hidden');
+
+  if (typeof window.handleThemeCustomizationMenuClick === 'function') {
+    window.handleThemeCustomizationMenuClick(e);
+    return;
+  }
+
+  if (typeof window.openThemeCustomization === 'function') {
+    window.openThemeCustomization();
+    return;
+  }
+
+  if (typeof window.showNotification === 'function') {
+    window.showNotification(
+      i18n.currentLocale === 'zh' ? '主题设置尚未加载完成，请稍后重试' : 'Theme settings are still loading. Please try again.',
+      'error'
+    );
+  }
+});
+
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.settings-menu') && !e.target.closest('.settings-btn')) {
     settingsMenu.classList.add('hidden');

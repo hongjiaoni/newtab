@@ -1006,11 +1006,14 @@ function bindThemeCustomizationTrigger() {
   const trigger = document.getElementById('themeCustomizationBtn');
   if (trigger && trigger.dataset.themeBound !== 'true') {
     trigger.dataset.themeBound = 'true';
-    trigger.addEventListener('click', (event) => {
+    const openFromTrigger = (event) => {
       event.preventDefault();
       event.stopPropagation();
       openThemeCustomization();
-    });
+    };
+    trigger.addEventListener('click', openFromTrigger);
+    trigger.addEventListener('mousedown', openFromTrigger);
+    trigger.addEventListener('pointerdown', openFromTrigger);
   }
 }
 
