@@ -517,6 +517,18 @@ function closeGoogleSignInModal() {
   if (modal) modal.classList.add('hidden');
 }
 
+function requireLoginForPersistentChange() {
+  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  showNotification(
+    currentLocale === 'zh'
+      ? '请先登录后再保存并同步当前设置'
+      : 'Please login before saving and syncing this change',
+    'info'
+  );
+  openGoogleSignInModal();
+  return false;
+}
+
 // Notification Helper
 function showNotification(message, type = 'info') {
   const notification = document.createElement('div');
@@ -575,6 +587,7 @@ window.handleLoginClick = handleLoginClick;
 window.handleLogout = handleLogout;
 window.openGoogleSignInModal = openGoogleSignInModal;
 window.closeGoogleSignInModal = closeGoogleSignInModal;
+window.requireLoginForPersistentChange = requireLoginForPersistentChange;
 window.updateAuthUI = updateAuthUI;
 
 // Initialize on load

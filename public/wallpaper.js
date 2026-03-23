@@ -4,6 +4,7 @@ const wallpaperState = {
   selectedWallpaper: localStorage.getItem('selectedWallpaper') || null,
   pendingWallpaper: undefined,
   baseWallpaper: null,
+  guestDefaultWallpaper: null,
   activeCategory: null,
   categories: [],
   wallpapers: [],
@@ -23,9 +24,26 @@ async function initializeWallpaper() {
   await loadCategories();
   await loadWallpapers();
 
+  const isLoggedIn = !!window.authState?.isLoggedIn;
+  if (!isLoggedIn) {
+    wallpaperState.selectedWallpaper = null;
+  }
+
   // Apply saved selection
   if (wallpaperState.selectedWallpaper) {
     applyWallpaper(wallpaperState.selectedWallpaper);
+    return;
+  }
+
+  if (!window.authState?.isLoggedIn) {
+    const guestDailyWallpaper = wallpaperState.wallpapers.find((item) => item.category === 'daily' || item.category === '每日推荐')
+      || wallpaperState.wallpapers[0];
+
+    if (guestDailyWallpaper?.url) {
+      wallpaperState.guestDefaultWallpaper = guestDailyWallpaper.url;
+      wallpaperState.selectedWallpaper = guestDailyWallpaper.url;
+      previewWallpaper(guestDailyWallpaper.url);
+    }
   }
 }
 
@@ -860,6 +878,11 @@ function setupWallpaperEventListeners() {
     saveBtn.addEventListener('click', () => {
       const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
       const next = wallpaperState.pendingWallpaper;
+
+      if (!window.authState || !window.authState.isLoggedIn) {
+        window.requireLoginForPersistentChange?.();
+        return;
+      }
 
       applyWallpaper(next || null);
       wallpaperState.pendingWallpaper = undefined;

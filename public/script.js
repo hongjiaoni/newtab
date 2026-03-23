@@ -1101,6 +1101,11 @@ function renderEngineModal() {
 // Bind events
 document.getElementById('closeEngineModal').onclick = closeEngineModal;
 document.getElementById('saveEngineSelection').onclick = () => {
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
+
   if (enginePageState.selectedIds.length === 0) {
     // Prevent empty selection? logic says at least one
     // Fallback to default if empty
@@ -1665,6 +1670,11 @@ addTypeRadios.forEach(radio => {
 saveItemBtn.addEventListener('click', () => {
   const type = document.querySelector('input[name="addType"]:checked').value;
   const isEditing = window.editingItem !== undefined;
+
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
 
   if (type === 'site') {
     const name = document.getElementById('siteName').value.trim();
