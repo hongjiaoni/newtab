@@ -66,14 +66,14 @@ const CYBER_PRESET = {
   hoverBg: '#eeeeee',
   shadowColor: 'rgba(0, 0, 0, 0.1)',
   darkMode: {
-    bgColor: '#0f0f10',
-    borderColor: '#3a3a3d',
+    bgColor: '#1a1c20',
+    borderColor: '#4b5059',
     textColor: '#f4f4f5',
-    textActiveColor: '#1e1e1e',
-    buttonBg: '#141416',
-    modalBg: '#141416',
-    inputBg: '#141416',
-    hoverBg: '#1b1b1e',
+    textActiveColor: '#141416',
+    buttonBg: '#202328',
+    modalBg: '#202328',
+    inputBg: '#262a30',
+    hoverBg: '#2f343c',
     shadowColor: 'rgba(0, 0, 0, 0.1)'
   }
 };
@@ -185,7 +185,7 @@ function openThemeCustomization() {
   console.log('membershipState:', window.membershipState);
   document.getElementById('settingsMenu')?.classList.add('hidden');
 
-  // Check login FIRST
+  /* Guest users can preview customization; login is required only when saving.
   if (!window.authState || !window.authState.isLoggedIn) {
     console.log('Not logged in, showing login modal');
     window.showNotification?.(
@@ -202,6 +202,7 @@ function openThemeCustomization() {
     return;
   }
 
+  */
   // Then check membership tier
   const effectiveTier = window.membershipState?.tier ?? window.authState?.profile?.membership_tier ?? 1;
   if (effectiveTier < 1) {
@@ -564,8 +565,10 @@ function renderThemePreview() {
     ? (document.getElementById('textActiveColorInput')?.value || themeState.customSettings.textActiveColor)
     : (document.getElementById('textActiveColorDarkInput')?.value || themeState.customSettings.darkMode.textActiveColor);
   preview.style.setProperty('--text-active-color', textActiveColor);
+  preview.style.setProperty('--shadow-color', shadowColor);
   preview.style.background = bgColor;
   preview.style.color = textColor;
+  preview.style.fontFamily = `"${fontEnglish || 'Patrick Hand'}", "${fontChinese || '优设好身体'}", sans-serif`;
   preview.dataset.style = previewStyle;
   preview.classList.toggle('dark', previewMode === 'dark');
   preview.classList.toggle('light', previewMode !== 'dark');
@@ -575,6 +578,7 @@ function renderThemePreview() {
       #themePreview,
       #themePreview * {
         animation: none !important;
+        font-family: inherit !important;
       }
 
       #themePreview .container,
@@ -597,6 +601,8 @@ function renderThemePreview() {
       #themePreview .search-box {
         display: flex;
         align-items: center;
+        background: var(--input-bg) !important;
+        border-color: var(--border-color) !important;
       }
 
       #themePreview .search-engine {
@@ -624,7 +630,7 @@ function renderThemePreview() {
         color: var(--text-color) !important;
         border: none !important;
         outline: none !important;
-        background: transparent !important;
+        background: var(--input-bg) !important;
         box-shadow: none !important;
       }
 
@@ -761,6 +767,11 @@ function updateThemePreview() {
 async function saveThemeCustomization() {
   const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
   const isZh = currentLocale === 'zh';
+
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
 
   const shadowLightHex = document.getElementById('shadowColorInput')?.value || toHexColor(themeState.customSettings.shadowColor);
   const shadowDarkHex = document.getElementById('shadowColorDarkInput')?.value || toHexColor(themeState.customSettings.darkMode?.shadowColor);
@@ -954,8 +965,10 @@ async function resetThemeCustomization() {
 
   const fontEn = document.getElementById('fontEnglishSelect');
   const fontZh = document.getElementById('fontChineseSelect');
+  const styleSelect = document.getElementById('themeStyleSelect');
   if (fontEn) fontEn.value = themeState.customSettings.fontEnglish;
   if (fontZh) fontZh.value = themeState.customSettings.fontChinese;
+  if (styleSelect) styleSelect.value = themeState.currentTheme;
 
   const bg = document.getElementById('bgColorInput');
   const card = document.getElementById('buttonBgInput');

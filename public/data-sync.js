@@ -2,10 +2,13 @@
 
 let syncDebounceTimer = null;
 const SYNC_DEBOUNCE_MS = 500;
+const USER_DATA_REFRESH_MS = 60 * 1000;
 const HOME_CONFIG_KEY_PREFIX = 'user_home_config_';
 const COLOR_CONFIG_KEY_PREFIX = 'user_color_config_';
 const CONFIG_META_KEY_PREFIX = 'user_config_meta_';
 const APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
+let userDataLoadPromise = null;
+let userDataRefreshTimer = null;
 
 function getHomeConfigCacheKey(uid) {
     return HOME_CONFIG_KEY_PREFIX + uid;
@@ -346,64 +349,75 @@ async function loadUserData(options = {}) {
         return;
     }
 
+    if (userDataLoadPromise) {
+        return userDataLoadPromise;
+    }
+
     const uid = window.authState.user.id;
+    userDataLoadPromise = (async () => {
+        // === Phase 1: Local Cache Immediate Hydration ===
+        if (!options.skipLocalHydration) {
+            try {
+                const localHome = localStorage.getItem(getHomeConfigCacheKey(uid));
+                const localColor = localStorage.getItem(getColorConfigCacheKey(uid));
+                
+                if (localHome) applyHomeConfig(JSON.parse(localHome));
+                if (localColor) applyColorConfig(JSON.parse(localColor));
 
-    // === Phase 1: Local Cache Immediate Hydration ===
-    try {
-        const localHome = localStorage.getItem(getHomeConfigCacheKey(uid));
-        const localColor = localStorage.getItem(getColorConfigCacheKey(uid));
-        
-        if (localHome) applyHomeConfig(JSON.parse(localHome));
-        if (localColor) applyColorConfig(JSON.parse(localColor));
-
-        window.renderHome?.();
-        window.renderSearchEngine?.();
-        window.updateTime?.();
-    } catch (e) {
-        console.warn('Failed to parse local cached configs', e);
-    }
-
-    // === Phase 2: Remote DB Overwrite ===
-    try {
-        console.log('Fetching remote configs from normalized Supabase tables...');
-
-        let requiresRender = false;
-        const remoteRes = await fetchLegacyConfigs(uid);
-
-        if (remoteRes.homeConfig && shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt)) {
-            localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(remoteRes.homeConfig));
-            updateConfigMeta(uid, 'home', {
-                localUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
-                remoteUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
-                pending: false
-            });
-            applyHomeConfig(remoteRes.homeConfig);
-            requiresRender = true;
-        } else if (remoteRes.homeConfig) {
-            console.log('Skipping stale remote home config');
+                window.renderHome?.();
+                window.renderSearchEngine?.();
+                window.updateTime?.();
+            } catch (e) {
+                console.warn('Failed to parse local cached configs', e);
+            }
         }
 
-        if (remoteRes.colorConfig && shouldApplyRemoteConfig(uid, 'color', remoteRes.colorUpdatedAt)) {
-            localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(remoteRes.colorConfig));
-            updateConfigMeta(uid, 'color', {
-                localUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
-                remoteUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
-                pending: false
-            });
-            applyColorConfig(remoteRes.colorConfig);
-        } else if (remoteRes.colorConfig) {
-            console.log('Skipping stale remote color config');
-        }
+        // === Phase 2: Remote DB Overwrite ===
+        try {
+            console.log('Fetching remote configs from normalized Supabase tables...');
 
-        if (requiresRender) {
-            window.renderHome?.();
-            window.renderSearchEngine?.();
-            window.updateTime?.();
+            let requiresRender = false;
+            const remoteRes = await fetchLegacyConfigs(uid);
+
+            if (remoteRes.homeConfig && shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt)) {
+                localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(remoteRes.homeConfig));
+                updateConfigMeta(uid, 'home', {
+                    localUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
+                    remoteUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
+                    pending: false
+                });
+                applyHomeConfig(remoteRes.homeConfig);
+                requiresRender = true;
+            } else if (remoteRes.homeConfig) {
+                console.log('Skipping stale remote home config');
+            }
+
+            if (remoteRes.colorConfig && shouldApplyRemoteConfig(uid, 'color', remoteRes.colorUpdatedAt)) {
+                localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(remoteRes.colorConfig));
+                updateConfigMeta(uid, 'color', {
+                    localUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
+                    remoteUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
+                    pending: false
+                });
+                applyColorConfig(remoteRes.colorConfig);
+            } else if (remoteRes.colorConfig) {
+                console.log('Skipping stale remote color config');
+            }
+
+            if (requiresRender) {
+                window.renderHome?.();
+                window.renderSearchEngine?.();
+                window.updateTime?.();
+            }
+            console.log('User data successfully loaded from remote');
+        } catch (err) {
+            console.error('Error fetching remote configs:', err);
+        } finally {
+            userDataLoadPromise = null;
         }
-        console.log('User data successfully loaded from remote');
-    } catch (err) {
-        console.error('Error fetching remote configs:', err);
-    }
+    })();
+
+    return userDataLoadPromise;
 }
 
 // Aggressive overwrite save for Home Config
@@ -582,6 +596,18 @@ function applyCachedUserData() {
     }
 }
 
+function shouldRefreshUserData() {
+    return !!(window.authState && window.authState.isLoggedIn && supabase && navigator.onLine && !document.hidden);
+}
+
+function scheduleUserDataRefresh() {
+    if (userDataRefreshTimer) return;
+    userDataRefreshTimer = setInterval(() => {
+        if (!shouldRefreshUserData()) return;
+        loadUserData({ skipLocalHydration: true });
+    }, USER_DATA_REFRESH_MS);
+}
+
 // Attach to Global Scope
 window.loadUserData = loadUserData;
 window.saveUserDataToBackend = saveUserDataToBackend;
@@ -595,5 +621,20 @@ window.applyCachedUserData = applyCachedUserData;
 window.addEventListener('online', () => {
     if (window.authState && window.authState.isLoggedIn) {
         flushPendingProfileSync();
+        loadUserData({ skipLocalHydration: true });
     }
 });
+
+window.addEventListener('focus', () => {
+    if (shouldRefreshUserData()) {
+        loadUserData({ skipLocalHydration: true });
+    }
+});
+
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && shouldRefreshUserData()) {
+        loadUserData({ skipLocalHydration: true });
+    }
+});
+
+scheduleUserDataRefresh();

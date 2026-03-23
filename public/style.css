@@ -28,6 +28,13 @@
   background-blend-mode: multiply;
 }
 
+[data-style="cyber"].dark {
+  background-image:
+    radial-gradient(900px 620px at 50% 15%, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 58%),
+    radial-gradient(1200px 880px at 50% 110%, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 62%);
+  background-blend-mode: screen;
+}
+
 [data-style="cyber"] .time {
   letter-spacing: 0.05em;
   font-size: 56px;
