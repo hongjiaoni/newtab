@@ -200,14 +200,6 @@ async function handleSession(session) {
 
   cleanUrlToHome();
 
-  if (window.flushPendingProfileSync) {
-    try {
-      await window.flushPendingProfileSync();
-    } catch (err) {
-      console.error('Error flushing pending sync:', err);
-    }
-  }
-
   // IMPORTANT: membership tier is needed before loading premium settings (theme/font)
   if (window.initializeMembership) {
     await window.initializeMembership();
@@ -225,6 +217,14 @@ async function handleSession(session) {
   // Trigger data load from server
   if (window.loadUserData) {
     await window.loadUserData();
+  }
+
+  if (window.flushPendingProfileSync) {
+    try {
+      await window.flushPendingProfileSync();
+    } catch (err) {
+      console.error('Error flushing pending sync:', err);
+    }
   }
 }
 
