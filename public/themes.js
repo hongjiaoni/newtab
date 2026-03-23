@@ -590,7 +590,7 @@ function renderThemePreview() {
       #themePreview,
       #themePreview * {
         animation: none !important;
-        font-family: inherit !important;
+        font-family: var(--preview-font-stack) !important;
       }
 
       #themePreview .container,
@@ -751,6 +751,7 @@ function renderThemePreviewUnified() {
   preview.style.setProperty('--text-active-color', textActiveColor);
   preview.style.setProperty('--hover-bg', hoverBg);
   preview.style.setProperty('--shadow-color', shadowColor);
+  preview.style.setProperty('--preview-font-stack', `"${fontEnglish || 'Patrick Hand'}", "${fontChinese || '优设好身体'}", sans-serif`);
   preview.style.background = modalBg;
   preview.style.color = textColor;
   preview.style.fontFamily = `"${fontEnglish || 'Patrick Hand'}", "${fontChinese || '优设好身体'}", sans-serif`;
@@ -780,7 +781,7 @@ function renderThemePreviewUnified() {
       #themePreview,
       #themePreview * {
         animation: none !important;
-        font-family: inherit !important;
+        font-family: var(--preview-font-stack) !important;
       }
 
       #themePreview {
