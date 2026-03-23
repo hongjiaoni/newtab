@@ -692,6 +692,282 @@ function renderThemePreview() {
   `;
 }
 
+function renderThemePreviewUnified() {
+  const preview = document.getElementById('themePreview');
+  if (!preview) return;
+
+  const previewStyle = document.getElementById('themeStyleSelect')?.value || themeState.currentTheme || 'handdrawn';
+  const fontChinese = document.getElementById('fontChineseSelect')?.value || themeState.customSettings.fontChinese;
+  const fontEnglish = document.getElementById('fontEnglishSelect')?.value || themeState.customSettings.fontEnglish;
+  const bgColor = previewMode === 'light'
+    ? (document.getElementById('bgColorInput')?.value || themeState.customSettings.bgColor)
+    : (document.getElementById('bgColorDarkInput')?.value || themeState.customSettings.darkMode.bgColor);
+  const buttonBg = previewMode === 'light'
+    ? (document.getElementById('buttonBgInput')?.value || themeState.customSettings.buttonBg)
+    : (document.getElementById('buttonBgDarkInput')?.value || themeState.customSettings.darkMode.buttonBg);
+  const inputBg = previewMode === 'light'
+    ? (document.getElementById('inputBgInput')?.value || themeState.customSettings.inputBg)
+    : (document.getElementById('inputBgDarkInput')?.value || themeState.customSettings.darkMode.inputBg);
+  const borderColor = previewMode === 'light'
+    ? (document.getElementById('borderColorInput')?.value || themeState.customSettings.borderColor)
+    : (document.getElementById('borderColorDarkInput')?.value || themeState.customSettings.darkMode.borderColor);
+  const textColor = previewMode === 'light'
+    ? (document.getElementById('textColorInput')?.value || themeState.customSettings.textColor)
+    : (document.getElementById('textColorDarkInput')?.value || themeState.customSettings.darkMode.textColor);
+  const modalBg = previewMode === 'light'
+    ? (document.getElementById('modalBgInput')?.value || themeState.customSettings.modalBg)
+    : (document.getElementById('modalBgDarkInput')?.value || themeState.customSettings.darkMode.modalBg);
+  const hoverBg = previewMode === 'light'
+    ? (document.getElementById('hoverBgInput')?.value || themeState.customSettings.hoverBg)
+    : (document.getElementById('hoverBgDarkInput')?.value || themeState.customSettings.darkMode.hoverBg);
+  const textActiveColor = previewMode === 'light'
+    ? (document.getElementById('textActiveColorInput')?.value || themeState.customSettings.textActiveColor)
+    : (document.getElementById('textActiveColorDarkInput')?.value || themeState.customSettings.darkMode.textActiveColor);
+  const shadowBase = previewMode === 'light'
+    ? (document.getElementById('shadowColorInput')?.value || themeState.customSettings.shadowColor)
+    : (document.getElementById('shadowColorDarkInput')?.value || themeState.customSettings.darkMode.shadowColor);
+  const shadowColor = String(shadowBase).trim().startsWith('#')
+    ? hexToRgba(shadowBase, previewMode === 'light' ? 0.2 : 0.5)
+    : shadowBase;
+
+  preview.style.setProperty('--bg-color', bgColor);
+  preview.style.setProperty('--button-bg', buttonBg);
+  preview.style.setProperty('--modal-bg', modalBg);
+  preview.style.setProperty('--input-bg', inputBg);
+  preview.style.setProperty('--border-color', borderColor);
+  preview.style.setProperty('--text-color', textColor);
+  preview.style.setProperty('--text-active-color', textActiveColor);
+  preview.style.setProperty('--hover-bg', hoverBg);
+  preview.style.setProperty('--shadow-color', shadowColor);
+  preview.style.background = modalBg;
+  preview.style.color = textColor;
+  preview.style.fontFamily = `"${fontEnglish || 'Patrick Hand'}", "${fontChinese || '优设好身体'}", sans-serif`;
+  preview.dataset.style = previewStyle;
+  preview.classList.toggle('dark', previewMode === 'dark');
+  preview.classList.toggle('light', previewMode !== 'dark');
+
+  const isEn = typeof i18n !== 'undefined' && i18n.currentLocale === 'en';
+  const previewText = {
+    search: isEn ? 'Search...' : '想要搜点什么吗？',
+    site: isEn ? 'Example Site' : '示例网站',
+    tag: isEn ? 'Work' : '工作',
+    active: isEn ? 'Active' : '已选择',
+    cancel: isEn ? 'Cancel' : '取消',
+    confirm: isEn ? 'Confirm' : '确认',
+    font: isEn ? 'Aa Sample Font 字体预览' : '字体预览 Aa Sample'
+  };
+
+  preview.innerHTML = `
+    <style>
+      #themePreview,
+      #themePreview * {
+        animation: none !important;
+        font-family: inherit !important;
+      }
+
+      #themePreview {
+        min-height: 300px;
+        overflow: hidden;
+      }
+
+      #themePreview .preview-stage {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        min-height: 262px;
+        background: var(--bg-color);
+        border-radius: 10px;
+        padding: 14px;
+      }
+
+      #themePreview .preview-shell {
+        width: 100%;
+        max-width: 460px;
+        min-height: 234px;
+      }
+
+      #themePreview .container,
+      #themePreview .content-area,
+      #themePreview .search-box,
+      #themePreview .chip,
+      #themePreview .preview-btn,
+      #themePreview .preview-chip-active {
+        transition: none !important;
+      }
+
+      #themePreview .container {
+        width: 100% !important;
+        max-width: none !important;
+        padding: 14px !important;
+      }
+
+      #themePreview .content-area {
+        width: 100% !important;
+        max-width: none !important;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      #themePreview .time,
+      #themePreview .date,
+      #themePreview .chip,
+      #themePreview .tag,
+      #themePreview .search-engine,
+      #themePreview .preview-search-icon,
+      #themePreview .preview-font-sample,
+      #themePreview .preview-chip-active {
+        color: var(--text-color) !important;
+      }
+
+      #themePreview .time {
+        font-size: 54px !important;
+        margin-bottom: 2px;
+      }
+
+      #themePreview .date {
+        margin-bottom: 18px !important;
+      }
+
+      #themePreview .preview-font-sample {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin: 0 0 16px;
+        font-size: 13px;
+        opacity: 0.82;
+        letter-spacing: 0.02em;
+      }
+
+      #themePreview .search-box {
+        display: flex;
+        align-items: center;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 0 22px !important;
+        padding: 12px 18px !important;
+        background: var(--input-bg) !important;
+        border-color: var(--border-color) !important;
+        box-shadow: 4px 4px 0 var(--shadow-color) !important;
+      }
+
+      #themePreview .search-engine {
+        display: flex;
+        align-items: center;
+        flex: 0 0 auto;
+        border-right-color: var(--border-color) !important;
+      }
+
+      #themePreview .preview-search-icon {
+        width: 28px;
+        height: 28px;
+        border: 2px solid var(--border-color);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        background: var(--button-bg);
+        box-shadow: 2px 2px 0 var(--shadow-color);
+      }
+
+      #themePreview .search-box input {
+        flex: 1;
+        min-width: 0;
+        opacity: 1 !important;
+        color: var(--text-color) !important;
+        border: none !important;
+        outline: none !important;
+        background: var(--input-bg) !important;
+        box-shadow: none !important;
+      }
+
+      #themePreview .search-box input::placeholder {
+        color: var(--text-color) !important;
+        opacity: 0.68 !important;
+      }
+
+      #themePreview .preview-btn {
+        font-family: inherit;
+        border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+        border: 2px solid var(--border-color);
+        font-weight: 700;
+        font-size: 14px;
+        background: var(--button-bg);
+        color: var(--text-color);
+        box-shadow: 4px 4px 0 var(--shadow-color);
+        padding: 8px 16px;
+      }
+
+      #themePreview .preview-btn:hover {
+        background: var(--hover-bg);
+      }
+
+      #themePreview .preview-btn.primary {
+        background: var(--text-color);
+        color: var(--text-active-color) !important;
+        border-color: var(--text-color);
+      }
+
+      #themePreview .preview-btn.primary:hover {
+        background: var(--hover-bg);
+        color: var(--text-color);
+        border-color: var(--border-color);
+      }
+
+      #themePreview .chip {
+        background: var(--button-bg) !important;
+        border-color: var(--border-color) !important;
+        box-shadow: 2px 2px 0 var(--shadow-color) !important;
+      }
+
+      #themePreview .preview-chip-active {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px 14px;
+        background: var(--text-color) !important;
+        color: var(--text-active-color) !important;
+        border: 2px solid var(--text-color) !important;
+        box-shadow: 2px 2px 0 var(--shadow-color) !important;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+    </style>
+    <div class="preview-stage">
+      <div class="preview-shell">
+        <div class="container">
+          <div class="time">12:34</div>
+          <div class="date">2026/01/25 Sat</div>
+          <div class="preview-font-sample">${previewText.font}</div>
+          <div class="search-box">
+            <div class="search-engine" style="border-right: 2px solid var(--border-color); margin-right: 12px; padding-right: 12px;">
+              <div class="preview-search-icon">G</div>
+            </div>
+            <input type="text" placeholder="${previewText.search}" readonly tabindex="-1" style="opacity:1; border:none; outline:none; background:transparent;" />
+          </div>
+
+          <div class="content-area">
+            <div class="chip">${previewText.site}</div>
+            <div class="chip tag"># ${previewText.tag}</div>
+            <div class="preview-chip-active">${previewText.active}</div>
+          </div>
+
+          <div style="display:flex; justify-content:center; gap: 10px; margin-top: 18px;">
+            <button type="button" class="preview-btn" onclick="return false" onmousedown="return false">${previewText.cancel}</button>
+            <button type="button" class="preview-btn primary" onclick="return false" onmousedown="return false">${previewText.confirm}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+renderThemePreview = renderThemePreviewUnified;
+window.renderThemePreview = renderThemePreviewUnified;
+
 // Update preview when settings change
 function updateThemePreview() {
   const styleEl = document.getElementById('themeStyleSelect');
