@@ -24,6 +24,21 @@ function parseTimestamp(value) {
     return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function latestTimestamp(...values) {
+    let winner = '';
+    let winnerTs = 0;
+
+    for (const value of values) {
+        const currentTs = parseTimestamp(value);
+        if (currentTs >= winnerTs) {
+            winnerTs = currentTs;
+            winner = value || winner;
+        }
+    }
+
+    return winner;
+}
+
 function getConfigMeta(uid) {
     if (!uid) return {};
     try {
@@ -236,7 +251,7 @@ async function fetchLegacyConfigs(uid) {
         supabase.from('user_site_order').select('site_id,position').eq('user_id', uid),
         supabase.from('user_tag_order').select('tag_name,position').eq('user_id', uid),
         supabase.from('user_theme_settings').select('theme_settings, updated_at').eq('user_id', uid).single(),
-        supabase.from('user_font_settings').select('font_settings').eq('user_id', uid).single()
+        supabase.from('user_font_settings').select('font_settings, updated_at').eq('user_id', uid).single()
     ]);
 
     const homeConfig = buildHomeConfigFromLegacy({
@@ -253,7 +268,7 @@ async function fetchLegacyConfigs(uid) {
 
     return {
         homeConfig,
-        homeUpdatedAt: settingsRes.data?.updated_at,
+        homeUpdatedAt: latestTimestamp(settingsRes.data?.updated_at, fontSettingsRes.data?.updated_at),
         colorConfig,
         colorUpdatedAt: themeSettingsRes.data?.updated_at
     };
@@ -329,7 +344,12 @@ function applyHomeConfig(config) {
     }
 
     if (s.fontChinese || s.fontEnglish) {
-        if (window.themeState && window.themeState.customSettings) {
+        if (window.applyFontSettings) {
+            window.applyFontSettings({
+                fontChinese: s.fontChinese,
+                fontEnglish: s.fontEnglish
+            });
+        } else if (window.themeState && window.themeState.customSettings) {
             if (s.fontChinese) window.themeState.customSettings.fontChinese = s.fontChinese;
             if (s.fontEnglish) window.themeState.customSettings.fontEnglish = s.fontEnglish;
         }
@@ -351,6 +371,9 @@ function applyHomeConfig(config) {
             fontEnglish: window.themeState?.customSettings?.fontEnglish
         }
     });
+
+    window.applyStyleTheme?.(state.currentTheme || window.themeState?.currentTheme || 'handdrawn');
+    window.applyCustomThemeForCurrentMode?.();
 }
 
 // Applies the parsed Color Config payload directly to themeState
