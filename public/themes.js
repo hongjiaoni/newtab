@@ -515,6 +515,18 @@ function setPreviewMode(mode) {
 
 function handleThemeFontChange() {
   renderThemePreview();
+  const fontEnglish = document.getElementById('fontEnglishSelect')?.value;
+  const fontChinese = document.getElementById('fontChineseSelect')?.value;
+
+  if (document.fonts?.load) {
+    const jobs = [];
+    if (fontEnglish) jobs.push(document.fonts.load(`16px "${fontEnglish}"`));
+    if (fontChinese) jobs.push(document.fonts.load(`16px "${fontChinese}"`));
+
+    Promise.allSettled(jobs).finally(() => {
+      requestAnimationFrame(() => renderThemePreview());
+    });
+  }
 }
 
 // Render theme preview
@@ -757,6 +769,12 @@ function renderThemePreviewUnified() {
     font: isEn ? 'Aa Sample Font 字体预览' : '字体预览 Aa Sample'
   };
 
+  previewText.search = isEn ? 'Search...' : '搜索...';
+  previewText.site = isEn ? 'Aa Example' : 'Aa 示例网站';
+  previewText.tag = isEn ? 'Bb Work' : 'Bb 工作';
+  previewText.cancel = isEn ? 'Cancel' : '取消';
+  previewText.confirm = isEn ? 'Confirm' : '确认';
+
   preview.innerHTML = `
     <style>
       #themePreview,
@@ -790,8 +808,7 @@ function renderThemePreviewUnified() {
       #themePreview .content-area,
       #themePreview .search-box,
       #themePreview .chip,
-      #themePreview .preview-btn,
-      #themePreview .preview-chip-active {
+      #themePreview .preview-btn {
         transition: none !important;
       }
 
@@ -814,9 +831,7 @@ function renderThemePreviewUnified() {
       #themePreview .chip,
       #themePreview .tag,
       #themePreview .search-engine,
-      #themePreview .preview-search-icon,
-      #themePreview .preview-font-sample,
-      #themePreview .preview-chip-active {
+      #themePreview .preview-search-icon {
         color: var(--text-color) !important;
       }
 
@@ -827,17 +842,6 @@ function renderThemePreviewUnified() {
 
       #themePreview .date {
         margin-bottom: 18px !important;
-      }
-
-      #themePreview .preview-font-sample {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        margin: 0 0 16px;
-        font-size: 13px;
-        opacity: 0.82;
-        letter-spacing: 0.02em;
       }
 
       #themePreview .search-box {
@@ -921,27 +925,12 @@ function renderThemePreviewUnified() {
         border-color: var(--border-color) !important;
         box-shadow: 2px 2px 0 var(--shadow-color) !important;
       }
-
-      #themePreview .preview-chip-active {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 8px 14px;
-        background: var(--text-color) !important;
-        color: var(--text-active-color) !important;
-        border: 2px solid var(--text-color) !important;
-        box-shadow: 2px 2px 0 var(--shadow-color) !important;
-        border-radius: 999px;
-        font-size: 13px;
-        font-weight: 700;
-      }
     </style>
     <div class="preview-stage">
       <div class="preview-shell">
         <div class="container">
           <div class="time">12:34</div>
           <div class="date">2026/01/25 Sat</div>
-          <div class="preview-font-sample">${previewText.font}</div>
           <div class="search-box">
             <div class="search-engine" style="border-right: 2px solid var(--border-color); margin-right: 12px; padding-right: 12px;">
               <div class="preview-search-icon">G</div>
@@ -952,7 +941,6 @@ function renderThemePreviewUnified() {
           <div class="content-area">
             <div class="chip">${previewText.site}</div>
             <div class="chip tag"># ${previewText.tag}</div>
-            <div class="preview-chip-active">${previewText.active}</div>
           </div>
 
           <div style="display:flex; justify-content:center; gap: 10px; margin-top: 18px;">

@@ -394,6 +394,7 @@ function applyColorConfig(config) {
         window.themeState.customSettings = mergedLight;
     }
     
+    window.applyStyleTheme?.(window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn');
     window.applyCustomThemeForCurrentMode?.();
     mergeAppearanceSnapshot({
         currentTheme: window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
@@ -478,6 +479,7 @@ async function loadUserData(options = {}) {
 
                 if (colorChanged) {
                     applyColorConfig(remoteRes.colorConfig);
+                    requiresRender = true;
                 }
             } else if (remoteRes.colorConfig) {
                 console.log('Skipping stale remote color config');
