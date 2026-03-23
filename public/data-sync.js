@@ -70,7 +70,6 @@ function shouldApplyRemoteConfig(uid, section, remoteUpdatedAt) {
 
     if (!remoteTs) return !sectionMeta.pending;
     if (sectionMeta.pending && localTs >= remoteTs) return false;
-    if (localTs > remoteTs) return false;
     return true;
 }
 
