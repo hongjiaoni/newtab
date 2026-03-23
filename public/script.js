@@ -766,7 +766,7 @@ if (oldLinks && oldLinks.length > 0 && state.sites.length === 0) {
     showOnHome: true
   }));
   localStorage.removeItem('links');
-  saveData();
+  saveData(false);
 }
 
 // Initialize default sites if empty (first visit)
@@ -787,7 +787,7 @@ if (state.sites.length === 0) {
     showOnHome: true
   }));
   state.siteOrder = state.sites.map(s => s.id);
-  saveData();
+  saveData(false);
 }
 
 // Initialize order arrays if empty (data migration)
@@ -1132,7 +1132,9 @@ window.selectEngineById = (id) => {
   if (idx < 0) return;
   state.engineId = id;
   state.engineIndex = idx;
-  saveData();
+  if (window.authState && window.authState.isLoggedIn) {
+    saveData();
+  }
   renderSearchEngine();
   renderEngineQuickList();
   engineMenu.classList.add('hidden');
@@ -1145,6 +1147,11 @@ window.toggleEngineAddMenu = () => {
 };
 
 window.addEngineById = (id) => {
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
+
   if (!ENGINE_CATALOG.some((e) => e.id === id)) return;
   const set = new Set(state.enabledEngineIds || []);
   if (set.has(id)) return;
@@ -1159,6 +1166,11 @@ window.addEngineById = (id) => {
 };
 
 window.removeEngineById = (id) => {
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
+
   const current = String(state.engineId || '');
   const list = (state.enabledEngineIds || []).filter((x) => x !== id);
   if (list.length < 1) return;

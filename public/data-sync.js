@@ -2,7 +2,7 @@
 
 let syncDebounceTimer = null;
 const SYNC_DEBOUNCE_MS = 500;
-const USER_DATA_REFRESH_MS = 60 * 1000;
+const USER_DATA_REFRESH_MS = 20 * 1000;
 const HOME_CONFIG_KEY_PREFIX = 'user_home_config_';
 const COLOR_CONFIG_KEY_PREFIX = 'user_color_config_';
 const CONFIG_META_KEY_PREFIX = 'user_config_meta_';
@@ -57,6 +57,46 @@ function shouldApplyRemoteConfig(uid, section, remoteUpdatedAt) {
     if (sectionMeta.pending && localTs >= remoteTs) return false;
     if (localTs > remoteTs) return false;
     return true;
+}
+
+function stringifyConfig(config) {
+    try {
+        return JSON.stringify(config ?? null);
+    } catch (_err) {
+        return '';
+    }
+}
+
+function hasPendingConfigSync(uid, section) {
+    if (!uid || !section) return false;
+    return !!getConfigMeta(uid)?.[section]?.pending;
+}
+
+function buildThemeSettingsFromLocalCache(uid) {
+    if (!uid) return null;
+
+    try {
+        const rawColor = localStorage.getItem(getColorConfigCacheKey(uid));
+        if (!rawColor) return null;
+
+        const colorPayload = JSON.parse(rawColor);
+        if (!colorPayload || typeof colorPayload !== 'object') return null;
+
+        const snapshot = JSON.parse(localStorage.getItem(APPEARANCE_SNAPSHOT_KEY) || '{}') || {};
+        const snapshotSettings = snapshot.customSettings || {};
+
+        return {
+            style: snapshot.currentTheme || window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
+            fontChinese: snapshotSettings.fontChinese || window.themeState?.customSettings?.fontChinese || '优设好身体',
+            fontEnglish: snapshotSettings.fontEnglish || window.themeState?.customSettings?.fontEnglish || 'Patrick Hand',
+            ...(colorPayload.light || {}),
+            darkMode: {
+                ...(colorPayload.dark || {})
+            }
+        };
+    } catch (_err) {
+        return null;
+    }
 }
 
 function mergeAppearanceSnapshot(partial) {
@@ -378,28 +418,44 @@ async function loadUserData(options = {}) {
 
             let requiresRender = false;
             const remoteRes = await fetchLegacyConfigs(uid);
+            const homeCacheKey = getHomeConfigCacheKey(uid);
+            const colorCacheKey = getColorConfigCacheKey(uid);
+            const currentHomeRaw = localStorage.getItem(homeCacheKey);
+            const currentColorRaw = localStorage.getItem(colorCacheKey);
 
             if (remoteRes.homeConfig && shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt)) {
-                localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(remoteRes.homeConfig));
+                const nextHomeRaw = stringifyConfig(remoteRes.homeConfig);
+                const homeChanged = currentHomeRaw !== nextHomeRaw;
+
+                localStorage.setItem(homeCacheKey, nextHomeRaw);
                 updateConfigMeta(uid, 'home', {
                     localUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
                     remoteUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
                     pending: false
                 });
-                applyHomeConfig(remoteRes.homeConfig);
-                requiresRender = true;
+
+                if (homeChanged) {
+                    applyHomeConfig(remoteRes.homeConfig);
+                    requiresRender = true;
+                }
             } else if (remoteRes.homeConfig) {
                 console.log('Skipping stale remote home config');
             }
 
             if (remoteRes.colorConfig && shouldApplyRemoteConfig(uid, 'color', remoteRes.colorUpdatedAt)) {
-                localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(remoteRes.colorConfig));
+                const nextColorRaw = stringifyConfig(remoteRes.colorConfig);
+                const colorChanged = currentColorRaw !== nextColorRaw;
+
+                localStorage.setItem(colorCacheKey, nextColorRaw);
                 updateConfigMeta(uid, 'color', {
                     localUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
                     remoteUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
                     pending: false
                 });
-                applyColorConfig(remoteRes.colorConfig);
+
+                if (colorChanged) {
+                    applyColorConfig(remoteRes.colorConfig);
+                }
             } else if (remoteRes.colorConfig) {
                 console.log('Skipping stale remote color config');
             }
@@ -576,11 +632,38 @@ function markHomeConfigUpdated() {
 }
 
 function flushPendingProfileSync() {
-    // Deprecated queued syncs in favor of raw JSONB overwrites.
-    // Trigger instant save unconditionally if online instead.
-    if (navigator.onLine) {
-        saveUserDataToBackend();
+    if (!navigator.onLine || !window.authState?.user || !supabase) {
+        return Promise.resolve();
     }
+
+    const uid = window.authState.user.id;
+
+    return (async () => {
+        if (hasPendingConfigSync(uid, 'color')) {
+            try {
+                const settings = buildThemeSettingsFromLocalCache(uid);
+                if (settings) {
+                    const syncedAt = new Date().toISOString();
+                    await saveLegacyThemeConfig(uid, settings, syncedAt);
+                    updateConfigMeta(uid, 'color', {
+                        localUpdatedAt: syncedAt,
+                        remoteUpdatedAt: syncedAt,
+                        pending: false
+                    });
+                }
+            } catch (err) {
+                console.error('Failed flushing pending color config:', err);
+            }
+        }
+
+        if (hasPendingConfigSync(uid, 'home')) {
+            try {
+                await saveUserDataToBackend(true);
+            } catch (err) {
+                console.error('Failed flushing pending home config:', err);
+            }
+        }
+    })();
 }
 
 function applyCachedUserData() {
@@ -618,10 +701,10 @@ window.markHomeConfigUpdated = markHomeConfigUpdated;
 window.flushPendingProfileSync = flushPendingProfileSync;
 window.applyCachedUserData = applyCachedUserData;
 
-window.addEventListener('online', () => {
+window.addEventListener('online', async () => {
     if (window.authState && window.authState.isLoggedIn) {
-        flushPendingProfileSync();
-        loadUserData({ skipLocalHydration: true });
+        await loadUserData({ skipLocalHydration: true });
+        await flushPendingProfileSync();
     }
 });
 
