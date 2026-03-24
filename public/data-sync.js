@@ -3,10 +3,12 @@
 let syncDebounceTimer = null;
 const SYNC_DEBOUNCE_MS = 500;
 const USER_DATA_REFRESH_MS = 20 * 1000;
+const PENDING_SYNC_MAX_AGE_MS = 2 * 60 * 1000;
 const HOME_CONFIG_KEY_PREFIX = 'user_home_config_';
 const COLOR_CONFIG_KEY_PREFIX = 'user_color_config_';
 const CONFIG_META_KEY_PREFIX = 'user_config_meta_';
 const APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
+const CURRENT_SYNC_SESSION_ID = `sync-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 let userDataLoadPromise = null;
 let userDataRefreshTimer = null;
 
@@ -63,13 +65,39 @@ function updateConfigMeta(uid, section, patch) {
     setConfigMeta(uid, meta);
 }
 
+function isCurrentSessionPending(sectionMeta) {
+    if (!sectionMeta?.pending) return false;
+    if (!sectionMeta.pendingSessionId) return false;
+
+    const pendingTs = parseTimestamp(sectionMeta.pendingSince || sectionMeta.localUpdatedAt);
+    const ageMs = pendingTs ? Math.max(0, Date.now() - pendingTs) : Number.POSITIVE_INFINITY;
+
+    return sectionMeta.pendingSessionId === CURRENT_SYNC_SESSION_ID && ageMs <= PENDING_SYNC_MAX_AGE_MS;
+}
+
+function clearExpiredPendingMeta(uid, section) {
+    if (!uid || !section) return false;
+
+    const sectionMeta = getConfigMeta(uid)[section] || {};
+    if (!sectionMeta.pending) return false;
+    if (isCurrentSessionPending(sectionMeta)) return true;
+
+    updateConfigMeta(uid, section, {
+        pending: false,
+        pendingSince: null,
+        pendingSessionId: null
+    });
+    return false;
+}
+
 function shouldApplyRemoteConfig(uid, section, remoteUpdatedAt) {
     const sectionMeta = getConfigMeta(uid)[section] || {};
     const remoteTs = parseTimestamp(remoteUpdatedAt);
     const localTs = parseTimestamp(sectionMeta.localUpdatedAt);
+    const hasFreshPending = clearExpiredPendingMeta(uid, section);
 
-    if (!remoteTs) return !sectionMeta.pending;
-    if (sectionMeta.pending && localTs >= remoteTs) return false;
+    if (!remoteTs) return !hasFreshPending;
+    if (hasFreshPending && localTs > remoteTs) return false;
     return true;
 }
 
@@ -83,7 +111,17 @@ function stringifyConfig(config) {
 
 function hasPendingConfigSync(uid, section) {
     if (!uid || !section) return false;
-    return !!getConfigMeta(uid)?.[section]?.pending;
+    return clearExpiredPendingMeta(uid, section);
+}
+
+function clearPendingMeta(uid, section, syncedAt) {
+    updateConfigMeta(uid, section, {
+        localUpdatedAt: syncedAt,
+        remoteUpdatedAt: syncedAt,
+        pending: false,
+        pendingSince: null,
+        pendingSessionId: null
+    });
 }
 
 function buildThemeSettingsFromLocalCache(uid) {
@@ -303,6 +341,59 @@ async function saveLegacyThemeConfig(uid, settings, syncedAt) {
     if (fontRes.error) throw fontRes.error;
 }
 
+function buildCurrentHomePayload() {
+    const colorMode = document.body.classList.contains('dark') ? 'dark' : 'light';
+
+    return {
+        sites: (state.sites || []).map(s => ({
+            id: s.id,
+            name: s.name,
+            url: s.url,
+            tags: Array.isArray(s.tags) ? s.tags : [],
+            showOnHome: !!s.showOnHome
+        })),
+        tags: state.tags || [],
+        tag_order: state.tagOrder || [],
+        site_order: state.siteOrder || [],
+        settings: {
+            viewMode: state.viewMode || 'general',
+            engineIndex: state.engineIndex || 0,
+            engineId: state.engineId || '',
+            enabledEngineIds: Array.isArray(state.enabledEngineIds) ? state.enabledEngineIds : [],
+            dateFormatIndex: state.dateFormatIndex || 0,
+            timeFormat: state.timeFormat || '24h',
+            locale: (typeof i18n !== 'undefined' && i18n.currentLocale) ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'),
+            wallpaper: window.wallpaperState?.selectedWallpaper || null,
+            theme: state.currentTheme || 'handdrawn',
+            colorMode,
+            fontChinese: window.themeState?.customSettings?.fontChinese || '优设好身体',
+            fontEnglish: window.themeState?.customSettings?.fontEnglish || 'Patrick Hand'
+        }
+    };
+}
+
+async function persistHomeConfig(uid, payload, syncedAt) {
+    localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(payload));
+    mergeAppearanceSnapshot({
+        currentTheme: payload.settings.theme || 'handdrawn',
+        colorMode: payload.settings.colorMode || 'light',
+        customSettings: {
+            ...(window.themeState?.customSettings || {}),
+            fontChinese: payload.settings.fontChinese,
+            fontEnglish: payload.settings.fontEnglish
+        }
+    });
+    updateConfigMeta(uid, 'home', {
+        localUpdatedAt: syncedAt,
+        pending: true,
+        pendingSince: syncedAt,
+        pendingSessionId: CURRENT_SYNC_SESSION_ID
+    });
+
+    await saveLegacyHomeConfig(payload, syncedAt);
+    clearPendingMeta(uid, 'home', syncedAt);
+}
+
 // Applies the parsed Home Config payload directly to internal running state
 function applyHomeConfig(config) {
     if (!config || typeof config !== 'object') return;
@@ -418,6 +509,9 @@ async function loadUserData(options = {}) {
 
     const uid = window.authState.user.id;
     userDataLoadPromise = (async () => {
+        clearExpiredPendingMeta(uid, 'home');
+        clearExpiredPendingMeta(uid, 'color');
+
         // === Phase 1: Local Cache Immediate Hydration ===
         if (!options.skipLocalHydration) {
             try {
@@ -454,11 +548,13 @@ async function loadUserData(options = {}) {
                 updateConfigMeta(uid, 'home', {
                     localUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
                     remoteUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
-                    pending: false
+                    pending: false,
+                    pendingSince: null,
+                    pendingSessionId: null
                 });
 
+                applyHomeConfig(remoteRes.homeConfig);
                 if (homeChanged) {
-                    applyHomeConfig(remoteRes.homeConfig);
                     requiresRender = true;
                 }
             } else if (remoteRes.homeConfig) {
@@ -473,11 +569,13 @@ async function loadUserData(options = {}) {
                 updateConfigMeta(uid, 'color', {
                     localUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
                     remoteUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
-                    pending: false
+                    pending: false,
+                    pendingSince: null,
+                    pendingSessionId: null
                 });
 
+                applyColorConfig(remoteRes.colorConfig);
                 if (colorChanged) {
-                    applyColorConfig(remoteRes.colorConfig);
                     requiresRender = true;
                 }
             } else if (remoteRes.colorConfig) {
@@ -507,61 +605,9 @@ async function saveUserDataToBackend(immediate = false) {
     const doSync = async () => {
         try {
             const uid = window.authState.user.id;
-            const colorMode = document.body.classList.contains('dark') ? 'dark' : 'light';
             const syncedAt = new Date().toISOString();
-            
-            const payload = {
-                sites: (state.sites || []).map(s => ({
-                    id: s.id,
-                    name: s.name,
-                    url: s.url,
-                    tags: Array.isArray(s.tags) ? s.tags : [],
-                    showOnHome: !!s.showOnHome
-                })),
-                tags: state.tags || [],
-                tag_order: state.tagOrder || [],
-                site_order: state.siteOrder || [],
-                settings: {
-                    viewMode: state.viewMode || 'general',
-                    engineIndex: state.engineIndex || 0,
-                    engineId: state.engineId || '',
-                    enabledEngineIds: Array.isArray(state.enabledEngineIds) ? state.enabledEngineIds : [],
-                    dateFormatIndex: state.dateFormatIndex || 0,
-                    timeFormat: state.timeFormat || '24h',
-                    locale: (typeof i18n !== 'undefined' && i18n.currentLocale) ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'),
-                    wallpaper: window.wallpaperState?.selectedWallpaper || null,
-                    theme: state.currentTheme || 'handdrawn',
-                    colorMode,
-                    fontChinese: window.themeState?.customSettings?.fontChinese || '优设好身体',
-                    fontEnglish: window.themeState?.customSettings?.fontEnglish || 'Patrick Hand'
-                }
-            };
-
-            // 1. Cache Locally
-            localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(payload));
-            mergeAppearanceSnapshot({
-                currentTheme: payload.settings.theme || 'handdrawn',
-                colorMode,
-                customSettings: {
-                    ...(window.themeState?.customSettings || {}),
-                    fontChinese: payload.settings.fontChinese,
-                    fontEnglish: payload.settings.fontEnglish
-                }
-            });
-            updateConfigMeta(uid, 'home', {
-                localUpdatedAt: syncedAt,
-                pending: true
-            });
-
-            // 2. Persist through the normalized sync RPC
-            await saveLegacyHomeConfig(payload, syncedAt);
-
-            updateConfigMeta(uid, 'home', {
-                localUpdatedAt: syncedAt,
-                remoteUpdatedAt: syncedAt,
-                pending: false
-            });
-
+            const payload = buildCurrentHomePayload();
+            await persistHomeConfig(uid, payload, syncedAt);
         } catch (err) {
             console.error('Error saving home config:', err);
         }
@@ -605,20 +651,18 @@ async function saveThemeSettings(settings) {
         });
         updateConfigMeta(uid, 'color', {
             localUpdatedAt: syncedAt,
-            pending: true
+            pending: true,
+            pendingSince: syncedAt,
+            pendingSessionId: CURRENT_SYNC_SESSION_ID
         });
 
         // 2. Persist through normalized theme/font tables
         await saveLegacyThemeConfig(uid, settings, syncedAt);
 
-        updateConfigMeta(uid, 'color', {
-            localUpdatedAt: syncedAt,
-            remoteUpdatedAt: syncedAt,
-            pending: false
-        });
+        clearPendingMeta(uid, 'color', syncedAt);
 
         // Theme style and fonts are stored with the home config as well.
-        await saveUserDataToBackend(true);
+        await persistHomeConfig(uid, buildCurrentHomePayload(), syncedAt);
 
     } catch (e) {
         console.error('Error saving color config:', e);
@@ -642,7 +686,9 @@ async function resetThemeCustomizationOnBackend() {
         updateConfigMeta(uid, 'color', {
             localUpdatedAt: syncedAt,
             remoteUpdatedAt: syncedAt,
-            pending: false
+            pending: false,
+            pendingSince: null,
+            pendingSessionId: null
         });
         
         window.clearCustomThemeSettings?.();
@@ -669,11 +715,7 @@ function flushPendingProfileSync() {
                 if (settings) {
                     const syncedAt = new Date().toISOString();
                     await saveLegacyThemeConfig(uid, settings, syncedAt);
-                    updateConfigMeta(uid, 'color', {
-                        localUpdatedAt: syncedAt,
-                        remoteUpdatedAt: syncedAt,
-                        pending: false
-                    });
+                    clearPendingMeta(uid, 'color', syncedAt);
                 }
             } catch (err) {
                 console.error('Failed flushing pending color config:', err);
