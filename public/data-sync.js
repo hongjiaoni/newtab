@@ -12,6 +12,30 @@ const CURRENT_SYNC_SESSION_ID = `sync-${Date.now()}-${Math.random().toString(36)
 let userDataLoadPromise = null;
 let userDataRefreshTimer = null;
 
+function isUserDataRuntimeReady() {
+    return (
+        typeof state !== 'undefined' &&
+        typeof i18n !== 'undefined' &&
+        typeof window.renderHome === 'function' &&
+        typeof window.renderSearchEngine === 'function' &&
+        typeof window.updateTime === 'function' &&
+        !!window.themeState &&
+        typeof window.applyStyleTheme === 'function' &&
+        typeof window.applyCustomThemeForCurrentMode === 'function'
+    );
+}
+
+async function waitForUserDataRuntimeReady(timeoutMs = 4000) {
+    const deadline = Date.now() + timeoutMs;
+    while (!isUserDataRuntimeReady()) {
+        if (Date.now() >= deadline) {
+            return false;
+        }
+        await new Promise((resolve) => setTimeout(resolve, 25));
+    }
+    return true;
+}
+
 function getHomeConfigCacheKey(uid) {
     return HOME_CONFIG_KEY_PREFIX + uid;
 }
@@ -509,6 +533,12 @@ async function loadUserData(options = {}) {
 
     const uid = window.authState.user.id;
     userDataLoadPromise = (async () => {
+        const runtimeReady = await waitForUserDataRuntimeReady();
+        if (!runtimeReady) {
+            console.warn('User data runtime not ready, skipping sync pass');
+            return;
+        }
+
         clearExpiredPendingMeta(uid, 'home');
         clearExpiredPendingMeta(uid, 'color');
 
@@ -736,12 +766,15 @@ function applyCachedUserData() {
     // Immediately fired post-login to hydrate screen.
     if (window.authState && window.authState.user) {
         const uid = window.authState.user.id;
-        try {
-            const h = localStorage.getItem(getHomeConfigCacheKey(uid));
-            const c = localStorage.getItem(getColorConfigCacheKey(uid));
-            if (h) applyHomeConfig(JSON.parse(h));
-            if (c) applyColorConfig(JSON.parse(c));
-        } catch(e){}
+        waitForUserDataRuntimeReady().then((ready) => {
+            if (!ready) return;
+            try {
+                const h = localStorage.getItem(getHomeConfigCacheKey(uid));
+                const c = localStorage.getItem(getColorConfigCacheKey(uid));
+                if (h) applyHomeConfig(JSON.parse(h));
+                if (c) applyColorConfig(JSON.parse(c));
+            } catch (e) {}
+        });
     }
 }
 
@@ -766,6 +799,7 @@ window.resetThemeCustomizationOnBackend = resetThemeCustomizationOnBackend;
 window.markHomeConfigUpdated = markHomeConfigUpdated;
 window.flushPendingProfileSync = flushPendingProfileSync;
 window.applyCachedUserData = applyCachedUserData;
+window.waitForUserDataRuntimeReady = waitForUserDataRuntimeReady;
 
 window.addEventListener('online', async () => {
     if (window.authState && window.authState.isLoggedIn) {

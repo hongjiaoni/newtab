@@ -205,6 +205,14 @@ async function handleSession(session) {
     await window.initializeMembership();
   }
 
+  if (window.waitForUserDataRuntimeReady) {
+    try {
+      await window.waitForUserDataRuntimeReady();
+    } catch (err) {
+      console.error('Failed while waiting for user data runtime:', err);
+    }
+  }
+
   // Fast path: apply cached premium settings immediately (theme/font) before hitting network.
   if (window.applyCachedUserData) {
     try {
