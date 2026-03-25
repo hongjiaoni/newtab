@@ -283,11 +283,6 @@
   text-decoration: underline;
 }
 
-@import url('https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css');
-@import url('https://chinese-fonts-cdn.deno.dev/packages/zhbtt/dist/result.css');
-@import url('https://chinese-fonts-cdn.deno.dev/packages/ysbth/dist/result.css');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Newsreader:wght@300;400;600;700&family=Anonymous+Pro:wght@400;700&display=swap');
-
 body {
   margin: 0;
   font-family: inherit;

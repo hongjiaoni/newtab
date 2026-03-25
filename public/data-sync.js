@@ -539,6 +539,8 @@ async function loadUserData(options = {}) {
             return;
         }
 
+        const preferRemote = options.force === true || options.skipLocalHydration === true;
+
         clearExpiredPendingMeta(uid, 'home');
         clearExpiredPendingMeta(uid, 'color');
 
@@ -570,7 +572,7 @@ async function loadUserData(options = {}) {
             const currentHomeRaw = localStorage.getItem(homeCacheKey);
             const currentColorRaw = localStorage.getItem(colorCacheKey);
 
-            if (remoteRes.homeConfig && shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt)) {
+            if (remoteRes.homeConfig && (preferRemote || shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt))) {
                 const nextHomeRaw = stringifyConfig(remoteRes.homeConfig);
                 const homeChanged = currentHomeRaw !== nextHomeRaw;
 
@@ -591,7 +593,7 @@ async function loadUserData(options = {}) {
                 console.log('Skipping stale remote home config');
             }
 
-            if (remoteRes.colorConfig && shouldApplyRemoteConfig(uid, 'color', remoteRes.colorUpdatedAt)) {
+            if (remoteRes.colorConfig && (preferRemote || shouldApplyRemoteConfig(uid, 'color', remoteRes.colorUpdatedAt))) {
                 const nextColorRaw = stringifyConfig(remoteRes.colorConfig);
                 const colorChanged = currentColorRaw !== nextColorRaw;
 
@@ -786,7 +788,7 @@ function scheduleUserDataRefresh() {
     if (userDataRefreshTimer) return;
     userDataRefreshTimer = setInterval(() => {
         if (!shouldRefreshUserData()) return;
-        loadUserData({ skipLocalHydration: true });
+        loadUserData({ skipLocalHydration: true, force: true });
     }, USER_DATA_REFRESH_MS);
 }
 
@@ -803,20 +805,20 @@ window.waitForUserDataRuntimeReady = waitForUserDataRuntimeReady;
 
 window.addEventListener('online', async () => {
     if (window.authState && window.authState.isLoggedIn) {
-        await loadUserData({ skipLocalHydration: true });
+        await loadUserData({ skipLocalHydration: true, force: true });
         await flushPendingProfileSync();
     }
 });
 
 window.addEventListener('focus', () => {
     if (shouldRefreshUserData()) {
-        loadUserData({ skipLocalHydration: true });
+        loadUserData({ skipLocalHydration: true, force: true });
     }
 });
 
 document.addEventListener('visibilitychange', () => {
     if (!document.hidden && shouldRefreshUserData()) {
-        loadUserData({ skipLocalHydration: true });
+        loadUserData({ skipLocalHydration: true, force: true });
     }
 });
 
