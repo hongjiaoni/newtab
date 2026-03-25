@@ -224,7 +224,7 @@ async function handleSession(session) {
 
   // Trigger data load from server
   if (window.loadUserData) {
-    await window.loadUserData();
+    await window.loadUserData({ force: true });
   }
 
   if (window.flushPendingProfileSync) {

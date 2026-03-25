@@ -135,6 +135,42 @@ const AVAILABLE_FONTS = {
   ]
 };
 
+const FONT_STYLESHEET_MAP = {
+  '优设好身体': 'https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css',
+  '字魂扁桃体': 'https://chinese-fonts-cdn.deno.dev/packages/zhbtt/dist/result.css',
+  '优设标题黑': 'https://chinese-fonts-cdn.deno.dev/packages/ysbth/dist/result.css'
+};
+
+function ensureFontStylesheet(fontName) {
+  const href = FONT_STYLESHEET_MAP[String(fontName || '').trim()];
+  if (!href || typeof document === 'undefined') return;
+
+  const existing = document.querySelector(`link[data-font-href="${href}"]`);
+  if (existing) return;
+
+  const link = document.createElement('link');
+  link.rel = 'stylesheet';
+  link.href = href;
+  link.dataset.fontHref = href;
+  document.head.appendChild(link);
+}
+
+function ensureThemeFontAssets(fontSettings = {}) {
+  const fontChinese = fontSettings.fontChinese || themeState.customSettings.fontChinese;
+  const fontEnglish = fontSettings.fontEnglish || themeState.customSettings.fontEnglish;
+
+  ensureFontStylesheet(fontChinese);
+
+  if (document.fonts?.load) {
+    const jobs = [];
+    if (fontEnglish) jobs.push(document.fonts.load(`16px "${fontEnglish}"`));
+    if (fontChinese) jobs.push(document.fonts.load(`16px "${fontChinese}"`));
+    return Promise.allSettled(jobs);
+  }
+
+  return Promise.resolve();
+}
+
 function hexToRgba(hex, alpha) {
   const h = String(hex || '').trim();
   if (!h.startsWith('#')) return String(hex || '');
@@ -517,16 +553,9 @@ function handleThemeFontChange() {
   renderThemePreview();
   const fontEnglish = document.getElementById('fontEnglishSelect')?.value;
   const fontChinese = document.getElementById('fontChineseSelect')?.value;
-
-  if (document.fonts?.load) {
-    const jobs = [];
-    if (fontEnglish) jobs.push(document.fonts.load(`16px "${fontEnglish}"`));
-    if (fontChinese) jobs.push(document.fonts.load(`16px "${fontChinese}"`));
-
-    Promise.allSettled(jobs).finally(() => {
-      requestAnimationFrame(() => renderThemePreview());
-    });
-  }
+  ensureThemeFontAssets({ fontChinese, fontEnglish }).finally(() => {
+    requestAnimationFrame(() => renderThemePreview());
+  });
 }
 
 // Render theme preview
@@ -1205,6 +1234,7 @@ function applyFontSettings(fontSettings) {
   const fontEnglish = fontSettings.fontEnglish || themeState.customSettings.fontEnglish;
   themeState.customSettings.fontChinese = fontChinese;
   themeState.customSettings.fontEnglish = fontEnglish;
+  ensureThemeFontAssets({ fontChinese, fontEnglish });
   applyCustomThemeForCurrentMode();
 }
 
@@ -1385,6 +1415,7 @@ function publishThemeCustomizationGlobals() {
 publishThemeCustomizationGlobals();
 
 try {
+  ensureThemeFontAssets(themeState.customSettings);
   bootstrapThemeAppearance();
   document.addEventListener('click', handleThemeCustomizationTrigger, true);
 
