@@ -176,20 +176,12 @@ function applyWallpaper(wallpaperId, options = {}) {
 
 // Open wallpaper selection modal
 function openWallpaperModal() {
-  if (window.hideFloatingLayer) {
-    window.hideFloatingLayer('settingsMenu');
-  } else {
-    document.getElementById('settingsMenu')?.classList.add('hidden');
-  }
+  document.getElementById('settingsMenu')?.classList.add('hidden');
   const modal = document.getElementById('wallpaperModal');
   if (modal) {
     wallpaperState.baseWallpaper = wallpaperState.selectedWallpaper;
     wallpaperState.pendingWallpaper = wallpaperState.selectedWallpaper;
-    if (window.showFloatingLayer) {
-      window.showFloatingLayer(modal);
-    } else {
-      modal.classList.remove('hidden');
-    }
+    modal.classList.remove('hidden');
     renderWallpaperUI();
   }
 }
@@ -204,11 +196,7 @@ function closeWallpaperModal() {
     }
     wallpaperState.pendingWallpaper = undefined;
     wallpaperState.baseWallpaper = null;
-    if (window.hideFloatingLayer) {
-      window.hideFloatingLayer(modal);
-    } else {
-      modal.classList.add('hidden');
-    }
+    modal.classList.add('hidden');
   }
 }
 
