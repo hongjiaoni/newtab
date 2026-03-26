@@ -1584,6 +1584,7 @@ input:disabled {
 [data-style="comic"] .time {
   font-size: 72px;
   font-weight: 700;
+  color: var(--text-color);
   text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.15);
   letter-spacing: -2px;
 }
@@ -1591,6 +1592,7 @@ input:disabled {
 [data-style="comic"] .date {
   font-size: 16px;
   font-weight: 600;
+  color: var(--text-color);
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 20px;
@@ -1627,16 +1629,6 @@ input:disabled {
 [data-style="comic"] .chip:hover {
   transform: translate(-2px, -2px) !important;
   box-shadow: 4px 4px 0 var(--shadow-color) !important;
-}
-
-/* Remove rainbow colors for comic theme - use black border always */
-[data-style="comic"] .chip:nth-child(6n+1),
-[data-style="comic"] .chip:nth-child(6n+2),
-[data-style="comic"] .chip:nth-child(6n+3),
-[data-style="comic"] .chip:nth-child(6n+4),
-[data-style="comic"] .chip:nth-child(6n+5),
-[data-style="comic"] .chip:nth-child(6n) {
-  border-color: #333 !important;
 }
 
 [data-style="comic"] .site-card {
@@ -1711,14 +1703,6 @@ input:disabled {
 [data-style="comic"] .container {
   padding-top: 60px;
 }
-
-/* Comic theme color accents for chips - rainbow colors */
-[data-style="comic"] .chip:nth-child(6n+1) { border-color: #ff6b6b; }
-[data-style="comic"] .chip:nth-child(6n+2) { border-color: #4ecdc4; }
-[data-style="comic"] .chip:nth-child(6n+3) { border-color: #ffe66d; }
-[data-style="comic"] .chip:nth-child(6n+4) { border-color: #95e1d3; }
-[data-style="comic"] .chip:nth-child(6n+5) { border-color: #dda0dd; }
-[data-style="comic"] .chip:nth-child(6n) { border-color: #98d8c8; }
 
 [data-style="comic"] .chip.site {
   border-color: var(--border-color) !important;
@@ -1808,11 +1792,11 @@ input:disabled {
 }
 
 [data-style="comic"].dark .time {
-  color: #f5f0e1;
+  color: var(--text-color);
 }
 
 [data-style="comic"].dark .date {
-  color: #b8b0a0;
+  color: var(--text-color);
 }
 
 [data-style="comic"].dark .search-box {
@@ -1841,13 +1825,6 @@ input:disabled {
 [data-style="comic"].dark .modal {
   border-color: var(--border-color);
 }
-
-[data-style="comic"].dark .chip:nth-child(6n+1) { border-color: #ff6b6b; }
-[data-style="comic"].dark .chip:nth-child(6n+2) { border-color: #4ecdc4; }
-[data-style="comic"].dark .chip:nth-child(6n+3) { border-color: #ffe66d; }
-[data-style="comic"].dark .chip:nth-child(6n+4) { border-color: #95e1d3; }
-[data-style="comic"].dark .chip:nth-child(6n+5) { border-color: #dda0dd; }
-[data-style="comic"].dark .chip:nth-child(6n) { border-color: #98d8c8; }
 
 [data-style="comic"].dark .chip.site {
   border-color: var(--border-color) !important;

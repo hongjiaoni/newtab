@@ -1908,7 +1908,7 @@ document.getElementById('languageMenuItem').addEventListener('click', (e) => {
 });
 
 let themeScriptLoadPromise = null;
-const THEME_SCRIPT_VERSION = '20260325-syncfix-1';
+const THEME_SCRIPT_VERSION = '20260326-uifix-1';
 
 function getThemeScriptUrl() {
   return new URL(`/themes.js?v=${THEME_SCRIPT_VERSION}`, window.location.origin).toString();
@@ -2157,7 +2157,7 @@ function selectCoffeeAmount(amount) {
   document.getElementById('coffeeCustomAmount').value = '';
 }
 
-function processCoffeePayment() {
+function processCoffeePaymentLegacy() {
   const customAmount = parseInt(document.getElementById('coffeeCustomAmount').value);
   const amount = customAmount > 0 ? customAmount : selectedCoffeeAmount;
 
@@ -2256,6 +2256,56 @@ async function submitFeedback() {
     submitBtn.disabled = false;
     submitBtn.textContent = i18n.currentLocale === 'zh' ? '提交' : 'Submit';
   }
+}
+
+function buildGumroadCoffeeUrl(amount) {
+  const template = String(window.GUMROAD_COFFEE_LINK_TEMPLATE || '').trim();
+  if (!template) {
+    return '';
+  }
+
+  if (template.includes('{amount}')) {
+    return template.replaceAll('{amount}', encodeURIComponent(String(amount)));
+  }
+
+  try {
+    const url = new URL(template, window.location.origin);
+    url.searchParams.set('amount', String(amount));
+    return url.toString();
+  } catch (error) {
+    console.error('Invalid Gumroad coffee URL template:', error);
+    return '';
+  }
+}
+
+function processCoffeePayment() {
+  const customAmount = parseInt(document.getElementById('coffeeCustomAmount').value, 10);
+  const amount = Number.isFinite(customAmount) && customAmount > 0 ? customAmount : selectedCoffeeAmount;
+
+  if (!Number.isFinite(amount) || amount < 1 || amount > 100) {
+    showNotification(i18n.currentLocale === 'zh' ? '请输入 1-100 之间的金额' : 'Please enter amount between 1-100', 'error');
+    return;
+  }
+
+  const gumroadUrl = buildGumroadCoffeeUrl(amount);
+  if (!gumroadUrl) {
+    showNotification(
+      i18n.currentLocale === 'zh'
+        ? 'Gumroad 支付链接尚未配置，请先完成配置。'
+        : 'Gumroad payment link is not configured yet.',
+      'warning'
+    );
+    return;
+  }
+
+  showNotification(
+    i18n.currentLocale === 'zh'
+      ? '正在跳转到 Gumroad 支付页面...'
+      : 'Opening Gumroad checkout...',
+    'success'
+  );
+  window.open(gumroadUrl, '_blank', 'noopener,noreferrer');
+  closeCoffeeModal();
 }
 
 // Export modal functions

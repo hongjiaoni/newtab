@@ -44,6 +44,12 @@ const APP_ENV_CONFIG = {
         tier3Monthly: '',
         tier3Yearly: ''
       }
+    },
+    gumroad: {
+      coffeeLinkTemplate: ''
+      // Example:
+      // https://yourname.gumroad.com/l/coffee?wanted=true&price={amount}
+      // {amount} will be replaced with the chosen number.
     }
   },
   staging: {
@@ -63,6 +69,12 @@ const APP_ENV_CONFIG = {
         tier3Monthly: '',
         tier3Yearly: ''
       }
+    },
+    gumroad: {
+      coffeeLinkTemplate: ''
+      // Example:
+      // https://yourname.gumroad.com/l/coffee?wanted=true&price={amount}
+      // {amount} will be replaced with the chosen number.
     }
   }
 };
@@ -100,6 +112,7 @@ const PADDLE_PRICE_TIER2_MONTHLY = resolvedAppConfig.paddle.prices.tier2Monthly;
 const PADDLE_PRICE_TIER2_YEARLY = resolvedAppConfig.paddle.prices.tier2Yearly;  // Premium tier yearly price ID
 const PADDLE_PRICE_TIER3_MONTHLY = resolvedAppConfig.paddle.prices.tier3Monthly; // Super tier monthly price ID
 const PADDLE_PRICE_TIER3_YEARLY = resolvedAppConfig.paddle.prices.tier3Yearly;  // Super tier yearly price ID
+const GUMROAD_COFFEE_LINK_TEMPLATE = resolvedAppConfig.gumroad?.coffeeLinkTemplate || '';
 
 // Export Paddle config to window for paddle.js
 window.PADDLE_ENVIRONMENT = PADDLE_ENVIRONMENT;
@@ -108,6 +121,7 @@ window.PADDLE_PRICE_TIER2_MONTHLY = PADDLE_PRICE_TIER2_MONTHLY;
 window.PADDLE_PRICE_TIER2_YEARLY = PADDLE_PRICE_TIER2_YEARLY;
 window.PADDLE_PRICE_TIER3_MONTHLY = PADDLE_PRICE_TIER3_MONTHLY;
 window.PADDLE_PRICE_TIER3_YEARLY = PADDLE_PRICE_TIER3_YEARLY;
+window.GUMROAD_COFFEE_LINK_TEMPLATE = GUMROAD_COFFEE_LINK_TEMPLATE;
 
 window.GOOGLE_CLIENT_ID = GOOGLE_CLIENT_ID;
 

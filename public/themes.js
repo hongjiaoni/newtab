@@ -1015,38 +1015,6 @@ function updateThemePreview() {
   const shadowDarkBase = shadowColorDarkEl?.value || toHexColor(themeState.customSettings.darkMode?.shadowColor);
 
   const nextStyle = styleEl?.value || themeState.currentTheme;
-  if (nextStyle !== lastStyleValue && nextStyle === 'cyber') {
-    const keepFonts = {
-      fontChinese: themeState.customSettings.fontChinese,
-      fontEnglish: themeState.customSettings.fontEnglish
-    };
-
-    themeState.customSettings = {
-      ...themeState.customSettings,
-      ...CYBER_PRESET,
-      ...keepFonts
-    };
-
-    if (bgColorEl) bgColorEl.value = CYBER_PRESET.bgColor;
-    if (buttonBgEl) buttonBgEl.value = CYBER_PRESET.buttonBg;
-    if (inputBgEl) inputBgEl.value = CYBER_PRESET.inputBg;
-    if (borderColorEl) borderColorEl.value = CYBER_PRESET.borderColor;
-    if (textColorEl) textColorEl.value = CYBER_PRESET.textColor;
-    if (textActiveColorEl) textActiveColorEl.value = CYBER_PRESET.textActiveColor;
-    if (modalBgEl) modalBgEl.value = CYBER_PRESET.modalBg;
-    if (hoverBgEl) hoverBgEl.value = CYBER_PRESET.hoverBg;
-    if (shadowColorEl) shadowColorEl.value = toHexColor(CYBER_PRESET.shadowColor);
-
-    if (bgColorDarkEl) bgColorDarkEl.value = CYBER_PRESET.darkMode.bgColor;
-    if (buttonBgDarkEl) buttonBgDarkEl.value = CYBER_PRESET.darkMode.buttonBg;
-    if (inputBgDarkEl) inputBgDarkEl.value = CYBER_PRESET.darkMode.inputBg;
-    if (borderColorDarkEl) borderColorDarkEl.value = CYBER_PRESET.darkMode.borderColor;
-    if (textColorDarkEl) textColorDarkEl.value = CYBER_PRESET.darkMode.textColor;
-    if (textActiveColorDarkEl) textActiveColorDarkEl.value = CYBER_PRESET.darkMode.textActiveColor;
-    if (modalBgDarkEl) modalBgDarkEl.value = CYBER_PRESET.darkMode.modalBg;
-    if (hoverBgDarkEl) hoverBgDarkEl.value = CYBER_PRESET.darkMode.hoverBg;
-    if (shadowColorDarkEl) shadowColorDarkEl.value = toHexColor(CYBER_PRESET.darkMode.shadowColor);
-  }
 
   lastStyleValue = nextStyle;
   const preview = document.getElementById('themePreview');
