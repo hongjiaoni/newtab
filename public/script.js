@@ -1908,7 +1908,7 @@ document.getElementById('languageMenuItem').addEventListener('click', (e) => {
 });
 
 let themeScriptLoadPromise = null;
-const THEME_SCRIPT_VERSION = '20260326-uifix-1';
+const THEME_SCRIPT_VERSION = '20260326-uifix-2';
 
 function getThemeScriptUrl() {
   return new URL(`/themes.js?v=${THEME_SCRIPT_VERSION}`, window.location.origin).toString();
