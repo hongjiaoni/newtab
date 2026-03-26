@@ -198,6 +198,187 @@ const translations = {
   }
 };
 
+const TRANSLATION_OVERRIDES = {
+  zh: {
+    search: '想要搜点什么呢？',
+    addNew: '添加',
+    addNewTitle: '添加新项目',
+    site: '网站',
+    tag: '标签',
+    name: '名称',
+    url: '网址',
+    urlPlaceholder: '网址 (https://...)',
+    tagName: '标签名称',
+    selectTags: '选择标签',
+    pinToHome: '固定在首页',
+    cancel: '取消',
+    save: '保存',
+    close: '关闭',
+    delete: '删除',
+    deleteConfirm: '确认删除',
+    edit: '编辑',
+    noSites: '这个标签下还没有网站',
+    nameRequired: '名称和网址不能为空',
+    tagNameRequired: '标签名称不能为空',
+    tagExists: '标签已存在',
+    darkMode: '深色模式',
+    lightMode: '浅色模式',
+    login: '登录',
+    logout: '退出登录',
+    googleSignIn: '登录',
+    googleLoginButton: '使用 Google 登录',
+    loginSuccess: '登录成功',
+    logoutSuccess: '已退出登录',
+    wallpaper: '壁纸',
+    wallpaperTitle: '选择壁纸',
+    landscape: '风景',
+    solid: '纯色',
+    daily: '每日推荐',
+    wallpaperChanged: '壁纸已更换',
+    restoreDefault: '恢复默认',
+    restoredDefault: '已恢复默认壁纸',
+    userProfile: '个人信息',
+    minimalist: '极简模式',
+    general: '通用模式',
+    language: '语言',
+    chinese: '中文',
+    english: '英文',
+    custom: '自定义',
+    upload: '上传',
+    uploadWallpaper: '上传壁纸',
+    themeCustomization: '主题',
+    about: '关于',
+    aboutTitle: '关于 NewTab',
+    aboutDesc: '一个简洁又好看的新标签页，让每次打开浏览器都更舒服一点。',
+    officialWebsite: '官网',
+    buyMeCoffee: 'Buy Me a Coffee',
+    coffeeDesc: '如果你喜欢这个项目，欢迎请我喝杯咖啡支持一下。',
+    feedback: '提交反馈',
+    feedbackType: '反馈类型',
+    feedbackContent: '反馈内容',
+    feedbackEmail: '联系邮箱（可选）',
+    feedbackPlaceholder: '请描述你遇到的问题或你的建议...',
+    submit: '提交',
+    submitting: '提交中...',
+    pay: '支付',
+    customAmount: '自定义金额',
+    addSite: '添加网站',
+    addTag: '添加标签',
+    changeWallpaper: '更换壁纸',
+    feedbackTypeBug: 'Bug 反馈',
+    feedbackTypeFeature: '功能建议',
+    feedbackTypeOther: '其他',
+    editSite: '编辑网站',
+    editTag: '编辑标签',
+    imageUrl: '图片地址',
+    apply: '应用',
+    pasteImageUrl: '粘贴图片链接 (http/https)',
+    invalidImageUrl: '请输入有效的图片链接',
+    addImage: '添加图片',
+    chooseUpload: '上传图片',
+    chooseLink: '填写链接',
+    addByLink: '添加链接',
+    confirmUpload: '确认上传',
+    localUpload: '本地上传',
+    addEngine: '新增',
+    remove: '移除',
+    searchEngines: '搜索引擎',
+    subscriptionRecords: '订阅记录',
+    back: '返回',
+    loginBeforeSave: '请先登录，再保存并同步当前设置',
+    supabaseMissing: 'Supabase 尚未初始化，请检查 config.js 中的配置',
+    themeLoadFailed: '主题设置加载失败，请刷新后重试',
+    gumroadLinkMissing: 'Gumroad 链接尚未配置，请先完成配置',
+    openingGumroadPage: '正在打开 Gumroad 页面...',
+    openingGumroadCheckout: '正在打开 Gumroad 支付页...',
+    feedbackContentRequired: '请先填写反馈内容',
+    feedbackSubmitFailed: '提交失败，请稍后重试',
+    feedbackSubmitSuccess: '感谢你的反馈！',
+    amountRangeInvalid: '请输入 1 到 100 之间的金额',
+    paymentNotConfigured: '支付功能尚未配置，请联系开发者',
+    paymentModuleLoadFailed: '支付模块加载失败，请刷新页面后重试',
+    donationComingSoon: '感谢支持，赞助功能即将上线',
+    saveThemeSuccess: '主题已保存',
+    saveThemeFailed: '保存失败，请稍后重试',
+    resetThemeSuccess: '主题已恢复默认设置',
+    upgradeFailed: '升级失败，请稍后重试',
+    paymentSystemNotLoaded: '支付系统尚未加载，请刷新页面后重试',
+    deleteItemConfirm: '确定要删除吗？',
+    loginRequiredTitle: '需要登录',
+    loginRequiredDesc: '请先登录后再使用这个功能',
+    loginNow: '立即登录',
+    upgradeMembership: '升级会员',
+    upgradeDesc: '解锁更多高级功能，提升你的使用体验',
+    premium: '高级会员',
+    superMembership: '超级会员',
+    upgradeMonthly: '按月升级',
+    upgradeYearly: '按年升级',
+    currentPlan: '当前方案',
+    maybeLater: '稍后再说',
+    customThemes: '自定义主题',
+    customFonts: '自定义字体',
+    uploadWallpapersLimited: '上传壁纸（50 张）',
+    allPremiumFeatures: '包含全部高级功能',
+    unlimitedWallpaperUploads: '无限上传壁纸',
+    unlockThemeCustomization: '解锁主题定制',
+    unlockCustomWallpapers: '解锁自定义壁纸',
+    unlockFontCustomization: '解锁字体定制',
+    upgradeThemeDesc: '升级会员后即可自由定制你的主题风格',
+    upgradeWallpaperDesc: '升级会员后即可上传自己喜欢的壁纸',
+    upgradeFontDesc: '升级会员后即可选择喜欢的中英文字体组合',
+    confirmText: '确认',
+    days: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+    months: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+  },
+  en: {
+    loginBeforeSave: 'Please log in before saving and syncing this change',
+    supabaseMissing: 'Supabase is not initialized. Please check your config.js credentials.',
+    themeLoadFailed: 'Theme settings failed to load. Please refresh and try again.',
+    gumroadLinkMissing: 'Gumroad payment link is not configured yet.',
+    openingGumroadPage: 'Opening Gumroad page...',
+    openingGumroadCheckout: 'Opening Gumroad checkout...',
+    feedbackContentRequired: 'Please enter feedback content',
+    feedbackSubmitFailed: 'Submit failed, please try again',
+    feedbackSubmitSuccess: 'Thank you for your feedback!',
+    amountRangeInvalid: 'Please enter an amount between 1 and 100',
+    paymentNotConfigured: 'Payment is not configured. Please contact the developer.',
+    paymentModuleLoadFailed: 'Payment module failed to load. Please refresh and try again.',
+    donationComingSoon: 'Thank you for your support. Donations are coming soon.',
+    saveThemeSuccess: 'Theme saved!',
+    saveThemeFailed: 'Save failed, please try again',
+    resetThemeSuccess: 'Theme customization reset',
+    upgradeFailed: 'Upgrade failed, please try again',
+    paymentSystemNotLoaded: 'Payment system not loaded. Please refresh and try again.',
+    deleteItemConfirm: 'Are you sure you want to delete this item?',
+    loginRequiredTitle: 'Login Required',
+    loginRequiredDesc: 'Please log in before using this feature',
+    loginNow: 'Login Now',
+    upgradeMembership: 'Upgrade Membership',
+    upgradeDesc: 'Unlock premium features and improve your experience',
+    premium: 'Premium',
+    superMembership: 'Super',
+    upgradeMonthly: 'Upgrade Monthly',
+    upgradeYearly: 'Upgrade Yearly',
+    currentPlan: 'Current Plan',
+    maybeLater: 'Maybe Later',
+    customThemes: 'Custom themes',
+    customFonts: 'Custom fonts',
+    uploadWallpapersLimited: 'Upload wallpapers (50 images)',
+    allPremiumFeatures: 'All premium features',
+    unlimitedWallpaperUploads: 'Unlimited wallpaper uploads',
+    unlockThemeCustomization: 'Unlock Theme Customization',
+    unlockCustomWallpapers: 'Unlock Custom Wallpapers',
+    unlockFontCustomization: 'Unlock Font Customization',
+    upgradeThemeDesc: 'Upgrade to customize your theme freely.',
+    upgradeWallpaperDesc: 'Upgrade to upload your own wallpapers.',
+    upgradeFontDesc: 'Upgrade to choose your preferred Chinese and English fonts.',
+    confirmText: 'Confirm'
+  }
+};
+
+Object.assign(translations.zh, TRANSLATION_OVERRIDES.zh);
+Object.assign(translations.en, TRANSLATION_OVERRIDES.en);
+
 function normalizeLocale(input) {
   if (!input) return 'zh';
   const v = String(input).trim();
@@ -1691,7 +1872,10 @@ saveItemBtn.addEventListener('click', () => {
   if (type === 'site') {
     const name = document.getElementById('siteName').value.trim();
     let url = document.getElementById('siteUrl').value.trim();
-    if (!name || !url) return alert(i18n.t('nameRequired'));
+    if (!name || !url) {
+      window.showNotification?.(i18n.t('nameRequired'), 'warning');
+      return;
+    }
 
     if (!url.startsWith('http')) url = 'https://' + url;
 
@@ -1734,7 +1918,10 @@ saveItemBtn.addEventListener('click', () => {
     }
   } else {
     const tagName = document.getElementById('tagName').value.trim();
-    if (!tagName) return alert(i18n.t('tagNameRequired'));
+    if (!tagName) {
+      window.showNotification?.(i18n.t('tagNameRequired'), 'warning');
+      return;
+    }
 
     if (isEditing) {
       // Update existing tag
@@ -1743,7 +1930,8 @@ saveItemBtn.addEventListener('click', () => {
       if (tagIndex !== -1) {
         // Check if new name already exists
         if (state.tags.includes(tagName) && tagName !== oldTagName) {
-          return alert(i18n.t('tagExists'));
+          window.showNotification?.(i18n.t('tagExists'), 'warning');
+          return;
         }
 
         state.tags[tagIndex] = tagName;
@@ -1764,7 +1952,10 @@ saveItemBtn.addEventListener('click', () => {
       }
     } else {
       // Create new tag
-      if (state.tags.includes(tagName)) return alert(i18n.t('tagExists'));
+      if (state.tags.includes(tagName)) {
+        window.showNotification?.(i18n.t('tagExists'), 'warning');
+        return;
+      }
       state.tags.push(tagName);
 
       // Add to tagOrder
@@ -2106,10 +2297,7 @@ document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) 
     }
 
     if (typeof window.showNotification === 'function') {
-      window.showNotification(
-        i18n.currentLocale === 'zh' ? '主题设置加载失败，请刷新后重试' : 'Theme settings failed to load. Please refresh and try again.',
-        'error'
-      );
+      window.showNotification(i18n.t('themeLoadFailed'), 'error');
     }
   });
 });
@@ -2138,22 +2326,12 @@ function closeAboutModal() {
 function openCoffeeSupportLink() {
   const gumroadUrl = String(window.GUMROAD_COFFEE_LINK_TEMPLATE || '').trim();
   if (!gumroadUrl) {
-    showNotification(
-      i18n.currentLocale === 'zh'
-        ? 'Gumroad 支付链接尚未配置，请先完成配置。'
-        : 'Gumroad payment link is not configured yet.',
-      'warning'
-    );
+    showNotification(i18n.t('gumroadLinkMissing'), 'warning');
     return;
   }
 
   closeAboutModal();
-  showNotification(
-    i18n.currentLocale === 'zh'
-      ? '正在跳转到 Gumroad 页面...'
-      : 'Opening Gumroad page...',
-    'success'
-  );
+  showNotification(i18n.t('openingGumroadPage'), 'success');
   window.open(gumroadUrl, '_blank', 'noopener,noreferrer');
 }
 
@@ -2184,42 +2362,27 @@ function processCoffeePaymentLegacy() {
   const amount = customAmount > 0 ? customAmount : selectedCoffeeAmount;
 
   if (amount < 1 || amount > 100) {
-    showNotification(i18n.currentLocale === 'zh' ? '请输入 1-100 之间的金额' : 'Please enter amount between 1-100', 'error');
+    showNotification(i18n.t('amountRangeInvalid'), 'error');
     return;
   }
 
   // Check if Paddle is configured
   if (!window.PADDLE_CLIENT_TOKEN) {
-    showNotification(
-      i18n.currentLocale === 'zh'
-        ? '支付功能尚未配置，请联系开发者'
-        : 'Payment not configured. Please contact the developer.',
-      'warning'
-    );
+    showNotification(i18n.t('paymentNotConfigured'), 'warning');
     console.error('Paddle not configured: PADDLE_CLIENT_TOKEN is empty in config.js');
     return;
   }
 
   // Check if Paddle SDK is loaded
   if (typeof Paddle === 'undefined') {
-    showNotification(
-      i18n.currentLocale === 'zh'
-        ? '支付模块加载失败，请刷新页面重试'
-        : 'Payment module failed to load. Please refresh and try again.',
-      'error'
-    );
+    showNotification(i18n.t('paymentModuleLoadFailed'), 'error');
     return;
   }
 
   // For donations, open external payment link or use Paddle custom amount
   // Since Paddle doesn't support arbitrary amounts without custom prices,
   // we'll redirect to a donation page or show a message
-  showNotification(
-    i18n.currentLocale === 'zh'
-      ? '感谢你的支持意向！捐赠功能即将上线'
-      : 'Thank you for your interest! Donation feature coming soon.',
-    'info'
-  );
+  showNotification(i18n.t('donationComingSoon'), 'info');
   closeCoffeeModal();
 
   // TODO: When ready, create donation prices in Paddle and use:
@@ -2244,13 +2407,13 @@ async function submitFeedback() {
   const email = document.getElementById('feedbackEmail').value.trim();
 
   if (!content) {
-    showNotification(i18n.currentLocale === 'zh' ? '请填写反馈内容' : 'Please enter feedback content', 'error');
+    showNotification(i18n.t('feedbackContentRequired'), 'error');
     return;
   }
 
   const submitBtn = document.getElementById('submitFeedbackBtn');
   submitBtn.disabled = true;
-  submitBtn.textContent = i18n.currentLocale === 'zh' ? '提交中...' : 'Submitting...';
+  submitBtn.textContent = i18n.t('submitting');
 
   try {
     const { error } = await supabase
@@ -2266,17 +2429,17 @@ async function submitFeedback() {
 
     if (error) {
       console.error('Feedback submit error:', error);
-      showNotification(i18n.currentLocale === 'zh' ? '提交失败，请重试' : 'Submit failed, please retry', 'error');
+      showNotification(i18n.t('feedbackSubmitFailed'), 'error');
     } else {
-      showNotification(i18n.currentLocale === 'zh' ? '感谢你的反馈！' : 'Thank you for your feedback!', 'success');
+      showNotification(i18n.t('feedbackSubmitSuccess'), 'success');
       closeFeedbackModal();
     }
   } catch (err) {
     console.error('Feedback exception:', err);
-    showNotification(i18n.currentLocale === 'zh' ? '提交失败' : 'Submit failed', 'error');
+    showNotification(i18n.t('feedbackSubmitFailed'), 'error');
   } finally {
     submitBtn.disabled = false;
-    submitBtn.textContent = i18n.currentLocale === 'zh' ? '提交' : 'Submit';
+    submitBtn.textContent = i18n.t('submit');
   }
 }
 
@@ -2305,27 +2468,17 @@ function processCoffeePayment() {
   const amount = Number.isFinite(customAmount) && customAmount > 0 ? customAmount : selectedCoffeeAmount;
 
   if (!Number.isFinite(amount) || amount < 1 || amount > 100) {
-    showNotification(i18n.currentLocale === 'zh' ? '请输入 1-100 之间的金额' : 'Please enter amount between 1-100', 'error');
+    showNotification(i18n.t('amountRangeInvalid'), 'error');
     return;
   }
 
   const gumroadUrl = buildGumroadCoffeeUrl(amount);
   if (!gumroadUrl) {
-    showNotification(
-      i18n.currentLocale === 'zh'
-        ? 'Gumroad 支付链接尚未配置，请先完成配置。'
-        : 'Gumroad payment link is not configured yet.',
-      'warning'
-    );
+    showNotification(i18n.t('gumroadLinkMissing'), 'warning');
     return;
   }
 
-  showNotification(
-    i18n.currentLocale === 'zh'
-      ? '正在跳转到 Gumroad 支付页面...'
-      : 'Opening Gumroad checkout...',
-    'success'
-  );
+  showNotification(i18n.t('openingGumroadCheckout'), 'success');
   window.open(gumroadUrl, '_blank', 'noopener,noreferrer');
   closeCoffeeModal();
 }
@@ -2497,14 +2650,22 @@ function editItemFromContext() {
 }
 
 // Delete item from context menu
-function deleteItemFromContext() {
+async function deleteItemFromContext() {
   hideAllContextMenus();
   if (!currentContextItem) return;
 
   const type = document.getElementById('itemContextMenu')?.dataset.type;
-  const confirmMsg = i18n.currentLocale === 'zh' ? '确定要删除吗？' : 'Are you sure you want to delete?';
+  const shouldDelete = window.showConfirmDialog
+    ? await window.showConfirmDialog({
+      title: i18n.t('deleteConfirm'),
+      message: i18n.t('deleteItemConfirm'),
+      confirmText: i18n.t('delete'),
+      cancelText: i18n.t('cancel'),
+      tone: 'danger'
+    })
+    : confirm(i18n.t('deleteItemConfirm'));
 
-  if (!confirm(confirmMsg)) return;
+  if (!shouldDelete) return;
 
   if (type === 'site') {
     const siteId = currentContextItem.dataset.id;
