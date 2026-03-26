@@ -138,6 +138,11 @@ function hasPendingConfigSync(uid, section) {
     return clearExpiredPendingMeta(uid, section);
 }
 
+function hasAnyPendingUserConfig(uid) {
+    if (!uid) return false;
+    return hasPendingConfigSync(uid, 'home') || hasPendingConfigSync(uid, 'color');
+}
+
 function clearPendingMeta(uid, section, syncedAt) {
     updateConfigMeta(uid, section, {
         localUpdatedAt: syncedAt,
@@ -631,7 +636,7 @@ async function loadUserData(options = {}) {
 }
 
 // Aggressive overwrite save for Home Config
-async function saveUserDataToBackend(immediate = false) {
+async function saveUserDataToBackend(immediate = true) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) return;
 
     const doSync = async () => {
@@ -645,7 +650,7 @@ async function saveUserDataToBackend(immediate = false) {
         }
     };
 
-    if (immediate === true) {
+    if (immediate !== false) {
         await doSync();
         return;
     }
@@ -704,7 +709,7 @@ async function saveThemeSettings(settings) {
 // Proxies existing API bindings to the new system
 async function saveFontSettings(fontSettings) {
     // Fonts are now embedded inside the Home Config payload
-    saveUserDataToBackend();
+    await saveUserDataToBackend(true);
 }
 
 async function resetThemeCustomizationOnBackend() {
@@ -730,7 +735,7 @@ async function resetThemeCustomizationOnBackend() {
 }
 
 function markHomeConfigUpdated() {
-    saveUserDataToBackend();
+    saveUserDataToBackend(true);
 }
 
 function flushPendingProfileSync() {
@@ -768,6 +773,7 @@ function applyCachedUserData() {
     // Immediately fired post-login to hydrate screen.
     if (window.authState && window.authState.user) {
         const uid = window.authState.user.id;
+        if (!hasAnyPendingUserConfig(uid)) return;
         waitForUserDataRuntimeReady().then((ready) => {
             if (!ready) return;
             try {
@@ -802,6 +808,7 @@ window.markHomeConfigUpdated = markHomeConfigUpdated;
 window.flushPendingProfileSync = flushPendingProfileSync;
 window.applyCachedUserData = applyCachedUserData;
 window.waitForUserDataRuntimeReady = waitForUserDataRuntimeReady;
+window.hasAnyPendingUserConfig = hasAnyPendingUserConfig;
 
 window.addEventListener('online', async () => {
     if (window.authState && window.authState.isLoggedIn) {
