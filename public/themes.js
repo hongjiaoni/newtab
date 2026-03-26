@@ -219,7 +219,11 @@ function openThemeCustomization() {
   console.log('openThemeCustomization called');
   console.log('authState:', window.authState);
   console.log('membershipState:', window.membershipState);
-  document.getElementById('settingsMenu')?.classList.add('hidden');
+  if (window.hideFloatingLayer) {
+    window.hideFloatingLayer('settingsMenu');
+  } else {
+    document.getElementById('settingsMenu')?.classList.add('hidden');
+  }
 
   /* Guest users can preview customization; login is required only when saving.
   if (!window.authState || !window.authState.isLoggedIn) {
@@ -233,7 +237,11 @@ function openThemeCustomization() {
     if (window.openGoogleSignInModal) {
       window.openGoogleSignInModal();
     } else {
-      document.getElementById('googleSignInModal')?.classList.remove('hidden');
+      if (window.showFloatingLayer) {
+        window.showFloatingLayer('googleSignInModal');
+      } else {
+        document.getElementById('googleSignInModal')?.classList.remove('hidden');
+      }
     }
     return;
   }
@@ -250,7 +258,13 @@ function openThemeCustomization() {
       'info'
     );
     const settingsMenu = document.getElementById('settingsMenu');
-    if (settingsMenu) settingsMenu.classList.add('hidden');
+    if (settingsMenu) {
+      if (window.hideFloatingLayer) {
+        window.hideFloatingLayer(settingsMenu);
+      } else {
+        settingsMenu.classList.add('hidden');
+      }
+    }
 
     setTimeout(() => {
       if (window.showUpgradeModal) {
@@ -267,10 +281,11 @@ function openThemeCustomization() {
     originalThemeOnOpen = themeState.currentTheme;
     const modal = document.getElementById('themeCustomizationModal');
     if (modal) {
-      modal.classList.remove('hidden');
-      modal.style.display = 'flex';
-      modal.style.visibility = 'visible';
-      modal.style.opacity = '1';
+      if (window.showFloatingLayer) {
+        window.showFloatingLayer(modal);
+      } else {
+        modal.classList.remove('hidden');
+      }
     }
     renderThemePreview();
   } catch (error) {
@@ -307,16 +322,16 @@ function createThemeModal() {
           <div>
             <!-- Tab Buttons -->
             <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
-              <button class="theme-tab-btn" id="tabStyle" onclick="switchThemeTab('style')">
+              <button class="theme-tab-btn" id="tabStyle" data-theme-action="switch-tab" data-tab="style">
                 ${isZh ? '风格' : 'Style'}
               </button>
-              <button class="theme-tab-btn active" id="tabFont" onclick="switchThemeTab('font')">
+              <button class="theme-tab-btn active" id="tabFont" data-theme-action="switch-tab" data-tab="font">
                 ${isZh ? '字体' : 'Font'}
               </button>
-              <button class="theme-tab-btn" id="tabLight" onclick="switchThemeTab('light')">
+              <button class="theme-tab-btn" id="tabLight" data-theme-action="switch-tab" data-tab="light">
                 ${isZh ? '浅色模式' : 'Light'}
               </button>
-              <button class="theme-tab-btn" id="tabDark" onclick="switchThemeTab('dark')">
+              <button class="theme-tab-btn" id="tabDark" data-theme-action="switch-tab" data-tab="dark">
                 ${isZh ? '深色模式' : 'Dark'}
               </button>
             </div>
@@ -325,7 +340,7 @@ function createThemeModal() {
             <div id="themePanelStyle" class="theme-panel hidden">
               <div class="theme-color-row">
                 <label>${isZh ? '当前风格' : 'Current Style'}</label>
-                <select id="themeStyleSelect" class="modal-input" onchange="updateThemePreview()">
+                <select id="themeStyleSelect" class="modal-input">
                   <option value="handdrawn" ${themeState.currentTheme === 'handdrawn' ? 'selected' : ''}>
                     ${isZh ? '手绘（默认）' : 'Hand-drawn (Default)'}
                   </option>
@@ -346,7 +361,7 @@ function createThemeModal() {
             <div id="themePanelFont" class="theme-panel">
               <div class="theme-color-row">
                 <label>${isZh ? '英文字体' : 'English Font'}</label>
-                <select id="fontEnglishSelect" class="modal-input" onchange="handleThemeFontChange()">
+                <select id="fontEnglishSelect" class="modal-input">
                   ${AVAILABLE_FONTS.english.map(f => `
                     <option value="${f.value}" ${themeState.customSettings.fontEnglish === f.value ? 'selected' : ''}>
                       ${f.name}
@@ -356,7 +371,7 @@ function createThemeModal() {
               </div>
               <div class="theme-color-row">
                 <label>${isZh ? '中文字体' : 'Chinese Font'}</label>
-                <select id="fontChineseSelect" class="modal-input" onchange="handleThemeFontChange()">
+                <select id="fontChineseSelect" class="modal-input">
                   ${AVAILABLE_FONTS.chinese.map(f => `
                     <option value="${f.value}" ${themeState.customSettings.fontChinese === f.value ? 'selected' : ''}>
                       ${f.name}
@@ -371,42 +386,42 @@ function createThemeModal() {
               <div class="theme-color-grid">
                 <div class="theme-color-item">
                   <label>${isZh ? '背景' : 'Background'}</label>
-                  <input type="color" id="bgColorInput" value="${themeState.customSettings.bgColor}" onchange="updateThemePreview()">
+                  <input type="color" id="bgColorInput" value="${themeState.customSettings.bgColor}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '按钮' : 'Button'}</label>
-                  <input type="color" id="buttonBgInput" value="${themeState.customSettings.buttonBg}" onchange="updateThemePreview()">
+                  <input type="color" id="buttonBgInput" value="${themeState.customSettings.buttonBg}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '输入框' : 'Input'}</label>
-                  <input type="color" id="inputBgInput" value="${themeState.customSettings.inputBg}" onchange="updateThemePreview()">
+                  <input type="color" id="inputBgInput" value="${themeState.customSettings.inputBg}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '边框' : 'Border'}</label>
-                  <input type="color" id="borderColorInput" value="${themeState.customSettings.borderColor}" onchange="updateThemePreview()">
+                  <input type="color" id="borderColorInput" value="${themeState.customSettings.borderColor}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '文字' : 'Text'}</label>
-                  <input type="color" id="textColorInput" value="${themeState.customSettings.textColor}" onchange="updateThemePreview()">
+                  <input type="color" id="textColorInput" value="${themeState.customSettings.textColor}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '文字(按下)' : 'Text Active'}</label>
-                  <input type="color" id="textActiveColorInput" value="${themeState.customSettings.textActiveColor}" onchange="updateThemePreview()">
+                  <input type="color" id="textActiveColorInput" value="${themeState.customSettings.textActiveColor}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '弹窗' : 'Modal'}</label>
-                  <input type="color" id="modalBgInput" value="${themeState.customSettings.modalBg}" onchange="updateThemePreview()">
+                  <input type="color" id="modalBgInput" value="${themeState.customSettings.modalBg}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '悬浮' : 'Hover'}</label>
-                  <input type="color" id="hoverBgInput" value="${themeState.customSettings.hoverBg}" onchange="updateThemePreview()">
+                  <input type="color" id="hoverBgInput" value="${themeState.customSettings.hoverBg}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '强调' : 'Accent'}</label>
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '阴影' : 'Shadow'}</label>
-                  <input type="color" id="shadowColorInput" value="${toHexColor(themeState.customSettings.shadowColor)}" onchange="updateThemePreview()">
+                  <input type="color" id="shadowColorInput" value="${toHexColor(themeState.customSettings.shadowColor)}">
                 </div>
               </div>
             </div>
@@ -416,42 +431,42 @@ function createThemeModal() {
               <div class="theme-color-grid">
                 <div class="theme-color-item">
                   <label>${isZh ? '背景' : 'Background'}</label>
-                  <input type="color" id="bgColorDarkInput" value="${themeState.customSettings.darkMode.bgColor}" onchange="updateThemePreview()">
+                  <input type="color" id="bgColorDarkInput" value="${themeState.customSettings.darkMode.bgColor}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '按钮' : 'Button'}</label>
-                  <input type="color" id="buttonBgDarkInput" value="${themeState.customSettings.darkMode.buttonBg}" onchange="updateThemePreview()">
+                  <input type="color" id="buttonBgDarkInput" value="${themeState.customSettings.darkMode.buttonBg}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '输入框' : 'Input'}</label>
-                  <input type="color" id="inputBgDarkInput" value="${themeState.customSettings.darkMode.inputBg}" onchange="updateThemePreview()">
+                  <input type="color" id="inputBgDarkInput" value="${themeState.customSettings.darkMode.inputBg}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '边框' : 'Border'}</label>
-                  <input type="color" id="borderColorDarkInput" value="${themeState.customSettings.darkMode.borderColor}" onchange="updateThemePreview()">
+                  <input type="color" id="borderColorDarkInput" value="${themeState.customSettings.darkMode.borderColor}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '文字' : 'Text'}</label>
-                  <input type="color" id="textColorDarkInput" value="${themeState.customSettings.darkMode.textColor}" onchange="updateThemePreview()">
+                  <input type="color" id="textColorDarkInput" value="${themeState.customSettings.darkMode.textColor}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '文字(按下)' : 'Text Active'}</label>
-                  <input type="color" id="textActiveColorDarkInput" value="${themeState.customSettings.darkMode.textActiveColor}" onchange="updateThemePreview()">
+                  <input type="color" id="textActiveColorDarkInput" value="${themeState.customSettings.darkMode.textActiveColor}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '弹窗' : 'Modal'}</label>
-                  <input type="color" id="modalBgDarkInput" value="${themeState.customSettings.darkMode.modalBg}" onchange="updateThemePreview()">
+                  <input type="color" id="modalBgDarkInput" value="${themeState.customSettings.darkMode.modalBg}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '悬浮' : 'Hover'}</label>
-                  <input type="color" id="hoverBgDarkInput" value="${themeState.customSettings.darkMode.hoverBg}" onchange="updateThemePreview()">
+                  <input type="color" id="hoverBgDarkInput" value="${themeState.customSettings.darkMode.hoverBg}">
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '强调' : 'Accent'}</label>
                 </div>
                 <div class="theme-color-item">
                   <label>${isZh ? '阴影' : 'Shadow'}</label>
-                  <input type="color" id="shadowColorDarkInput" value="${toHexColor(themeState.customSettings.darkMode.shadowColor)}" onchange="updateThemePreview()">
+                  <input type="color" id="shadowColorDarkInput" value="${toHexColor(themeState.customSettings.darkMode.shadowColor)}">
                 </div>
               </div>
             </div>
@@ -460,10 +475,10 @@ function createThemeModal() {
           <!-- Right: Preview -->
           <div>
             <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-              <button class="theme-tab-btn active" onclick="setPreviewMode('light')" id="previewLightBtn">
+              <button class="theme-tab-btn active" data-theme-action="preview-mode" data-mode="light" id="previewLightBtn">
                 ${isZh ? '浅色预览' : 'Light'}
               </button>
-              <button class="theme-tab-btn" onclick="setPreviewMode('dark')" id="previewDarkBtn">
+              <button class="theme-tab-btn" data-theme-action="preview-mode" data-mode="dark" id="previewDarkBtn">
                 ${isZh ? '深色预览' : 'Dark'}
               </button>
             </div>
@@ -473,20 +488,73 @@ function createThemeModal() {
         </div>
 
         <div class="modal-actions" style="margin-top: 20px;">
-          <button class="cancel-btn" onclick="closeThemeModal()">${isZh ? '取消' : 'Cancel'}</button>
-          <button class="cancel-btn" onclick="resetThemeCustomization()">${isZh ? '重置' : 'Reset'}</button>
-          <button class="primary-btn" onclick="saveThemeCustomization()">${isZh ? '保存' : 'Save'}</button>
+          <button class="cancel-btn" data-theme-action="close-theme">${isZh ? '取消' : 'Cancel'}</button>
+          <button class="cancel-btn" data-theme-action="reset-theme">${isZh ? '重置' : 'Reset'}</button>
+          <button class="primary-btn" data-theme-action="save-theme">${isZh ? '保存' : 'Save'}</button>
         </div>
       </div>
     </div>
   `;
 
   document.body.insertAdjacentHTML('beforeend', modalHTML);
+  const modalRoot = document.getElementById('themeCustomizationModal');
+  if (modalRoot && modalRoot.dataset.bound !== 'true') {
+    modalRoot.dataset.bound = 'true';
+    modalRoot.addEventListener('click', handleThemeModalActionClick);
+    modalRoot.addEventListener('change', handleThemeModalFieldChange);
+  }
   document.querySelectorAll('#themeCustomizationModal .theme-color-item').forEach((item) => {
     if (!item.querySelector('input')) {
       item.remove();
     }
   });
+}
+
+function handleThemeModalActionClick(event) {
+  const actionTarget = event.target.closest('[data-theme-action]');
+  if (!actionTarget) return;
+
+  const action = actionTarget.dataset.themeAction;
+  if (!action) return;
+
+  event.preventDefault();
+
+  switch (action) {
+    case 'switch-tab':
+      switchThemeTab(actionTarget.dataset.tab || 'font');
+      break;
+    case 'preview-mode':
+      setPreviewMode(actionTarget.dataset.mode || 'light');
+      break;
+    case 'close-theme':
+      closeThemeModal();
+      break;
+    case 'reset-theme':
+      void resetThemeCustomization();
+      break;
+    case 'save-theme':
+      void saveThemeCustomization();
+      break;
+    default:
+      break;
+  }
+}
+
+function handleThemeModalFieldChange(event) {
+  const target = event.target;
+  if (!target) return;
+
+  if (target.id === 'fontEnglishSelect' || target.id === 'fontChineseSelect') {
+    handleThemeFontChange();
+    return;
+  }
+
+  if (
+    target.id === 'themeStyleSelect'
+    || target.matches?.('#themeCustomizationModal input[type="color"]')
+  ) {
+    updateThemePreview();
+  }
 }
 
 function getThemeDisplayName(style) {
@@ -559,7 +627,7 @@ function handleThemeFontChange() {
 }
 
 // Render theme preview
-function renderThemePreview() {
+function renderThemePreviewLegacy() {
   const preview = document.getElementById('themePreview');
   if (!preview) return;
   const previewStyle = document.getElementById('themeStyleSelect')?.value || themeState.currentTheme || 'handdrawn';
@@ -1306,7 +1374,11 @@ function closeThemeModal(restoreOriginal = true) {
     applyStyleTheme(originalThemeOnOpen);
     originalThemeOnOpen = null;
   }
-  document.getElementById('themeCustomizationModal')?.classList.add('hidden');
+  if (window.hideFloatingLayer) {
+    window.hideFloatingLayer('themeCustomizationModal');
+  } else {
+    document.getElementById('themeCustomizationModal')?.classList.add('hidden');
+  }
 }
 
 // Before opening modal, store the original theme

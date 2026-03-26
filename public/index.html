@@ -15,8 +15,8 @@
   <link rel="stylesheet" href="https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css">
   <link rel="stylesheet" href="https://chinese-fonts-cdn.deno.dev/packages/zhbtt/dist/result.css">
   <link rel="stylesheet" href="https://chinese-fonts-cdn.deno.dev/packages/ysbth/dist/result.css">
-  <link rel="stylesheet" href="style.css?v=20260326-uifix-2" />
-  <link rel="stylesheet" href="wallpaper-modal.css?v=20260326-uifix-2" />
+  <link rel="stylesheet" href="style.css?v=20260326-uifix-3" />
+  <link rel="stylesheet" href="wallpaper-modal.css?v=20260326-uifix-3" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260131">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20260131">
   <link rel="shortcut icon" href="/favicon.png?v=20260131">
@@ -38,17 +38,17 @@
   <div class="top-right-controls">
     <button id="settingsToggle" class="settings-btn">⋯</button>
     <div id="settingsMenu" class="settings-menu hidden">
-      <div class="settings-menu-item" onclick="toggleTheme()">
+      <div class="settings-menu-item" data-action="toggle-theme">
         <span id="themeText">深色模式</span>
       </div>
       <div class="settings-menu-item" id="languageMenuItem">
         <span id="langText">语言</span>
         <div id="languageSubmenu" class="settings-submenu hidden">
-          <div onclick="i18n.setLocale('en')">English</div>
-          <div onclick="i18n.setLocale('zh')">中文</div>
+          <div data-action="set-locale" data-locale="en">English</div>
+          <div data-action="set-locale" data-locale="zh">中文</div>
         </div>
       </div>
-      <div class="settings-menu-item" onclick="toggleMinimalist()">
+      <div class="settings-menu-item" data-action="toggle-minimalist">
         <span id="minimalistText">极简模式</span>
       </div>
       <div class="settings-menu-divider"></div>
@@ -59,13 +59,12 @@
         <span id="themeCustomizationText">主题</span>
       </div>
       <div class="settings-menu-divider"></div>
-      <div class="settings-menu-item" onclick="openAboutModal()">
+      <div class="settings-menu-item" data-action="open-about">
         <span id="aboutText">关于</span>
       </div>
       <div class="settings-menu-divider"></div>
       <div id="authMenuContainer">
-        <div class="settings-menu-item" id="loginMenuItem"
-          onclick="document.getElementById('googleSignInModal').classList.remove('hidden')">
+        <div class="settings-menu-item" id="loginMenuItem" data-action="open-login-modal">
           <span id="loginText">登录</span>
         </div>
       </div>
@@ -77,7 +76,7 @@
     <div class="modal google-signin-modal">
       <h3 id="googleSignInTitle">登录</h3>
       <div id="googleSignInContainer" style="text-align: center; padding: 20px;">
-        <button onclick="handleLoginClick()" class="primary-btn sketchy-border"
+        <button data-action="google-login" class="primary-btn sketchy-border"
           style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
           <img src="https://www.google.com/favicon.ico" width="18" height="18">
           <span id="googleLoginBtnText">Google 登录</span>
@@ -264,10 +263,10 @@
       <div style="text-align: center; padding: 20px;">
         <p style="margin-bottom: 20px; opacity: 0.8;" id="aboutDesc">简洁美观的新标签页，让每次打开浏览器都是一种享受。</p>
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-          <button onclick="openCoffeeModal()" class="primary-btn sketchy-border" style="padding: 12px 24px;">
+          <button data-action="open-coffee-link" class="primary-btn sketchy-border" style="padding: 12px 24px;">
             <span id="coffeeBtn">请我喝杯咖啡</span>
           </button>
-          <button onclick="openFeedbackModal()" class="cancel-btn sketchy-border" style="padding: 12px 24px;">
+          <button data-action="open-feedback" class="cancel-btn sketchy-border" style="padding: 12px 24px;">
             <span id="feedbackBtn">提交反馈</span>
           </button>
         </div>
@@ -277,7 +276,7 @@
         </div>
       </div>
       <div class="modal-actions">
-        <button onclick="closeAboutModal()" class="cancel-btn" id="aboutCloseBtn">关闭</button>
+        <button data-action="close-about" class="cancel-btn" id="aboutCloseBtn">关闭</button>
       </div>
     </div>
   </div>
@@ -289,10 +288,10 @@
       <div style="padding: 20px;">
         <p style="margin-bottom: 20px; opacity: 0.8;" id="coffeeDesc">如果你喜欢这个项目，可以请我喝杯咖啡表示支持！</p>
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-          <button class="coffee-amount-btn" data-amount="1" onclick="selectCoffeeAmount(1)">$1</button>
-          <button class="coffee-amount-btn" data-amount="3" onclick="selectCoffeeAmount(3)">$3</button>
-          <button class="coffee-amount-btn selected" data-amount="5" onclick="selectCoffeeAmount(5)">$5</button>
-          <button class="coffee-amount-btn" data-amount="10" onclick="selectCoffeeAmount(10)">$10</button>
+          <button class="coffee-amount-btn" data-action="select-coffee-amount" data-amount="1">$1</button>
+          <button class="coffee-amount-btn" data-action="select-coffee-amount" data-amount="3">$3</button>
+          <button class="coffee-amount-btn selected" data-action="select-coffee-amount" data-amount="5">$5</button>
+          <button class="coffee-amount-btn" data-action="select-coffee-amount" data-amount="10">$10</button>
         </div>
         <div style="text-align: center;">
           <input type="number" id="coffeeCustomAmount" min="1" max="100" placeholder="自定义金额" class="modal-input"
@@ -300,8 +299,8 @@
         </div>
       </div>
       <div class="modal-actions">
-        <button onclick="closeCoffeeModal()" class="cancel-btn" id="coffeeCancelBtn">取消</button>
-        <button onclick="processCoffeePayment()" class="primary-btn" id="coffeePayBtn">支付</button>
+        <button data-action="close-coffee" class="cancel-btn" id="coffeeCancelBtn">取消</button>
+        <button data-action="process-coffee-payment" class="primary-btn" id="coffeePayBtn">支付</button>
       </div>
     </div>
   </div>
@@ -330,45 +329,45 @@
         </div>
       </div>
       <div class="modal-actions">
-        <button onclick="closeFeedbackModal()" class="cancel-btn" id="feedbackCancelBtn">取消</button>
-        <button onclick="submitFeedback()" class="primary-btn" id="submitFeedbackBtn">提交</button>
+        <button data-action="close-feedback" class="cancel-btn" id="feedbackCancelBtn">取消</button>
+        <button data-action="submit-feedback" class="primary-btn" id="submitFeedbackBtn">提交</button>
       </div>
     </div>
   </div>
 
   <!-- Right-click Context Menu (for empty areas) -->
   <div id="pageContextMenu" class="page-context-menu hidden">
-    <div class="context-menu-item" onclick="openAddSiteFromContext()">
+    <div class="context-menu-item" data-action="context-add-site">
       <span id="ctxAddSite">添加网站</span>
     </div>
-    <div class="context-menu-item" onclick="openAddTagFromContext()">
+    <div class="context-menu-item" data-action="context-add-tag">
       <span id="ctxAddTag">添加标签</span>
     </div>
     <div class="context-menu-divider"></div>
-    <div class="context-menu-item" onclick="openWallpaperFromContext()">
+    <div class="context-menu-item" data-action="context-open-wallpaper">
       <span id="ctxWallpaper">更换壁纸</span>
     </div>
   </div>
 
   <!-- Item Context Menu (for sites/tags) -->
   <div id="itemContextMenu" class="page-context-menu item-context-menu hidden">
-    <div class="context-menu-item" onclick="editItemFromContext()">
+    <div class="context-menu-item" data-action="context-edit-item">
       <span id="ctxEditItem">编辑</span>
     </div>
-    <div class="context-menu-item" onclick="deleteItemFromContext()">
+    <div class="context-menu-item" data-action="context-delete-item">
       <span id="ctxDeleteItem">删除</span>
     </div>
   </div>
 
-  <script src="config.js?v=20260326-uifix-2"></script>
+  <script src="config.js?v=20260326-uifix-3"></script>
   <script src="supabase-client.js"></script>
-  <script src="wallpaper.js?v=20260326-uifix-2"></script>
+  <script src="wallpaper.js?v=20260326-uifix-3"></script>
   <script src="paddle.js"></script>
-  <script src="membership.js?v=20260326-uifix-2"></script>
-  <script src="auth.js?v=20260326-uifix-2"></script>
-  <script src="data-sync.js?v=20260326-uifix-2"></script>
-  <script src="/themes.js?v=20260326-uifix-2"></script>
-  <script src="/script.js?v=20260326-uifix-2"></script>
+  <script src="membership.js?v=20260326-uifix-3"></script>
+  <script src="auth.js?v=20260326-uifix-3"></script>
+  <script src="data-sync.js?v=20260326-uifix-3"></script>
+  <script src="/themes.js?v=20260326-uifix-3"></script>
+  <script src="/script.js?v=20260326-uifix-3"></script>
 </body>
 
 </html>
