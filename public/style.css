@@ -906,6 +906,113 @@ textarea:-ms-input-placeholder {
   display: none !important;
 }
 
+/* Subtle motion for floating menus and overlays */
+.settings-menu,
+.settings-submenu,
+.engine-menu,
+.context-menu,
+.page-context-menu {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.16s ease,
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.16s ease;
+  will-change: opacity, transform;
+}
+
+.settings-menu {
+  transform: translateY(0) scale(1);
+  transform-origin: top right;
+}
+
+.settings-submenu {
+  transform: translateX(0) scale(1);
+  transform-origin: top right;
+}
+
+.engine-menu,
+.context-menu,
+.page-context-menu {
+  transform: translateY(0) scale(1);
+  transform-origin: top left;
+}
+
+.settings-menu.hidden {
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-6px) scale(0.985);
+}
+
+.settings-submenu.hidden {
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateX(6px) scale(0.985);
+}
+
+.engine-menu.hidden {
+  display: flex !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-6px) scale(0.985);
+}
+
+.context-menu.hidden,
+.page-context-menu.hidden {
+  display: block !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(6px) scale(0.985);
+}
+
+.modal-overlay {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.18s ease,
+    visibility 0.18s ease;
+  will-change: opacity;
+}
+
+.modal-overlay .modal {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition:
+    opacity 0.18s ease,
+    transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.modal-overlay.hidden {
+  display: flex !important;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.modal-overlay.hidden .modal {
+  opacity: 0;
+  transform: translateY(10px) scale(0.985);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-menu,
+  .settings-submenu,
+  .engine-menu,
+  .context-menu,
+  .page-context-menu,
+  .modal-overlay,
+  .modal-overlay .modal {
+    transition: none !important;
+  }
+}
+
 .modal h3 {
   margin: 0 0 16px;
   font-weight: 700;
