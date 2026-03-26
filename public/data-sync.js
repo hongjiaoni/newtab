@@ -693,16 +693,18 @@ async function saveThemeSettings(settings) {
             pendingSessionId: CURRENT_SYNC_SESSION_ID
         });
 
+        // Theme style and fonts are also stored with the home config, so persist them
+        // even if the dedicated theme/color table write fails later.
+        await persistHomeConfig(uid, buildCurrentHomePayload(), syncedAt);
+
         // 2. Persist through normalized theme/font tables
         await saveLegacyThemeConfig(uid, settings, syncedAt);
 
         clearPendingMeta(uid, 'color', syncedAt);
 
-        // Theme style and fonts are stored with the home config as well.
-        await persistHomeConfig(uid, buildCurrentHomePayload(), syncedAt);
-
     } catch (e) {
         console.error('Error saving color config:', e);
+        throw e;
     }
 }
 
