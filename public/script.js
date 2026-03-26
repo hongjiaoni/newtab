@@ -1899,16 +1899,16 @@ function updateSettingsMenu() {
 
 settingsToggle.addEventListener('click', (e) => {
   e.stopPropagation();
-  settingsMenu.classList.toggle('hidden');
+  toggleFloatingLayer(settingsMenu);
 });
 
 document.getElementById('languageMenuItem').addEventListener('click', (e) => {
   e.stopPropagation();
-  document.getElementById('languageSubmenu').classList.toggle('hidden');
+  toggleFloatingLayer('languageSubmenu');
 });
 
 let themeScriptLoadPromise = null;
-const THEME_SCRIPT_VERSION = '20260326-uifix-2';
+const THEME_SCRIPT_VERSION = '20260326-uifix-3';
 
 function getThemeScriptUrl() {
   return new URL(`/themes.js?v=${THEME_SCRIPT_VERSION}`, window.location.origin).toString();
@@ -2031,6 +2031,37 @@ ensureThemeCustomizationLoaded().then((loaded) => {
   window.applyCustomThemeForCurrentMode?.();
 });
 
+function resolveFloatingLayer(target) {
+  if (!target) return null;
+  if (typeof target === 'string') return document.getElementById(target);
+  return target;
+}
+
+function showFloatingLayer(target) {
+  const element = resolveFloatingLayer(target);
+  if (!element) return null;
+  element.classList.remove('hidden');
+  return element;
+}
+
+function hideFloatingLayer(target) {
+  const element = resolveFloatingLayer(target);
+  if (!element) return null;
+  element.classList.add('hidden');
+  return element;
+}
+
+function toggleFloatingLayer(target) {
+  const element = resolveFloatingLayer(target);
+  if (!element) return false;
+  element.classList.toggle('hidden');
+  return !element.classList.contains('hidden');
+}
+
+window.showFloatingLayer = showFloatingLayer;
+window.hideFloatingLayer = hideFloatingLayer;
+window.toggleFloatingLayer = toggleFloatingLayer;
+
 function isElementVisible(element) {
   return !!element && !element.classList.contains('hidden');
 }
@@ -2052,8 +2083,8 @@ function hasOpenTransientUi() {
 }
 
 function closeTransientUi() {
-  settingsMenu?.classList.add('hidden');
-  document.getElementById('languageSubmenu')?.classList.add('hidden');
+  hideFloatingLayer(settingsMenu);
+  hideFloatingLayer('languageSubmenu');
   window.closeWallpaperModal?.();
   window.closeThemeModal?.(false);
   closeModals?.();
@@ -2061,8 +2092,8 @@ function closeTransientUi() {
   window.closeAboutModal?.();
   window.closeCoffeeModal?.();
   window.closeFeedbackModal?.();
-  pageContextMenu?.classList.add('hidden');
-  itemContextMenu?.classList.add('hidden');
+  hideFloatingLayer(pageContextMenu);
+  hideFloatingLayer(itemContextMenu);
 }
 
 document.addEventListener('click', (e) => {
@@ -2082,7 +2113,7 @@ document.addEventListener('click', (e) => {
 document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) => {
   e.preventDefault();
   e.stopPropagation();
-  settingsMenu.classList.add('hidden');
+  hideFloatingLayer(settingsMenu);
 
   if (typeof window.openThemeCustomization === 'function') {
     window.openThemeCustomization();
@@ -2116,10 +2147,10 @@ document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) 
 
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.settings-menu') && !e.target.closest('.settings-btn')) {
-    settingsMenu.classList.add('hidden');
-    document.getElementById('languageSubmenu').classList.add('hidden');
+    hideFloatingLayer(settingsMenu);
+    hideFloatingLayer('languageSubmenu');
   } else if (!e.target.closest('#languageMenuItem')) {
-    document.getElementById('languageSubmenu').classList.add('hidden');
+    hideFloatingLayer('languageSubmenu');
   }
 });
 
@@ -2127,17 +2158,39 @@ document.addEventListener('click', (e) => {
 let selectedCoffeeAmount = 5;
 
 function openAboutModal() {
-  document.getElementById('settingsMenu').classList.add('hidden');
-  document.getElementById('aboutModal').classList.remove('hidden');
+  hideFloatingLayer('settingsMenu');
+  showFloatingLayer('aboutModal');
 }
 
 function closeAboutModal() {
-  document.getElementById('aboutModal').classList.add('hidden');
+  hideFloatingLayer('aboutModal');
+}
+
+function openCoffeeSupportLink() {
+  const gumroadUrl = String(window.GUMROAD_COFFEE_LINK_TEMPLATE || '').trim();
+  if (!gumroadUrl) {
+    showNotification(
+      i18n.currentLocale === 'zh'
+        ? 'Gumroad 支付链接尚未配置，请先完成配置。'
+        : 'Gumroad payment link is not configured yet.',
+      'warning'
+    );
+    return;
+  }
+
+  closeAboutModal();
+  showNotification(
+    i18n.currentLocale === 'zh'
+      ? '正在跳转到 Gumroad 页面...'
+      : 'Opening Gumroad page...',
+    'success'
+  );
+  window.open(gumroadUrl, '_blank', 'noopener,noreferrer');
 }
 
 function openCoffeeModal() {
-  document.getElementById('aboutModal').classList.add('hidden');
-  document.getElementById('coffeeModal').classList.remove('hidden');
+  hideFloatingLayer('aboutModal');
+  showFloatingLayer('coffeeModal');
   selectedCoffeeAmount = 5;
   document.querySelectorAll('.coffee-amount-btn').forEach(btn => {
     btn.classList.toggle('selected', btn.dataset.amount === '5');
@@ -2146,7 +2199,7 @@ function openCoffeeModal() {
 }
 
 function closeCoffeeModal() {
-  document.getElementById('coffeeModal').classList.add('hidden');
+  hideFloatingLayer('coffeeModal');
 }
 
 function selectCoffeeAmount(amount) {
@@ -2205,15 +2258,15 @@ function processCoffeePaymentLegacy() {
 }
 
 function openFeedbackModal() {
-  document.getElementById('aboutModal').classList.add('hidden');
-  document.getElementById('feedbackModal').classList.remove('hidden');
+  hideFloatingLayer('aboutModal');
+  showFloatingLayer('feedbackModal');
   document.getElementById('feedbackType').value = 'bug';
   document.getElementById('feedbackContent').value = '';
   document.getElementById('feedbackEmail').value = window.authState?.user?.email || '';
 }
 
 function closeFeedbackModal() {
-  document.getElementById('feedbackModal').classList.add('hidden');
+  hideFloatingLayer('feedbackModal');
 }
 
 async function submitFeedback() {
@@ -2308,9 +2361,103 @@ function processCoffeePayment() {
   closeCoffeeModal();
 }
 
+function handleDataActionClick(event) {
+  const actionTarget = event.target.closest('[data-action]');
+  if (!actionTarget) return;
+
+  const { action } = actionTarget.dataset;
+  if (!action) return;
+
+  switch (action) {
+    case 'toggle-theme':
+      event.preventDefault();
+      toggleTheme();
+      break;
+    case 'set-locale':
+      event.preventDefault();
+      i18n.setLocale(actionTarget.dataset.locale || 'zh');
+      hideFloatingLayer('languageSubmenu');
+      hideFloatingLayer('settingsMenu');
+      break;
+    case 'toggle-minimalist':
+      event.preventDefault();
+      toggleMinimalist();
+      break;
+    case 'open-login-modal':
+      event.preventDefault();
+      showFloatingLayer('googleSignInModal');
+      break;
+    case 'google-login':
+      event.preventDefault();
+      handleLoginClick();
+      break;
+    case 'open-about':
+      event.preventDefault();
+      openAboutModal();
+      break;
+    case 'close-about':
+      event.preventDefault();
+      closeAboutModal();
+      break;
+    case 'open-coffee-link':
+      event.preventDefault();
+      openCoffeeSupportLink();
+      break;
+    case 'open-feedback':
+      event.preventDefault();
+      openFeedbackModal();
+      break;
+    case 'close-feedback':
+      event.preventDefault();
+      closeFeedbackModal();
+      break;
+    case 'close-coffee':
+      event.preventDefault();
+      closeCoffeeModal();
+      break;
+    case 'process-coffee-payment':
+      event.preventDefault();
+      processCoffeePayment();
+      break;
+    case 'select-coffee-amount':
+      event.preventDefault();
+      selectCoffeeAmount(parseInt(actionTarget.dataset.amount, 10));
+      break;
+    case 'submit-feedback':
+      event.preventDefault();
+      submitFeedback();
+      break;
+    case 'context-add-site':
+      event.preventDefault();
+      openAddSiteFromContext();
+      break;
+    case 'context-add-tag':
+      event.preventDefault();
+      openAddTagFromContext();
+      break;
+    case 'context-open-wallpaper':
+      event.preventDefault();
+      openWallpaperFromContext();
+      break;
+    case 'context-edit-item':
+      event.preventDefault();
+      editItemFromContext();
+      break;
+    case 'context-delete-item':
+      event.preventDefault();
+      deleteItemFromContext();
+      break;
+    default:
+      break;
+  }
+}
+
+document.addEventListener('click', handleDataActionClick);
+
 // Export modal functions
 window.openAboutModal = openAboutModal;
 window.closeAboutModal = closeAboutModal;
+window.openCoffeeSupportLink = openCoffeeSupportLink;
 window.openCoffeeModal = openCoffeeModal;
 window.closeCoffeeModal = closeCoffeeModal;
 window.selectCoffeeAmount = selectCoffeeAmount;
@@ -2371,7 +2518,7 @@ function showPageContextMenu(e) {
   // Show page context menu (with wallpaper option)
   pageContextMenu.style.left = e.clientX + 'px';
   pageContextMenu.style.top = e.clientY + 'px';
-  pageContextMenu.classList.remove('hidden');
+  showFloatingLayer(pageContextMenu);
 
   // Adjust position if menu goes off screen
   const rect = pageContextMenu.getBoundingClientRect();
@@ -2402,7 +2549,7 @@ function showItemContextMenu(e, type) {
   itemContextMenu.dataset.type = type;
   itemContextMenu.style.left = e.clientX + 'px';
   itemContextMenu.style.top = e.clientY + 'px';
-  itemContextMenu.classList.remove('hidden');
+  showFloatingLayer(itemContextMenu);
 
   // Adjust position if menu goes off screen
   const rect = itemContextMenu.getBoundingClientRect();
@@ -2415,8 +2562,8 @@ function showItemContextMenu(e, type) {
 }
 
 function hideAllContextMenus() {
-  pageContextMenu?.classList.add('hidden');
-  itemContextMenu?.classList.add('hidden');
+  hideFloatingLayer(pageContextMenu);
+  hideFloatingLayer(itemContextMenu);
   currentContextItem = null;
 }
 
@@ -2426,8 +2573,8 @@ function hidePageContextMenu() {
 
 function openAddSiteFromContext() {
   hidePageContextMenu();
-  document.getElementById('modalOverlay').classList.remove('hidden');
-  document.getElementById('addModal').classList.remove('hidden');
+  showFloatingLayer('modalOverlay');
+  showFloatingLayer('addModal');
   document.querySelector('input[name="addType"][value="site"]').checked = true;
   document.getElementById('siteForm').classList.remove('hidden');
   document.getElementById('tagForm').classList.add('hidden');
@@ -2436,8 +2583,8 @@ function openAddSiteFromContext() {
 
 function openAddTagFromContext() {
   hidePageContextMenu();
-  document.getElementById('modalOverlay').classList.remove('hidden');
-  document.getElementById('addModal').classList.remove('hidden');
+  showFloatingLayer('modalOverlay');
+  showFloatingLayer('addModal');
   document.querySelector('input[name="addType"][value="tag"]').checked = true;
   document.getElementById('siteForm').classList.add('hidden');
   document.getElementById('tagForm').classList.remove('hidden');
@@ -2448,7 +2595,7 @@ function openWallpaperFromContext() {
   if (window.openWallpaperModal) {
     window.openWallpaperModal();
   } else {
-    document.getElementById('wallpaperModal').classList.remove('hidden');
+    showFloatingLayer('wallpaperModal');
     if (window.renderWallpaperUI) window.renderWallpaperUI();
   }
 }

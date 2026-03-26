@@ -46,7 +46,7 @@ const APP_ENV_CONFIG = {
       }
     },
     gumroad: {
-      coffeeLinkTemplate: 'https://tooooooooodd.gumroad.com/coffee?price={amount}'
+      coffeeLinkTemplate: 'https://tooooooooodd.gumroad.com/coffee'
       // Example:
       // https://yourname.gumroad.com/l/coffee?wanted=true&price={amount}
       // {amount} will be replaced with the chosen number.
@@ -71,7 +71,7 @@ const APP_ENV_CONFIG = {
       }
     },
     gumroad: {
-      coffeeLinkTemplate: 'https://tooooooooodd.gumroad.com/coffee?price={amount}'
+      coffeeLinkTemplate: 'https://tooooooooodd.gumroad.com/coffee'
       // Example:
       // https://yourname.gumroad.com/l/coffee?wanted=true&price={amount}
       // {amount} will be replaced with the chosen number.
