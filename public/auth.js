@@ -213,8 +213,10 @@ async function handleSession(session) {
     }
   }
 
+  const hasLocalPendingConfig = !!window.hasAnyPendingUserConfig?.(session.user.id);
+
   // Fast path: apply cached premium settings immediately (theme/font) before hitting network.
-  if (window.applyCachedUserData) {
+  if (hasLocalPendingConfig && window.applyCachedUserData) {
     try {
       window.applyCachedUserData({ uid: session.user.id, effectiveTier: window.membershipState?.tier || 1 });
     } catch (err) {
@@ -224,7 +226,7 @@ async function handleSession(session) {
 
   // Trigger data load from server
   if (window.loadUserData) {
-    await window.loadUserData({ force: true });
+    await window.loadUserData({ force: true, skipLocalHydration: !hasLocalPendingConfig });
   }
 
   if (window.flushPendingProfileSync) {
