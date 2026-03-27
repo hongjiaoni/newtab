@@ -7,6 +7,16 @@ const membershipState = {
     stripeCustomerId: null
 };
 
+function membershipText(key, fallback) {
+    if (typeof i18n !== 'undefined' && typeof i18n.t === 'function') {
+        const translated = i18n.t(key);
+        if (translated && translated !== key) {
+            return translated;
+        }
+    }
+    return fallback;
+}
+
 // Membership tier configuration
 const MEMBERSHIP_CONFIG = {
     1: {
@@ -152,20 +162,20 @@ function showUpgradeModal(context = 'general') {
     // Customize message based on context (multilingual)
     const messages = {
         theme: {
-            title: isZh ? '解锁主题定制' : 'Unlock Theme Customization',
-            desc: isZh ? '升级至高级会员，自由定制您的专属主题风格！' : 'Upgrade to Premium to customize your theme!'
+            title: membershipText('unlockThemeCustomization', 'Unlock Theme Customization'),
+            desc: membershipText('upgradeThemeDesc', 'Upgrade to customize your theme freely.')
         },
         wallpaper: {
-            title: isZh ? '解锁自定义壁纸' : 'Unlock Custom Wallpapers',
-            desc: isZh ? '升级至高级会员，上传您喜爱的壁纸，打造个性化首页！' : 'Upgrade to Premium to upload your favorite wallpapers!'
+            title: membershipText('unlockCustomWallpapers', 'Unlock Custom Wallpapers'),
+            desc: membershipText('upgradeWallpaperDesc', 'Upgrade to upload your own wallpapers.')
         },
         font: {
-            title: isZh ? '解锁字体定制' : 'Unlock Font Customization',
-            desc: isZh ? '升级至高级会员，选择您喜欢的中英文字体组合！' : 'Upgrade to Premium to choose custom fonts!'
+            title: membershipText('unlockFontCustomization', 'Unlock Font Customization'),
+            desc: membershipText('upgradeFontDesc', 'Upgrade to choose your preferred Chinese and English fonts.')
         },
         general: {
-            title: isZh ? '升级会员' : 'Upgrade Membership',
-            desc: isZh ? '解锁更多高级功能，提升您的使用体验！' : 'Unlock premium features and enhance your experience!'
+            title: membershipText('upgradeMembership', 'Upgrade Membership'),
+            desc: membershipText('upgradeDesc', 'Unlock premium features and improve your experience')
         }
     };
 
@@ -273,22 +283,22 @@ function showLoginRequiredModal() {
     const modalHTML = `
     <div id="loginRequiredModal" class="modal-overlay">
       <div class="modal" style="max-width: 400px; text-align: center;">
-        <h3>${isZh ? '需要登录' : 'Login Required'}</h3>
+        <h3>${membershipText('loginRequiredTitle', 'Login Required')}</h3>
         <p style="margin: 20px 0; opacity: 0.8;">
-          ${isZh ? '请先登录以使用此功能' : 'Please login to use this feature'}
+          ${membershipText('loginRequiredDesc', 'Please log in before using this feature')}
         </p>
         <div class="modal-actions" style="justify-content: center;">
           <button class="cancel-btn" onclick="
             document.getElementById('loginRequiredModal').remove();
           ">
-            ${isZh ? '取消' : 'Cancel'}
+            ${membershipText('cancel', 'Cancel')}
           </button>
           <button class="primary-btn" onclick="
             document.getElementById('loginRequiredModal').remove();
             window.closeUpgradeModal?.();
             window.openGoogleSignInModal?.();
           ">
-            ${isZh ? '立即登录' : 'Login Now'}
+            ${membershipText('loginNow', 'Login Now')}
           </button>
         </div>
       </div>
@@ -323,7 +333,7 @@ async function handleUpgrade(tier, billingCycle = 'monthly') {
             const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
             if (window.showNotification) {
                 window.showNotification(
-                    currentLocale === 'zh' ? '升级失败，请稍后重试' : 'Upgrade failed, please try again',
+                    membershipText('upgradeFailed', 'Upgrade failed, please try again'),
                     'error'
                 );
             }
@@ -333,7 +343,7 @@ async function handleUpgrade(tier, billingCycle = 'monthly') {
         const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
         if (window.showNotification) {
             window.showNotification(
-                currentLocale === 'zh' ? '支付系统未加载，请刷新页面重试' : 'Payment system not loaded, please refresh',
+                membershipText('paymentSystemNotLoaded', 'Payment system not loaded. Please refresh and try again.'),
                 'error'
             );
         }

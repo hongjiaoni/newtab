@@ -243,7 +243,8 @@ async function handleLoginClick() {
   console.log('Login button clicked');
   if (!supabase) {
     console.error('Supabase object is missing!');
-    return alert('Supabase not initialized. Please check your config.js credentials.');
+    showNotification(getSystemMessage('supabaseMissing', 'Supabase is not initialized. Please check your config.js credentials.'), 'error');
+    return;
   }
 
   localStorage.setItem(AUTH_PENDING_LOGIN_AT_KEY, String(Date.now()));
@@ -528,15 +529,30 @@ function closeGoogleSignInModal() {
 }
 
 function requireLoginForPersistentChange() {
-  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
-  showNotification(
-    currentLocale === 'zh'
-      ? '请先登录后再保存并同步当前设置'
-      : 'Please login before saving and syncing this change',
-    'info'
-  );
+  showNotification(getSystemMessage('loginBeforeSave', 'Please login before saving and syncing this change'), 'info');
   openGoogleSignInModal();
   return false;
+}
+
+function getSystemMessage(key, fallback) {
+  if (typeof i18n !== 'undefined' && typeof i18n.t === 'function') {
+    const translated = i18n.t(key);
+    if (translated && translated !== key) {
+      return translated;
+    }
+  }
+  return fallback;
+}
+
+function ensureNotificationRoot() {
+  let root = document.getElementById('notificationRoot');
+  if (!root) {
+    root = document.createElement('div');
+    root.id = 'notificationRoot';
+    root.className = 'notification-root';
+    document.body.appendChild(root);
+  }
+  return root;
 }
 
 // Notification Helper
@@ -544,17 +560,65 @@ function showNotification(message, type = 'info') {
   const notification = document.createElement('div');
   notification.className = `notification notification-${type}`;
   notification.textContent = message;
-  notification.style.cssText = `
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    padding: 12px 20px; border-radius: 8px; z-index: 9999;
-    background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#3498db'};
-    color: white; font-size: 14px; animation: slideDown 0.3s ease;
-  `;
-  document.body.appendChild(notification);
+  ensureNotificationRoot().appendChild(notification);
+  requestAnimationFrame(() => notification.classList.add('is-visible'));
   setTimeout(() => {
-    notification.style.opacity = '0';
-    setTimeout(() => notification.remove(), 300);
+    notification.classList.remove('is-visible');
+    setTimeout(() => notification.remove(), 220);
   }, 3000);
+}
+
+function showConfirmDialog({
+  title,
+  message,
+  confirmText,
+  cancelText,
+  tone = 'warning'
+} = {}) {
+  return new Promise((resolve) => {
+    document.getElementById('systemConfirmDialog')?.remove();
+
+    const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+    const isZh = currentLocale === 'zh';
+    const confirmTitle = title || (isZh ? '请确认' : 'Please Confirm');
+    const confirmMessage = message || (isZh ? '确认继续吗？' : 'Do you want to continue?');
+    const confirmLabel = confirmText || getSystemMessage('confirmText', 'Confirm');
+    const cancelLabel = cancelText || getSystemMessage('cancel', 'Cancel');
+
+    const overlay = document.createElement('div');
+    overlay.id = 'systemConfirmDialog';
+    overlay.className = 'modal-overlay system-confirm-overlay';
+    overlay.innerHTML = `
+      <div class="modal system-confirm-dialog ${tone}">
+        <h3>${confirmTitle}</h3>
+        <p class="system-confirm-message">${confirmMessage}</p>
+        <div class="modal-actions system-confirm-actions">
+          <button class="cancel-btn" type="button">${cancelLabel}</button>
+          <button class="primary-btn" type="button">${confirmLabel}</button>
+        </div>
+      </div>
+    `;
+
+    const cleanup = (result) => {
+      overlay.classList.add('hidden');
+      setTimeout(() => {
+        overlay.remove();
+        resolve(result);
+      }, 180);
+    };
+
+    const [cancelBtn, confirmBtn] = overlay.querySelectorAll('button');
+    cancelBtn?.addEventListener('click', () => cleanup(false));
+    confirmBtn?.addEventListener('click', () => cleanup(true));
+    overlay.addEventListener('click', (event) => {
+      if (event.target === overlay) {
+        cleanup(false);
+      }
+    });
+
+    document.body.appendChild(overlay);
+    requestAnimationFrame(() => overlay.classList.remove('hidden'));
+  });
 }
 
 // Event Listeners Setup
@@ -599,6 +663,8 @@ window.openGoogleSignInModal = openGoogleSignInModal;
 window.closeGoogleSignInModal = closeGoogleSignInModal;
 window.requireLoginForPersistentChange = requireLoginForPersistentChange;
 window.updateAuthUI = updateAuthUI;
+window.showNotification = showNotification;
+window.showConfirmDialog = showConfirmDialog;
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {

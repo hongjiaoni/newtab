@@ -1099,18 +1099,12 @@ async function saveThemeCustomization() {
     });
 
     if (window.showNotification) {
-      window.showNotification(
-        isZh ? '主题已保存！' : 'Theme saved!',
-        'success'
-      );
+      window.showNotification(i18n.t('saveThemeSuccess'), 'success');
     }
   } catch (err) {
     console.error('Failed to persist theme customization:', err);
     if (window.showNotification) {
-      window.showNotification(
-        isZh ? '保存失败，请稍后重试' : 'Save failed, please try again',
-        'error'
-      );
+      window.showNotification(i18n.t('saveThemeFailed'), 'error');
     }
   }
 }
@@ -1288,7 +1282,7 @@ async function resetThemeCustomization() {
   }
 
   if (window.showNotification) {
-    window.showNotification(isZh ? '已重置主题定制' : 'Theme customization reset', 'success');
+    window.showNotification(i18n.t('resetThemeSuccess'), 'success');
   }
 }
 
