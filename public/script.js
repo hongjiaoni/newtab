@@ -303,6 +303,8 @@ const TRANSLATION_OVERRIDES = {
     resetThemeSuccess: '主题已恢复默认设置',
     upgradeFailed: '升级失败，请稍后重试',
     paymentSystemNotLoaded: '支付系统尚未加载，请刷新页面后重试',
+    syncLoadFailed: '同步最新配置失败，请稍后重试',
+    syncSaveFailed: '保存失败，暂未同步到云端',
     deleteItemConfirm: '确定要删除吗？',
     loginRequiredTitle: '需要登录',
     loginRequiredDesc: '请先登录后再使用这个功能',
@@ -349,6 +351,8 @@ const TRANSLATION_OVERRIDES = {
     resetThemeSuccess: 'Theme customization reset',
     upgradeFailed: 'Upgrade failed, please try again',
     paymentSystemNotLoaded: 'Payment system not loaded. Please refresh and try again.',
+    syncLoadFailed: 'Failed to sync the latest settings. Please try again later.',
+    syncSaveFailed: 'Save failed. Your changes were not synced to the cloud yet.',
     deleteItemConfirm: 'Are you sure you want to delete this item?',
     loginRequiredTitle: 'Login Required',
     loginRequiredDesc: 'Please log in before using this feature',
@@ -1021,6 +1025,8 @@ const engineMenu = document.getElementById('engineMenu');
 const contentEl = document.getElementById('content');
 const settingsToggle = document.getElementById('settingsToggle');
 const settingsMenu = document.getElementById('settingsMenu');
+const languageMenuItem = document.getElementById('languageMenuItem');
+const languageSubmenu = document.getElementById('languageSubmenu');
 
 // Modals
 const modalOverlay = document.getElementById('modalOverlay');
@@ -1308,14 +1314,17 @@ document.getElementById('saveEngineSelection').onclick = () => {
 };
 
 window.selectEngineById = (id) => {
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
+
   const enabled = getEnabledEngines(state.enabledEngineIds || []);
   const idx = enabled.findIndex((e) => e.id === id);
   if (idx < 0) return;
   state.engineId = id;
   state.engineIndex = idx;
-  if (window.authState && window.authState.isLoggedIn) {
-    saveData();
-  }
+  saveData();
   renderSearchEngine();
   renderEngineQuickList();
   engineMenu.classList.add('hidden');
@@ -2088,14 +2097,49 @@ function updateSettingsMenu() {
   }
 }
 
+function closeSettingsLayers(options = {}) {
+  const { keepMenuOpen = false } = options;
+  languageSubmenu?.classList.add('hidden');
+  if (!keepMenuOpen) {
+    settingsMenu?.classList.add('hidden');
+  }
+}
+
+function openSettingsMenu() {
+  settingsMenu?.classList.remove('hidden');
+}
+
+function toggleSettingsMenu() {
+  if (!settingsMenu) return;
+  const willOpen = settingsMenu.classList.contains('hidden');
+  closeSettingsLayers();
+  if (willOpen) {
+    openSettingsMenu();
+  }
+}
+
+function toggleLanguageSubmenu() {
+  if (!settingsMenu || !languageSubmenu) return;
+  if (settingsMenu.classList.contains('hidden')) {
+    openSettingsMenu();
+  }
+  const willOpen = languageSubmenu.classList.contains('hidden');
+  closeSettingsLayers({ keepMenuOpen: true });
+  if (willOpen) {
+    languageSubmenu.classList.remove('hidden');
+  }
+}
+
+window.closeSettingsLayers = closeSettingsLayers;
+
 settingsToggle.addEventListener('click', (e) => {
   e.stopPropagation();
-  settingsMenu.classList.toggle('hidden');
+  toggleSettingsMenu();
 });
 
-document.getElementById('languageMenuItem').addEventListener('click', (e) => {
+languageMenuItem?.addEventListener('click', (e) => {
   e.stopPropagation();
-  document.getElementById('languageSubmenu').classList.toggle('hidden');
+  toggleLanguageSubmenu();
 });
 
 let themeScriptLoadPromise = null;
@@ -2229,7 +2273,7 @@ function isElementVisible(element) {
 function hasOpenTransientUi() {
   return [
     settingsMenu,
-    document.getElementById('languageSubmenu'),
+    languageSubmenu,
     document.getElementById('wallpaperModal'),
     document.getElementById('themeCustomizationModal'),
     document.getElementById('aboutModal'),
@@ -2243,8 +2287,7 @@ function hasOpenTransientUi() {
 }
 
 function closeTransientUi() {
-  settingsMenu?.classList.add('hidden');
-  document.getElementById('languageSubmenu')?.classList.add('hidden');
+  closeSettingsLayers();
   window.closeWallpaperModal?.();
   window.closeThemeModal?.(false);
   closeModals?.();
@@ -2273,7 +2316,7 @@ document.addEventListener('click', (e) => {
 document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) => {
   e.preventDefault();
   e.stopPropagation();
-  settingsMenu.classList.add('hidden');
+  closeSettingsLayers();
 
   if (typeof window.openThemeCustomization === 'function') {
     window.openThemeCustomization();
@@ -2304,10 +2347,9 @@ document.getElementById('themeCustomizationBtn')?.addEventListener('click', (e) 
 
 document.addEventListener('click', (e) => {
   if (!e.target.closest('.settings-menu') && !e.target.closest('.settings-btn')) {
-    settingsMenu.classList.add('hidden');
-    document.getElementById('languageSubmenu').classList.add('hidden');
+    closeSettingsLayers();
   } else if (!e.target.closest('#languageMenuItem')) {
-    document.getElementById('languageSubmenu').classList.add('hidden');
+    closeSettingsLayers({ keepMenuOpen: true });
   }
 });
 
@@ -2315,12 +2357,11 @@ document.addEventListener('click', (e) => {
 let selectedCoffeeAmount = 5;
 
 function openAboutModal() {
-  document.getElementById('settingsMenu').classList.add('hidden');
-  document.getElementById('aboutModal').classList.remove('hidden');
+  window.openManagedOverlay?.('aboutModal');
 }
 
 function closeAboutModal() {
-  document.getElementById('aboutModal').classList.add('hidden');
+  window.closeManagedOverlay?.('aboutModal');
 }
 
 function openCoffeeSupportLink() {
@@ -2336,8 +2377,7 @@ function openCoffeeSupportLink() {
 }
 
 function openCoffeeModal() {
-  document.getElementById('aboutModal').classList.add('hidden');
-  document.getElementById('coffeeModal').classList.remove('hidden');
+  window.openManagedOverlay?.('coffeeModal');
   selectedCoffeeAmount = 5;
   document.querySelectorAll('.coffee-amount-btn').forEach(btn => {
     btn.classList.toggle('selected', btn.dataset.amount === '5');
@@ -2346,7 +2386,7 @@ function openCoffeeModal() {
 }
 
 function closeCoffeeModal() {
-  document.getElementById('coffeeModal').classList.add('hidden');
+  window.closeManagedOverlay?.('coffeeModal');
 }
 
 function selectCoffeeAmount(amount) {
@@ -2390,15 +2430,14 @@ function processCoffeePaymentLegacy() {
 }
 
 function openFeedbackModal() {
-  document.getElementById('aboutModal').classList.add('hidden');
-  document.getElementById('feedbackModal').classList.remove('hidden');
+  window.openManagedOverlay?.('feedbackModal');
   document.getElementById('feedbackType').value = 'bug';
   document.getElementById('feedbackContent').value = '';
   document.getElementById('feedbackEmail').value = window.authState?.user?.email || '';
 }
 
 function closeFeedbackModal() {
-  document.getElementById('feedbackModal').classList.add('hidden');
+  window.closeManagedOverlay?.('feedbackModal');
 }
 
 async function submitFeedback() {
@@ -2481,6 +2520,21 @@ function processCoffeePayment() {
   showNotification(i18n.t('openingGumroadCheckout'), 'success');
   window.open(gumroadUrl, '_blank', 'noopener,noreferrer');
   closeCoffeeModal();
+}
+
+function setupManagedOverlayActionBindings() {
+  document.getElementById('aboutMenuItem')?.addEventListener('click', openAboutModal);
+  document.getElementById('aboutCoffeeAction')?.addEventListener('click', openCoffeeSupportLink);
+  document.getElementById('aboutFeedbackAction')?.addEventListener('click', openFeedbackModal);
+  document.getElementById('aboutCloseBtn')?.addEventListener('click', closeAboutModal);
+  document.getElementById('coffeeCancelBtn')?.addEventListener('click', closeCoffeeModal);
+  document.getElementById('coffeePayBtn')?.addEventListener('click', processCoffeePayment);
+  document.getElementById('feedbackCancelBtn')?.addEventListener('click', closeFeedbackModal);
+  document.getElementById('submitFeedbackBtn')?.addEventListener('click', submitFeedback);
+
+  document.querySelectorAll('.coffee-amount-btn').forEach((button) => {
+    button.onclick = () => selectCoffeeAmount(parseInt(button.dataset.amount, 10));
+  });
 }
 
 // Export modal functions
@@ -2567,12 +2621,10 @@ function showItemContextMenu(e, type) {
   const deleteLabel = document.getElementById('ctxDeleteItem');
 
   if (editLabel) {
-    editLabel.textContent = i18n.currentLocale === 'zh'
-      ? (type === 'site' ? '编辑网站' : '编辑标签')
-      : (type === 'site' ? 'Edit Site' : 'Edit Tag');
+    editLabel.textContent = type === 'site' ? i18n.t('editSite') : i18n.t('editTag');
   }
   if (deleteLabel) {
-    deleteLabel.textContent = i18n.currentLocale === 'zh' ? '删除' : 'Delete';
+    deleteLabel.textContent = i18n.t('delete');
   }
 
   itemContextMenu.dataset.type = type;
@@ -2602,6 +2654,10 @@ function hidePageContextMenu() {
 
 function openAddSiteFromContext() {
   hidePageContextMenu();
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
   document.getElementById('modalOverlay').classList.remove('hidden');
   document.getElementById('addModal').classList.remove('hidden');
   document.querySelector('input[name="addType"][value="site"]').checked = true;
@@ -2612,6 +2668,10 @@ function openAddSiteFromContext() {
 
 function openAddTagFromContext() {
   hidePageContextMenu();
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
   document.getElementById('modalOverlay').classList.remove('hidden');
   document.getElementById('addModal').classList.remove('hidden');
   document.querySelector('input[name="addType"][value="tag"]').checked = true;
@@ -2621,6 +2681,10 @@ function openAddTagFromContext() {
 
 function openWallpaperFromContext() {
   hidePageContextMenu();
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
   if (window.openWallpaperModal) {
     window.openWallpaperModal();
   } else {
@@ -2633,6 +2697,10 @@ function openWallpaperFromContext() {
 function editItemFromContext() {
   hideAllContextMenus();
   if (!currentContextItem) return;
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
 
   const type = document.getElementById('itemContextMenu')?.dataset.type;
 
@@ -2653,6 +2721,10 @@ function editItemFromContext() {
 async function deleteItemFromContext() {
   hideAllContextMenus();
   if (!currentContextItem) return;
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
 
   const type = document.getElementById('itemContextMenu')?.dataset.type;
   const shouldDelete = window.showConfirmDialog
@@ -2711,6 +2783,7 @@ if (window.applyStyleTheme) {
   }
 }
 // ===== Initialize =====
+setupManagedOverlayActionBindings();
 searchInput.focus();
 updateAllText();
 renderHome();

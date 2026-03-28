@@ -331,7 +331,7 @@ function updateAuthUI() {
   } else {
     // Show login trigger button
     authMenuContainer.innerHTML = `
-      <div class="settings-menu-item" id="loginMenuItem" onclick="openGoogleSignInModal()">
+      <div class="settings-menu-item" id="loginMenuItem">
         <span id="loginText">${typeof i18n !== 'undefined' ? i18n.t('login') : '登录'}</span>
       </div>
     `;
@@ -519,13 +519,11 @@ function closeUserProfile() {
 
 // Modal Helpers
 function openGoogleSignInModal() {
-  const modal = document.getElementById('googleSignInModal');
-  if (modal) modal.classList.remove('hidden');
+  openManagedOverlay('googleSignInModal');
 }
 
 function closeGoogleSignInModal() {
-  const modal = document.getElementById('googleSignInModal');
-  if (modal) modal.classList.add('hidden');
+  closeManagedOverlay('googleSignInModal');
 }
 
 function requireLoginForPersistentChange() {
@@ -553,6 +551,46 @@ function ensureNotificationRoot() {
     document.body.appendChild(root);
   }
   return root;
+}
+
+const MANAGED_OVERLAY_IDS = [
+  'googleSignInModal',
+  'aboutModal',
+  'coffeeModal',
+  'feedbackModal',
+  'upgradeModal',
+  'loginRequiredModal'
+];
+
+function closeManagedOverlay(id, options = {}) {
+  const { remove = false } = options;
+  const modal = document.getElementById(id);
+  if (!modal) return;
+  if (remove) {
+    modal.remove();
+    return;
+  }
+  modal.classList.add('hidden');
+}
+
+function closeManagedOverlays(exceptId = null) {
+  MANAGED_OVERLAY_IDS.forEach((id) => {
+    if (id === exceptId) return;
+    closeManagedOverlay(id, { remove: id === 'loginRequiredModal' });
+  });
+}
+
+function openManagedOverlay(id, options = {}) {
+  const { closeSettings = true } = options;
+  closeManagedOverlays(id);
+  if (closeSettings) {
+    window.closeSettingsLayers?.();
+  }
+  const modal = document.getElementById(id);
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
+  return modal;
 }
 
 // Notification Helper
@@ -623,6 +661,20 @@ function showConfirmDialog({
 
 // Event Listeners Setup
 function setupAuthEventListeners() {
+  const authMenuContainer = document.getElementById('authMenuContainer');
+  if (authMenuContainer) {
+    authMenuContainer.onclick = (event) => {
+      if (event.target.closest('#loginMenuItem')) {
+        openGoogleSignInModal();
+      }
+    };
+  }
+
+  const googleLoginAction = document.getElementById('googleLoginAction');
+  if (googleLoginAction) {
+    googleLoginAction.onclick = handleLoginClick;
+  }
+
   const closeLoginBtn = document.getElementById('closeGoogleSignIn');
   if (closeLoginBtn) {
     closeLoginBtn.onclick = closeGoogleSignInModal;
@@ -665,6 +717,9 @@ window.requireLoginForPersistentChange = requireLoginForPersistentChange;
 window.updateAuthUI = updateAuthUI;
 window.showNotification = showNotification;
 window.showConfirmDialog = showConfirmDialog;
+window.openManagedOverlay = openManagedOverlay;
+window.closeManagedOverlay = closeManagedOverlay;
+window.closeManagedOverlays = closeManagedOverlays;
 
 // Initialize on load
 document.addEventListener('DOMContentLoaded', () => {

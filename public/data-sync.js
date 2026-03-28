@@ -9,8 +9,22 @@ const COLOR_CONFIG_KEY_PREFIX = 'user_color_config_';
 const CONFIG_META_KEY_PREFIX = 'user_config_meta_';
 const APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
 const CURRENT_SYNC_SESSION_ID = `sync-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+const SYNC_ERROR_NOTIFICATION_THROTTLE_MS = 30 * 1000;
 let userDataLoadPromise = null;
 let userDataRefreshTimer = null;
+let lastSyncNotificationAt = 0;
+
+function notifySyncStatus(messageKey, fallback, type = 'warning') {
+    if (typeof window.showNotification !== 'function') return;
+    const now = Date.now();
+    if (now - lastSyncNotificationAt < SYNC_ERROR_NOTIFICATION_THROTTLE_MS) return;
+    lastSyncNotificationAt = now;
+
+    const message = (typeof i18n !== 'undefined' && typeof i18n.t === 'function')
+        ? (i18n.t(messageKey) !== messageKey ? i18n.t(messageKey) : fallback)
+        : fallback;
+    window.showNotification(message, type);
+}
 
 function isUserDataRuntimeReady() {
     return (
@@ -627,6 +641,7 @@ async function loadUserData(options = {}) {
             console.log('User data successfully loaded from remote');
         } catch (err) {
             console.error('Error fetching remote configs:', err);
+            notifySyncStatus('syncLoadFailed', 'Failed to sync the latest settings. Please try again later.');
         } finally {
             userDataLoadPromise = null;
         }
@@ -647,6 +662,7 @@ async function saveUserDataToBackend(immediate = true) {
             await persistHomeConfig(uid, payload, syncedAt);
         } catch (err) {
             console.error('Error saving home config:', err);
+            notifySyncStatus('syncSaveFailed', 'Save failed. Your changes were not synced to the cloud yet.', 'error');
         }
     };
 

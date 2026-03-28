@@ -219,7 +219,7 @@ function openThemeCustomization() {
   console.log('openThemeCustomization called');
   console.log('authState:', window.authState);
   console.log('membershipState:', window.membershipState);
-  document.getElementById('settingsMenu')?.classList.add('hidden');
+  window.closeSettingsLayers?.();
 
   /* Guest users can preview customization; login is required only when saving.
   if (!window.authState || !window.authState.isLoggedIn) {
@@ -249,8 +249,7 @@ function openThemeCustomization() {
         : '当前账号暂不可使用主题设置',
       'info'
     );
-    const settingsMenu = document.getElementById('settingsMenu');
-    if (settingsMenu) settingsMenu.classList.add('hidden');
+    window.closeSettingsLayers?.();
 
     setTimeout(() => {
       if (window.showUpgradeModal) {

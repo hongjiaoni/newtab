@@ -176,7 +176,7 @@ function applyWallpaper(wallpaperId, options = {}) {
 
 // Open wallpaper selection modal
 function openWallpaperModal() {
-  document.getElementById('settingsMenu')?.classList.add('hidden');
+  window.closeSettingsLayers?.();
   const modal = document.getElementById('wallpaperModal');
   if (modal) {
     wallpaperState.baseWallpaper = wallpaperState.selectedWallpaper;
