@@ -183,7 +183,15 @@ function showUpgradeModal(context = 'general') {
     if (modalTitle) modalTitle.textContent = msg.title;
     if (modalDesc) modalDesc.textContent = msg.desc;
 
-    document.getElementById('upgradeModal').classList.remove('hidden');
+    window.openManagedOverlay?.('upgradeModal');
+    const overlay = document.getElementById('upgradeModal');
+    if (overlay) {
+        overlay.onclick = (event) => {
+            if (event.target === overlay) {
+                closeUpgradeModal();
+            }
+        };
+    }
 }
 
 // Create upgrade modal HTML with multilingual support
@@ -268,7 +276,7 @@ function createUpgradeModal() {
 
 // Close upgrade modal
 function closeUpgradeModal() {
-    document.getElementById('upgradeModal')?.classList.add('hidden');
+    window.closeManagedOverlay?.('upgradeModal');
 }
 
 // Show custom notification modal (replaces alert)
@@ -281,7 +289,7 @@ function showLoginRequiredModal() {
     if (existing) existing.remove();
 
     const modalHTML = `
-    <div id="loginRequiredModal" class="modal-overlay">
+    <div id="loginRequiredModal" class="modal-overlay hidden">
       <div class="modal" style="max-width: 400px; text-align: center;">
         <h3>${membershipText('loginRequiredTitle', 'Login Required')}</h3>
         <p style="margin: 20px 0; opacity: 0.8;">
@@ -306,6 +314,15 @@ function showLoginRequiredModal() {
   `;
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
+    window.openManagedOverlay?.('loginRequiredModal', { closeSettings: false });
+    const overlay = document.getElementById('loginRequiredModal');
+    if (overlay) {
+        overlay.onclick = (event) => {
+            if (event.target === overlay) {
+                window.closeManagedOverlay?.('loginRequiredModal', { remove: true });
+            }
+        };
+    }
 }
 
 // Handle upgrade button click
