@@ -1,10 +1,8 @@
 # NewTab
 
-[English](README.md) | [中文](README.zh-CN.md)
+这是一个基于 Web 的支持高度自定义的浏览器新标签页项目，支持 Google 登录和云端数据同步。
 
-NewTab is a customizable, sync-first new tab page: fast search, wallpapers, themes, fonts, website shortcuts, cloud sync, and a growing set of product features.
 
-## Features
 
 - Sites + tags: add/edit/delete, reorder, tag view, right-click menus
 - Search engines: switch quickly, manage enabled engines, sync preferences
@@ -14,7 +12,10 @@ NewTab is a customizable, sync-first new tab page: fast search, wallpapers, them
 - Membership: tier gating + Paddle payment flows
 - Feedback + support: in-product feedback + Gumroad support link
 
-## Quick Start
+- `public/`: 前端代码（HTML, CSS, JS）
+- `server.js`: 后端服务器代码
+- `database.js`: 数据库管理
+- `docs/archive/`: 旧文档存档
 
 Static-first (recommended for UI work):
 
