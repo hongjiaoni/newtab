@@ -1,23 +1,22 @@
 # NewTab
 
-这是一个基于 Web 的支持高度自定义的浏览器新标签页项目，支持 Google 登录和云端数据同步。
+[中文](README.zh-CN.md) | [English](README.md)
 
+NewTab is a customizable + sync-first new tab page: search, wallpapers, themes, fonts, website shortcuts and tag management, plus a consistent cloud profile across devices.
 
+## Highlights
 
-- Sites + tags: add/edit/delete, reorder, tag view, right-click menus
-- Search engines: switch quickly, manage enabled engines, sync preferences
-- Wallpapers: built-in categories, daily picks, solid colors, custom uploads (premium)
-- Themes + fonts: light/dark, style presets, full color control, bilingual fonts, live preview
+- Sites + tags: CRUD, drag to reorder, tag view, right-click actions
+- Search engines: quick switch, enabled list management, cloud-synced preferences
+- Wallpapers: curated categories, daily picks, solid color backgrounds, custom uploads (premium)
+- Themes + fonts: light/dark, style presets, full palette control, Chinese/English font pairing, live preview
 - Cloud sync: Supabase Auth + Postgres + Storage, local cache + remote refresh
-- Membership: tier gating + Paddle payment flows
-- Feedback + support: in-product feedback + Gumroad support link
+- Membership: tiered access + Paddle payment flow
+- Feedback & support: in-product feedback + Gumroad support link
 
-- `public/`: 前端代码（HTML, CSS, JS）
-- `server.js`: 后端服务器代码
-- `database.js`: 数据库管理
-- `docs/archive/`: 旧文档存档
+## Quick Start
 
-Static-first (recommended for UI work):
+Static-first (recommended for UI/front-end work):
 
 ```bash
 npx serve public -l 3000
@@ -32,25 +31,25 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## Setup (Cloud)
+## Cloud Setup
 
-- Configure Supabase + Google OAuth + Storage bucket `wallpapers`
-- Fill in [`public/config.js`](/E:/Docs/Cursor/git/newtab/public/config.js)
+- Configure Supabase + Google OAuth + Storage bucket: `wallpapers`
+- Fill in `public/config.js`
 
-Deployment details: [`DEPLOY.md`](/E:/Docs/Cursor/git/newtab/DEPLOY.md)
+Deployment notes: `DEPLOY.md`
 
 ## Contributing
 
-PRs are welcome. Please keep changes focused and avoid large rewrites.
+PRs are welcome. Prefer small, focused changes and avoid large rewrites in one shot.
 
 Good areas to help:
 
-- sync consistency and status UX
-- theme + preview polish
-- modal/menu UX and accessibility
-- i18n cleanup and copy improvements
+- Sync consistency and sync-status UX
+- Theme preview vs. actual rendering alignment
+- Modal/menu UX and accessibility (keyboard, screen readers)
+- i18n + copy consistency
 
-More project notes: [`FEATURE_LIST.md`](/E:/Docs/Cursor/git/newtab/FEATURE_LIST.md)
+More features: `FEATURE_LIST.md`
 
 ## License
 
