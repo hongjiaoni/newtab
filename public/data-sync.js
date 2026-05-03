@@ -542,7 +542,6 @@ function applyColorConfig(config) {
 // plus user_theme_settings / user_font_settings.
 async function loadUserData(options = {}) {
     if (!window.authState || !window.authState.isLoggedIn || !supabase) {
-        console.log('Not logged in, skipping data load');
         return;
     }
 
@@ -552,11 +551,6 @@ async function loadUserData(options = {}) {
 
     const uid = window.authState.user.id;
     userDataLoadPromise = (async () => {
-        const runtimeReady = await waitForUserDataRuntimeReady();
-        if (!runtimeReady) {
-            console.warn('User data runtime not ready, skipping sync pass');
-            return;
-        }
 
         const preferRemote = options.force === true || options.skipLocalHydration === true;
 
@@ -582,7 +576,6 @@ async function loadUserData(options = {}) {
 
         // === Phase 2: Remote DB Overwrite ===
         try {
-            console.log('Fetching remote configs from normalized Supabase tables...');
 
             let requiresRender = false;
             const remoteRes = await fetchLegacyConfigs(uid);
@@ -608,8 +601,6 @@ async function loadUserData(options = {}) {
                 if (homeChanged) {
                     requiresRender = true;
                 }
-            } else if (remoteRes.homeConfig) {
-                console.log('Skipping stale remote home config');
             }
 
             if (remoteRes.colorConfig && (preferRemote || shouldApplyRemoteConfig(uid, 'color', remoteRes.colorUpdatedAt))) {
@@ -629,8 +620,6 @@ async function loadUserData(options = {}) {
                 if (colorChanged) {
                     requiresRender = true;
                 }
-            } else if (remoteRes.colorConfig) {
-                console.log('Skipping stale remote color config');
             }
 
             if (requiresRender) {
@@ -638,7 +627,6 @@ async function loadUserData(options = {}) {
                 window.renderSearchEngine?.();
                 window.updateTime?.();
             }
-            console.log('User data successfully loaded from remote');
         } catch (err) {
             console.error('Error fetching remote configs:', err);
             notifySyncStatus('syncLoadFailed', 'Failed to sync the latest settings. Please try again later.');
@@ -799,7 +787,9 @@ function applyCachedUserData() {
                 const c = localStorage.getItem(getColorConfigCacheKey(uid));
                 if (h) applyHomeConfig(JSON.parse(h));
                 if (c) applyColorConfig(JSON.parse(c));
-            } catch (e) {}
+            } catch (e) {
+                console.warn('Failed to apply cached user data:', e);
+            }
         });
     }
 }

@@ -70,7 +70,6 @@ async function initializeMembership() {
             membershipState.endDate = data.subscription_end_date;
             membershipState.stripeCustomerId = data.stripe_customer_id;
 
-            console.log('Membership initialized:', membershipState);
             updateMembershipUI();
 
             // If tier changed (e.g. upgrade completed) reload user data so premium settings load/clear correctly.
@@ -327,12 +326,8 @@ function showLoginRequiredModal() {
 
 // Handle upgrade button click
 async function handleUpgrade(tier, billingCycle = 'monthly') {
-    console.log('handleUpgrade called, tier:', tier);
-    console.log('authState:', window.authState);
-
     // Check login with proper authState check
     if (!window.authState || !window.authState.isLoggedIn || !window.authState.user) {
-        console.log('User not logged in');
         showLoginRequiredModal();
         return;
     }

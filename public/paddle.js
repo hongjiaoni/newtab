@@ -32,7 +32,6 @@ function initializePaddle() {
         eventCallback: handlePaddleEvent
       });
       paddleInitialized = true;
-      console.log('Paddle initialized:', PADDLE_ENVIRONMENT);
       resolve();
     } catch (err) {
       console.error('Paddle initialization failed:', err);
@@ -43,8 +42,6 @@ function initializePaddle() {
 
 // Handle Paddle events (checkout completed, closed, etc.)
 function handlePaddleEvent(event) {
-  console.log('Paddle event:', event);
-
   if (event.name === 'checkout.completed') {
     const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
     if (window.showNotification) {
@@ -77,7 +74,7 @@ function handlePaddleEvent(event) {
   }
 
   if (event.name === 'checkout.closed') {
-    console.log('Checkout closed by user');
+    // Checkout closed by user
   }
 }
 
@@ -172,6 +169,7 @@ function handlePaddleReturn() {
       try {
         window.closeUpgradeModal?.();
       } catch (_err) {
+        console.warn('Failed to close upgrade modal:', _err);
       }
 
       setTimeout(() => {
