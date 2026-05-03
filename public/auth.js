@@ -76,13 +76,11 @@ async function ensureProfileExists(user) {
       .single();
 
     if (existing) {
-      console.log('Profile already exists');
       return;
     }
 
     // Profile doesn't exist, create it
     if (fetchError && fetchError.code === 'PGRST116') {
-      console.log('Creating new profile for user:', user.id);
 
       const meta = user.user_metadata || {};
       const { error: insertError } = await supabase
@@ -99,8 +97,6 @@ async function ensureProfileExists(user) {
 
       if (insertError) {
         console.error('Failed to create profile:', insertError);
-      } else {
-        console.log('Profile created successfully');
       }
 
       // Ensure default home settings row exists
@@ -188,7 +184,6 @@ async function handleSession(session) {
 
     if (data) {
       authState.profile = data;
-      console.log('Profile loaded:', data);
     } else if (error) {
       console.error('Error fetching profile:', error);
     }
@@ -240,7 +235,6 @@ async function handleSession(session) {
 
 // Google Login
 async function handleLoginClick() {
-  console.log('Login button clicked');
   if (!supabase) {
     console.error('Supabase object is missing!');
     showNotification(getSystemMessage('supabaseMissing', 'Supabase is not initialized. Please check your config.js credentials.'), 'error');
@@ -249,7 +243,6 @@ async function handleLoginClick() {
 
   localStorage.setItem(AUTH_PENDING_LOGIN_AT_KEY, String(Date.now()));
 
-  console.log('Starting OAuth flow...');
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -273,8 +266,15 @@ async function handleLogout() {
   if (error) {
     console.error('Logout error:', error);
   } else {
-    // Clear all local storage data
-    localStorage.clear();
+    // Clear only NewTab-related local storage data
+    const keysToRemove = [
+      'auth_last_login_at', 'auth_pending_login_at',
+      'user_sites', 'user_tags', 'user_site_tags',
+      'user_site_order', 'user_tag_order',
+      'cached_user_data', 'cached_settings',
+      'selectedWallpaper', 'userDataCache', 'themeConfig'
+    ];
+    keysToRemove.forEach(key => localStorage.removeItem(key));
 
     // Reset state to defaults if available
     if (typeof state !== 'undefined') {

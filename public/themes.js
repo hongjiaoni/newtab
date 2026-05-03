@@ -216,9 +216,6 @@ function applyStyleTheme(style) {
 
 // Open theme customization modal
 function openThemeCustomization() {
-  console.log('openThemeCustomization called');
-  console.log('authState:', window.authState);
-  console.log('membershipState:', window.membershipState);
   window.closeSettingsLayers?.();
 
   /* Guest users can preview customization; login is required only when saving.
@@ -242,7 +239,6 @@ function openThemeCustomization() {
   // Then check membership tier
   const effectiveTier = window.membershipState?.tier ?? window.authState?.profile?.membership_tier ?? 1;
   if (effectiveTier < 1) {
-    console.log('Tier insufficient, showing upgrade modal');
     window.showNotification?.(
       (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
         ? 'Theme customization is not available for this account'
@@ -259,7 +255,6 @@ function openThemeCustomization() {
     return;
   }
 
-  console.log('Opening theme customization modal');
   try {
     createThemeModal();
     // Store original theme for restore on cancel

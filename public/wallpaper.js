@@ -86,7 +86,6 @@ async function loadCategories() {
     if (data && data.length > 0) {
       wallpaperState.categories = data;
       wallpaperState.activeCategory = data[0].name;
-      console.log('Loaded categories:', data);
     }
   } catch (err) {
     console.error('Load categories exception:', err);
@@ -126,7 +125,6 @@ async function loadWallpapers() {
 
     if (data) {
       wallpaperState.wallpapers = data;
-      console.log('Loaded wallpapers:', data.length);
     }
 
     wallpaperState.isLoading = false;
@@ -661,7 +659,7 @@ async function handleUserWallpaperUpload(event) {
       return;
     }
   } catch (err) {
-    console.log('No quota record yet, proceeding with upload');
+    // No quota record yet, proceeding with upload
   }
 
   // Validate file

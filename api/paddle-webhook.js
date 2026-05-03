@@ -93,8 +93,6 @@ module.exports = async (req, res) => {
     return;
   }
 
-  console.log('Paddle webhook event:', event.event_type);
-
   try {
     // Handle subscription activated (payment successful)
     if (event.event_type === 'subscription.activated' || event.event_type === 'subscription.created') {
@@ -116,8 +114,6 @@ module.exports = async (req, res) => {
       }
 
       if (userId) {
-        console.log('Updating membership for user:', userId, 'tier:', tier);
-        
         // Use RPC to update membership tier securely
         const { error } = await supabaseAdmin.rpc('update_membership_tier', {
           p_user_id: userId,
@@ -130,8 +126,6 @@ module.exports = async (req, res) => {
           console.error('Failed to update membership:', error);
           throw error;
         }
-
-        console.log('Membership updated successfully');
       } else {
         console.warn('No user_id in custom_data');
       }
@@ -180,7 +174,6 @@ module.exports = async (req, res) => {
 
       // Only process if this is a subscription transaction
       if (userId && data.subscription_id) {
-        console.log('Transaction completed for subscription, user:', userId);
         
         // The subscription.activated event should handle this, but as backup:
         const { data: profile } = await supabaseAdmin
