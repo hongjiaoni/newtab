@@ -1,0 +1,96 @@
+/* Wallpaper Modal - Enlarged for better usability */
+.wallpaper-modal {
+    width: 90vw !important;
+    max-width: 1200px !important;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.wallpaper-content {
+    min-height: 400px;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+.wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 20px;
+    justify-items: center;
+    padding: 10px 0;
+}
+
+.wallpaper-item {
+    cursor: pointer;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.2s;
+    border: 2px solid var(--border-color);
+    width: 100%;
+    text-align: center;
+    background: var(--card-bg);
+    padding: 6px;
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+
+.wallpaper-item:hover {
+    transform: translate(-2px, -2px) scale(1.05);
+    box-shadow: 6px 6px 0 var(--shadow-color);
+}
+
+.wallpaper-item img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 6px;
+}
+
+.wallpaper-title {
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wallpaper-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.wallpaper-tab {
+    font-family: inherit;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    border: 2px solid var(--border-color);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--text-color);
+    box-shadow: 2px 2px 0 var(--shadow-color);
+    transition: all 0.2s ease;
+    padding: 8px 14px;
+    opacity: 0.9;
+}
+
+.wallpaper-tab:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 4px 4px 0 var(--shadow-color);
+    background: var(--hover-bg);
+    opacity: 1;
+}
+
+.wallpaper-tab.active {
+    background: var(--accent-color);
+    color: #fff;
+    border-color: var(--accent-color);
+    opacity: 1;
+    text-decoration: none;
+    font-weight: 800;
+}
