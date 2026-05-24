@@ -1,8 +1,8 @@
 // ===== Paddle Payment Integration =====
 
 // Paddle environment config (set via window or fallback)
-const PADDLE_ENVIRONMENT = window.PADDLE_ENVIRONMENT || 'sandbox'; // 'sandbox' or 'production'
-const PADDLE_CLIENT_TOKEN = window.PADDLE_CLIENT_TOKEN || '';
+var PADDLE_ENVIRONMENT = window.PADDLE_ENVIRONMENT || 'sandbox'; // 'sandbox' or 'production'
+var PADDLE_CLIENT_TOKEN = window.PADDLE_CLIENT_TOKEN || '';
 
 // Price IDs for different tiers and billing cycles (set in config.js or here)
 const PADDLE_PRICES = {
@@ -42,7 +42,16 @@ function initializePaddle() {
 
 // Handle Paddle events (checkout completed, closed, etc.)
 function handlePaddleEvent(event) {
+  // Hide inline container when checkout is done
+  function hideInlineContainer() {
+    if (window.IS_EXTENSION) {
+      const container = document.getElementById('paddle-checkout-container');
+      if (container) container.classList.add('hidden');
+    }
+  }
+
   if (event.name === 'checkout.completed') {
+    hideInlineContainer();
     const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
     if (window.showNotification) {
       window.showNotification(
@@ -74,7 +83,7 @@ function handlePaddleEvent(event) {
   }
 
   if (event.name === 'checkout.closed') {
-    // Checkout closed by user
+    hideInlineContainer();
   }
 }
 
@@ -125,6 +134,12 @@ async function createCheckoutSession(tier = 2, billingCycle = 'monthly') {
 
   // Open Paddle Checkout overlay
   try {
+    // In extension mode, show the inline container before opening
+    if (window.IS_EXTENSION) {
+      const container = document.getElementById('paddle-checkout-container');
+      if (container) container.classList.remove('hidden');
+    }
+
     Paddle.Checkout.open({
       items: [{ priceId: priceId, quantity: 1 }],
       customer: {
@@ -136,12 +151,16 @@ async function createCheckoutSession(tier = 2, billingCycle = 'monthly') {
         billing_cycle: billingCycle
       },
       settings: {
-        displayMode: 'overlay',
+        displayMode: window.IS_EXTENSION ? 'inline' : 'overlay',
         theme: 'light',
         locale: (typeof i18n !== 'undefined' && i18n.currentLocale === 'zh') ? 'zh' : 'en',
         allowLogout: false,
         successUrl,
-        cancelUrl
+        cancelUrl,
+        ...(window.IS_EXTENSION ? {
+          frameTarget: 'paddle-inline-root',
+          frameStyle: 'width: 100%; min-height: 450px; background: transparent; border: none;'
+        } : {})
       }
     });
   } catch (err) {

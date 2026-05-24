@@ -16,7 +16,6 @@ if (typeof supabase !== 'undefined' && supabase.createClient) {
     } else {
         // Correct SDK usage: supabase.createClient
         supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('Supabase client initialized');
         // Export to short name for legacy support or internal use
         window.supabase = supabaseClient;
     }
