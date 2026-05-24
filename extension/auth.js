@@ -14,6 +14,10 @@ const AUTH_PENDING_LOGIN_AT_KEY = 'auth_pending_login_at';
 const AUTH_MAX_AGE_MS = 90 * 24 * 60 * 60 * 1000;
 
 function getOAuthRedirectUrl() {
+  // Extension takes priority
+  if (typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION && EXTENSION_ORIGIN) {
+    return EXTENSION_ORIGIN + '/';
+  }
   if (typeof OAUTH_REDIRECT_URL === 'string' && OAUTH_REDIRECT_URL.trim()) {
     return OAUTH_REDIRECT_URL.trim();
   }
@@ -33,6 +37,12 @@ function getHomeRedirectUrl() {
 }
 
 function cleanUrlToHome() {
+  // In extension mode, the URL is already at chrome-extension://<id>/index.html.
+  // Changing it via replaceState (e.g. to chrome-extension://<id>/) causes
+  // "file not found" on page refresh since Chrome doesn't auto-resolve
+  // extension origin directory paths to index.html.
+  if (typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION) return;
+
   try {
     const base = getOAuthRedirectUrl();
     const home = new URL('/', base);
@@ -233,14 +243,8 @@ async function handleSession(session) {
   }
 }
 
-// Google Login
-async function handleLoginClick() {
-  if (!supabase) {
-    console.error('Supabase object is missing!');
-    showNotification(getSystemMessage('supabaseMissing', 'Supabase is not initialized. Please check your config.js credentials.'), 'error');
-    return;
-  }
-
+// Google Login (Web)
+async function handleWebLogin() {
   localStorage.setItem(AUTH_PENDING_LOGIN_AT_KEY, String(Date.now()));
 
   const { error } = await supabase.auth.signInWithOAuth({
@@ -256,6 +260,107 @@ async function handleLoginClick() {
   }
 }
 
+// Google Login (Extension)
+// Uses chrome.identity.launchWebAuthFlow to handle OAuth in a popup,
+// so the redirect returns to the extension instead of the web site.
+async function handleExtensionLogin() {
+  try {
+    // Build the Supabase OAuth authorization URL
+    const redirectURL = chrome.identity.getRedirectURL();
+    // redirectURL is like: https://<extid>.chromiumapp.org/
+    const oauthUrl = SUPABASE_URL
+      + '/auth/v1/authorize'
+      + '?provider=google'
+      + '&redirect_to=' + encodeURIComponent(redirectURL);
+
+    // Open OAuth flow in a Chrome-managed popup
+    const responseUrl = await new Promise((resolve, reject) => {
+      chrome.identity.launchWebAuthFlow(
+        { url: oauthUrl, interactive: true },
+        (url) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(chrome.runtime.lastError.message));
+          } else if (!url) {
+            reject(new Error('No redirect URL returned — the login window may have been closed.'));
+          } else {
+            resolve(url);
+          }
+        }
+      );
+    });
+
+    // Parse tokens from the hash fragment
+    // Format: https://<extid>.chromiumapp.org/#access_token=...&refresh_token=...&...
+    const hashStart = responseUrl.indexOf('#');
+    if (hashStart === -1) {
+      throw new Error('No token data in redirect URL. Make sure the URL '
+        + redirectURL + ' is added to your Supabase project Redirect URLs.');
+    }
+
+    const hash = responseUrl.substring(hashStart + 1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get('access_token');
+    const refreshToken = params.get('refresh_token');
+
+    if (!accessToken || !refreshToken) {
+      throw new Error('Missing tokens in redirect URL. The OAuth flow may have failed.');
+    }
+
+    // Establish the Supabase session with the returned tokens
+    const { error: sessionError } = await supabase.auth.setSession({
+      access_token: accessToken,
+      refresh_token: refreshToken
+    });
+
+    if (sessionError) {
+      throw new Error('Failed to set session: ' + sessionError.message);
+    }
+
+    // Wait for full data loading to complete before showing success.
+    // setSession() triggers onAuthStateChange → handleSession() (fire-and-forget).
+    // We explicitly await handleSession() here so user data finishes loading
+    // before the "Login successful" notification is shown.
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      await handleSession(session);
+    }
+
+    showNotification(
+      (typeof i18n !== 'undefined' && i18n.currentLocale === 'zh')
+        ? '登录成功！' : 'Login successful!',
+      'success'
+    );
+  } catch (err) {
+    console.error('Extension login failed:', err);
+    showNotification(
+      (typeof i18n !== 'undefined' && i18n.currentLocale === 'zh')
+        ? '登录失败：' + err.message
+        : 'Login failed: ' + err.message,
+      'error'
+    );
+  }
+}
+
+// Google Login (dispatches to web or extension flow)
+async function handleLoginClick() {
+  if (!supabase) {
+    console.error('Supabase object is missing!');
+    showNotification(getSystemMessage('supabaseMissing', 'Supabase is not initialized. Please check your config.js credentials.'), 'error');
+    return;
+  }
+
+  localStorage.setItem(AUTH_PENDING_LOGIN_AT_KEY, String(Date.now()));
+
+  if (
+    typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION &&
+    typeof chrome !== 'undefined' && chrome.identity && chrome.identity.launchWebAuthFlow
+  ) {
+    return handleExtensionLogin();
+  }
+
+  return handleWebLogin();
+}
+
 window.handleLoginClick = handleLoginClick; // Ensure global access
 
 // Logout
@@ -264,40 +369,61 @@ async function handleLogout() {
 
   const { error } = await supabase.auth.signOut();
   if (error) {
-    console.error('Logout error:', error);
-  } else {
-    // Clear only NewTab-related local storage data
-    const keysToRemove = [
-      'auth_last_login_at', 'auth_pending_login_at',
-      'user_sites', 'user_tags', 'user_site_tags',
-      'user_site_order', 'user_tag_order',
-      'cached_user_data', 'cached_settings',
-      'selectedWallpaper', 'userDataCache', 'themeConfig'
-    ];
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-
-    // Reset state to defaults if available
-    if (typeof state !== 'undefined') {
-      state.sites = [];
-      state.tags = [];
-      state.tagOrder = [];
-      state.siteOrder = [];
-      state.engineIndex = 0;
-      state.dateFormatIndex = 0;
-      state.timeFormat = '24h';
-      state.viewMode = 'general';
-    }
-
-    // Reset wallpaper
-    if (window.wallpaperState) {
-      window.wallpaperState.selectedWallpaper = null;
-      document.body.style.backgroundImage = '';
-      document.body.style.backgroundColor = '';
-    }
-
-    // Reload page to reset all UI
-    window.location.reload();
+    console.error('Logout error (server-side):', error);
+    // Continue with local cleanup even if server request fails
   }
+
+  // Always clear local state regardless of server response
+  signOutLocally();
+}
+
+function signOutLocally() {
+  // Clear only NewTab-related local storage data
+  const keysToRemove = [
+    'auth_last_login_at', 'auth_pending_login_at',
+    'user_sites', 'user_tags', 'user_site_tags',
+    'user_site_order', 'user_tag_order',
+    'cached_user_data', 'cached_settings',
+    'selectedWallpaper', 'userDataCache', 'themeConfig'
+  ];
+  keysToRemove.forEach(key => localStorage.removeItem(key));
+
+  // Reset local state to defaults
+  if (typeof state !== 'undefined') {
+    state.sites = [];
+    state.tags = [];
+    state.tagOrder = [];
+    state.siteOrder = [];
+    state.engineIndex = 0;
+    state.dateFormatIndex = 0;
+    state.timeFormat = '24h';
+    state.viewMode = 'general';
+  }
+
+  // Reset wallpaper
+  if (window.wallpaperState) {
+    window.wallpaperState.selectedWallpaper = null;
+    document.body.style.backgroundImage = '';
+    document.body.style.backgroundColor = '';
+  }
+
+  // Clear chrome.storage.local in extension mode, then reload
+  // so Supabase doesn't find a stale session on next load.
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+    try {
+      chrome.storage.local.clear(function() {
+        if (chrome.runtime.lastError) {
+          console.error('Failed to clear chrome.storage.local:', chrome.runtime.lastError);
+        }
+        window.location.reload();
+      });
+      return;
+    } catch (e) {
+      console.error('Failed to clear chrome.storage.local:', e);
+    }
+  }
+
+  window.location.reload();
 }
 
 // Update auth UI (Avatar vs Login button)

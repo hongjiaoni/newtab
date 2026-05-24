@@ -4,7 +4,6 @@
 
 const express = require('express');
 const cors = require('cors');
-const bodyParser = require('body-parser');
 const path = require('path');
 const { OAuth2Client } = require('google-auth-library');
 const db = require('./database');
@@ -14,13 +13,26 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuration
+// Configuration — prefer environment variables, fall back for dev convenience
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '608226137663-n7g5fqo6268rqs51nu6iv4m9d202phah.apps.googleusercontent.com';
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || '';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || '';
+const ADMIN_TOKEN = process.env.ADMIN_TOKEN || '';
 const client = new OAuth2Client(CLIENT_ID);
+
+// ===== Security Middleware =====
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '0');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  next();
+});
 
 // ===== Middleware =====
 app.use(cors());
-app.use(bodyParser.json({ limit: '10mb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static('public'));
 
 // Configure Multer for wallpaper uploads
@@ -65,7 +77,8 @@ function requireAuth(req, res, next) {
 
 function requireAdmin(req, res, next) {
   const token = req.headers.authorization?.replace('Bearer ', '');
-  if (token !== 'mock-admin-token') {
+  const expectedToken = ADMIN_TOKEN || 'mock-admin-token';
+  if (token !== expectedToken) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
   next();
@@ -152,12 +165,21 @@ app.post('/api/settings', requireAuth, async (req, res) => {
 
 app.post('/api/admin/login', (req, res) => {
   const { email, password } = req.body;
-  
-  // In production, use environment variables and proper hashing
-  if (email === 'hongjiaoni@gmail.com' && password === '1qazwsx#') {
-    res.json({ success: true, token: 'mock-admin-token', admin: { name: 'Admin', email } });
+
+  // In production, set ADMIN_EMAIL / ADMIN_PASSWORD / ADMIN_TOKEN environment variables
+  if (ADMIN_EMAIL && ADMIN_PASSWORD) {
+    if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+      res.json({ success: true, token: ADMIN_TOKEN, admin: { name: 'Admin', email } });
+    } else {
+      res.status(401).json({ success: false, error: 'Invalid credentials' });
+    }
   } else {
-    res.status(401).json({ success: false, error: 'Invalid credentials' });
+    // Dev-only fallback (no env vars set)
+    if (email === 'hongjiaoni@gmail.com' && password === '1qazwsx#') {
+      res.json({ success: true, token: 'mock-admin-token', admin: { name: 'Admin', email } });
+    } else {
+      res.status(401).json({ success: false, error: 'Invalid credentials' });
+    }
   }
 });
 
@@ -175,7 +197,7 @@ app.get('/api/admin/stats', async (req, res) => {
     const userCount = db.get('SELECT COUNT(*) as count FROM users');
     const today = new Date().toISOString().slice(0, 10);
     const todayLogins = db.get(
-      'SELECT COUNT(DISTINCT user_id) as count FROM user_activity WHERE login_date = ? AND action = "login"',
+      'SELECT COUNT(DISTINCT user_id) as count FROM user_activity WHERE login_date = ? AND action = \'login\'',
       [today]
     );
     const totalWallpapers = db.get('SELECT COUNT(*) as count FROM daily_wallpapers');
@@ -204,7 +226,7 @@ app.get('/api/admin/stats/trending', async (req, res) => {
       date.setDate(date.getDate() - i);
       const dateStr = date.toISOString().slice(0, 10);
       const row = db.get(
-        'SELECT COUNT(DISTINCT user_id) as count FROM user_activity WHERE login_date = ? AND action = "login"',
+        'SELECT COUNT(DISTINCT user_id) as count FROM user_activity WHERE login_date = ? AND action = \'login\'',
         [dateStr]
       );
       trending.push({ date: dateStr, count: row?.count || 0 });
@@ -430,6 +452,10 @@ app.get('/api/wallpaper/daily', async (req, res) => {
 });
 
 // ===== Start Server =====
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;

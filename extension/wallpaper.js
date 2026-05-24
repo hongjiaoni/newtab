@@ -19,25 +19,76 @@ const MAX_WALLPAPER_UPLOAD_BYTES = 15 * 1024 * 1024;
 const WALLPAPER_UPLOAD_COOLDOWN_MS = 10 * 1000;
 const LAST_WALLPAPER_UPLOAD_AT_KEY = 'wallpaper_last_upload_at';
 
+// ── Caching for faster loading ───────────────────────────────────────
+const WALLPAPER_CACHE_KEY = 'wp_cache_data';
+const CATEGORIES_CACHE_KEY = 'wp_cats_cache';
+const WALLPAPER_CACHE_TTL = 5 * 60 * 1000;   // 5 min for wallpaper list
+const CATEGORIES_CACHE_TTL = 10 * 60 * 1000;  // 10 min for categories
+
+function getCache(key, ttl) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const entry = JSON.parse(raw);
+    if (Date.now() - entry.ts > ttl) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return entry.data;
+  } catch { return null; }
+}
+
+function setCache(key, data) {
+  try {
+    localStorage.setItem(key, JSON.stringify({ data, ts: Date.now() }));
+  } catch { /* quota exceeded — silently ignore */ }
+}
+
 // Initialize wallpaper system
 async function initializeWallpaper() {
-  await loadCategories();
-  await loadWallpapers();
-
+  // ── Phase 1: Show cached data immediately (fast) ──
+  const cachedCats = getCache(CATEGORIES_CACHE_KEY, CATEGORIES_CACHE_TTL);
+  const cachedWps = getCache(WALLPAPER_CACHE_KEY, WALLPAPER_CACHE_TTL);
+  const hasCache = !!(cachedCats && cachedWps);
   const isLoggedIn = !!window.authState?.isLoggedIn;
+
+  if (cachedCats) wallpaperState.categories = cachedCats;
+  if (cachedWps) wallpaperState.wallpapers = cachedWps;
+
+  // If we have cached data, apply wallpaper instantly while fresh data loads
+  if (hasCache) {
+    const savedWallpaper = localStorage.getItem('selectedWallpaper');
+    if (savedWallpaper && (isLoggedIn || wallpaperState.wallpapers.some(w => w.url === savedWallpaper))) {
+      applyWallpaper(savedWallpaper);
+    } else if (!isLoggedIn && wallpaperState.wallpapers.length > 0) {
+      const guest = wallpaperState.wallpapers.find(
+        (w) => w.category === 'daily' || w.category === '每日推荐'
+      ) || wallpaperState.wallpapers[0];
+      if (guest?.url) {
+        wallpaperState.guestDefaultWallpaper = guest.url;
+        wallpaperState.selectedWallpaper = guest.url;
+        previewWallpaper(guest.url);
+      }
+    }
+  }
+
+  // ── Phase 2: Fetch fresh data from network (parallel) ──
+  await Promise.all([loadCategories(), loadWallpapers()]);
+
+  // ── Phase 3: Re-apply with fresh data ──
   if (!isLoggedIn) {
     wallpaperState.selectedWallpaper = null;
   }
 
-  // Apply saved selection
   if (wallpaperState.selectedWallpaper) {
     applyWallpaper(wallpaperState.selectedWallpaper);
     return;
   }
 
   if (!window.authState?.isLoggedIn) {
-    const guestDailyWallpaper = wallpaperState.wallpapers.find((item) => item.category === 'daily' || item.category === '每日推荐')
-      || wallpaperState.wallpapers[0];
+    const guestDailyWallpaper = wallpaperState.wallpapers.find(
+      (item) => item.category === 'daily' || item.category === '每日推荐'
+    ) || wallpaperState.wallpapers[0];
 
     if (guestDailyWallpaper?.url) {
       wallpaperState.guestDefaultWallpaper = guestDailyWallpaper.url;
@@ -86,6 +137,7 @@ async function loadCategories() {
     if (data && data.length > 0) {
       wallpaperState.categories = data;
       wallpaperState.activeCategory = data[0].name;
+      setCache(CATEGORIES_CACHE_KEY, data);
     }
   } catch (err) {
     console.error('Load categories exception:', err);
@@ -125,6 +177,7 @@ async function loadWallpapers() {
 
     if (data) {
       wallpaperState.wallpapers = data;
+      setCache(WALLPAPER_CACHE_KEY, data);
     }
 
     wallpaperState.isLoading = false;
@@ -231,10 +284,7 @@ function renderWallpaperUI() {
               <p style="margin-bottom: 15px; opacity: 0.8;">
                 ${currentLocale === 'zh' ? '登录后可添加自定义壁纸' : 'Login to add custom wallpapers'}
               </p>
-              <button onclick="
-                if (window.closeWallpaperModal) window.closeWallpaperModal();
-                window.openGoogleSignInModal?.();
-              " class="primary-btn sketchy-border"
+              <button onclick="wpOpenLoginFromWallpaper()" class="primary-btn sketchy-border"
                 style="padding: 15px 30px; margin: 0 auto; display: block;">
                 ${currentLocale === 'zh' ? '立即登录' : 'Login'}
               </button>
@@ -246,10 +296,7 @@ function renderWallpaperUI() {
               <p style="margin-bottom: 15px; opacity: 0.8;">
                 ${currentLocale === 'zh' ? '自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}
               </p>
-              <button onclick="
-                if (window.closeWallpaperModal) window.closeWallpaperModal();
-                window.showUpgradeModal?.('wallpaper');
-              " class="primary-btn sketchy-border"
+              <button onclick="wpOpenUpgradeFromWallpaper()" class="primary-btn sketchy-border"
                 style="padding: 15px 30px; margin: 0 auto; display: block;">
                 ${currentLocale === 'zh' ? '升级会员' : 'Upgrade Membership'}
               </button>
@@ -280,7 +327,7 @@ function renderWallpaperUI() {
                     ${t('confirmUpload')}
                   </button>
                   <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
-                  <button class="cancel-btn sketchy-border" onclick="document.getElementById('wallpaperFileInput').click()"
+                  <button class="cancel-btn sketchy-border" onclick="wpTriggerFileInput()"
                     style="padding: 10px 18px;">
                     ${t('localUpload')}
                   </button>
@@ -299,7 +346,7 @@ function renderWallpaperUI() {
                     ${t('confirmUpload')}
                   </button>
                   <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
-                  <button class="cancel-btn sketchy-border" onclick="document.getElementById('wallpaperFileInput').click()"
+                  <button class="cancel-btn sketchy-border" onclick="wpTriggerFileInput()"
                     style="padding: 10px 18px;">
                     ${t('localUpload')}
                   </button>
@@ -341,7 +388,7 @@ function renderWallpaperUI() {
       : wallpaperState.selectedWallpaper;
     gridContainer.innerHTML = filteredWallpapers.map(w => `
       <div class="wallpaper-item ${currentSelected === w.url ? 'selected' : ''}" onclick="selectWallpaper('${w.url}')">
-        <img src="${w.url}" alt="Wallpaper" title="Wallpaper">
+        <img src="${w.url}" alt="Wallpaper" title="Wallpaper" loading="lazy">
       </div>
     `).join('');
   }
@@ -593,6 +640,20 @@ async function addCustomWallpaperByUrl() {
     showNotification(currentLocale === 'zh' ? '添加出错' : 'Add error', 'error');
   }
 }
+
+// Helper functions for CSP-safe onclick in dynamic HTML (extension compatibility)
+window.wpOpenLoginFromWallpaper = function() {
+  if (window.closeWallpaperModal) window.closeWallpaperModal();
+  if (window.openGoogleSignInModal) window.openGoogleSignInModal();
+};
+window.wpOpenUpgradeFromWallpaper = function() {
+  if (window.closeWallpaperModal) window.closeWallpaperModal();
+  if (window.showUpgradeModal) window.showUpgradeModal('wallpaper');
+};
+window.wpTriggerFileInput = function() {
+  var input = document.getElementById('wallpaperFileInput');
+  if (input) input.click();
+};
 
 window.toggleCustomWallpaperAdd = toggleCustomWallpaperAdd;
 window.setCustomWallpaperAddMode = setCustomWallpaperAddMode;

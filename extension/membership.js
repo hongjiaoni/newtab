@@ -295,16 +295,10 @@ function showLoginRequiredModal() {
           ${membershipText('loginRequiredDesc', 'Please log in before using this feature')}
         </p>
         <div class="modal-actions" style="justify-content: center;">
-          <button class="cancel-btn" onclick="
-            document.getElementById('loginRequiredModal').remove();
-          ">
+          <button class="cancel-btn" onclick="mbDismissLoginRequired()">
             ${membershipText('cancel', 'Cancel')}
           </button>
-          <button class="primary-btn" onclick="
-            document.getElementById('loginRequiredModal').remove();
-            window.closeUpgradeModal?.();
-            window.openGoogleSignInModal?.();
-          ">
+          <button class="primary-btn" onclick="mbDismissAndLogin()">
             ${membershipText('loginNow', 'Login Now')}
           </button>
         </div>
@@ -361,6 +355,18 @@ async function handleUpgrade(tier, billingCycle = 'monthly') {
         }
     }
 }
+
+// Helper functions for CSP-safe onclick in dynamic HTML (extension compatibility)
+window.mbDismissLoginRequired = function() {
+  var modal = document.getElementById('loginRequiredModal');
+  if (modal) modal.remove();
+};
+window.mbDismissAndLogin = function() {
+  var modal = document.getElementById('loginRequiredModal');
+  if (modal) modal.remove();
+  if (window.closeUpgradeModal) window.closeUpgradeModal();
+  if (window.openGoogleSignInModal) window.openGoogleSignInModal();
+};
 
 // Export functions
 window.membershipState = membershipState;

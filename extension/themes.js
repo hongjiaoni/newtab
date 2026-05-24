@@ -28,7 +28,7 @@ const themeState = {
   }
 };
 
-const APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
+var APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
 
 function readAppearanceSnapshot() {
   if (typeof localStorage === 'undefined') return null;
