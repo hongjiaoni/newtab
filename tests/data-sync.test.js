@@ -1,7 +1,10 @@
-const assert = require('assert');
-const fs = require('fs');
-const path = require('path');
-const vm = require('vm');
+import { describe, expect, test } from 'vitest';
+import fs from 'node:fs';
+import path from 'node:path';
+import vm from 'node:vm';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function createLocalStorage() {
   const store = new Map();
@@ -167,13 +170,13 @@ async function testHomeSaveFallsBackAndNormalizesSiteIds() {
 
   await context.window.saveUserDataToBackend(true);
 
-  assert.strictEqual(notifications.length, 0, 'home save should not show save failed notification');
-  assert.ok(supabase.calls.some((call) => call.op === 'rpc' && call.name === 'sync_home_config'));
-  assert.ok(supabase.calls.some((call) => call.op === 'upsert' && call.table === 'user_home_settings'));
+  expect(notifications, 'home save should not show save failed notification').toHaveLength(0);
+  expect(supabase.calls.some((call) => call.op === 'rpc' && call.name === 'sync_home_config')).toBe(true);
+  expect(supabase.calls.some((call) => call.op === 'upsert' && call.table === 'user_home_settings')).toBe(true);
 
   const siteInsert = supabase.calls.find((call) => call.op === 'insert' && call.table === 'user_sites');
-  assert.ok(siteInsert, 'fallback should insert sites');
-  assert.match(siteInsert.rows[0].id, /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+  expect(siteInsert, 'fallback should insert sites').toBeTruthy();
+  expect(siteInsert.rows[0].id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
 }
 
 async function testOptionalTablesCanBeMissing() {
@@ -183,9 +186,9 @@ async function testOptionalTablesCanBeMissing() {
 
   await context.window.saveUserDataToBackend(true);
 
-  assert.strictEqual(notifications.length, 0, 'missing optional tables should not fail the entire save');
-  assert.ok(supabase.calls.some((call) => call.op === 'upsert' && call.table === 'user_home_settings'));
-  assert.ok(supabase.calls.some((call) => call.op === 'insert' && call.table === 'user_sites'));
+  expect(notifications, 'missing optional tables should not fail the entire save').toHaveLength(0);
+  expect(supabase.calls.some((call) => call.op === 'upsert' && call.table === 'user_home_settings')).toBe(true);
+  expect(supabase.calls.some((call) => call.op === 'insert' && call.table === 'user_sites')).toBe(true);
 }
 
 async function testThemeSaveFallsBackWhenThemeTablesAreMissing() {
@@ -202,16 +205,12 @@ async function testThemeSaveFallsBackWhenThemeTablesAreMissing() {
     darkMode: { bgColor: '#000000', borderColor: '#eeeeee' }
   });
 
-  assert.strictEqual(notifications.length, 0, 'theme save should not show save failed notification');
-  assert.ok(supabase.calls.some((call) => call.op === 'upsert' && call.table === 'user_home_settings'));
+  expect(notifications, 'theme save should not show save failed notification').toHaveLength(0);
+  expect(supabase.calls.some((call) => call.op === 'upsert' && call.table === 'user_home_settings')).toBe(true);
 }
 
-(async () => {
-  await testHomeSaveFallsBackAndNormalizesSiteIds();
-  await testOptionalTablesCanBeMissing();
-  await testThemeSaveFallsBackWhenThemeTablesAreMissing();
-  console.log('data-sync tests passed');
-})().catch((err) => {
-  console.error(err);
-  process.exit(1);
+describe('data sync fallback', () => {
+  test('falls back to table sync and normalizes legacy site ids', testHomeSaveFallsBackAndNormalizesSiteIds);
+  test('keeps saving when optional sync tables are missing', testOptionalTablesCanBeMissing);
+  test('keeps theme save working when theme/font tables are missing', testThemeSaveFallsBackWhenThemeTablesAreMissing);
 });
