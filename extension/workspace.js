@@ -20,7 +20,8 @@ const WS_STRINGS = {
     agentModelLabel: '模型', agentSave: '保存', agentDeleteAgent: '删除 Agent', agentDeleteConfirm: '删除这个 Agent 及其全部对话？',
     agentDefaultName: '通用助手', agentMessagePlaceholder: '给 {name} 发消息', agentEmpty: '开始和 {name} 对话吧',
     agentChats: '对话', cancel: '取消', weekStart: '0',
-    storageFull: '本地存储空间不足，已压缩较早聊天中的图片'
+    storageFull: '本地存储空间不足，已压缩较早聊天中的图片',
+    changeSize: '修改规格', sizeS: '小', sizeM: '横版中', sizeV: '竖版中', sizeL: '大', sizeMid: '中', applySize: '确认', expandChat: '展开对话', switchAgent: '切换 Agent', prevSize: '上一个规格', nextSize: '下一个规格'
   },
   en: {
     widgetAgent: 'AI Agent', widgetHistory: 'Recently Visited', widgetRss: 'Feeds',
@@ -35,7 +36,8 @@ const WS_STRINGS = {
     agentModelLabel: 'Model', agentSave: 'Save', agentDeleteAgent: 'Delete Agent', agentDeleteConfirm: 'Delete this agent and all its chats?',
     agentDefaultName: 'Assistant', agentMessagePlaceholder: 'Message {name}', agentEmpty: 'Start a conversation with {name}',
     agentChats: 'Chats', cancel: 'Cancel', weekStart: '0',
-    storageFull: 'Local storage is full; images in older chats were compacted'
+    storageFull: 'Local storage is full; images in older chats were compacted',
+    changeSize: 'Change Size', sizeS: 'Small', sizeM: 'Medium (wide)', sizeV: 'Medium (tall)', sizeL: 'Large', sizeMid: 'Medium', applySize: 'Apply', expandChat: 'Open chat', switchAgent: 'Switch agent', prevSize: 'Previous size', nextSize: 'Next size'
   },
   fr: {
     widgetAgent: 'Agent IA', widgetHistory: 'Visités récemment', widgetRss: 'Flux',
@@ -50,7 +52,8 @@ const WS_STRINGS = {
     agentModelLabel: 'Modèle', agentSave: 'Enregistrer', agentDeleteAgent: 'Supprimer l\'agent', agentDeleteConfirm: 'Supprimer cet agent et toutes ses conversations ?',
     agentDefaultName: 'Assistant', agentMessagePlaceholder: 'Écrire à {name}', agentEmpty: 'Commencez une conversation avec {name}',
     agentChats: 'Conversations', cancel: 'Annuler', weekStart: '1',
-    storageFull: 'Stockage local plein : les images des anciennes conversations ont été compactées'
+    storageFull: 'Stockage local plein : les images des anciennes conversations ont été compactées',
+    changeSize: 'Changer la taille', sizeS: 'Petit', sizeM: 'Moyen (large)', sizeV: 'Moyen (haut)', sizeL: 'Grand', sizeMid: 'Moyen', applySize: 'Appliquer', expandChat: 'Ouvrir la conversation', switchAgent: "Changer d'agent", prevSize: 'Taille précédente', nextSize: 'Taille suivante'
   },
   es: {
     widgetAgent: 'Agente IA', widgetHistory: 'Visitados recientemente', widgetRss: 'Fuentes',
@@ -65,7 +68,8 @@ const WS_STRINGS = {
     agentModelLabel: 'Modelo', agentSave: 'Guardar', agentDeleteAgent: 'Eliminar agente', agentDeleteConfirm: '¿Eliminar este agente y todas sus conversaciones?',
     agentDefaultName: 'Asistente', agentMessagePlaceholder: 'Escribe a {name}', agentEmpty: 'Empieza una conversación con {name}',
     agentChats: 'Conversaciones', cancel: 'Cancelar', weekStart: '1',
-    storageFull: 'Almacenamiento local lleno: se compactaron las imágenes de conversaciones antiguas'
+    storageFull: 'Almacenamiento local lleno: se compactaron las imágenes de conversaciones antiguas',
+    changeSize: 'Cambiar tamaño', sizeS: 'Pequeño', sizeM: 'Mediano (ancho)', sizeV: 'Mediano (alto)', sizeL: 'Grande', sizeMid: 'Mediano', applySize: 'Aplicar', expandChat: 'Abrir conversación', switchAgent: 'Cambiar agente', prevSize: 'Tamaño anterior', nextSize: 'Tamaño siguiente'
   },
   ja: {
     widgetAgent: 'AI エージェント', widgetHistory: '最近のアクセス', widgetRss: 'フィード',
@@ -80,7 +84,8 @@ const WS_STRINGS = {
     agentModelLabel: 'モデル', agentSave: '保存', agentDeleteAgent: 'エージェントを削除', agentDeleteConfirm: 'このエージェントとすべての会話を削除しますか？',
     agentDefaultName: 'アシスタント', agentMessagePlaceholder: '{name} にメッセージ', agentEmpty: '{name} との会話を始めましょう',
     agentChats: '会話', cancel: 'キャンセル', weekStart: '0',
-    storageFull: 'ローカル保存容量が不足したため、古い会話の画像を圧縮しました'
+    storageFull: 'ローカル保存容量が不足したため、古い会話の画像を圧縮しました',
+    changeSize: 'サイズを変更', sizeS: '小', sizeM: '中（横長）', sizeV: '中（縦長）', sizeL: '大', sizeMid: '中', applySize: '適用', expandChat: '会話を開く', switchAgent: 'エージェントを切り替え', prevSize: '前のサイズ', nextSize: '次のサイズ'
   },
   ko: {
     widgetAgent: 'AI 에이전트', widgetHistory: '최근 방문', widgetRss: '피드',
@@ -95,7 +100,8 @@ const WS_STRINGS = {
     agentModelLabel: '모델', agentSave: '저장', agentDeleteAgent: '에이전트 삭제', agentDeleteConfirm: '이 에이전트와 모든 대화를 삭제하시겠습니까?',
     agentDefaultName: '어시스턴트', agentMessagePlaceholder: '{name}에게 메시지', agentEmpty: '{name}와(과) 대화를 시작하세요',
     agentChats: '대화', cancel: '취소', weekStart: '0',
-    storageFull: '로컬 저장 공간이 부족하여 이전 대화의 이미지를 정리했습니다'
+    storageFull: '로컬 저장 공간이 부족하여 이전 대화의 이미지를 정리했습니다',
+    changeSize: '크기 변경', sizeS: '소형', sizeM: '중형(가로)', sizeV: '중형(세로)', sizeL: '대형', sizeMid: '중형', applySize: '적용', expandChat: '대화 열기', switchAgent: '에이전트 전환', prevSize: '이전 크기', nextSize: '다음 크기'
   }
 };
 
@@ -168,7 +174,10 @@ const WS_ICONS = {
   image: '<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/>',
   minus: '<path d="M6 12h12"/>',
   chevronL: '<path d="m15 18-6-6 6-6"/>',
-  chevronR: '<path d="m9 18 6-6-6-6"/>'
+  chevronR: '<path d="m9 18 6-6-6-6"/>',
+  expand: '<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/>',
+  pencil: '<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m14 6 4 4"/>',
+  trash: '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>'
 };
 
 function sym(name, extraClass) {
@@ -198,6 +207,32 @@ const WIDGET_NAME_KEYS = {
   agent: 'widgetAgent', calendar: 'pluginCalendar', notes: 'pluginNotes',
   todo: 'pluginTodo', history: 'widgetHistory', rss: 'widgetRss'
 };
+
+// Widget sizes on a 4-column grid, in grid units (width x height), like
+// Apple's widget families: small 1x1, medium (wide) 2x1, medium (tall) 1x2,
+// large 2x2. Each widget offers its own subset; the first is the default.
+const SIZES = { s: [1, 1], m: [2, 1], v: [1, 2], l: [2, 2] };
+const WIDGET_SIZES = {
+  agent: ['l', 'm'],
+  calendar: ['v', 's', 'm'],
+  notes: ['s', 'm', 'l'],
+  todo: ['l', 'm', 'v'],
+  history: ['s', 'm', 'l'],
+  rss: ['l', 'm']
+};
+// Default layout fills a 4 x 4 grid exactly.
+const DEFAULT_WIDGETS = ['agent', 'calendar', 'notes', 'history', 'rss', 'todo'];
+const DEFAULT_SIZES = { agent: 'l', calendar: 'v', notes: 's', history: 's', rss: 'l', todo: 'l' };
+
+function widgetSize(type) {
+  const size = workbench.widgetSizes?.[type];
+  return (WIDGET_SIZES[type] || []).includes(size) ? size : DEFAULT_SIZES[type];
+}
+
+function sizeLabel(type, size) {
+  if (type === 'agent' && size === 'm') return wsT('sizeMid');
+  return wsT({ s: 'sizeS', m: 'sizeM', v: 'sizeV', l: 'sizeL' }[size]);
+}
 
 function widgetName(type) {
   return wsT(WIDGET_NAME_KEYS[type] || type);
@@ -230,7 +265,8 @@ function newAgent(overrides) {
 
 function defaultWorkbench() {
   return {
-    widgets: WIDGET_TYPES.slice(),
+    widgets: DEFAULT_WIDGETS.slice(),
+    widgetSizes: { ...DEFAULT_SIZES },
     notes: [],
     todos: [],
     calendar: [],
@@ -250,8 +286,15 @@ function normalizeWorkbench(raw) {
     // Older data listed only notes/todo/calendar under `plugins`; keep that choice.
     wb.widgets = Array.isArray(raw?.plugins)
       ? ['agent', ...raw.plugins.filter((t) => WIDGET_TYPES.includes(t)), 'history', 'rss']
-      : WIDGET_TYPES.slice();
+      : DEFAULT_WIDGETS.slice();
   }
+  // Sizes: keep valid choices, fill the rest with defaults.
+  const sizes = {};
+  WIDGET_TYPES.forEach((t) => {
+    const v = raw?.widgetSizes?.[t];
+    sizes[t] = (WIDGET_SIZES[t] || []).includes(v) ? v : DEFAULT_SIZES[t];
+  });
+  wb.widgetSizes = sizes;
   wb.widgets = wb.widgets.filter((t, i, arr) => WIDGET_TYPES.includes(t) && arr.indexOf(t) === i);
   delete wb.plugins;
   ['notes', 'todos', 'calendar'].forEach((k) => { if (!Array.isArray(wb[k])) wb[k] = []; });
@@ -345,7 +388,6 @@ function persistWorkbenchSync() {
 }
 
 let workbench = loadWorkbench();
-let workspaceEditing = false;
 
 function ensureAgentActive() {
   const agent = workbench.agent;
@@ -392,6 +434,8 @@ function ensurePluginModal() {
 function openPluginModal(title, bodyHtml, afterBind) {
   const modal = ensurePluginModal();
   modalOverlay.querySelectorAll(':scope > .modal').forEach((m) => { if (m !== modal) m.classList.add('hidden'); });
+  modal.classList.remove('ws-modal--size', 'ws-modal--wide');
+  modal.querySelector(':scope > .modal-actions')?.classList.remove('hidden');
   document.getElementById('pluginModalTitle').textContent = title;
   document.getElementById('pluginModalBody').innerHTML = bodyHtml;
   document.getElementById('pluginModalClose').textContent = i18n.t('close') || 'Close';
@@ -433,14 +477,9 @@ function renderWorkspaceHeader() {
     '<span class="spacer"></span>' +
     '<div class="ws-actions glass glass--capsule">' +
     '<button type="button" class="btn btn--sm" id="wsAddWidget">' + sym('plus') + escapeHtml(wsT('addWidget')) + '</button>' +
-    '<button type="button" class="btn btn--sm' + (workspaceEditing ? ' is-active' : '') + '" id="wsEdit">' + escapeHtml(workspaceEditing ? wsT('done') : wsT('edit')) + '</button>' +
     '<button type="button" class="icon-btn" id="wsBackHome" aria-label="' + escapeHtml(i18n.t('wbBackHome') || 'Home') + '" title="' + escapeHtml(i18n.t('wbBackHome') || 'Home') + '">' + sym('up') + '</button>' +
     '</div>';
   document.getElementById('wsAddWidget').addEventListener('click', openPluginPicker);
-  document.getElementById('wsEdit').addEventListener('click', () => {
-    workspaceEditing = !workspaceEditing;
-    renderWorkbench();
-  });
   document.getElementById('wsBackHome').addEventListener('click', scrollToHomeScreen);
 }
 
@@ -453,11 +492,23 @@ const WIDGET_RENDERERS = {
   rss: renderRssWidget
 };
 
+function createWidgetElement(type, size) {
+  const el = document.createElement('article');
+  el.dataset.widget = type;
+  el.innerHTML = '<div class="widget-head"></div><div class="widget-body"></div>';
+  applyWidgetSize(el, type, size);
+  return el;
+}
+
+function applyWidgetSize(el, type, size) {
+  el.className = 'widget glass w-' + type + ' size-' + size;
+  el.dataset.size = size;
+}
+
 function renderWorkbench() {
   renderWorkspaceHeader();
   const grid = document.getElementById('wsGrid');
   if (!grid) return;
-  grid.classList.toggle('is-editing', workspaceEditing);
   grid.querySelector('.ws-empty')?.remove();
 
   // Keep existing widget elements (so the Agent chat keeps its scroll and
@@ -465,19 +516,18 @@ function renderWorkbench() {
   const existing = new Map(Array.from(grid.children).map((el) => [el.dataset.widget, el]));
   const order = workbench.widgets || [];
   order.forEach((type) => {
+    const size = widgetSize(type);
     let el = existing.get(type);
     if (!el) {
-      el = document.createElement('article');
-      el.className = 'widget glass w-' + type;
-      el.dataset.widget = type;
-      el.innerHTML = '<div class="widget-head"></div><div class="widget-body"></div>';
-      bindWidgetDrag(el);
+      el = createWidgetElement(type, size);
+      bindWidgetInteractions(el);
+    } else if (el.dataset.size !== size) {
+      applyWidgetSize(el, type, size);
+      el.querySelector('.widget-body').innerHTML = '';
     }
     existing.delete(type);
-    el.draggable = workspaceEditing;
     grid.appendChild(el); // appendChild moves it into order
     WIDGET_RENDERERS[type](el);
-    renderEditBadge(el, type);
   });
   existing.forEach((el) => el.remove());
 
@@ -496,48 +546,241 @@ function widgetHead(el, type, actionsHtml) {
     sym(type) + '<span class="widget-title">' + escapeHtml(widgetName(type)) + '</span><span class="spacer"></span>' + (actionsHtml || '');
 }
 
-function renderEditBadge(el, type) {
-  el.querySelector('.widget-remove')?.remove();
-  if (!workspaceEditing) return;
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.className = 'widget-remove';
-  btn.setAttribute('aria-label', wsT('removeWidget'));
-  btn.title = wsT('removeWidget');
-  btn.innerHTML = sym('minus');
-  btn.addEventListener('click', () => {
-    workbench.widgets = workbench.widgets.filter((t) => t !== type);
-    persistWorkbenchSync();
+// ---------- Widget context menu (right click) ----------
+let widgetMenuTarget = null;
+
+function ensureWidgetMenu() {
+  let menu = document.getElementById('widgetMenu');
+  if (menu) return menu;
+  menu = document.createElement('div');
+  menu.id = 'widgetMenu';
+  menu.className = 'context-menu widget-menu hidden';
+  menu.setAttribute('role', 'menu');
+  document.body.appendChild(menu);
+  menu.addEventListener('click', (e) => {
+    const item = e.target.closest('[data-widget-action]');
+    if (!item || !widgetMenuTarget) return;
+    const type = widgetMenuTarget;
+    hideWidgetMenu();
+    if (item.dataset.widgetAction === 'size') openSizePicker(type);
+    if (item.dataset.widgetAction === 'remove') {
+      workbench.widgets = workbench.widgets.filter((t) => t !== type);
+      persistWorkbenchSync();
+    }
   });
-  el.appendChild(btn);
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#widgetMenu')) hideWidgetMenu();
+  });
+  document.addEventListener('scroll', hideWidgetMenu, true);
+  return menu;
 }
 
+function showWidgetMenu(type, x, y) {
+  const menu = ensureWidgetMenu();
+  widgetMenuTarget = type;
+  const canResize = (WIDGET_SIZES[type] || []).length > 1;
+  menu.innerHTML =
+    (canResize ? '<div class="context-menu-item" role="menuitem" data-widget-action="size">' + escapeHtml(wsT('changeSize')) + '…</div>' : '') +
+    '<div class="context-menu-item context-menu-item--danger" role="menuitem" data-widget-action="remove">' + escapeHtml(wsT('removeWidget')) + '</div>';
+  menu.classList.remove('hidden');
+  const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+  const rect = menu.getBoundingClientRect();
+  const left = Math.min(x, window.innerWidth - rect.width - 8);
+  const top = Math.min(y, window.innerHeight - rect.height - 8);
+  // context-menu positions are in zoomed CSS px
+  menu.style.left = (left / zoom) + 'px';
+  menu.style.top = (top / zoom) + 'px';
+}
+
+function hideWidgetMenu() {
+  widgetMenuTarget = null;
+  document.getElementById('widgetMenu')?.classList.add('hidden');
+}
+
+// ---------- Size picker (preview, left/right to switch, apply) ----------
+function gridMetrics() {
+  const grid = document.getElementById('wsGrid');
+  const css = getComputedStyle(grid);
+  const cols = css.gridTemplateColumns.split(' ').filter(Boolean).length || 4;
+  const gap = parseFloat(css.columnGap) || 16;
+  const unitW = (grid.clientWidth - gap * (cols - 1)) / cols;
+  const unitH = parseFloat(css.gridAutoRows) || 180;
+  return { cols, gap, unitW, unitH };
+}
+
+function openSizePicker(type) {
+  const sizes = WIDGET_SIZES[type] || [];
+  if (sizes.length < 2) return;
+  let index = Math.max(0, sizes.indexOf(widgetSize(type)));
+  const body =
+    '<div class="size-picker">' +
+    '<button type="button" class="size-nav glass glass--capsule glass--interactive" data-size-step="-1" aria-label="' + escapeHtml(wsT('prevSize')) + '">' + sym('chevronL') + '</button>' +
+    '<div class="size-stage"></div>' +
+    '<button type="button" class="size-nav glass glass--capsule glass--interactive" data-size-step="1" aria-label="' + escapeHtml(wsT('nextSize')) + '">' + sym('chevronR') + '</button>' +
+    '</div>' +
+    '<div class="size-caption"><span class="size-name"></span><span class="size-dims"></span></div>' +
+    '<div class="size-dots">' + sizes.map(() => '<span></span>').join('') + '</div>' +
+    '<div class="modal-actions"><button type="button" class="cancel-btn" data-size-cancel>' + escapeHtml(wsT('cancel')) + '</button>' +
+    '<button type="button" class="primary-btn" data-size-apply>' + escapeHtml(wsT('applySize')) + '</button></div>';
+
+  openPluginModal(wsT('changeSize') + ' · ' + widgetName(type), body, () => {
+    const modal = document.getElementById('pluginModal');
+    modal.classList.add('ws-modal--size');
+    modal.querySelector(':scope > .modal-actions')?.classList.add('hidden'); // the shell's own Close
+    const stage = modal.querySelector('.size-stage');
+    const { gap, unitW, unitH } = gridMetrics();
+
+    const show = () => {
+      const size = sizes[index];
+      const [w, h] = SIZES[size];
+      const width = w * unitW + (w - 1) * gap;
+      const height = h * unitH + (h - 1) * gap;
+      // Render a real (inert) widget at the candidate size, scaled to fit.
+      const scale = Math.min(1, 600 / (2 * unitW + gap), 380 / (2 * unitH + gap));
+      const el = createWidgetElement(type, size);
+      el.style.width = width + 'px';
+      el.style.height = height + 'px';
+      el.style.transform = 'scale(' + scale + ')';
+      el.inert = true;
+      el.dataset.preview = 'true';
+      // The wrapper has the scaled size, so the stage can center it exactly.
+      const wrap = document.createElement('div');
+      wrap.className = 'size-preview';
+      wrap.style.width = width * scale + 'px';
+      wrap.style.height = height * scale + 'px';
+      wrap.appendChild(el);
+      stage.replaceChildren(wrap);
+      stage.style.width = (2 * unitW + gap) * scale + 32 + 'px';
+      stage.style.height = (2 * unitH + gap) * scale + 32 + 'px';
+      WIDGET_RENDERERS[type](el);
+      el.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
+      modal.querySelector('.size-name').textContent = sizeLabel(type, size);
+      modal.querySelector('.size-dims').textContent = w + ' × ' + h;
+      modal.querySelectorAll('.size-dots span').forEach((d, i) => d.classList.toggle('active', i === index));
+    };
+    const step = (dir) => {
+      index = (index + dir + sizes.length) % sizes.length;
+      show();
+    };
+    modal.querySelectorAll('[data-size-step]').forEach((btn) => {
+      btn.addEventListener('click', () => step(Number(btn.dataset.sizeStep)));
+    });
+    const onKey = (e) => {
+      if (modal.classList.contains('hidden')) {
+        document.removeEventListener('keydown', onKey);
+        return;
+      }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+    };
+    document.addEventListener('keydown', onKey);
+    modal.querySelector('[data-size-cancel]').addEventListener('click', closePluginModal);
+    modal.querySelector('[data-size-apply]').addEventListener('click', () => {
+      workbench.widgetSizes = { ...(workbench.widgetSizes || {}), [type]: sizes[index] };
+      closePluginModal();
+      animateGridChange(() => persistWorkbenchSync());
+    });
+    show();
+  });
+}
+
+// ---------- Drag to move (title bar), live reflow, snap on drop ----------
 let draggedWidget = null;
 
-function bindWidgetDrag(el) {
+// FLIP: measure, apply the change, then animate every widget from its old
+// position to its new one so the rest of the grid visibly makes room.
+function animateGridChange(mutate) {
+  const grid = document.getElementById('wsGrid');
+  if (!grid) { mutate(); return; }
+  const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+  const before = new Map(Array.from(grid.children).map((el) => [el, el.getBoundingClientRect()]));
+  mutate();
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  Array.from(grid.children).forEach((el) => {
+    const a = before.get(el);
+    if (!a) return;
+    const b = el.getBoundingClientRect();
+    const dx = (a.left - b.left) / zoom;
+    const dy = (a.top - b.top) / zoom;
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+    el.animate([{ transform: 'translate(' + dx + 'px, ' + dy + 'px)' }, { transform: 'none' }],
+      { duration: 320, easing: 'cubic-bezier(0.2, 0.8, 0.2, 1)' });
+  });
+}
+
+function moveWidget(type, targetType, after) {
+  const list = workbench.widgets.filter((t) => t !== type);
+  let at = list.indexOf(targetType);
+  if (at < 0) return false;
+  if (after) at += 1;
+  list.splice(at, 0, type);
+  if (list.join() === workbench.widgets.join()) return false;
+  workbench.widgets = list;
+  return true;
+}
+
+function reorderGridDom() {
+  const grid = document.getElementById('wsGrid');
+  workbench.widgets.forEach((t) => {
+    const el = grid.querySelector(':scope > [data-widget="' + t + '"]');
+    if (el) grid.appendChild(el);
+  });
+}
+
+function bindWidgetInteractions(el) {
+  const head = el.querySelector('.widget-head');
+  // Only the title bar starts a drag, so text in the widget stays selectable.
+  head.addEventListener('pointerdown', (e) => {
+    if (e.button !== 0 || e.target.closest('button, a, input, select, textarea')) return;
+    el.draggable = true;
+  });
+  const disarm = () => { el.draggable = false; };
+  head.addEventListener('pointerup', disarm);
+  head.addEventListener('pointercancel', disarm);
+
   el.addEventListener('dragstart', (e) => {
-    if (!workspaceEditing) { e.preventDefault(); return; }
+    if (!el.draggable) { e.preventDefault(); return; }
     draggedWidget = el.dataset.widget;
-    el.classList.add('is-dragging');
     e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', draggedWidget);
+    // Let the browser snapshot the drag image before dimming the original.
+    requestAnimationFrame(() => el.classList.add('is-dragging'));
+    hideWidgetMenu();
   });
   el.addEventListener('dragend', () => {
     el.classList.remove('is-dragging');
-    draggedWidget = null;
+    el.draggable = false;
+    if (draggedWidget) {
+      draggedWidget = null;
+      saveWorkbench();
+      window.markHomeConfigUpdated?.();
+    }
   });
   el.addEventListener('dragover', (e) => {
-    if (!workspaceEditing || !draggedWidget) return;
+    if (!draggedWidget) return;
     e.preventDefault();
-  });
-  el.addEventListener('drop', (e) => {
-    if (!workspaceEditing || !draggedWidget) return;
-    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
     const target = el.dataset.widget;
     if (target === draggedWidget) return;
-    const list = workbench.widgets.filter((t) => t !== draggedWidget);
-    list.splice(list.indexOf(target), 0, draggedWidget);
-    workbench.widgets = list;
-    persistWorkbenchSync();
+    // Before or after the target, by which half the pointer is over
+    const r = el.getBoundingClientRect();
+    const after = r.width > r.height * 1.4 ? e.clientX > r.left + r.width / 2 : e.clientY > r.top + r.height / 2;
+    animateGridChange(() => {
+      if (moveWidget(draggedWidget, target, after)) reorderGridDom();
+    });
+  });
+  el.addEventListener('drop', (e) => {
+    if (draggedWidget) e.preventDefault();
+  });
+  el.addEventListener('contextmenu', (e) => {
+    // Text fields keep the browser's own menu (copy/paste).
+    if (e.target.closest('input, textarea, [contenteditable]')) {
+      e.stopPropagation();
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+    showWidgetMenu(el.dataset.widget, e.clientX, e.clientY);
   });
 }
 
@@ -610,28 +853,41 @@ function eventsOn(key) {
     .sort((a, b) => String(a.time || '').localeCompare(String(b.time || '')));
 }
 
+function calendarGridHtml(cells, todayK, selKey, marked) {
+  return '<div class="cal-mini">' +
+    weekdayLabels().map((w) => '<span class="cal-dow">' + escapeHtml(w) + '</span>').join('') +
+    cells.map((c) => '<button type="button" class="cal-cell' + (c.muted ? ' muted' : '') + (c.key === todayK ? ' today' : '') +
+      (c.key === selKey && c.key !== todayK ? ' selected' : '') + (marked.has(c.key) ? ' has-ev' : '') +
+      '" data-cal-key="' + c.key + '">' + c.day + '</button>').join('') +
+    '</div>';
+}
+
+// Sizes: s = month only, m = month | agenda side by side, v = month over agenda.
 function renderCalendarWidget(el) {
+  const size = el.dataset.size || widgetSize('calendar');
   widgetHead(el, 'calendar',
-    '<button type="button" class="btn btn--plain btn--sm" data-cal-open>' + sym('plus') + '</button>');
+    '<button type="button" class="icon-btn icon-btn--sm" data-cal-open aria-label="' + escapeHtml(i18n.t('eventPlaceholder') || '') + '">' + sym('plus') + '</button>');
   const now = new Date();
   const todayK = todayKey();
   const selKey = workbench.calSel || todayK;
   const marked = new Set((workbench.calendar || []).map((ev) => ev.date));
   const cells = monthCells(now.getFullYear(), now.getMonth());
   const monthLabel = now.toLocaleDateString(wsIntlLocale(), { month: 'long' });
+  const selDate = new Date(selKey + 'T00:00:00');
+  const dayLabel = selDate.toLocaleDateString(wsIntlLocale(), { month: 'short', day: 'numeric', weekday: 'short' });
   const events = eventsOn(selKey);
-
-  el.querySelector('.widget-body').innerHTML =
-    '<div class="cal-month">' + escapeHtml(monthLabel) + '</div>' +
-    '<div class="cal-mini">' +
-    weekdayLabels().map((w) => '<span class="cal-dow">' + escapeHtml(w) + '</span>').join('') +
-    cells.map((c) => '<button type="button" class="cal-cell' + (c.muted ? ' muted' : '') + (c.key === todayK ? ' today' : '') +
-      (c.key === selKey && c.key !== todayK ? ' selected' : '') + (marked.has(c.key) ? ' has-ev' : '') +
-      '" data-cal-key="' + c.key + '">' + c.day + '</button>').join('') +
-    '</div>' +
+  const agenda = '<div class="cal-agenda">' +
+    (size === 'm' ? '<div class="cal-agenda-day">' + escapeHtml(dayLabel) + '</div>' : '') +
     '<div class="cal-events">' + (events.length
       ? events.map((ev) => '<div class="cal-event"><b>' + escapeHtml(ev.title) + '</b><span>' + escapeHtml(ev.time || '') + '</span></div>').join('')
       : '<div class="ws-muted">' + escapeHtml(selKey === todayK ? wsT('noEventsToday') : (i18n.t('calendarEmpty') || '')) + '</div>') +
+    '</div></div>';
+
+  el.querySelector('.widget-body').innerHTML =
+    '<div class="cal-layout cal-layout--' + size + '">' +
+    '<div class="cal-month-block"><div class="cal-month">' + escapeHtml(monthLabel) + '</div>' +
+    calendarGridHtml(cells, todayK, selKey, marked) + '</div>' +
+    (size === 's' ? '' : agenda) +
     '</div>';
 
   el.querySelector('[data-cal-open]').addEventListener('click', openCalendarEditor);
@@ -639,7 +895,8 @@ function renderCalendarWidget(el) {
     btn.addEventListener('click', () => {
       workbench.calSel = btn.dataset.calKey;
       saveWorkbench();
-      renderCalendarWidget(el);
+      if (size === 's') openCalendarEditor();
+      else renderCalendarWidget(el);
     });
     btn.addEventListener('dblclick', () => {
       workbench.calSel = btn.dataset.calKey;
@@ -729,15 +986,20 @@ function sortedNotes() {
   return (workbench.notes || []).slice().sort((a, b) => (b.pinned - a.pinned) || ((b.updatedAt || 0) - (a.updatedAt || 0)));
 }
 
+// Sizes: s = one note, m = up to 3 side by side, l = up to 4 in a 2 x 2 grid.
+// Cards clamp their text (3 lines on small and medium).
 function renderNotesWidget(el) {
+  const size = el.dataset.size || widgetSize('notes');
   const notes = sortedNotes();
   widgetHead(el, 'notes',
     (notes.length ? '<span class="widget-badge">' + notes.length + '</span>' : '') +
-    '<button type="button" class="btn btn--plain btn--sm" data-note-new aria-label="' + escapeHtml(i18n.t('addNote') || '') + '">' + sym('plus') + '</button>');
+    '<button type="button" class="icon-btn icon-btn--sm" data-note-new aria-label="' + escapeHtml(i18n.t('addNote') || '') + '">' + sym('plus') + '</button>');
   const body = el.querySelector('.widget-body');
+  const max = { s: 1, m: 3, l: 4 }[size] || 1;
   body.innerHTML = notes.length
-    ? notes.slice(0, 4).map((n) => '<button type="button" class="note-card" style="--note:' + (NOTE_COLORS.includes(n.color) ? n.color : NOTE_COLORS[0]) + '">' +
-      (n.pinned ? '<span class="note-pin">📌</span>' : '') + escapeHtml(n.text || '…') + '</button>').join('')
+    ? '<div class="note-cards note-cards--' + size + '">' + notes.slice(0, max).map((n) =>
+      '<button type="button" class="note-card" style="--note:' + (NOTE_COLORS.includes(n.color) ? n.color : NOTE_COLORS[0]) + '">' +
+      (n.pinned ? '<span class="note-pin">📌</span>' : '') + '<span class="note-text">' + escapeHtml(n.text || '…') + '</span></button>').join('') + '</div>'
     : '<button type="button" class="ws-empty-cta" data-note-new>' + escapeHtml(i18n.t('notesEmpty') || '') + '</button>';
   el.querySelectorAll('[data-note-new]').forEach((btn) => btn.addEventListener('click', () => {
     workbench.notes.unshift({ id: generateUuid(), text: '', color: NOTE_COLORS[0], pinned: false, updatedAt: Date.now() });
@@ -809,7 +1071,7 @@ function renderTodoWidget(el) {
   // Open items first, then the most recently finished.
   const list = todos.slice().sort((a, b) => (a.done - b.done) || ((b.updatedAt || 0) - (a.updatedAt || 0)));
   el.querySelector('.widget-body').innerHTML =
-    '<div class="todo-list">' + list.map((t) =>
+    '<div class="todo-list todo-list--' + (el.dataset.size || widgetSize('todo')) + '">' + list.map((t) =>
       '<label class="todo-row' + (t.done ? ' done' : '') + '"><input type="checkbox" data-todo-id="' + t.id + '"' + (t.done ? ' checked' : '') + '>' +
       '<span class="todo-text">' + escapeHtml(t.text) + '</span>' +
       (t.priority === 'high' ? '<span class="todo-flag high"></span>' : t.priority === 'medium' ? '<span class="todo-flag medium"></span>' : '') +
@@ -947,8 +1209,11 @@ function hasChromeHistoryApi() {
   return typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION && typeof chrome !== 'undefined' && !!chrome.permissions;
 }
 
-function historyRowsHtml(rows) {
-  return rows.map((r) => {
+// Rows per size: small shows a compact list, medium and large scroll.
+const HISTORY_LIMIT = { s: 3, m: 20, l: 40 };
+
+function historyRowsHtml(rows, size) {
+  return rows.slice(0, HISTORY_LIMIT[size] || 40).map((r) => {
     const url = safeHttpUrl(r.url);
     if (!url) return '';
     const fav = wsFavicon(url);
@@ -971,11 +1236,12 @@ function bindOpenLinks(container) {
 }
 
 function renderHistoryWidget(el) {
+  const size = el.dataset.size || widgetSize('history');
   const body = el.querySelector('.widget-body');
   if (!hasChromeHistoryApi()) {
     widgetHead(el, 'history');
     const rows = readVisits();
-    body.innerHTML = rows.length ? historyRowsHtml(rows) : '<div class="ws-muted ws-center">' + escapeHtml(wsT('historyEmptyWeb')) + '</div>';
+    body.innerHTML = rows.length ? historyRowsHtml(rows, size) : '<div class="ws-muted ws-center">' + escapeHtml(wsT('historyEmptyWeb')) + '</div>';
     bindOpenLinks(body);
     return;
   }
@@ -1001,7 +1267,7 @@ function renderHistoryWidget(el) {
       const rows = (items || [])
         .filter((it) => safeHttpUrl(it.url))
         .map((it) => ({ url: it.url, title: it.title, ts: it.lastVisitTime }));
-      body.innerHTML = rows.length ? historyRowsHtml(rows) : '<div class="ws-muted ws-center">—</div>';
+      body.innerHTML = rows.length ? historyRowsHtml(rows, size) : '<div class="ws-muted ws-center">—</div>';
       bindOpenLinks(body);
     });
   });
@@ -1131,7 +1397,7 @@ function renderRssWidget(el) {
   items.sort((a, b) => b.ts - a.ts);
 
   body.innerHTML = items.length
-    ? items.slice(0, 40).map((it) => {
+    ? items.slice(0, (el.dataset.size || widgetSize('rss')) === 'm' ? 20 : 40).map((it) => {
       const fav = wsFavicon(it.link);
       return '<a class="rss-item' + (read.has(it.link) ? ' is-read' : '') + '" href="' + escapeHtml(it.link) + '" data-open-url="' + escapeHtml(it.link) + '">' +
         '<span class="t">' + escapeHtml(it.title) + '</span>' +
@@ -1219,32 +1485,75 @@ function currentAgentModel() {
   return provider.models.find((m) => m.id === project.model) || provider.models[0];
 }
 
-function renderAgentWidget(el) {
-  widgetHead(el, 'agent',
-    '<button type="button" class="btn btn--plain btn--sm" data-agent-new>' + sym('plus') + escapeHtml(wsT('agentNew')) + '</button>');
-  el.querySelector('[data-agent-new]').addEventListener('click', () => openAgentEditor(null));
-  const body = el.querySelector('.widget-body');
-  if (!body.querySelector('#agentPanel')) body.innerHTML = '<div class="agent" id="agentPanel"></div>';
-  renderAgentPanel();
+// Agent panels: the widget body, and the expanded chat window. Every lookup is
+// scoped to its panel (data-role attributes, no ids), so both can be live at
+// once and the size preview can render an inert copy.
+function agentPanels() {
+  return Array.from(document.querySelectorAll('.agent[data-agent-panel]'))
+    .filter((p) => !p.closest('[data-preview]'));
 }
 
-function renderAgentPanel() {
-  const panel = document.getElementById('agentPanel');
-  if (!panel) return;
+function roleEl(panel, role) {
+  return panel.querySelector('[data-role="' + role + '"]');
+}
+
+function renderAgentWidget(el) {
+  const size = el.dataset.size || widgetSize('agent');
+  widgetHead(el, 'agent',
+    (size === 'm'
+      ? '<button type="button" class="icon-btn icon-btn--sm" data-agent-expand aria-label="' + escapeHtml(wsT('expandChat')) + '" title="' + escapeHtml(wsT('expandChat')) + '">' + sym('expand') + '</button>'
+      : '') +
+    '<button type="button" class="btn btn--plain btn--sm" data-agent-new>' + sym('plus') + escapeHtml(wsT('agentNew')) + '</button>');
+  el.querySelector('[data-agent-new]').addEventListener('click', () => openAgentEditor(null));
+  el.querySelector('[data-agent-expand]')?.addEventListener('click', openAgentWindow);
+  const body = el.querySelector('.widget-body');
+  let panel = body.querySelector('.agent[data-agent-panel]');
+  if (!panel) {
+    body.innerHTML = '<div class="agent" data-agent-panel></div>';
+    panel = body.firstChild;
+  }
+  panel.classList.toggle('agent--compact', size === 'm');
+  renderAgentPanel(panel);
+}
+
+// The medium widget is compact; this opens the full chat in a wide sheet.
+function openAgentWindow() {
+  const project = getActiveProject();
+  openPluginModal((project.emoji || '✨') + ' ' + project.name, '<div class="agent agent--window" data-agent-panel></div>', () => {
+    const modal = document.getElementById('pluginModal');
+    modal.classList.add('ws-modal--wide');
+    renderAgentPanel(modal.querySelector('.agent[data-agent-panel]'));
+    roleEl(modal, 'input')?.focus();
+  });
+}
+
+// No panel: re-render every live panel (used after state changes).
+function renderAgentPanel(panel) {
+  if (!panel) {
+    agentPanels().forEach((p) => renderAgentPanel(p));
+    return;
+  }
   const project = ensureAgentActive();
   const agent = workbench.agent;
   const chat = getActiveChat();
   const isLoggedIn = !!window.authState?.isLoggedIn;
   const model = currentAgentModel();
+  const compact = panel.classList.contains('agent--compact');
   // Keep the unsent draft and focus across re-renders.
-  const prevInput = document.getElementById('agentInput');
+  const prevInput = roleEl(panel, 'input');
   const draft = prevInput ? prevInput.value : '';
   const hadFocus = prevInput && document.activeElement === prevInput;
 
-  const agentList = agent.projects.map((pr) =>
+  const agentList = compact ? '' : '<div class="agent-list">' + agent.projects.map((pr) =>
     '<button type="button" class="agent-item" data-agent-id="' + pr.id + '" aria-current="' + (pr.id === project.id) + '">' +
     '<span class="agent-ava">' + escapeHtml(pr.emoji || '✨') + '</span><span class="agent-item-name">' + escapeHtml(pr.name) + '</span></button>'
-  ).join('');
+  ).join('') + '</div>';
+
+  const agentSelect = compact
+    ? '<select class="agent-chat-select agent-switch" data-role="agent-select" aria-label="' + escapeHtml(wsT('switchAgent')) + '">' +
+      agent.projects.map((pr) => '<option value="' + pr.id + '"' + (pr.id === project.id ? ' selected' : '') + '>' +
+        escapeHtml((pr.emoji || '✨') + ' ' + pr.name) + '</option>').join('') + '</select>'
+    : '';
 
   const chatOptions = project.chats.slice().sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)).map((c) =>
     '<option value="' + c.id + '"' + (c.id === chat.id ? ' selected' : '') + '>' + escapeHtml(chatTitle(c)) + '</option>'
@@ -1256,34 +1565,36 @@ function renderAgentPanel() {
     ).join('') + '</div>'
     : '';
 
+  const label = (key, fallback) => escapeHtml(i18n.t(key) || fallback || '');
   panel.innerHTML = `
-    <div class="agent-list">${agentList}</div>
+    ${agentList}
     <div class="agent-chat">
       <div class="agent-chat-bar">
-        <select id="agentChatSelect" class="agent-chat-select" aria-label="${escapeHtml(wsT('agentChats'))}">${chatOptions}</select>
-        <button type="button" class="icon-btn icon-btn--sm" id="agentNewChat" title="${escapeHtml(i18n.t('agentNewChat') || '')}" aria-label="${escapeHtml(i18n.t('agentNewChat') || '')}">${sym('plus')}</button>
-        <button type="button" class="icon-btn icon-btn--sm" id="agentRenameChat" title="${escapeHtml(i18n.t('agentRename') || '')}" aria-label="${escapeHtml(i18n.t('agentRename') || '')}">✎</button>
-        <button type="button" class="icon-btn icon-btn--sm" id="agentDeleteChat" title="${escapeHtml(i18n.t('agentDelete') || '')}" aria-label="${escapeHtml(i18n.t('agentDelete') || '')}">✕</button>
+        ${agentSelect}
+        ${compact ? '' : `<select class="agent-chat-select" data-role="chat-select" aria-label="${escapeHtml(wsT('agentChats'))}">${chatOptions}</select>`}
+        <button type="button" class="icon-btn icon-btn--sm" data-role="new-chat" title="${label('agentNewChat')}" aria-label="${label('agentNewChat')}">${sym('plus')}</button>
+        ${compact ? '' : `<button type="button" class="icon-btn icon-btn--sm" data-role="rename-chat" title="${label('agentRename')}" aria-label="${label('agentRename')}">${sym('pencil')}</button>
+        <button type="button" class="icon-btn icon-btn--sm" data-role="delete-chat" title="${label('agentDelete')}" aria-label="${label('agentDelete')}">${sym('trash')}</button>`}
         <span class="spacer"></span>
-        <button type="button" class="icon-btn icon-btn--sm" id="agentEdit" title="${escapeHtml(wsT('agentEdit'))}" aria-label="${escapeHtml(wsT('agentEdit'))}">${sym('gear')}</button>
+        <button type="button" class="icon-btn icon-btn--sm" data-role="edit" title="${escapeHtml(wsT('agentEdit'))}" aria-label="${escapeHtml(wsT('agentEdit'))}">${sym('gear')}</button>
       </div>
-      <div class="agent-messages" id="agentMessages"></div>
+      <div class="agent-messages" data-role="messages"></div>
       ${imagePreview}
       <div class="composer">
-        <button type="button" class="icon-btn icon-btn--sm" id="agentAttach" title="${escapeHtml(i18n.t('agentAttachImage') || '')}" aria-label="${escapeHtml(i18n.t('agentAttachImage') || '')}">${sym('image')}</button>
-        <textarea id="agentInput" rows="1" placeholder="${escapeHtml(wsT('agentMessagePlaceholder', { name: project.name }))}"></textarea>
-        <button type="button" class="model-chip" id="agentModelChip" title="${escapeHtml(wsT('agentModelLabel'))}">${escapeHtml(model.name)}</button>
-        <button type="button" class="send" id="agentSend" aria-label="${escapeHtml(i18n.t('agentSend') || 'Send')}">${sym('send')}</button>
+        <button type="button" class="icon-btn icon-btn--sm" data-role="attach" title="${label('agentAttachImage')}" aria-label="${label('agentAttachImage')}">${sym('image')}</button>
+        <textarea data-role="input" rows="1" placeholder="${escapeHtml(wsT('agentMessagePlaceholder', { name: project.name }))}"></textarea>
+        ${compact ? '' : `<button type="button" class="model-chip" data-role="model" title="${escapeHtml(wsT('agentModelLabel'))}">${escapeHtml(model.name)}</button>`}
+        <button type="button" class="send" data-role="send" aria-label="${label('agentSend', 'Send')}">${sym('send')}</button>
       </div>
-      ${isLoggedIn ? '' : `<button type="button" class="agent-login" id="agentLogin">${escapeHtml(i18n.t('agentLoginRequired') || 'Log in')}</button>`}
-      <input type="file" id="agentFileInput" accept="image/*" multiple class="hidden">
+      ${isLoggedIn || compact ? '' : `<button type="button" class="agent-login" data-role="login">${label('agentLoginRequired', 'Log in')}</button>`}
+      <input type="file" data-role="file" accept="image/*" multiple class="hidden">
     </div>`;
 
-  const input = document.getElementById('agentInput');
+  const input = roleEl(panel, 'input');
   input.value = draft;
   if (hadFocus) input.focus();
-  bindAgentEvents(model);
-  renderAgentMessages();
+  bindAgentEvents(panel, model);
+  renderAgentMessages(panel);
 }
 
 function addPendingImage(file) {
@@ -1294,47 +1605,48 @@ function addPendingImage(file) {
   }).catch(() => window.showNotification?.(i18n.t('agentImageFailed') || 'Image failed', 'error'));
 }
 
-function bindAgentEvents(model) {
-  const panel = document.getElementById('agentPanel');
+function selectAgent(id) {
+  if (workbench.agent.activeProjectId === id) return;
+  workbench.agent.activeProjectId = id;
+  workbench.agent.activeChatId = null;
+  saveWorkbench();
+  renderAgentPanel();
+}
+
+function bindAgentEvents(panel, model) {
   panel.querySelectorAll('[data-agent-id]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      if (workbench.agent.activeProjectId === btn.dataset.agentId) return;
-      workbench.agent.activeProjectId = btn.dataset.agentId;
-      workbench.agent.activeChatId = null;
-      saveWorkbench();
-      renderAgentPanel();
-    });
+    btn.addEventListener('click', () => selectAgent(btn.dataset.agentId));
     btn.addEventListener('dblclick', () => openAgentEditor(btn.dataset.agentId));
   });
-
-  document.getElementById('agentChatSelect').addEventListener('change', (e) => {
+  roleEl(panel, 'agent-select')?.addEventListener('change', (e) => selectAgent(e.target.value));
+  roleEl(panel, 'chat-select')?.addEventListener('change', (e) => {
     workbench.agent.activeChatId = e.target.value;
     saveWorkbench();
     renderAgentPanel();
   });
-  document.getElementById('agentNewChat').addEventListener('click', () => {
+  roleEl(panel, 'new-chat').addEventListener('click', () => {
     const chat = newChat();
     getActiveProject().chats.push(chat);
     workbench.agent.activeChatId = chat.id;
     saveWorkbench();
     renderAgentPanel();
-    document.getElementById('agentInput')?.focus();
+    roleEl(panel, 'input')?.focus();
   });
-  document.getElementById('agentRenameChat').addEventListener('click', () => openRenameModal(workbench.agent.activeChatId, 'agent-chat'));
-  document.getElementById('agentDeleteChat').addEventListener('click', () => {
+  roleEl(panel, 'rename-chat')?.addEventListener('click', () => openRenameModal(workbench.agent.activeChatId, 'agent-chat'));
+  roleEl(panel, 'delete-chat')?.addEventListener('click', () => {
     const project = getActiveProject();
     if (!window.confirm(i18n.t('agentChatDeleteConfirm') || 'Delete this chat?')) return;
     project.chats = project.chats.filter((c) => c.id !== workbench.agent.activeChatId);
     workbench.agent.activeChatId = null;
     persistWorkbenchSync();
   });
-  document.getElementById('agentEdit').addEventListener('click', () => openAgentEditor(workbench.agent.activeProjectId));
-  document.getElementById('agentModelChip').addEventListener('click', () => openAgentEditor(workbench.agent.activeProjectId));
-  document.getElementById('agentLogin')?.addEventListener('click', () => window.openGoogleSignInModal?.());
+  roleEl(panel, 'edit').addEventListener('click', () => openAgentEditor(workbench.agent.activeProjectId));
+  roleEl(panel, 'model')?.addEventListener('click', () => openAgentEditor(workbench.agent.activeProjectId));
+  roleEl(panel, 'login')?.addEventListener('click', () => window.openGoogleSignInModal?.());
 
-  const input = document.getElementById('agentInput');
-  const fileInput = document.getElementById('agentFileInput');
-  document.getElementById('agentAttach').addEventListener('click', () => fileInput.click());
+  const input = roleEl(panel, 'input');
+  const fileInput = roleEl(panel, 'file');
+  roleEl(panel, 'attach').addEventListener('click', () => fileInput.click());
   fileInput.addEventListener('change', () => {
     Array.from(fileInput.files || []).slice(0, AGENT_IMAGE_MAX - agentPendingImages.length).forEach(addPendingImage);
     fileInput.value = '';
@@ -1363,11 +1675,11 @@ function bindAgentEvents(model) {
     });
   });
 
-  document.getElementById('agentSend').addEventListener('click', sendAgentMessage);
+  roleEl(panel, 'send').addEventListener('click', () => sendAgentMessage(panel));
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
       e.preventDefault();
-      sendAgentMessage();
+      sendAgentMessage(panel);
     }
   });
 
@@ -1465,21 +1777,38 @@ function messageTextContent(m) {
   return String(m.content || '');
 }
 
-function renderAgentMessages(autoScroll) {
-  const container = document.getElementById('agentMessages');
+// panel: one panel, or every live panel when omitted.
+function renderAgentMessages(panel, autoScroll) {
+  if (!panel || typeof panel === 'boolean') {
+    agentPanels().forEach((p) => renderAgentMessages(p, autoScroll));
+    return;
+  }
+  const container = roleEl(panel, 'messages');
   if (!container) return;
   const chat = getActiveChat();
   const project = getActiveProject();
+  const compact = panel.classList.contains('agent--compact');
 
   if (!chat.messages.length) {
+    // Compact: one line; logged-out users get the login prompt here instead.
+    const loginHint = compact && !window.authState?.isLoggedIn;
     container.innerHTML = '<div class="agent-placeholder"><span class="agent-placeholder-ava">' + escapeHtml(project.emoji || '✨') + '</span>' +
-      escapeHtml(wsT('agentEmpty', { name: project.name })) +
-      (project.systemPrompt ? '<span class="agent-placeholder-role">' + escapeHtml(project.systemPrompt) + '</span>' : '') + '</div>';
+      (loginHint
+        ? '<button type="button" class="agent-login" data-role="login-inline">' + escapeHtml(i18n.t('agentLoginRequired') || 'Log in') + '</button>'
+        : escapeHtml(wsT('agentEmpty', { name: project.name }))) +
+      (project.systemPrompt && !compact ? '<span class="agent-placeholder-role">' + escapeHtml(project.systemPrompt) + '</span>' : '') + '</div>';
+    container.querySelector('[data-role="login-inline"]')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      window.openGoogleSignInModal?.();
+    });
     return;
   }
 
-  container.innerHTML = chat.messages.map((m, idx) => {
-    const isLast = idx === chat.messages.length - 1;
+  // The compact (medium) widget shows the latest exchange; the rest is one
+  // click away in the expanded chat.
+  const messages = compact ? chat.messages.slice(-2) : chat.messages;
+  container.innerHTML = messages.map((m, idx) => {
+    const isLast = idx === messages.length - 1;
     const text = messageTextContent(m);
     const images = Array.isArray(m.content)
       ? m.content.filter((p) => p && p.type === 'image_url' && p.image_url?.url).map((p) => p.image_url.url)
@@ -1487,7 +1816,7 @@ function renderAgentMessages(autoScroll) {
     const imgHtml = images.length
       ? '<div class="agent-msg-images">' + images.map((u) => '<img src="' + escapeHtml(u) + '" alt="">').join('') + '</div>'
       : '';
-    const actions = (m.role === 'assistant' && isLast && !agentIsStreaming)
+    const actions = (m.role === 'assistant' && isLast && !agentIsStreaming && !compact)
       ? '<span class="agent-msg-actions">' +
         '<button type="button" data-regen title="' + escapeHtml(i18n.t('agentRegenerate') || '') + '">⟳</button>' +
         '<button type="button" data-copy-msg title="' + escapeHtml(i18n.t('agentCopy') || '') + '">⧉</button>' +
@@ -1497,7 +1826,8 @@ function renderAgentMessages(autoScroll) {
       '<span class="msg-foot"><span class="msg-time">' + formatAgentTime(m.ts) + '</span>' + actions + '</span></div>';
   }).join('');
 
-  container.querySelector('[data-regen]')?.addEventListener('click', regenerateAgentReply);
+  if (compact) container.onclick = openAgentWindow;
+  container.querySelector('[data-regen]')?.addEventListener('click', () => regenerateAgentReply(panel));
   container.querySelector('[data-copy-msg]')?.addEventListener('click', () => {
     const last = chat.messages[chat.messages.length - 1];
     navigator.clipboard?.writeText(messageTextContent(last)).then(() => {
@@ -1560,13 +1890,15 @@ function buildUserContent(text, images) {
   return parts;
 }
 
-async function sendAgentMessage() {
+// panel: the panel whose composer was used (defaults to the first live one).
+async function sendAgentMessage(panel) {
   if (agentIsStreaming) return;
   if (!window.authState?.isLoggedIn) {
     showLoginRequiredForAgent();
     return;
   }
-  const input = document.getElementById('agentInput');
+  panel = panel || agentPanels()[0];
+  const input = panel ? roleEl(panel, 'input') : null;
   const text = (input && input.value.trim()) || '';
   const images = agentPendingImages.slice();
   if (!text && !images.length) return;
@@ -1614,7 +1946,7 @@ async function sendAgentMessage() {
     const result = await consumeAgentStream(res, (delta) => {
       assistantMsg.content += delta;
       chat.updatedAt = Date.now();
-      renderAgentMessages(true);
+      renderAgentMessages(null, true);
     });
     if (!result.ok) throw new Error(result.error);
     if (!assistantMsg.content.trim()) assistantMsg.content = '…';
@@ -1628,7 +1960,7 @@ async function sendAgentMessage() {
   renderAgentPanel();
 }
 
-async function regenerateAgentReply() {
+async function regenerateAgentReply(panel) {
   if (agentIsStreaming) return;
   const chat = getActiveChat();
   const lastUserIdx = chat.messages.map((m) => m.role).lastIndexOf('user');
@@ -1642,10 +1974,11 @@ async function regenerateAgentReply() {
   const images = Array.isArray(lastUserMsg.content)
     ? lastUserMsg.content.filter((p) => p && p.type === 'image_url' && p.image_url?.url).map((p) => p.image_url.url)
     : [];
-  const input = document.getElementById('agentInput');
+  panel = panel || agentPanels()[0];
+  const input = panel ? roleEl(panel, 'input') : null;
   if (input) input.value = text;
   agentPendingImages = images;
-  await sendAgentMessage();
+  await sendAgentMessage(panel);
 }
 
 function compressImage(file, maxDim, quality) {
@@ -1709,6 +2042,8 @@ window.getWorkbench = function () {
 };
 
 window.recordVisit = recordVisit;
+window.hideWidgetMenu = hideWidgetMenu;
+window.openSizePicker = openSizePicker;
 window.initWorkbench = initWorkbench;
 window.renderWorkbench = renderWorkbench;
 window.openPluginEditor = openPluginEditor;
