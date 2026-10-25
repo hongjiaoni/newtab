@@ -2355,6 +2355,7 @@ function applyZoomLevel(level, persist) {
   state.zoomLevel = zoom;
   if (persist !== false) localStorage.setItem('zoomLevel', zoom);
   document.documentElement.style.zoom = String(ZOOM_FACTORS[zoom]);
+  document.documentElement.style.setProperty('--app-zoom', String(ZOOM_FACTORS[zoom]));
   updateSettingsMenu();
 }
 

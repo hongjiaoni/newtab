@@ -3,6 +3,10 @@
 }
 
 :root {
+  /* Viewport size corrected for the html zoom set by applyZoomLevel() */
+  --app-zoom: 1;
+  --vw-full: calc(100vw / var(--app-zoom));
+  --vh-full: calc(100vh / var(--app-zoom));
   --bg-color: #f0f0f0;
   --button-bg: #ffffff;
   --modal-bg: #ffffff;
@@ -42,7 +46,7 @@
 body {
   margin: 0;
   font-family: inherit;
-  height: 100vh;
+  height: var(--vh-full);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -625,8 +629,8 @@ textarea:-ms-input-placeholder {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: var(--vw-full);
+  height: var(--vh-full);
   background: rgba(0, 0, 0, 0.4);
   /* Slight dim, not blur */
   display: flex;
@@ -2435,7 +2439,7 @@ input:disabled {
 .screens {
   display: flex;
   width: 100%;
-  height: 100vh;
+  height: var(--vh-full);
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x mandatory;
@@ -2447,9 +2451,9 @@ input:disabled {
 }
 
 .screen {
-  flex: 0 0 100vw;
-  width: 100vw;
-  height: 100vh;
+  flex: 0 0 var(--vw-full);
+  width: var(--vw-full);
+  height: var(--vh-full);
   overflow-y: auto;
   display: flex;
   align-items: center;
