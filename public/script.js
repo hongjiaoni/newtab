@@ -2574,6 +2574,16 @@ setInterval(updateTime, 1000);
 updateTime();
 
 // ===== Search Engine =====
+// Broken engine icons fall back via data-fallback-src. One delegated listener
+// (image errors don't bubble, so capture) replaces inline onerror attributes,
+// which the extension's CSP blocks.
+document.addEventListener('error', (e) => {
+  const img = e.target;
+  if (img && img.tagName === 'IMG' && img.dataset.fallbackSrc && img.src !== img.dataset.fallbackSrc) {
+    img.src = img.dataset.fallbackSrc;
+  }
+}, true);
+
 function renderSearchEngine() {
   const enabledIds = state.enabledEngineIds || [];
   const enabled = getEnabledEngines(enabledIds);
@@ -2594,7 +2604,7 @@ function renderSearchEngine() {
     return `
           <div class="engine-option ${isCurrent ? 'active' : ''}" data-engine-id="${eng.id}">
             <div class="engine-option-main" onclick="selectEngineById('${eng.id}')">
-              <img src="${eng.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
+              <img src="${eng.icon}" alt="${name}" data-fallback-src="https://www.google.com/favicon.ico">
               <span>${name}</span>
             </div>
             ${enabled.length > 1 ? `
@@ -2629,7 +2639,7 @@ function renderEngineQuickList() {
     const isActive = engine.id === currentEngine.id;
     return `
       <div class="engine-quick-item ${isActive ? 'active' : ''}" onclick="selectEngineById('${engine.id}')" title="${name}">
-        <img src="${engine.icon}" alt="${name}" onerror="this.src='https://www.google.com/favicon.ico'">
+        <img src="${engine.icon}" alt="${name}" data-fallback-src="https://www.google.com/favicon.ico">
         <span>${name}</span>
       </div>
     `;
@@ -2712,7 +2722,7 @@ function renderEngineModal() {
     return `
       <div class="engine-item ${isSelected ? 'selected' : ''}" onclick="toggleEngineSelection('${eng.id}')">
         <div class="engine-check">✓</div>
-        <img src="${eng.icon}" onerror="this.src='https://www.google.com/favicon.ico'">
+        <img src="${eng.icon}" data-fallback-src="https://www.google.com/favicon.ico">
         <span>${name}</span>
       </div>
     `;

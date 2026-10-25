@@ -23,14 +23,14 @@ const MEMBERSHIP_CONFIG = {
         name: '基础会员',
         nameEn: 'Basic',
         features: ['基础壁纸库', '网站标签管理', '数据同步'],
-        limitations: ['无法自定义主题', '无法上传壁纸', '无法自定义字体']
+        limitations: ['无法上传壁纸']
     },
     2: {
         name: '高级会员',
         nameEn: 'Premium',
         priceMonthly: 4.99,
         priceYearly: 49.99,
-        features: ['所有基础功能', '自定义主题', '自定义字体', '上传壁纸 (50张)', '优先支持'],
+        features: ['所有基础功能', '上传壁纸 (50张)', '优先支持'],
         badge: '⭐'
     },
     3: {
@@ -38,7 +38,7 @@ const MEMBERSHIP_CONFIG = {
         nameEn: 'Super',
         priceMonthly: 9.99,
         priceYearly: 99.99,
-        features: ['所有高级功能', '无限壁纸上传', '专属主题', 'API访问', '专属客服'],
+        features: ['所有高级功能', '无限壁纸上传', 'API访问', '专属客服'],
         badge: '👑'
     }
 };

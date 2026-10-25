@@ -57,6 +57,7 @@
 
 /* ---------- Buttons ---------- */
 .btn {
+  box-shadow: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -89,7 +90,9 @@
   place-items: center;
   width: var(--control-md);
   height: var(--control-md);
+  padding: 0;
   border: 0;
+  box-shadow: none;
   border-radius: var(--radius-capsule);
   background: transparent;
   color: var(--glass-label);

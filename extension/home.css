@@ -45,6 +45,18 @@ body {
   background-attachment: fixed;
 }
 
+/* Gentle shade at the top and bottom so white text sitting directly on the
+   wallpaper (clock, page titles) stays readable on bright images. Light solid
+   wallpapers switch to dark ink instead, so they skip it. */
+body:not([data-wallpaper-tone="light"])::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0) 26%, rgba(0, 0, 0, 0) 74%, rgba(0, 0, 0, 0.2));
+}
+
 body[data-wallpaper-tone="light"] {
   --on-wallpaper: rgba(0, 0, 0, 0.84);
   --on-wallpaper-shadow: 0 1px 1px rgba(255, 255, 255, 0.45);

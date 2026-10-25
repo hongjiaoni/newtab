@@ -23,7 +23,7 @@
     "service_worker": "background.js"
   },
   "content_security_policy": {
-    "extension_pages": "script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.paddle.com; font-src 'self'; img-src 'self' https: data:; connect-src 'self' https://* wss://*"
+    "extension_pages": "script-src 'self'; style-src 'self' 'unsafe-inline' https://cdn.paddle.com; font-src 'self'; img-src 'self' https: data: blob:; connect-src 'self' https://* wss://*"
   },
   "icons": {
     "16": "icons/icon16.png",

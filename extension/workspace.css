@@ -193,6 +193,7 @@
   margin: auto;
   text-align: center;
   max-width: 260px;
+  text-wrap: balance; /* no lone last character in CJK */
 }
 
 .ws-empty-cta {
@@ -341,6 +342,7 @@
 }
 
 .ws-grant p {
+  text-wrap: balance;
   margin: 0 0 var(--space-3);
   font: var(--text-footnote);
   color: var(--glass-label-2);
@@ -732,6 +734,7 @@
 }
 
 .agent-placeholder {
+  text-wrap: balance;
   display: flex;
   flex-direction: column;
   align-items: center;

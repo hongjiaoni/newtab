@@ -90,3 +90,35 @@ describe('extension/public two-end sync', () => {
     expect(manifest.action.default_icon['128']).toBe('icons/icon128.png');
   });
 });
+describe('extension release checks', () => {
+  const manifest = JSON.parse(fs.readFileSync(EXT('manifest.json'), 'utf8'));
+
+  test('icons are real PNGs at their declared sizes', () => {
+    for (const [size, rel] of Object.entries(manifest.icons)) {
+      const buf = fs.readFileSync(EXT(rel));
+      expect(buf.subarray(1, 4).toString(), rel).toBe('PNG');
+      expect(buf.readUInt32BE(16), rel + ' width').toBe(Number(size));
+      expect(buf.readUInt32BE(20), rel + ' height').toBe(Number(size));
+    }
+  });
+
+  test('permissions match the features that need them', () => {
+    expect(manifest.permissions).toEqual(expect.arrayContaining(['storage', 'favicon']));
+    expect(manifest.optional_permissions).toEqual(['history']);
+    expect(manifest.permissions).not.toContain('history'); // asked for at runtime only
+  });
+
+  test('CSP allows blob: images (uploads) but no remote scripts', () => {
+    const csp = manifest.content_security_policy.extension_pages;
+    expect(csp).toMatch(/img-src [^;]*blob:/);
+    expect(csp).toMatch(/script-src 'self';/);
+  });
+
+  test('no inline handlers the click polyfill cannot rebind', () => {
+    // click-handler.js only rebinds onclick/onchange; anything else is blocked by MV3 CSP.
+    for (const rel of COPY_FILES.filter((f) => f.endsWith('.js'))) {
+      const src = fs.readFileSync(PUBLIC(rel), 'utf8');
+      expect(src, rel).not.toMatch(/\son(error|load|input|keydown|submit|mouseover)="/);
+    }
+  });
+});

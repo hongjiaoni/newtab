@@ -387,19 +387,14 @@ button {
   font-size: 16px;
   background: var(--button-bg);
   color: var(--text-color);
-  box-shadow: var(--sketch-shadow);
-  transition: all 0.2s ease;
+  transition: background-color var(--dur-fast) var(--ease-standard), transform var(--dur-base) var(--ease-spring);
   padding: 8px 20px;
 }
 
-button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: var(--sketch-shadow);
-}
-
+/* Press feedback only; no lift or shadow (the old hand-drawn hover moved
+   every button 2px and overrode .btn / .icon-btn hover states). */
 button:active {
-  transform: translate(1px, 1px);
-  box-shadow: var(--sketch-shadow);
+  transform: scale(0.97);
 }
 
 /* Specific button overrides */

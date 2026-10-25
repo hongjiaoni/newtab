@@ -4,14 +4,28 @@
     {
       "name": "newtab",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["start"],
+      "runtimeArgs": [
+        "start"
+      ],
       "port": 3000
     },
     {
       "name": "design-preview",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["-e", "const e=require('express');e().use(e.static('.')).listen(4100)"],
+      "runtimeArgs": [
+        "-e",
+        "const e=require('express');e().use(e.static('.')).listen(4100)"
+      ],
       "port": 4100
+    },
+    {
+      "name": "extension-csp",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "const e=require('express');const fs=require('fs');const csp=JSON.parse(fs.readFileSync('extension/manifest.json','utf8')).content_security_policy.extension_pages;e().use((q,r,n)=>{r.setHeader('Content-Security-Policy',csp);n();}).use(e.static('extension')).listen(4300)"
+      ],
+      "port": 4300
     }
   ]
 }
