@@ -59,7 +59,7 @@ body {
   left: 0;
   width: var(--vw-full);
   height: var(--vh-full);
-  background: var(--scrim);
+  background: color-mix(in srgb, var(--scrim) 70%, transparent); /* same dim as the folder window */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,7 +80,10 @@ body {
   box-shadow:
     0 0 0 0.5px var(--glass-edge),
     inset 0 1px 0 0 var(--glass-rim),
+    inset 0 -1px 0 0 var(--glass-rim-low),
     var(--glass-shadow-lifted);
+  position: relative;
+  isolation: isolate;
   text-align: left;
   font-size: 14px;
   opacity: 1;
@@ -89,6 +92,21 @@ body {
 
 .modal * {
   font-family: inherit;
+}
+
+/* Specular ring, as on every .glass surface (folder window, toolbar) */
+.modal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(160deg, var(--glass-rim) 0%, transparent 32%, transparent 68%, var(--glass-rim-low) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .hidden {

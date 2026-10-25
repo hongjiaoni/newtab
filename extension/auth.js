@@ -678,7 +678,9 @@ function closeUserProfile() {
 // The sign-in prompt replaces whatever is open: dialogs, folder window, menus.
 function closeAllWindowsExceptSignIn() {
   const signIn = document.getElementById('googleSignInModal');
-  document.querySelectorAll('.modal-overlay:not(.hidden), .modal:not(.hidden)').forEach((el) => {
+  // Overlays close as a whole; only #modalOverlay toggles its sheets one by
+  // one (other overlays never unhide their inner .modal again).
+  document.querySelectorAll('.modal-overlay:not(.hidden), #modalOverlay > .modal:not(.hidden)').forEach((el) => {
     if (el === signIn || signIn?.contains(el)) return;
     el.classList.add('hidden');
   });
