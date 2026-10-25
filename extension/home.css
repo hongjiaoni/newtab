@@ -185,7 +185,7 @@ body[data-wallpaper-tone="light"] {
 .engine-menu,
 .context-menu,
 .page-context-menu {
-  background: var(--glass-tint-thick);
+  background: var(--ctl-sheen), var(--glass-tint-menu);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
@@ -366,8 +366,8 @@ body[data-wallpaper-tone="light"] {
   width: 6px;
   height: 6px;
   margin-left: auto;
-  border-left: 1.5px solid currentColor;
-  border-bottom: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+  border-top: 1.5px solid currentColor;
   transform: rotate(45deg);
   opacity: 0.5;
 }
@@ -398,15 +398,7 @@ body[data-wallpaper-tone="light"] {
   border-radius: 4px;
 }
 
-.engine-option.active .engine-option-main::after {
-  content: "";
-  width: 5px;
-  height: 9px;
-  margin-left: auto;
-  border: solid currentColor;
-  border-width: 0 2px 2px 0;
-  transform: translateY(-1px) rotate(45deg);
-}
+.engine-option.active { font-weight: 600; }
 
 .engine-remove {
   display: inline-grid;
@@ -935,3 +927,8 @@ body[data-wallpaper-tone="light"] {
 }
 .avatar-btn .avatar-img.hidden,
 .avatar-btn .avatar-default.hidden { display: none; }
+
+/* Mode submenu: current option in the accent color */
+.settings-submenu div { font-weight: 400; color: var(--label-1); }
+.settings-submenu div.is-selected { color: var(--accent); font-weight: 600; }
+.settings-submenu div.is-selected:hover { color: var(--accent-contrast); }

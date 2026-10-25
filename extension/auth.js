@@ -675,7 +675,25 @@ function closeUserProfile() {
 }
 
 // Modal Helpers
+// The sign-in prompt replaces whatever is open: dialogs, folder window, menus.
+function closeAllWindowsExceptSignIn() {
+  const signIn = document.getElementById('googleSignInModal');
+  document.querySelectorAll('.modal-overlay:not(.hidden), .modal:not(.hidden)').forEach((el) => {
+    if (el === signIn || signIn?.contains(el)) return;
+    el.classList.add('hidden');
+  });
+  document.getElementById('systemConfirmDialog')?.remove();
+  window.closeFolder?.();
+  window.hideAllContextMenus?.();
+  window.hideContextMenu?.();
+  window.hideWidgetMenu?.();
+  document.getElementById('settingsMenu')?.classList.add('hidden');
+  document.getElementById('modeSubmenu')?.classList.add('hidden');
+  document.getElementById('settingsToggle')?.setAttribute('aria-expanded', 'false');
+}
+
 function openGoogleSignInModal() {
+  closeAllWindowsExceptSignIn();
   openManagedOverlay('googleSignInModal');
 }
 

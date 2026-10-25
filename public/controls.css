@@ -785,3 +785,79 @@ button:disabled {
     transition: none;
   }
 }
+
+/* ---------- Liquid Glass controls ----------
+ * Inside a glass sheet a nested backdrop-filter cannot see the page, so the
+ * controls are glass by their surface: a light-to-clear gradient, a bright
+ * top rim and a hairline edge. */
+.modal-input,
+.field,
+select,
+select.modal-input,
+.cancel-btn,
+.logout-btn,
+.btn--plain,
+.wallpaper-tab,
+.page-btn,
+.engine-item,
+.segmented-control,
+.settings-group {
+  background: var(--ctl-glass-bg);
+  box-shadow: var(--ctl-glass-shadow);
+}
+
+select,
+select.modal-input {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e93' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"), var(--ctl-glass-bg);
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 12px center, 0 0;
+}
+
+.cancel-btn:hover,
+.logout-btn:hover,
+.btn--plain:hover,
+.wallpaper-tab:hover,
+.page-btn:hover,
+.engine-item:hover {
+  background: var(--ctl-glass-bg-hover);
+}
+
+.modal-input:focus,
+.field:focus,
+select:focus-visible {
+  box-shadow: var(--ctl-glass-shadow), 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+/* Accent controls keep their color under a glass sheen */
+.primary-btn,
+.wallpaper-tab.active,
+.page-btn.active,
+.seg-btn.active,
+.seg-btn:has(input:checked) {
+  background: var(--ctl-sheen), var(--accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 0 0.5px color-mix(in srgb, var(--accent) 60%, #000), 0 2px 6px color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+/* Engine picker: the full catalog scrolls inside the sheet */
+.engine-modal {
+  width: min(800px, 90%);
+  max-width: none;
+}
+.engine-modal .engine-grid {
+  max-height: min(56vh, 520px);
+  overflow-y: auto;
+  padding: 4px;
+}
+.engine-count-hint {
+  margin-right: auto;
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.engine-item.selected {
+  background: var(--ctl-sheen), color-mix(in srgb, var(--accent) 16%, transparent);
+  box-shadow: var(--ctl-glass-shadow), inset 0 0 0 1.5px var(--accent);
+}
+
+/* The sign-in prompt sits above every other layer */
+#googleSignInModal { z-index: 5000; }

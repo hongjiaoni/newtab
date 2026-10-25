@@ -159,16 +159,13 @@
 
   <!-- Search Engine Selection Modal -->
   <div id="engineModal" class="modal-overlay hidden">
-    <div class="modal" style="max-width: 800px; width: 90%;">
+    <div class="modal engine-modal">
       <h3 id="engineModalTitle">搜索引擎</h3>
       <div id="engineList" class="engine-grid">
         <!-- Populated by JS -->
       </div>
-      <div class="pagination-controls" id="enginePagination">
-        <!-- Populated by JS -->
-      </div>
       <div class="modal-actions">
-        <span id="engineCountHint" style="margin-right: auto; opacity: 0.7; font-size: 14px;"></span>
+        <span id="engineCountHint" class="engine-count-hint"></span>
         <button id="closeEngineModal" class="cancel-btn">关闭</button>
         <button id="saveEngineSelection" class="primary-btn">保存</button>
       </div>

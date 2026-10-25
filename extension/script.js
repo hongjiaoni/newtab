@@ -30,6 +30,7 @@ const translations = {
     tagName: '标签名称',
     selectTags: '选择标签',
     pinToHome: '固定在首页',
+    engineLimit: '最多只能选择 5 个搜索引擎', engineSelected: '已选 {n}/5',
     iconTextLabel: '文字', iconColorLabel: '背景色', iconCustom: '自定义',
     done: '完成', accentLabel: '主题色', accentCustom: '自定义', accentBlue: '蓝色', accentPurple: '紫色', accentPink: '粉色', accentRed: '红色', accentOrange: '橙色', accentYellow: '黄色', accentGreen: '绿色', accentGraphite: '石墨色', folderSitesLabel: '放入文件夹的网站', folderNoSites: '首页还没有可以放入的网站', folderDragOutHint: '把图标拖到窗口外即可移出文件夹',
     iconLabel: '图标', iconUpload: '上传图片', iconAuto: '自动获取', iconInvalid: '无法读取这张图片',
@@ -208,6 +209,7 @@ const translations = {
     tagName: 'Tag Name',
     selectTags: 'Select Tags',
     pinToHome: 'Pin to Home',
+    engineLimit: 'You can select up to 5 search engines', engineSelected: 'Selected {n}/5',
     iconTextLabel: 'Text', iconColorLabel: 'Background', iconCustom: 'Custom',
     done: 'Done', accentLabel: 'Accent Color', accentCustom: 'Custom', accentBlue: 'Blue', accentPurple: 'Purple', accentPink: 'Pink', accentRed: 'Red', accentOrange: 'Orange', accentYellow: 'Yellow', accentGreen: 'Green', accentGraphite: 'Graphite', folderSitesLabel: 'Sites to put in the folder', folderNoSites: 'There are no sites on the home page to add yet', folderDragOutHint: 'Drag an icon outside this window to move it out',
     iconLabel: 'Icon', iconUpload: 'Upload Image', iconAuto: 'Automatic', iconInvalid: 'Could not read this image',
@@ -300,6 +302,7 @@ const translations = {
     tagName: "Nom de l'étiquette",
     selectTags: 'Sélectionner les étiquettes',
     pinToHome: "Épingler à l'accueil",
+    engineLimit: 'Vous pouvez choisir jusqu\'à 5 moteurs', engineSelected: '{n}/5 sélectionnés',
     iconTextLabel: 'Texte', iconColorLabel: 'Fond', iconCustom: 'Personnalisée',
     done: 'OK', accentLabel: 'Couleur d\'accent', accentCustom: 'Personnalisée', accentBlue: 'Bleu', accentPurple: 'Violet', accentPink: 'Rose', accentRed: 'Rouge', accentOrange: 'Orange', accentYellow: 'Jaune', accentGreen: 'Vert', accentGraphite: 'Graphite', folderSitesLabel: 'Sites à placer dans le dossier', folderNoSites: 'Aucun site de l\'accueil à ajouter pour l\'instant', folderDragOutHint: 'Faites glisser une icône hors de cette fenêtre pour la sortir du dossier',
     iconLabel: 'Icône', iconUpload: 'Importer une image', iconAuto: 'Automatique', iconInvalid: 'Impossible de lire cette image',
@@ -518,6 +521,7 @@ const translations = {
     tagName: 'Nombre de etiqueta',
     selectTags: 'Seleccionar etiquetas',
     pinToHome: 'Fijar en inicio',
+    engineLimit: 'Puedes elegir hasta 5 motores', engineSelected: '{n}/5 seleccionados',
     iconTextLabel: 'Texto', iconColorLabel: 'Fondo', iconCustom: 'Personalizado',
     done: 'Listo', accentLabel: 'Color de acento', accentCustom: 'Personalizado', accentBlue: 'Azul', accentPurple: 'Morado', accentPink: 'Rosa', accentRed: 'Rojo', accentOrange: 'Naranja', accentYellow: 'Amarillo', accentGreen: 'Verde', accentGraphite: 'Grafito', folderSitesLabel: 'Sitios para la carpeta', folderNoSites: 'Todavía no hay sitios en el inicio para añadir', folderDragOutHint: 'Arrastra un icono fuera de esta ventana para sacarlo de la carpeta',
     iconLabel: 'Icono', iconUpload: 'Subir imagen', iconAuto: 'Automático', iconInvalid: 'No se pudo leer esta imagen',
@@ -736,6 +740,7 @@ const translations = {
     tagName: 'タグ名',
     selectTags: 'タグを選択',
     pinToHome: 'ホームに固定',
+    engineLimit: '選択できる検索エンジンは 5 つまでです', engineSelected: '{n}/5 選択中',
     iconTextLabel: 'テキスト', iconColorLabel: '背景色', iconCustom: 'カスタム',
     done: '完了', accentLabel: 'アクセントカラー', accentCustom: 'カスタム', accentBlue: 'ブルー', accentPurple: 'パープル', accentPink: 'ピンク', accentRed: 'レッド', accentOrange: 'オレンジ', accentYellow: 'イエロー', accentGreen: 'グリーン', accentGraphite: 'グラファイト', folderSitesLabel: 'フォルダに入れるサイト', folderNoSites: 'ホームに追加できるサイトがまだありません', folderDragOutHint: 'アイコンをウインドウの外へドラッグするとフォルダから出せます',
     iconLabel: 'アイコン', iconUpload: '画像をアップロード', iconAuto: '自動取得', iconInvalid: 'この画像を読み込めませんでした',
@@ -954,6 +959,7 @@ const translations = {
     tagName: '태그 이름',
     selectTags: '태그 선택',
     pinToHome: '홈에 고정',
+    engineLimit: '검색 엔진은 최대 5개까지 선택할 수 있습니다', engineSelected: '{n}/5 선택됨',
     iconTextLabel: '텍스트', iconColorLabel: '배경색', iconCustom: '사용자 지정',
     done: '완료', accentLabel: '강조 색상', accentCustom: '사용자 지정', accentBlue: '파란색', accentPurple: '보라색', accentPink: '분홍색', accentRed: '빨간색', accentOrange: '주황색', accentYellow: '노란색', accentGreen: '초록색', accentGraphite: '그래파이트', folderSitesLabel: '폴더에 넣을 사이트', folderNoSites: '아직 홈에 추가할 사이트가 없습니다', folderDragOutHint: '아이콘을 창 밖으로 드래그하면 폴더에서 꺼낼 수 있습니다',
     iconLabel: '아이콘', iconUpload: '이미지 업로드', iconAuto: '자동', iconInvalid: '이 이미지를 읽을 수 없습니다',
@@ -1814,7 +1820,7 @@ let ENGINE_CATALOG = [
   { id: 'google', name: { zh: '谷歌', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
   { id: 'bing', name: { zh: '必应', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
   { id: 'duckduckgo', name: { zh: 'DuckDuckGo', en: 'DuckDuckGo' }, url: 'https://duckduckgo.com/?q=', icon: 'https://duckduckgo.com/favicon.ico' },
-  { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://search.yahoo.com/favicon.ico' },
+  { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo', ja: 'Yahoo!' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://www.google.com/s2/favicons?domain=yahoo.com&sz=64' },
   { id: 'yandex', name: { zh: 'Yandex', en: 'Yandex' }, url: 'https://yandex.com/search/?text=', icon: 'https://yandex.com/favicon.ico' },
   { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
   { id: 'brave', name: { zh: 'Brave', en: 'Brave' }, url: 'https://search.brave.com/search?q=', icon: 'https://brave.com/static-assets/images/brave-logo-sans-text.svg' },
@@ -1822,10 +1828,10 @@ let ENGINE_CATALOG = [
 
   // Chinese Specific
   { id: 'baidu', name: { zh: '百度', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
-  { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: 'https://www.sogou.com/favicon.ico' },
+  { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: 'https://www.google.com/s2/favicons?domain=sogou.com&sz=64' },
   { id: 'so360', name: { zh: '360 搜索', en: '360 Search' }, url: 'https://www.so.com/s?q=', icon: 'https://www.so.com/favicon.ico' },
   { id: 'zhihu', name: { zh: '知乎', en: 'Zhihu' }, url: 'https://www.zhihu.com/search?q=', icon: 'https://static.zhihu.com/heifetz/favicon.ico' },
-  { id: 'bilibili', name: { zh: 'B站', en: 'Bilibili' }, url: 'https://search.bilibili.com/all?keyword=', icon: 'https://www.bilibili.com/favicon.ico' },
+  { id: 'bilibili', name: { zh: '哔哩哔哩', en: 'Bilibili' }, url: 'https://search.bilibili.com/all?keyword=', icon: 'https://www.bilibili.com/favicon.ico' },
   { id: 'xiaohongshu', name: { zh: '小红书', en: 'Xiaohongshu' }, url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: 'https://www.xiaohongshu.com/favicon.ico' },
   { id: 'weibo', name: { zh: '微博', en: 'Weibo' }, url: 'https://s.weibo.com/weibo?q=', icon: 'https://weibo.com/favicon.ico' },
   { id: 'douban', name: { zh: '豆瓣', en: 'Douban' }, url: 'https://www.douban.com/search?q=', icon: 'https://img3.doubanio.com/favicon.ico' },
@@ -1849,16 +1855,19 @@ let ENGINE_CATALOG = [
 
   // Shopping
   { id: 'amazon', name: { zh: '亚马逊', en: 'Amazon' }, url: 'https://www.amazon.com/s?k=', icon: 'https://www.amazon.com/favicon.ico' },
-  { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.taobao.com/favicon.ico' },
+  { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.google.com/s2/favicons?domain=taobao.com&sz=64' },
   { id: 'jd', name: { zh: '京东', en: 'JD' }, url: 'https://search.jd.com/Search?keyword=', icon: 'https://www.jd.com/favicon.ico' },
 
 ];
 
 const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
 
+// Engine names exist in zh and en (a few carry more); other UI languages use
+// the English (brand) name.
 function getEngineName(engine) {
-  const lang = (typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh') === 'en' ? 'en' : 'zh';
-  return engine?.name?.[lang] || engine?.name?.en || engine?.id || '';
+  const locale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  const names = engine?.name || {};
+  return names[locale] || (locale === 'zh' ? names.zh : names.en) || names.en || engine?.id || '';
 }
 
 function reconcileEngineStateAfterCatalogLoad() {
@@ -1917,7 +1926,9 @@ async function loadGlobalEngineCatalog() {
       }));
 
     if (!list.length) return false;
-    ENGINE_CATALOG = list;
+    // The server list leads; built-in engines it lacks are kept after it.
+    const serverIds = new Set(list.map((e) => e.id));
+    ENGINE_CATALOG = list.concat(ENGINE_CATALOG.filter((e) => !serverIds.has(e.id)));
     return true;
   } catch (err) {
     console.warn('Failed to load global search engines:', err);
@@ -2787,7 +2798,7 @@ function toggleEngineSelection(id) {
   } else {
     // Select
     if (enginePageState.selectedIds.length >= 5) {
-      const msg = i18n.currentLocale === 'zh' ? '最多只能选择 5 个搜索引擎' : 'You can select up to 5 search engines';
+      const msg = i18n.t('engineLimit');
       if (window.showNotification) window.showNotification(msg, 'info');
       return;
     }
@@ -2806,16 +2817,8 @@ function renderEngineModal() {
   const pag = document.getElementById('enginePagination');
   const hint = document.getElementById('engineCountHint');
 
-  const total = ENGINE_CATALOG.length;
-  const totalPages = Math.ceil(total / enginePageState.pageSize);
-
-  // Ensure page validity
-  if (enginePageState.page < 1) enginePageState.page = 1;
-  if (enginePageState.page > totalPages) enginePageState.page = totalPages;
-
-  const start = (enginePageState.page - 1) * enginePageState.pageSize;
-  const end = start + enginePageState.pageSize;
-  const items = ENGINE_CATALOG.slice(start, end);
+  // The whole catalog in one scrolling grid (no pages)
+  const items = ENGINE_CATALOG;
 
   grid.innerHTML = items.map(eng => {
     const isSelected = enginePageState.selectedIds.includes(eng.id);
@@ -2829,32 +2832,11 @@ function renderEngineModal() {
     `;
   }).join('');
 
-  // Pagination
-  let pageHtml = `
-    <button class="page-btn" ${enginePageState.page === 1 ? 'disabled' : ''} onclick="setEnginePage(${enginePageState.page - 1})">‹</button>
-  `;
-
-  for (let i = 1; i <= totalPages; i++) {
-    // Show first, last, current, and surrounding
-    if (i === 1 || i === totalPages || (i >= enginePageState.page - 1 && i <= enginePageState.page + 1)) {
-      pageHtml += `<button class="page-btn ${i === enginePageState.page ? 'active' : ''}" onclick="setEnginePage(${i})">${i}</button>`;
-    } else if (i === enginePageState.page - 2 || i === enginePageState.page + 2) {
-      pageHtml += `<span style="opacity:0.5">...</span>`;
-    }
-  }
-
-  pageHtml += `
-    <button class="page-btn" ${enginePageState.page === totalPages ? 'disabled' : ''} onclick="setEnginePage(${enginePageState.page + 1})">›</button>
-  `;
-
-  pag.innerHTML = pageHtml;
+  if (pag) pag.innerHTML = '';
 
   // Hint text
   const count = enginePageState.selectedIds.length;
-  const text = i18n.currentLocale === 'zh'
-    ? `已选 ${count}/5`
-    : `Selected ${count}/5`;
-  hint.textContent = text;
+  hint.textContent = i18n.t('engineSelected').replace('{n}', count);
 }
 
 // Bind events
@@ -2920,7 +2902,7 @@ window.addEngineById = async (id) => {
   const set = new Set(state.enabledEngineIds || []);
   if (set.has(id)) return;
   if ((state.enabledEngineIds || []).length >= 5) {
-    const msg = i18n.currentLocale === 'zh' ? '最多只能选择 5 个搜索引擎' : 'You can select up to 5 search engines';
+    const msg = i18n.t('engineLimit');
     if (window.showNotification) window.showNotification(msg, 'info');
     return;
   }
@@ -3892,8 +3874,7 @@ function syncModeSubmenuUI() {
   if (!modeSubmenu) return;
   const current = (typeof state !== 'undefined' && state.viewMode) || 'general';
   modeSubmenu.querySelectorAll('[data-mode-option]').forEach((el) => {
-    el.style.fontWeight = el.dataset.modeOption === current ? '800' : '400';
-    el.style.opacity = el.dataset.modeOption === current ? '1' : '0.7';
+    el.classList.toggle('is-selected', el.dataset.modeOption === current);
   });
 }
 

@@ -101,6 +101,12 @@
   --glass-rim: rgba(255, 255, 255, 0.75);          /* 顶部高光边 */
   --glass-rim-low: rgba(255, 255, 255, 0.18);      /* 底部弱边 */
   --glass-edge: rgba(0, 0, 0, 0.06);               /* 外轮廓，保证浅色壁纸上可辨 */
+  --glass-tint-menu: rgba(255, 255, 255, 0.5);     /* 菜单：更通透 */
+  /* 控件玻璃：上亮下透的渐变 + 高光边，用于按钮、输入框、下拉框、分段控件 */
+  --ctl-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.26));
+  --ctl-glass-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.38));
+  --ctl-glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), inset 0 -0.5px 0 rgba(255, 255, 255, 0.3), 0 0 0 0.5px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --ctl-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 55%);
   --glass-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.22), 0 2px 6px -2px rgba(0, 0, 0, 0.12);
   --glass-shadow-lifted: 0 24px 60px -12px rgba(0, 0, 0, 0.32), 0 4px 12px -4px rgba(0, 0, 0, 0.16);
   --glass-label: var(--label-1);
@@ -156,6 +162,11 @@
     --glass-rim: rgba(255, 255, 255, 0.32);
     --glass-rim-low: rgba(255, 255, 255, 0.08);
     --glass-edge: rgba(0, 0, 0, 0.3);
+  --glass-tint-menu: rgba(32, 32, 36, 0.56);
+  --ctl-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+  --ctl-glass-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.09));
+  --ctl-glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -0.5px 0 rgba(255, 255, 255, 0.06), 0 0 0 0.5px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --ctl-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 55%);
     --glass-hover: rgba(255, 255, 255, 0.08);
     --glass-press: rgba(255, 255, 255, 0.04);
     --scrim: rgba(0, 0, 0, 0.42);
@@ -189,6 +200,11 @@
   --glass-rim: rgba(255, 255, 255, 0.32);
   --glass-rim-low: rgba(255, 255, 255, 0.08);
   --glass-edge: rgba(0, 0, 0, 0.3);
+  --glass-tint-menu: rgba(32, 32, 36, 0.56);
+  --ctl-glass-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+  --ctl-glass-bg-hover: linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0.09));
+  --ctl-glass-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -0.5px 0 rgba(255, 255, 255, 0.06), 0 0 0 0.5px rgba(0, 0, 0, 0.4), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --ctl-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 55%);
   --glass-hover: rgba(255, 255, 255, 0.08);
   --glass-press: rgba(255, 255, 255, 0.04);
   --scrim: rgba(0, 0, 0, 0.42);
