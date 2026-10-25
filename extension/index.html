@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="tokens.css" />
   <link rel="stylesheet" href="glass.css" />
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="wallpaper-modal.css" />
+  <link rel="stylesheet" href="controls.css" />
   <link rel="stylesheet" href="home.css" />
   <link rel="stylesheet" href="workspace.css" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -99,7 +99,6 @@
         <!-- Content Area: pinned sites and tags -->
         <div id="content" class="content-area"></div>
 
-        <div id="homeFooter" class="home-footer" style="display:none;"></div>
       </div>
 
       <button type="button" id="toWorkspaceBtn" class="to-workspace glass glass--capsule glass--clear">
@@ -140,16 +139,14 @@
       <div class="wallpaper-content">
         <div id="wallpaperUploadContainer" class="wallpaper-upload-container hidden">
           <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*">
-          <button id="uploadWallpaperBtn" class="primary-btn"
-            style="padding: 15px 30px; margin: 20px auto; display: block;">
-            上传图片
-          </button>
+          <button id="uploadWallpaperBtn" class="primary-btn">上传图片</button>
         </div>
         <div id="wallpaperGrid" class="wallpaper-grid"></div>
       </div>
 
       <div class="modal-actions">
         <button id="restoreDefaultWallpaper" class="cancel-btn">恢复默认</button>
+        <span class="spacer"></span>
         <button id="closeWallpaperModal" class="cancel-btn">关闭</button>
         <button id="saveWallpaperSelection" class="primary-btn">保存</button>
       </div>
@@ -174,13 +171,22 @@
     </div>
   </div>
 
+  <!-- Folder window -->
+  <div id="folderOverlay" class="folder-overlay hidden">
+    <div class="folder-sheet glass glass--thick glass--lifted" role="dialog" aria-modal="true" aria-labelledby="folderNameInput">
+      <input type="text" id="folderNameInput" class="folder-name-input" maxlength="40" autocomplete="off" />
+      <div class="sites-grid folder-grid" id="folderGrid"></div>
+      <p class="folder-hint" id="folderHint"></p>
+    </div>
+  </div>
+
   <!-- Modals -->
   <div id="modalOverlay" class="modal-overlay hidden">
     <!-- Settings Modal -->
-    <div id="settingsModal" class="modal hidden">
+    <div id="settingsModal" class="modal settings-sheet hidden">
       <h3 id="settingsModalTitle">设置</h3>
-      <div class="appearance-panel">
-        <div class="appearance-row">
+      <div class="settings-group">
+        <div class="settings-row">
           <label id="appearanceLabel">外观</label>
           <div class="segmented-control" id="appearanceGroup">
             <button class="seg-btn" data-appearance="light" id="apLight">浅色模式</button>
@@ -188,7 +194,11 @@
             <button class="seg-btn" data-appearance="auto" id="apAuto">跟随系统</button>
           </div>
         </div>
-        <div class="appearance-row">
+        <div class="settings-row">
+          <span class="settings-row-label" id="accentLabel">主题色</span>
+          <div class="accent-swatches" id="accentGroup" role="radiogroup" aria-labelledby="accentLabel"></div>
+        </div>
+        <div class="settings-row">
           <label id="zoomLabel">缩放</label>
           <div class="segmented-control" id="zoomGroup">
             <button class="seg-btn" data-zoom="100">100%</button>
@@ -196,16 +206,18 @@
             <button class="seg-btn" data-zoom="150">150%</button>
           </div>
         </div>
-        <div class="appearance-row">
+      </div>
+      <div class="settings-group">
+        <div class="settings-row">
           <label id="timeFormatLabel">时间格式</label>
           <div class="segmented-control" id="timeFormatGroup">
             <button class="seg-btn" data-time-format="24h" id="tf24">24 小时</button>
             <button class="seg-btn" data-time-format="12h" id="tf12">12 小时</button>
           </div>
         </div>
-        <div class="appearance-row">
-          <label id="settingsLangLabel">语言</label>
-          <select id="settingsLangSelect" class="modal-input">
+        <div class="settings-row">
+          <label id="settingsLangLabel" for="settingsLangSelect">语言</label>
+          <select id="settingsLangSelect">
             <option value="zh">中文</option>
             <option value="en">English</option>
             <option value="fr">Français</option>
@@ -214,19 +226,19 @@
             <option value="ko">한국어</option>
           </select>
         </div>
-        <div class="appearance-row">
+        <div class="settings-row">
           <label id="openBehaviorLabel">页面打开方式</label>
           <div class="segmented-control" id="openBehaviorGroup">
             <button class="seg-btn" data-open-behavior="newtab" id="obNew">新标签页打开</button>
             <button class="seg-btn" data-open-behavior="current" id="obCurrent">当前页打开</button>
           </div>
         </div>
-        <div class="appearance-row">
-          <button id="settingsAboutBtn" class="cancel-btn" style="width:100%;">关于</button>
-        </div>
+      </div>
+      <div class="settings-group">
+        <button type="button" id="settingsAboutBtn" class="settings-row settings-row--action">关于</button>
       </div>
       <div class="modal-actions">
-        <button id="closeSettingsModal" class="cancel-btn">关闭</button>
+        <button id="closeSettingsModal" class="primary-btn">完成</button>
       </div>
     </div>
 
@@ -246,9 +258,9 @@
     <!-- Add/Edit Modal -->
     <div id="addModal" class="modal hidden">
       <h3 id="addModalTitle">Add New</h3>
-      <div class="modal-type-switch">
-        <label><input type="radio" name="addType" value="site" checked> <span id="typeLabel1">Site</span></label>
-        <label><input type="radio" name="addType" value="tag"> <span id="typeLabel2">Tag</span></label>
+      <div class="segmented-control add-type-tabs" role="tablist">
+        <label class="seg-btn"><input type="radio" name="addType" value="site" checked><span id="typeLabel1">Site</span></label>
+        <label class="seg-btn"><input type="radio" name="addType" value="folder"><span id="typeLabel2">Folder</span></label>
       </div>
 
       <div id="siteForm">
@@ -273,23 +285,20 @@
         </div>
 
         <div class="modal-section">
-          <label class="section-label" id="selectTagsLabel">Select Tags</label>
-          <div class="tags-select" id="tagSelector">
-            <!-- Checkboxes for tags -->
-          </div>
-        </div>
-
-        <div class="modal-section">
           <label class="checkbox-label">
             <input type="checkbox" id="showOnHome" checked> <span id="pinToHomeLabel">Pin to Home</span>
           </label>
         </div>
       </div>
 
-      <div id="tagForm" class="hidden">
+      <div id="folderForm" class="hidden">
         <div class="modal-section">
-          <label class="section-label" id="tagNameLabel">Tag Name</label>
-          <input type="text" id="tagName" placeholder="Tag Name" class="modal-input" />
+          <label class="section-label" id="newFolderNameLabel" for="newFolderName">文件夹名称</label>
+          <input type="text" id="newFolderName" class="modal-input" />
+        </div>
+        <div class="modal-section">
+          <span class="section-label" id="folderSitesLabel">放入文件夹的网站</span>
+          <div class="folder-site-picker" id="folderSitePicker"></div>
         </div>
       </div>
 
@@ -299,13 +308,6 @@
       </div>
     </div>
 
-    <!-- Tag View Modal -->
-    <div id="tagViewModal" class="modal hidden">
-      <h3 id="tagViewTitle">Tag Name</h3>
-      <div id="tagViewLinks" class="tag-links-grid"></div>
-      <div class="modal-actions">
-        <button id="closeTagModal">Close</button>
-      </div>
     </div>
     <!-- Delete Confirmation Modal -->
     <div id="deleteModal" class="modal hidden">

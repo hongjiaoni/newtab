@@ -292,6 +292,8 @@ function buildHomeConfigFromLegacy(legacy) {
             wallpaper: legacy.settingsRow.wallpaper || null,
             // color_mode now stores 'light' | 'dark' | 'auto'
             appearance: normalizeAppearanceValue(legacy.settingsRow.color_mode),
+            // undefined when the accent column doesn't exist yet: the local choice stays
+            accent: legacy.settingsRow.accent_color || undefined,
             zoomLevel: legacy.settingsRow?.zoom_level || '100',
             openBehavior: legacy.settingsRow?.open_behavior || 'newtab'
         },
@@ -373,6 +375,7 @@ function buildHomeSettingsRow(uid, payload, syncedAt) {
         wallpaper: Object.prototype.hasOwnProperty.call(s, 'wallpaper') ? s.wallpaper : null,
         theme: 'glass',
         color_mode: normalizeAppearanceValue(s.appearance),
+        accent_color: s.accent || 'blue',
         zoom_level: s.zoomLevel || '100',
         open_behavior: s.openBehavior || 'newtab',
         workbench: payload?.workbench || null,
@@ -413,7 +416,7 @@ async function writeHomeSettingsRow(uid, payload, syncedAt) {
         // Migration not applied yet: the new columns (zoom_level / open_behavior / workbench)
         // are missing, so retry with the legacy column set instead of failing the whole sync.
         const msg = compactSupabaseError(err).toLowerCase();
-        if (msg.includes('zoom_level') || msg.includes('open_behavior') || msg.includes('workbench') || msg.includes('column')) {
+        if (msg.includes('zoom_level') || msg.includes('open_behavior') || msg.includes('workbench') || msg.includes('accent_color') || msg.includes('column')) {
             const s = payload?.settings || {};
             await writeRequiredTable('home settings upsert (legacy)', () => (
                 db
@@ -623,6 +626,7 @@ function buildCurrentHomePayload() {
             // Same value under the old key: the sync_home_config RPC deployed
             // before supabase_glass_migration.sql reads settings.colorMode.
             colorMode: normalizeAppearanceValue(window.getAppearance?.()),
+            accent: window.getAccent?.() || 'blue',
             zoomLevel: state.zoomLevel || '100',
             openBehavior: state.openBehavior || 'newtab'
         },
@@ -662,6 +666,9 @@ function applyHomeConfig(config) {
     if (Array.isArray(config.tags)) state.tags = config.tags;
     if (Array.isArray(config.site_order)) state.siteOrder = config.site_order;
     if (Array.isArray(config.tag_order)) state.tagOrder = config.tag_order;
+    // Tags became folders: convert cloud data from older clients, then save the
+    // converted layout back (deferred so it doesn't run inside the load).
+    if (window.migrateTagsToFolders?.()) setTimeout(() => window.saveData?.(), 0);
 
     const s = config.settings || {};
     state.openFolderId = null;
@@ -703,6 +710,9 @@ function applyHomeConfig(config) {
 
     if (typeof s.appearance === 'string') {
         window.setAppearance?.(s.appearance, { sync: false });
+    }
+    if (typeof s.accent === 'string') {
+        window.setAccent?.(s.accent, { sync: false });
     }
 }
 

@@ -34,7 +34,7 @@ export const COPY_FILES = [
   'workspace.js',
   'script.js',
   'style.css',
-  'wallpaper-modal.css',
+  'controls.css',
   'auth.js',
   'config.js',
   'data-sync.js',

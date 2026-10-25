@@ -1,0 +1,787 @@
+/* =====================================================================
+ * NewTab shared controls — Liquid Glass
+ * Fields, selects, checkboxes, buttons, segmented controls, grouped
+ * settings rows, sheets (modals), toasts, the engine and wallpaper pickers.
+ * Every secondary UI (settings, home menus, workspace editors) uses these.
+ * Built only from tokens.css; loaded after style.css.
+ * ===================================================================== */
+
+/* ---------- Base ---------- */
+input,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+::placeholder {
+  color: var(--label-3);
+  opacity: 1;
+}
+
+/* ---------- Text fields ---------- */
+.modal-input,
+.field {
+  width: 100%;
+  height: var(--control-md);
+  margin: 0;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--fill-3);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+  font: var(--text-body);
+  color: var(--label-1);
+  transition: box-shadow var(--dur-fast) var(--ease-standard), background-color var(--dur-fast) var(--ease-standard);
+}
+
+textarea.modal-input,
+textarea.field {
+  height: auto;
+  min-height: 88px;
+  padding: var(--space-2) var(--space-3);
+  line-height: 1.5;
+  resize: vertical;
+}
+
+.modal-input:focus,
+.field:focus {
+  background: var(--fill-2);
+  box-shadow: inset 0 0 0 0.5px var(--separator), 0 0 0 3px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+input[type="date"].modal-input,
+input[type="time"].modal-input,
+input[type="number"].modal-input {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Select (pop-up button) ---------- */
+select,
+select.modal-input {
+  appearance: none;
+  -webkit-appearance: none;
+  height: var(--control-sm);
+  min-width: 120px;
+  padding: 0 28px 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-xs);
+  background-color: var(--fill-2);
+  /* macOS pop-up button chevrons (mid gray reads on light and dark) */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='12' viewBox='0 0 8 12' fill='none' stroke='%238e8e93' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M1 4.5 4 1.5l3 3M1 7.5l3 3 3-3'/%3E%3C/svg%3E");
+  background-position: right 10px center;
+  background-size: 8px 12px;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+  font: var(--text-callout);
+  color: var(--label-1);
+  cursor: pointer;
+}
+
+select:hover {
+  background-color: var(--fill-1);
+}
+
+select:focus-visible {
+  box-shadow: inset 0 0 0 0.5px var(--separator), 0 0 0 3px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+select option {
+  background: var(--surface-raised);
+  color: var(--label-1);
+}
+
+/* ---------- Checkbox & radio ---------- */
+input[type="checkbox"],
+input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  border: 0;
+  background: var(--fill-2);
+  box-shadow: inset 0 0 0 1px var(--label-4);
+  vertical-align: middle;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);
+}
+
+input[type="checkbox"] {
+  border-radius: 5px;
+}
+
+input[type="radio"] {
+  border-radius: 50%;
+}
+
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background: var(--accent);
+  box-shadow: none;
+}
+
+input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2.5px;
+  width: 5px;
+  height: 10px;
+  border: solid var(--accent-contrast);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+input[type="radio"]:checked::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--accent-contrast);
+}
+
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+input:disabled,
+select:disabled,
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--text-body);
+  cursor: pointer;
+}
+
+/* ---------- Buttons ---------- */
+.primary-btn,
+.cancel-btn,
+.logout-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-width: 76px;
+  height: var(--control-md);
+  padding: 0 var(--space-5);
+  border: 0;
+  border-radius: var(--radius-capsule);
+  box-shadow: none;
+  font: var(--text-headline);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard), transform var(--dur-base) var(--ease-spring), filter var(--dur-fast) var(--ease-standard);
+}
+
+.primary-btn {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.primary-btn:hover {
+  filter: brightness(1.06);
+}
+
+.cancel-btn {
+  background: var(--fill-2);
+  color: var(--label-1);
+}
+
+.cancel-btn:hover {
+  background: var(--fill-1);
+}
+
+/* Destructive: red label on a neutral fill, like Apple's destructive buttons */
+.logout-btn {
+  background: var(--fill-2);
+  color: var(--red);
+}
+
+.logout-btn:hover {
+  background: color-mix(in srgb, var(--red) 14%, var(--fill-2));
+}
+
+.primary-btn:active,
+.cancel-btn:active,
+.logout-btn:active {
+  transform: scale(0.96);
+}
+
+.primary-btn:focus-visible,
+.cancel-btn:focus-visible,
+.logout-btn:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  outline-offset: 2px;
+}
+
+/* ---------- Segmented control ---------- */
+.segmented-control {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-capsule);
+  background: var(--fill-2);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+}
+
+.seg-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: transparent;
+  box-shadow: none;
+  font: var(--text-subhead);
+  color: var(--label-1);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+
+.seg-btn:hover {
+  background: var(--fill-3);
+}
+
+.seg-btn.active,
+.seg-btn:has(input:checked) {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+}
+
+/* A radio inside a segment (the add-item tabs) drives the selection */
+.seg-btn input[type="radio"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.seg-btn:active {
+  transform: none;
+}
+
+/* ---------- Sheet (modal) layout ---------- */
+.modal {
+  font: var(--text-body);
+}
+
+.modal h3 {
+  margin: 0 0 var(--space-5);
+  font: var(--text-title2);
+  color: var(--label-1);
+}
+
+.modal p {
+  font: var(--text-body);
+  color: var(--label-2);
+}
+
+.modal-section {
+  margin-bottom: var(--space-4);
+}
+
+.modal-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font: var(--text-subhead);
+  color: var(--label-2);
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-6);
+}
+
+.modal-actions .spacer {
+  flex: 1;
+}
+
+/* ---------- Grouped settings rows (iOS / macOS Settings style) ---------- */
+.settings-sheet {
+  max-width: 480px;
+}
+
+.settings-group {
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--fill-3);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+  overflow: hidden;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 48px;
+  padding: var(--space-2) var(--space-4);
+}
+
+.settings-row + .settings-row {
+  box-shadow: inset 0 0.5px 0 var(--separator);
+}
+
+.settings-row > label,
+.settings-row > .settings-row-label {
+  flex: none;
+  font: var(--text-body);
+  color: var(--label-1);
+}
+
+.settings-row .segmented-control {
+  min-width: 0;
+}
+
+/* A whole row that acts as a button ("About") */
+.settings-row--action {
+  width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font: var(--text-body);
+  color: var(--label-1);
+  text-align: left;
+  cursor: pointer;
+}
+
+.settings-row--action:hover {
+  background: var(--fill-3);
+}
+
+.settings-row--action::after {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-right: 1.75px solid var(--label-3);
+  border-bottom: 1.75px solid var(--label-3);
+  transform: rotate(-45deg);
+}
+
+.settings-row--action:active {
+  transform: none;
+}
+
+/* ---------- Accent color swatches ---------- */
+.accent-swatches {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.accent-swatch {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow: inset 0 0 0 0.5px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.accent-swatch:hover {
+  transform: scale(1.1);
+}
+
+.accent-swatch[aria-checked="true"] {
+  box-shadow: 0 0 0 2px var(--surface-raised), 0 0 0 4px var(--swatch);
+}
+
+.accent-swatch[aria-checked="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* "Custom": a color wheel that opens the system picker */
+.accent-swatch--custom {
+  overflow: hidden;
+  background: conic-gradient(#ff3b30, #ff9500, #ffcc00, #34c759, #30b0c7, #007aff, #af52de, #ff2d55, #ff3b30);
+}
+
+.accent-swatch--custom input[type="color"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ---------- Toast notifications ---------- */
+.notification-root {
+  position: fixed;
+  top: var(--space-5);
+  left: 50%;
+  z-index: 9999;
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  max-width: min(440px, calc(100vw - 32px));
+  min-height: 40px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-capsule);
+  background: var(--glass-tint-thick);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  box-shadow: 0 0 0 0.5px var(--glass-edge), inset 0 1px 0 0 var(--glass-rim), var(--glass-shadow-lifted);
+  font: var(--text-callout);
+  color: var(--label-1);
+  opacity: 0;
+  transform: translateY(-8px) scale(0.96);
+  transition: opacity var(--dur-fast) var(--ease-standard), transform var(--dur-base) var(--ease-spring);
+  pointer-events: auto;
+}
+
+.notification.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.notification::before {
+  content: "";
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--label-3);
+}
+
+.notification-success::before { background: var(--green); }
+.notification-warning::before { background: var(--orange); }
+.notification-error::before { background: var(--red); }
+
+.system-confirm-overlay {
+  z-index: 1100;
+}
+
+.system-confirm-dialog {
+  max-width: 400px;
+}
+
+.system-confirm-message {
+  margin: 0;
+  line-height: 1.55;
+  color: var(--label-2);
+}
+
+/* ---------- Search engine picker ---------- */
+.engine-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(132px, 1fr));
+  gap: var(--space-3);
+  max-height: 56vh;
+  padding: var(--space-1);
+  overflow-y: auto;
+}
+
+.engine-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--fill-3);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard), transform var(--dur-base) var(--ease-spring);
+}
+
+.engine-item:hover {
+  background: var(--fill-2);
+}
+
+.engine-item:active {
+  transform: scale(0.97);
+}
+
+.engine-item.selected {
+  background: color-mix(in srgb, var(--accent) 14%, var(--fill-3));
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.engine-item img {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.engine-item span {
+  font: var(--text-callout);
+  text-align: center;
+}
+
+.engine-check {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px var(--label-4);
+  color: transparent;
+  font-size: 0;
+}
+
+.engine-item.selected .engine-check {
+  background: var(--accent);
+  box-shadow: none;
+}
+
+.engine-item.selected .engine-check::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 3px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--accent-contrast);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  margin-top: var(--space-4);
+}
+
+.page-btn {
+  display: grid;
+  place-items: center;
+  min-width: var(--control-sm);
+  height: var(--control-sm);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: transparent;
+  box-shadow: none;
+  font: var(--text-subhead);
+  color: var(--label-1);
+  cursor: pointer;
+}
+
+.page-btn:hover {
+  background: var(--fill-3);
+}
+
+.page-btn.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+/* ---------- Wallpaper picker ---------- */
+.wallpaper-modal {
+  width: min(920px, calc(100vw - 48px));
+  max-width: none;
+  max-height: 86vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.wallpaper-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.wallpaper-tab {
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: var(--fill-3);
+  box-shadow: none;
+  font: var(--text-subhead);
+  color: var(--label-1);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.wallpaper-tab:hover {
+  background: var(--fill-2);
+}
+
+.wallpaper-tab.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.wallpaper-content {
+  flex: 1;
+  min-height: 280px;
+  margin: 0 calc(-1 * var(--space-2));
+  padding: var(--space-1) var(--space-2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.wallpaper-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: var(--space-3);
+}
+
+.wallpaper-item {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-sm);
+  background: var(--fill-2);
+  overflow: hidden;
+  cursor: pointer;
+  /* keep off-screen thumbnails out of layout/paint work */
+  content-visibility: auto;
+  contain-intrinsic-size: 168px 105px;
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-standard);
+}
+
+.wallpaper-item:hover {
+  transform: scale(1.02);
+}
+
+.wallpaper-item:active {
+  transform: scale(0.98);
+}
+
+.wallpaper-item.selected {
+  box-shadow: 0 0 0 2px var(--surface-raised), 0 0 0 4.5px var(--accent);
+}
+
+.wallpaper-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-standard);
+}
+
+.wallpaper-item img.is-loaded {
+  opacity: 1;
+}
+
+.wallpaper-empty {
+  grid-column: 1 / -1;
+  padding: var(--space-10) 0;
+  text-align: center;
+  font: var(--text-callout);
+  color: var(--label-2);
+}
+
+.wallpaper-upload-container {
+  margin-bottom: var(--space-4);
+}
+
+.wallpaper-upload-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.wallpaper-upload-row .modal-input {
+  flex: 1;
+  min-width: 220px;
+}
+
+.wallpaper-upload-note {
+  margin: 0 0 var(--space-2);
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.wallpaper-gate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) 0 var(--space-2);
+  text-align: center;
+}
+
+/* ---------- Coffee amounts ---------- */
+.coffee-amount-btn {
+  min-width: 64px;
+  height: var(--control-md);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: var(--fill-2);
+  box-shadow: none;
+  font: var(--text-headline);
+  color: var(--label-1);
+  cursor: pointer;
+}
+
+.coffee-amount-btn:hover {
+  background: var(--fill-1);
+}
+
+.coffee-amount-btn.selected {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wallpaper-item,
+  .wallpaper-item img,
+  .notification,
+  .accent-swatch {
+    transition: none;
+  }
+}

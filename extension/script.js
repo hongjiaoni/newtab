@@ -30,6 +30,7 @@ const translations = {
     tagName: '标签名称',
     selectTags: '选择标签',
     pinToHome: '固定在首页',
+    done: '完成', accentLabel: '主题色', accentCustom: '自定义', accentBlue: '蓝色', accentPurple: '紫色', accentPink: '粉色', accentRed: '红色', accentOrange: '橙色', accentYellow: '黄色', accentGreen: '绿色', accentGraphite: '石墨色', folderSitesLabel: '放入文件夹的网站', folderNoSites: '首页还没有可以放入的网站', folderDragOutHint: '把图标拖到窗口外即可移出文件夹',
     iconLabel: '图标', iconUpload: '上传图片', iconAuto: '自动获取', iconInvalid: '无法读取这张图片',
     cancel: '取消',
     save: '保存',
@@ -206,6 +207,7 @@ const translations = {
     tagName: 'Tag Name',
     selectTags: 'Select Tags',
     pinToHome: 'Pin to Home',
+    done: 'Done', accentLabel: 'Accent Color', accentCustom: 'Custom', accentBlue: 'Blue', accentPurple: 'Purple', accentPink: 'Pink', accentRed: 'Red', accentOrange: 'Orange', accentYellow: 'Yellow', accentGreen: 'Green', accentGraphite: 'Graphite', folderSitesLabel: 'Sites to put in the folder', folderNoSites: 'There are no sites on the home page to add yet', folderDragOutHint: 'Drag an icon outside this window to move it out',
     iconLabel: 'Icon', iconUpload: 'Upload Image', iconAuto: 'Automatic', iconInvalid: 'Could not read this image',
     cancel: 'Cancel',
     save: 'Save',
@@ -296,6 +298,7 @@ const translations = {
     tagName: "Nom de l'étiquette",
     selectTags: 'Sélectionner les étiquettes',
     pinToHome: "Épingler à l'accueil",
+    done: 'OK', accentLabel: 'Couleur d\'accent', accentCustom: 'Personnalisée', accentBlue: 'Bleu', accentPurple: 'Violet', accentPink: 'Rose', accentRed: 'Rouge', accentOrange: 'Orange', accentYellow: 'Jaune', accentGreen: 'Vert', accentGraphite: 'Graphite', folderSitesLabel: 'Sites à placer dans le dossier', folderNoSites: 'Aucun site de l\'accueil à ajouter pour l\'instant', folderDragOutHint: 'Faites glisser une icône hors de cette fenêtre pour la sortir du dossier',
     iconLabel: 'Icône', iconUpload: 'Importer une image', iconAuto: 'Automatique', iconInvalid: 'Impossible de lire cette image',
     cancel: 'Annuler',
     save: 'Enregistrer',
@@ -512,6 +515,7 @@ const translations = {
     tagName: 'Nombre de etiqueta',
     selectTags: 'Seleccionar etiquetas',
     pinToHome: 'Fijar en inicio',
+    done: 'Listo', accentLabel: 'Color de acento', accentCustom: 'Personalizado', accentBlue: 'Azul', accentPurple: 'Morado', accentPink: 'Rosa', accentRed: 'Rojo', accentOrange: 'Naranja', accentYellow: 'Amarillo', accentGreen: 'Verde', accentGraphite: 'Grafito', folderSitesLabel: 'Sitios para la carpeta', folderNoSites: 'Todavía no hay sitios en el inicio para añadir', folderDragOutHint: 'Arrastra un icono fuera de esta ventana para sacarlo de la carpeta',
     iconLabel: 'Icono', iconUpload: 'Subir imagen', iconAuto: 'Automático', iconInvalid: 'No se pudo leer esta imagen',
     cancel: 'Cancelar',
     save: 'Guardar',
@@ -728,6 +732,7 @@ const translations = {
     tagName: 'タグ名',
     selectTags: 'タグを選択',
     pinToHome: 'ホームに固定',
+    done: '完了', accentLabel: 'アクセントカラー', accentCustom: 'カスタム', accentBlue: 'ブルー', accentPurple: 'パープル', accentPink: 'ピンク', accentRed: 'レッド', accentOrange: 'オレンジ', accentYellow: 'イエロー', accentGreen: 'グリーン', accentGraphite: 'グラファイト', folderSitesLabel: 'フォルダに入れるサイト', folderNoSites: 'ホームに追加できるサイトがまだありません', folderDragOutHint: 'アイコンをウインドウの外へドラッグするとフォルダから出せます',
     iconLabel: 'アイコン', iconUpload: '画像をアップロード', iconAuto: '自動取得', iconInvalid: 'この画像を読み込めませんでした',
     cancel: 'キャンセル',
     save: '保存',
@@ -944,6 +949,7 @@ const translations = {
     tagName: '태그 이름',
     selectTags: '태그 선택',
     pinToHome: '홈에 고정',
+    done: '완료', accentLabel: '강조 색상', accentCustom: '사용자 지정', accentBlue: '파란색', accentPurple: '보라색', accentPink: '분홍색', accentRed: '빨간색', accentOrange: '주황색', accentYellow: '노란색', accentGreen: '초록색', accentGraphite: '그래파이트', folderSitesLabel: '폴더에 넣을 사이트', folderNoSites: '아직 홈에 추가할 사이트가 없습니다', folderDragOutHint: '아이콘을 창 밖으로 드래그하면 폴더에서 꺼낼 수 있습니다',
     iconLabel: '아이콘', iconUpload: '이미지 업로드', iconAuto: '자동', iconInvalid: '이 이미지를 읽을 수 없습니다',
     cancel: '취소',
     save: '저장',
@@ -1528,22 +1534,22 @@ window.updateAllText = function () {
   const typeLabel1 = document.getElementById('typeLabel1');
   const typeLabel2 = document.getElementById('typeLabel2');
   if (typeLabel1) typeLabel1.textContent = i18n.t('site');
-  if (typeLabel2) typeLabel2.textContent = i18n.t('tag');
+  if (typeLabel2) typeLabel2.textContent = i18n.t('folder');
 
   // Update section labels
   const nameLabel = document.getElementById('nameLabel');
   const urlLabel = document.getElementById('urlLabel');
-  const selectTagsLabel = document.getElementById('selectTagsLabel');
-  const tagNameLabel = document.getElementById('tagNameLabel');
   if (nameLabel) nameLabel.textContent = i18n.t('name');
   if (urlLabel) urlLabel.textContent = i18n.t('url');
-  if (selectTagsLabel) selectTagsLabel.textContent = i18n.t('selectTags');
-  if (tagNameLabel) tagNameLabel.textContent = i18n.t('tagName');
+  const newFolderNameLabel = document.getElementById('newFolderNameLabel');
+  const folderSitesLabel = document.getElementById('folderSitesLabel');
+  if (newFolderNameLabel) newFolderNameLabel.textContent = i18n.t('renameLabel');
+  if (folderSitesLabel) folderSitesLabel.textContent = i18n.t('folderSitesLabel');
 
   // Update input placeholders
   document.getElementById('siteName').placeholder = i18n.t('name');
   document.getElementById('siteUrl').placeholder = i18n.t('urlPlaceholder');
-  document.getElementById('tagName').placeholder = i18n.t('tagName');
+  document.getElementById('newFolderName').placeholder = i18n.t('newFolder');
 
   // Update checkbox label
   const iconLabels = { siteIconLabel: 'iconLabel', siteIconUpload: 'iconUpload', siteIconAuto: 'iconAuto' };
@@ -1557,7 +1563,6 @@ window.updateAllText = function () {
   // Update modal buttons
   document.getElementById('closeAddModal').textContent = i18n.t('cancel');
   document.getElementById('saveItem').textContent = i18n.t('save');
-  document.getElementById('closeTagModal').textContent = i18n.t('cancel');
 
   // Update time and date display
   updateTime();
@@ -1622,7 +1627,7 @@ window.updateAllText = function () {
   if (obNewEl) obNewEl.textContent = i18n.t('obNew') || 'New tab';
   if (obCurrentEl) obCurrentEl.textContent = i18n.t('obCurrent') || 'Current tab';
   if (settingsAboutBtnEl) settingsAboutBtnEl.textContent = i18n.t('settingsAbout') || 'About';
-  if (closeSettingsModalEl) closeSettingsModalEl.textContent = i18n.t('close') || 'Close';
+  if (closeSettingsModalEl) closeSettingsModalEl.textContent = i18n.t('done') || 'Done';
   const toWorkspaceTextEl = document.getElementById('toWorkspaceText');
   if (toWorkspaceTextEl) toWorkspaceTextEl.textContent = i18n.t('workbench') || 'Workbench';
   document.getElementById('dotHome')?.setAttribute('aria-label', i18n.t('wbBackHome') || 'Home');
@@ -1632,6 +1637,7 @@ window.updateAllText = function () {
     apLight: i18n.t('lightMode') || 'Light',
     apDark: i18n.t('darkMode') || 'Dark',
     apAuto: i18n.t('followSystem') || 'Auto',
+    accentLabel: i18n.t('accentLabel') || 'Accent Color',
     zoomLabel: i18n.t('zoom') || 'Zoom'
   };
   Object.entries(appearanceLabels).forEach(([id, text]) => {
@@ -2050,7 +2056,7 @@ function handleDragStart(event, id, type, source, index) {
   dragState.draggedId = id;
   dragState.draggedType = type;
   dragState.draggedSource = source || 'home';
-  dragState.draggedElement = event.target.closest('.site-tile, .chip');
+  dragState.draggedElement = event.target.closest('.site-tile');
 
   event.dataTransfer.effectAllowed = 'move';
   event.dataTransfer.setData('text/plain', String(id));
@@ -2061,23 +2067,9 @@ function handleDragOver(event) {
   event.preventDefault();
   event.dataTransfer.dropEffect = 'move';
 
-  const target = event.target.closest('.site-tile, .chip');
+  const target = event.target.closest('.site-tile');
   if (!target || target === dragState.draggedElement) return false;
   dragState.dropTarget = target;
-
-  // Tag chips: reorder tagOrder
-  if (dragState.draggedType === 'tag' && target.classList.contains('chip')) {
-    const chips = Array.from(contentEl.querySelectorAll('.chip.tag'));
-    const fromIndex = chips.indexOf(dragState.draggedElement);
-    const toIndex = chips.indexOf(target);
-    if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-      const item = state.tagOrder[fromIndex];
-      state.tagOrder.splice(fromIndex, 1);
-      state.tagOrder.splice(toIndex, 0, item);
-      renderHome();
-    }
-    return false;
-  }
 
   if (dragState.draggedType !== 'site' && dragState.draggedType !== 'folder') return false;
 
@@ -2120,11 +2112,6 @@ function handleDrop(event, targetId, targetType) {
 
   const draggedId = dragState.draggedId;
   const draggedType = dragState.draggedType;
-
-  if (draggedType === 'tag') {
-    saveData();
-    return false;
-  }
 
   if (!draggedId || draggedId === targetId) return false;
 
@@ -2233,6 +2220,9 @@ function moveSiteOutOfFolder(siteId) {
   const folder = (state.sites || []).find((s) => s && s.id === state.openFolderId && s.type === 'folder');
   if (!folder || !Array.isArray(folder.children)) return;
   folder.children = folder.children.filter((id) => id !== siteId);
+  // A site taken out of a folder lands on the home grid, so it must be visible there.
+  const site = (state.sites || []).find((s) => s && s.id === siteId);
+  if (site) site.showOnHome = true;
   const folderIndex = state.siteOrder.indexOf(folder.id);
   const insertAt = folderIndex === -1 ? state.siteOrder.length : Math.min(folderIndex, state.siteOrder.length);
   if (!state.siteOrder.includes(siteId)) state.siteOrder.splice(insertAt, 0, siteId);
@@ -2250,6 +2240,43 @@ function deleteFolder(folderId) {
   state.siteOrder.splice(insertAt, 0, ...missing);
   if (state.openFolderId === folderId) state.openFolderId = null;
 }
+
+// Tags were retired in favor of folders. Each tag becomes a folder holding the
+// sites that carried it (the first tag in display order wins; sites already in
+// a folder stay where they are). Returns true when anything changed.
+function migrateTagsToFolders() {
+  const tags = Array.isArray(state.tags) ? state.tags : [];
+  const order = Array.isArray(state.tagOrder) ? state.tagOrder.filter((t) => tags.includes(t)) : [];
+  const orderedTags = order.concat(tags.filter((t) => !order.includes(t)));
+  const hasSiteTags = (state.sites || []).some((s) => s && Array.isArray(s.tags) && s.tags.length);
+  if (!orderedTags.length && !hasSiteTags) return false;
+
+  const inFolder = new Set((state.sites || [])
+    .filter((s) => s && s.type === 'folder')
+    .flatMap((f) => (Array.isArray(f.children) ? f.children : [])));
+  const claimed = new Set();
+  orderedTags.forEach((tag) => {
+    const members = (state.sites || []).filter((s) => s && s.type !== 'folder'
+      && Array.isArray(s.tags) && s.tags.includes(tag) && !claimed.has(s.id) && !inFolder.has(s.id));
+    if (!members.length) return;
+    const ids = members.map((m) => m.id);
+    ids.forEach((id) => claimed.add(id));
+    const positions = ids.map((id) => state.siteOrder.indexOf(id)).filter((i) => i >= 0);
+    const folder = {
+      id: generateUuid(), type: 'folder', name: tag, url: '', showOnHome: true, tags: [], children: ids
+    };
+    state.sites.push(folder);
+    state.siteOrder = state.siteOrder.filter((id) => !ids.includes(id));
+    const at = positions.length ? Math.min(Math.min(...positions), state.siteOrder.length) : state.siteOrder.length;
+    state.siteOrder.splice(at, 0, folder.id);
+  });
+  (state.sites || []).forEach((s) => { if (s && Array.isArray(s.tags)) s.tags = []; });
+  state.tags = [];
+  state.tagOrder = [];
+  return true;
+}
+
+window.migrateTagsToFolders = migrateTagsToFolders;
 
 // ===== Rename Modal =====
 const renameModal = document.getElementById('renameModal');
@@ -2431,10 +2458,7 @@ if (state.sites.length === 0) {
   saveData(false);
 }
 
-// Initialize order arrays if empty (data migration)
-if (state.tagOrder.length === 0 && state.tags.length > 0) {
-  state.tagOrder = [...state.tags];
-}
+if (migrateTagsToFolders()) saveData(false);
 if (state.siteOrder.length === 0 && state.sites.length > 0) {
   state.siteOrder = state.sites.map(s => s.id);
 }
@@ -2464,6 +2488,9 @@ async function saveData(syncToBackend = true) {
   return true;
 }
 
+// appearance.js (view mode) and data-sync.js (tag migration) save through this.
+window.saveData = saveData;
+
 async function toggleMinimalist() {
   state.viewMode = state.viewMode === 'general' ? 'minimalist' : 'general';
   await saveData();
@@ -2488,13 +2515,11 @@ const languageSubmenu = document.getElementById('languageSubmenu');
 // Modals
 const modalOverlay = document.getElementById('modalOverlay');
 const addModal = document.getElementById('addModal');
-const tagViewModal = document.getElementById('tagViewModal');
 const closeAddModalBtn = document.getElementById('closeAddModal');
-const closeTagModalBtn = document.getElementById('closeTagModal');
 const saveItemBtn = document.getElementById('saveItem');
 const addTypeRadios = document.getElementsByName('addType');
 const siteForm = document.getElementById('siteForm');
-const tagForm = document.getElementById('tagForm');
+const folderForm = document.getElementById('folderForm');
 
 // Context Menu
 const contextMenu = document.getElementById('contextMenu');
@@ -2894,75 +2919,7 @@ renderSearchEngine();
   }
 })();
 
-let homeFooterConfig = null;
 
-async function loadHomeFooterConfig() {
-  if (!window.supabase) {
-    homeFooterConfig = null;
-    return false;
-  }
-
-  try {
-    const { data, error } = await window.supabase
-      .from('app_settings')
-      .select('key,value')
-      .eq('key', 'home_footer')
-      .maybeSingle();
-
-    if (error) {
-      console.warn('Failed to load home footer config:', error);
-      homeFooterConfig = null;
-      return false;
-    }
-
-    const v = data?.value;
-    if (!v || typeof v !== 'object') {
-      homeFooterConfig = null;
-      return false;
-    }
-
-    homeFooterConfig = v;
-    return true;
-  } catch (err) {
-    console.warn('Failed to load home footer config:', err);
-    homeFooterConfig = null;
-    return false;
-  }
-}
-
-function renderHomeFooter() {
-  const el = document.getElementById('homeFooter');
-  if (!el) return;
-
-  const cfg = homeFooterConfig;
-  if (!cfg) {
-    el.style.display = 'none';
-    el.innerHTML = '';
-    return;
-  }
-
-  const locale = (typeof i18n !== 'undefined' ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'));
-  const text = String((locale === 'en' ? cfg.text_en : cfg.text_zh) || cfg.text_en || cfg.text_zh || '').trim();
-  const url = String(cfg.url || '').trim();
-
-  if (!text) {
-    el.style.display = 'none';
-    el.innerHTML = '';
-    return;
-  }
-
-  if (url) {
-    el.innerHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-  } else {
-    el.textContent = text;
-  }
-  el.style.display = 'block';
-}
-
-(async () => {
-  await loadHomeFooterConfig();
-  renderHomeFooter();
-})();
 
 // ===== Context Menu Functions =====
 function showContextMenu(event, item, type) {
@@ -3012,34 +2969,12 @@ function renderContextMenu() {
   const item = contextMenuState.targetItem;
   const type = contextMenuState.targetType;
 
-  // Reset form
-  document.getElementById('siteName').value = '';
-  document.getElementById('siteUrl').value = '';
-  document.getElementById('tagName').value = '';
-
-  if (type === 'site') {
-    // Set form to site type
-    document.querySelector('input[name="addType"][value="site"]').checked = true;
-    document.getElementById('siteForm').classList.remove('hidden');
-    document.getElementById('tagForm').classList.add('hidden');
-
-    // Pre-fill site data
-    document.getElementById('siteName').value = item.name;
-    document.getElementById('siteUrl').value = item.url;
-    document.getElementById('showOnHome').checked = item.showOnHome;
-    pendingSiteIcon = undefined;
-
-    // Render tag checkboxes (with current site selection)
-    renderTagSelector(item.tags);
-  } else {
-    // Set form to tag type
-    document.querySelector('input[name="addType"][value="tag"]').checked = true;
-    document.getElementById('siteForm').classList.add('hidden');
-    document.getElementById('tagForm').classList.remove('hidden');
-
-    // Pre-fill tag data
-    document.getElementById('tagName').value = item;
-  }
+  if (type !== 'site') return;
+  setAddType('site');
+  document.getElementById('siteName').value = item.name;
+  document.getElementById('siteUrl').value = item.url;
+  document.getElementById('showOnHome').checked = item.showOnHome;
+  pendingSiteIcon = undefined;
 
   // Store the item being edited for save logic
   window.editingItem = { item, type };
@@ -3090,13 +3025,6 @@ document.getElementById('confirmDelete').addEventListener('click', async () => {
       if (ss.type === 'folder' && Array.isArray(ss.children)) {
         ss.children = ss.children.filter(cid => cid !== item.id);
       }
-    });
-  } else {
-    state.tags = state.tags.filter(t => t !== item);
-    state.tagOrder = state.tagOrder.filter(t => t !== item);
-    // Remove tag from all sites
-    state.sites.forEach(site => {
-      site.tags = site.tags.filter(t => t !== item);
     });
   }
   const saved = await saveData();
@@ -3360,128 +3288,133 @@ function getFolderChildren(folder) {
 function renderHome() {
   contentEl.innerHTML = '';
 
-  if (state.viewMode === 'minimalist') return;
-
-  const openFolder = state.openFolderId
-    ? (state.sites || []).find((s) => s && s.id === state.openFolderId && s.type === 'folder')
-    : null;
-
-  if (openFolder) {
-    renderFolderView(openFolder);
+  if (state.viewMode === 'minimalist') {
+    renderFolderPopup();
     return;
   }
 
-  // 1. Tags (sorted by tagOrder)
-  const orderedTags = state.tagOrder.length > 0
-    ? state.tagOrder.filter((tag) => state.tags.includes(tag))
-    : state.tags;
-
-  const tagRow = document.createElement('div');
-  tagRow.className = 'tag-row';
-  orderedTags.forEach((tag, index) => {
-    const chip = document.createElement('div');
-    chip.className = 'chip tag glass glass--capsule glass--clear';
-    chip.textContent = '# ' + tag;
-    chip.onclick = () => openTagView(tag);
-    chip.oncontextmenu = (e) => showContextMenu(e, tag, 'tag');
-    chip.draggable = true;
-    chip.addEventListener('dragstart', (e) => handleDragStart(e, tag, 'tag', 'home', index));
-    chip.addEventListener('dragover', handleDragOver);
-    chip.addEventListener('drop', (e) => handleDrop(e, tag, 'tag'));
-    chip.addEventListener('dragend', handleDragEnd);
-    tagRow.appendChild(chip);
-  });
-  if (tagRow.children.length) contentEl.appendChild(tagRow);
-
-  // 2. Sites grid (favicon tiles + folder tiles)
+  // Sites grid (favicon tiles + folder tiles)
   const grid = document.createElement('div');
   grid.className = 'sites-grid';
   getVisibleSites().forEach((site, index) => {
     grid.appendChild(createSiteTile(site, index, 'home'));
   });
 
-  // 3. Add tile
+  // Add tile
   const addTile = document.createElement('div');
   addTile.className = 'site-tile add-tile';
   addTile.title = i18n.t('addSite') || 'Add Site';
   addTile.innerHTML =
     '<div class="site-tile-icon add-tile-icon glass glass--clear"><svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></div>' +
     '<span class="site-tile-name"></span>';
-  addTile.onclick = openAddSiteModal;
+  addTile.onclick = () => openAddSiteModal('site');
   grid.appendChild(addTile);
 
   contentEl.appendChild(grid);
+  renderFolderPopup();
 }
 
-function renderFolderView(folder) {
-  const header = document.createElement('div');
-  header.className = 'folder-header';
-  const backBtn = document.createElement('button');
-  backBtn.type = 'button';
-  backBtn.className = 'folder-back-btn glass glass--capsule glass--interactive';
-  backBtn.innerHTML = '<svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
-  backBtn.append(i18n.t('back') || 'Back');
-  backBtn.onclick = closeFolder;
-  const title = document.createElement('span');
-  title.className = 'folder-title';
-  title.textContent = folder.name || (i18n.t('folder') || 'Folder');
-  header.appendChild(backBtn);
-  header.appendChild(title);
-  contentEl.appendChild(header);
+// ===== Folder window =====
+// A folder opens as a centered glass window over a blurred home page. Its
+// icons can be edited/deleted from the context menu, reordered by dragging,
+// and dragged outside the window to take them out (like iOS).
+const folderOverlay = document.getElementById('folderOverlay');
+const folderGrid = document.getElementById('folderGrid');
+const folderNameInput = document.getElementById('folderNameInput');
+const folderHint = document.getElementById('folderHint');
 
-  const grid = document.createElement('div');
-  grid.className = 'sites-grid';
-  getFolderChildren(folder).forEach((site, index) => {
-    grid.appendChild(createSiteTile(site, index, 'folder'));
-  });
+function getOpenFolder() {
+  if (!state.openFolderId) return null;
+  return (state.sites || []).find((s) => s && s.id === state.openFolderId && s.type === 'folder') || null;
+}
 
-  if (grid.children.length === 0) {
-    const hint = document.createElement('div');
-    hint.className = 'folder-empty-hint';
-    hint.textContent = i18n.t('emptyFolder') || 'This folder is empty. Drag a site onto the folder icon to add it.';
-    grid.appendChild(hint);
+function renderFolderPopup() {
+  if (!folderOverlay) return;
+  const folder = getOpenFolder();
+  if (!folder) {
+    folderOverlay.classList.add('hidden');
+    return;
   }
-
-  contentEl.appendChild(grid);
+  if (document.activeElement !== folderNameInput) folderNameInput.value = folder.name || '';
+  folderNameInput.placeholder = i18n.t('newFolder') || 'New Folder';
+  folderNameInput.setAttribute('aria-label', i18n.t('renameLabel') || 'Folder name');
+  const children = getFolderChildren(folder);
+  folderGrid.replaceChildren(...children.map((site, index) => createSiteTile(site, index, 'folder')));
+  folderHint.textContent = children.length ? i18n.t('folderDragOutHint') : i18n.t('emptyFolder');
+  folderOverlay.classList.remove('hidden');
 }
 
 function openFolder(folderId) {
   state.openFolderId = folderId;
-  renderHome();
+  renderFolderPopup();
 }
 
 function closeFolder() {
+  if (!state.openFolderId) return;
+  commitFolderName();
   state.openFolderId = null;
+  renderFolderPopup();
   renderHome();
 }
 
-function renderTagSelector(selectedTags) {
-  const tagSelector = document.getElementById('tagSelector');
-  if (!tagSelector) return;
-  const selected = Array.isArray(selectedTags) ? selectedTags : [];
-  tagSelector.innerHTML = '';
-  state.tags.forEach((tag) => {
-    const label = document.createElement('label');
-    label.className = 'chip tag';
-    label.style.border = '1px solid transparent';
-    label.style.opacity = '0.6';
-    label.style.cursor = 'pointer';
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.value = tag;
-    checkbox.checked = selected.includes(tag);
-    checkbox.style.display = 'none';
-    checkbox.addEventListener('change', () => {
-      label.style.opacity = checkbox.checked ? '1' : '0.6';
-      label.style.borderColor = checkbox.checked ? 'var(--text-color)' : 'transparent';
-    });
-    if (checkbox.checked) {
-      label.style.opacity = '1';
-      label.style.borderColor = 'var(--text-color)';
-    }
-    label.appendChild(checkbox);
-    label.appendChild(document.createTextNode(' ' + tag));
-    tagSelector.appendChild(label);
+function commitFolderName() {
+  const folder = getOpenFolder();
+  if (!folder || !folderNameInput) return;
+  const name = folderNameInput.value.trim() || i18n.t('newFolder') || 'New Folder';
+  if (name === folder.name) return;
+  folder.name = name;
+  saveData();
+}
+
+folderNameInput?.addEventListener('change', () => {
+  commitFolderName();
+  renderHome();
+});
+folderNameInput?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.isComposing) folderNameInput.blur();
+});
+folderOverlay?.addEventListener('click', (e) => {
+  if (e.target === folderOverlay) closeFolder();
+});
+// Dragging an icon out of the window takes it out of the folder; the drag
+// then continues on the home grid (reorder there, or drop on another folder).
+folderOverlay?.addEventListener('dragover', (e) => {
+  if (dragState.draggedSource !== 'folder' || e.target.closest('.folder-sheet')) return;
+  e.preventDefault();
+  moveSiteOutOfFolder(dragState.draggedId);
+  dragState.draggedSource = 'home';
+  state.openFolderId = null;
+  renderHome();
+  saveData();
+});
+
+// Home sites that can go into a new folder (links not already in one).
+function renderFolderSitePicker() {
+  const picker = document.getElementById('folderSitePicker');
+  if (!picker) return;
+  const inFolder = new Set((state.sites || [])
+    .filter((s) => s && s.type === 'folder')
+    .flatMap((f) => (Array.isArray(f.children) ? f.children : [])));
+  const sites = getVisibleSites().filter((s) => s.type !== 'folder' && !inFolder.has(s.id));
+  picker.replaceChildren();
+  if (!sites.length) {
+    const empty = document.createElement('p');
+    empty.className = 'folder-picker-empty';
+    empty.textContent = i18n.t('folderNoSites');
+    picker.appendChild(empty);
+    return;
+  }
+  sites.forEach((site) => {
+    const row = document.createElement('label');
+    row.className = 'folder-picker-row';
+    const box = document.createElement('input');
+    box.type = 'checkbox';
+    box.value = site.id;
+    const name = document.createElement('span');
+    name.className = 'folder-picker-name';
+    name.textContent = site.name || site.url;
+    row.append(box, createFaviconIcon(site), name);
+    picker.appendChild(row);
   });
 }
 
@@ -3504,13 +3437,23 @@ function renderSiteIconPreview() {
   document.getElementById('siteIconAuto')?.classList.toggle('hidden', !icon);
 }
 
-function openAddSiteModal() {
+function setAddType(type) {
+  const isFolder = type === 'folder';
+  const radio = document.querySelector('input[name="addType"][value="' + (isFolder ? 'folder' : 'site') + '"]');
+  if (radio) radio.checked = true;
+  siteForm.classList.toggle('hidden', isFolder);
+  folderForm.classList.toggle('hidden', !isFolder);
+}
+
+// type: 'site' (default) or 'folder'
+function openAddSiteModal(type) {
   pendingSiteIcon = undefined;
   window.editingItem = undefined;
   document.getElementById('siteName').value = '';
   document.getElementById('siteUrl').value = '';
-  document.getElementById('tagName').value = '';
-  renderTagSelector();
+  document.getElementById('newFolderName').value = '';
+  setAddType(type === 'folder' ? 'folder' : 'site');
+  renderFolderSitePicker();
   renderSiteIconPreview();
   addModal.classList.remove('hidden');
   modalOverlay.classList.remove('hidden');
@@ -3544,14 +3487,12 @@ document.getElementById('siteIconAuto')?.addEventListener('click', () => {
 function closeModals() {
   modalOverlay.classList.add('hidden');
   addModal.classList.add('hidden');
-  tagViewModal.classList.add('hidden');
   document.getElementById('deleteModal').classList.add('hidden'); // Close delete modal
   renameModal?.classList.add('hidden');
   settingsModal?.classList.add('hidden');
 }
 
 closeAddModalBtn.onclick = closeModals;
-closeTagModalBtn.onclick = closeModals;
 modalOverlay.onclick = (e) => {
   if (e.target === modalOverlay) closeModals();
 };
@@ -3559,13 +3500,8 @@ modalOverlay.onclick = (e) => {
 // Switch Add Type
 addTypeRadios.forEach(radio => {
   radio.addEventListener('change', (e) => {
-    if (e.target.value === 'site') {
-      siteForm.classList.remove('hidden');
-      tagForm.classList.add('hidden');
-    } else {
-      siteForm.classList.add('hidden');
-      tagForm.classList.remove('hidden');
-    }
+    setAddType(e.target.value);
+    if (e.target.value === 'folder') renderFolderSitePicker();
   });
 });
 
@@ -3589,7 +3525,6 @@ saveItemBtn.addEventListener('click', async () => {
 
     if (!url.startsWith('http')) url = 'https://' + url;
 
-    const selectedTags = Array.from(document.querySelectorAll('#tagSelector input:checked')).map(cb => cb.value);
     const showOnHome = document.getElementById('showOnHome').checked;
 
     if (isEditing) {
@@ -3598,7 +3533,6 @@ saveItemBtn.addEventListener('click', async () => {
       if (siteIndex !== -1) {
         state.sites[siteIndex].name = name;
         state.sites[siteIndex].url = url;
-        state.sites[siteIndex].tags = selectedTags;
         state.sites[siteIndex].showOnHome = showOnHome;
         if (pendingSiteIcon !== undefined) {
           if (pendingSiteIcon) state.sites[siteIndex].customIcon = pendingSiteIcon;
@@ -3619,7 +3553,7 @@ saveItemBtn.addEventListener('click', async () => {
         id: generateUuid(),
         name,
         url,
-        tags: selectedTags,
+        tags: [],
         showOnHome
       };
       if (pendingSiteIcon) newSite.customIcon = pendingSiteIcon;
@@ -3632,50 +3566,15 @@ saveItemBtn.addEventListener('click', async () => {
       }
     }
   } else {
-    const tagName = document.getElementById('tagName').value.trim();
-    if (!tagName) {
-      window.showNotification?.(i18n.t('tagNameRequired'), 'warning');
-      return;
-    }
-
-    if (isEditing) {
-      // Update existing tag
-      const oldTagName = window.editingItem.item;
-      const tagIndex = state.tags.indexOf(oldTagName);
-      if (tagIndex !== -1) {
-        // Check if new name already exists
-        if (state.tags.includes(tagName) && tagName !== oldTagName) {
-          window.showNotification?.(i18n.t('tagExists'), 'warning');
-          return;
-        }
-
-        state.tags[tagIndex] = tagName;
-
-        // Update tagOrder
-        const orderIndex = state.tagOrder.indexOf(oldTagName);
-        if (orderIndex !== -1) {
-          state.tagOrder[orderIndex] = tagName;
-        }
-
-        // Update all sites that have this tag
-        state.sites.forEach(site => {
-          const siteTagIndex = site.tags.indexOf(oldTagName);
-          if (siteTagIndex !== -1) {
-            site.tags[siteTagIndex] = tagName;
-          }
-        });
-      }
-    } else {
-      // Create new tag
-      if (state.tags.includes(tagName)) {
-        window.showNotification?.(i18n.t('tagExists'), 'warning');
-        return;
-      }
-      state.tags.push(tagName);
-
-      // Add to tagOrder
-      state.tagOrder.push(tagName);
-    }
+    const name = document.getElementById('newFolderName').value.trim() || i18n.t('newFolder') || 'New Folder';
+    const ids = Array.from(document.querySelectorAll('#folderSitePicker input:checked')).map((cb) => cb.value);
+    const folder = { id: generateUuid(), type: 'folder', name, url: '', showOnHome: true, tags: [], children: ids };
+    state.sites.push(folder);
+    // The folder takes the place of the first site it swallowed.
+    const positions = ids.map((id) => state.siteOrder.indexOf(id)).filter((i) => i >= 0);
+    state.siteOrder = state.siteOrder.filter((id) => !ids.includes(id));
+    const at = positions.length ? Math.min(Math.min(...positions), state.siteOrder.length) : state.siteOrder.length;
+    state.siteOrder.splice(at, 0, folder.id);
   }
 
   // Clear editing state
@@ -3689,47 +3588,6 @@ saveItemBtn.addEventListener('click', async () => {
   closeModals();
 });
 
-// ===== Tag View Logic =====
-function openTagView(tagName) {
-  document.getElementById('tagViewTitle').textContent = '# ' + tagName;
-  const grid = document.getElementById('tagViewLinks');
-  grid.innerHTML = '';
-
-  const tagSites = state.sites.filter(s => s.tags.includes(tagName));
-
-  if (tagSites.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; opacity: 0.5;">${i18n.t('noSites')}</div>`;
-  } else {
-    // Collect all links first
-    tagSites.forEach((site, index) => {
-      const el = document.createElement('a');
-      el.className = 'tag-link-item';
-      el.href = site.url;
-      el.textContent = site.name;
-      el.oncontextmenu = (e) => showContextMenu(e, site, 'site');
-      // Middle-click opens in new tab
-      el.onmousedown = (e) => {
-        if (e.button === 1) {
-          e.preventDefault();
-          window.recordVisit?.(site.url, site.name);
-          window.open(site.url, '_blank');
-        }
-      };
-      grid.appendChild(el);
-
-      // Add separator if not last
-      if (index < tagSites.length - 1) {
-        const sep = document.createElement('span');
-        sep.className = 'tag-view-separator';
-        sep.textContent = '、';
-        grid.appendChild(sep);
-      }
-    });
-  }
-
-  tagViewModal.classList.remove('hidden');
-  modalOverlay.classList.remove('hidden');
-}
 
 
 // ===== Language Toggle =====
@@ -3846,6 +3704,44 @@ function syncSettingsModalUI() {
   const appearance = window.getAppearance?.() || 'auto';
   document.querySelectorAll('#appearanceGroup .seg-btn').forEach((b) => b.classList.toggle('active', b.dataset.appearance === appearance));
   document.querySelectorAll('#zoomGroup .seg-btn').forEach((b) => b.classList.toggle('active', b.dataset.zoom === state.zoomLevel));
+  renderAccentSwatches();
+}
+
+// Accent swatches: the eight system colors plus a custom color wheel.
+function renderAccentSwatches() {
+  const group = document.getElementById('accentGroup');
+  if (!group || !window.ACCENT_PRESETS) return;
+  const current = window.getAccent?.() || 'blue';
+  const dark = !!window.isDarkAppearance?.();
+  const names = Object.keys(window.ACCENT_PRESETS);
+  if (group.children.length !== names.length + 1) {
+    group.innerHTML = names.map((name) =>
+      '<button type="button" class="accent-swatch" role="radio" data-accent="' + name + '"></button>'
+    ).join('') +
+      '<label class="accent-swatch accent-swatch--custom" role="radio" data-accent="custom">' +
+      '<input type="color" id="accentCustomInput" aria-label="custom"></label>';
+    group.querySelectorAll('button[data-accent]').forEach((btn) => {
+      btn.addEventListener('click', () => window.setAccent?.(btn.dataset.accent));
+    });
+    const picker = document.getElementById('accentCustomInput');
+    // 'input' previews live; 'change' (picker closed) saves and syncs once.
+    picker.addEventListener('input', () => window.setAccent?.(picker.value, { sync: false }));
+    picker.addEventListener('change', () => window.setAccent?.(picker.value));
+  }
+  const nameKey = (name) => 'accent' + name.charAt(0).toUpperCase() + name.slice(1);
+  group.querySelectorAll('[data-accent]').forEach((el) => {
+    const name = el.dataset.accent;
+    const isCustom = name === 'custom';
+    const checked = isCustom ? !window.ACCENT_PRESETS[current] : name === current;
+    el.setAttribute('aria-checked', String(checked));
+    const label = i18n.t(isCustom ? 'accentCustom' : nameKey(name));
+    el.setAttribute('aria-label', label);
+    el.title = label;
+    if (!isCustom) el.style.setProperty('--swatch', window.ACCENT_PRESETS[name][dark ? 1 : 0]);
+    else el.style.setProperty('--swatch', checked ? current : 'transparent');
+  });
+  const picker = document.getElementById('accentCustomInput');
+  if (picker && !window.ACCENT_PRESETS[current]) picker.value = current;
 }
 window.syncSettingsModalUI = syncSettingsModalUI;
 
@@ -3945,7 +3841,9 @@ function hasOpenTransientUi() {
     pageContextMenu,
     itemContextMenu,
     settingsModal,
-    document.getElementById('pluginModal')
+    document.getElementById('pluginModal'),
+    document.getElementById('folderOverlay'),
+    document.getElementById('widgetMenu')
   ].some(isElementVisible);
 }
 
@@ -3962,11 +3860,30 @@ function closeTransientUi() {
   itemContextMenu?.classList.add('hidden');
 }
 
+// Escape closes the topmost layer: menus and dialogs first, then the folder window.
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape' || e.isComposing) return;
+  const modalOpen = [modalOverlay, engineModal, document.getElementById('wallpaperModal'),
+    document.getElementById('aboutModal'), document.getElementById('coffeeModal'),
+    document.getElementById('feedbackModal')].some(isElementVisible);
+  const menuOpen = [settingsMenu, pageContextMenu, contextMenu, document.getElementById('widgetMenu')].some(isElementVisible);
+  if (modalOpen || menuOpen) {
+    closeTransientUi();
+    hideContextMenu();
+    window.hideWidgetMenu?.();
+  } else if (state.openFolderId) {
+    closeFolder();
+  } else {
+    return;
+  }
+  e.preventDefault();
+});
+
 document.addEventListener('click', (e) => {
   if (!hasOpenTransientUi()) return;
 
   const insideInteractiveLayer = e.target.closest(
-    '.modal, .settings-menu, .settings-btn, .page-context-menu, .item-context-menu, .context-menu'
+    '.modal, .settings-menu, .settings-btn, .page-context-menu, .item-context-menu, .context-menu, .folder-overlay, .widget-menu'
   );
 
   if (insideInteractiveLayer) return;
@@ -4289,12 +4206,7 @@ function openAddSiteFromContext() {
     window.requireLoginForPersistentChange?.();
     return;
   }
-  document.getElementById('modalOverlay').classList.remove('hidden');
-  document.getElementById('addModal').classList.remove('hidden');
-  document.querySelector('input[name="addType"][value="site"]').checked = true;
-  document.getElementById('siteForm').classList.remove('hidden');
-  document.getElementById('tagForm').classList.add('hidden');
-  renderTagSelector();
+  openAddSiteModal('site');
 }
 
 function openAddFolderFromContext() {
@@ -4303,20 +4215,7 @@ function openAddFolderFromContext() {
     window.requireLoginForPersistentChange?.();
     return;
   }
-  const folderId = generateUuid();
-  state.sites.push({
-    id: folderId,
-    type: 'folder',
-    name: i18n.t('newFolder') || 'New Folder',
-    url: '',
-    showOnHome: true,
-    tags: [],
-    children: []
-  });
-  state.siteOrder.push(folderId);
-  saveData();
-  renderHome();
-  openRenameModal(folderId, 'folder');
+  openAddSiteModal('folder');
 }
 
 function openWallpaperFromContext() {

@@ -437,37 +437,6 @@ body[data-wallpaper-tone="light"] {
   width: 100%;
 }
 
-.tag-row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  height: var(--control-sm);
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-capsule);
-  font: var(--text-subhead);
-  cursor: pointer;
-  user-select: none;
-  transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-standard);
-}
-
-.chip:hover {
-  background-color: color-mix(in srgb, var(--glass-tint-clear), var(--glass-hover));
-}
-
-.chip:active {
-  transform: scale(0.95);
-}
-
-.chip.dragging {
-  opacity: 0.5;
-}
-
 .sites-grid {
   /* auto-fit collapses unused tracks, so a short row stays centered; the
      max-width caps a row at 8 icons (8 x 88 + 7 x 16 = 816px). */
@@ -601,52 +570,182 @@ body[data-wallpaper-tone="light"] {
   height: 24px;
 }
 
-/* ---------- Open folder view ---------- */
-.folder-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
+/* ---------- Folder window ---------- */
+/* No backdrop-filter on the overlay: it would become the backdrop root and the
+   glass sheet inside could only blur the dim layer, not the home page. */
+.folder-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900; /* under #modalOverlay (1000) so edit/delete dialogs open on top */
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: color-mix(in srgb, var(--scrim) 70%, transparent);
+  animation: folder-fade var(--dur-base) var(--ease-standard);
 }
 
-.folder-back-btn {
-  display: inline-flex;
+.folder-sheet {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-5);
+  width: min(560px, 100%);
+  max-height: min(80vh, 640px);
+  padding: var(--space-6) var(--space-6) var(--space-5);
+  border-radius: var(--radius-2xl);
+  animation: folder-pop var(--dur-slow) var(--ease-spring);
+}
+
+@keyframes folder-fade {
+  from { opacity: 0; }
+}
+
+@keyframes folder-pop {
+  from { opacity: 0; transform: scale(0.88); }
+}
+
+.folder-name-input {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 320px);
   height: var(--control-md);
-  padding: 0 var(--space-4) 0 var(--space-3);
+  padding: 0 var(--space-3);
   border: 0;
-  font: var(--text-headline);
-  color: var(--glass-label);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font: var(--text-title2);
+  color: var(--label-1);
+  text-align: center;
+  transition: background-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);
+}
+
+.folder-name-input:hover {
+  background: var(--fill-3);
+}
+
+.folder-name-input:focus {
+  background: var(--fill-2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+.folder-grid {
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+  min-height: 92px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Inside the glass sheet: names use regular ink, plates use a fill instead of a
+   second glass layer. */
+.folder-grid .site-tile-name {
+  color: var(--label-1);
+  text-shadow: none;
+}
+
+.folder-grid .site-tile-icon:not(.is-letter):not(.has-custom-icon) {
+  background: var(--surface-raised);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: 0 0 0 0.5px var(--separator), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.folder-grid .site-tile-icon::before {
+  display: none;
+}
+
+.folder-hint {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .folder-overlay,
+  .folder-sheet {
+    animation: none;
+  }
+}
+
+/* ---------- Add item: Site / Folder tabs and the folder site picker ---------- */
+.add-type-tabs {
+  display: grid;
+  width: 100%;
+  margin-bottom: var(--space-5);
+}
+
+.folder-site-picker {
+  display: flex;
+  flex-direction: column;
+  max-height: 260px;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+  background: var(--fill-3);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+}
+
+.folder-picker-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  font: var(--text-body);
   cursor: pointer;
 }
 
-.folder-back-btn .sym {
-  position: relative;
-  z-index: 2;
-  width: 16px;
-  height: 16px;
+.folder-picker-row + .folder-picker-row {
+  box-shadow: inset 0 0.5px 0 var(--separator);
 }
 
-.folder-title {
-  font: var(--text-title2);
-  color: var(--on-wallpaper);
-  text-shadow: var(--on-wallpaper-shadow);
+.folder-picker-row:hover {
+  background: var(--fill-3);
 }
 
-.folder-empty-hint {
-  grid-column: 1 / -1;
-  max-width: 420px;
-  padding: var(--space-4) var(--space-5);
+.folder-picker-row .site-tile-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--surface-raised);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: 0 0 0 0.5px var(--separator);
+}
+
+.folder-picker-row .site-tile-icon::before {
+  display: none;
+}
+
+.folder-picker-row .site-tile-favicon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.folder-picker-row .site-tile-icon.is-letter .site-tile-letter {
+  font-size: 13px;
+}
+
+.folder-picker-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-picker-empty {
+  margin: 0;
+  padding: var(--space-4);
   font: var(--text-callout);
-  color: var(--glass-label-2);
-  line-height: 1.5;
+  color: var(--label-2);
+  text-align: center;
 }
 
-.home-footer {
-  color: var(--on-wallpaper);
-  text-shadow: var(--on-wallpaper-shadow);
-}
 
 .to-workspace {
   color: var(--glass-label);
@@ -654,12 +753,11 @@ body[data-wallpaper-tone="light"] {
 
 @media (prefers-reduced-motion: reduce) {
   .settings-menu,
-  .settings-submenu,
-  .engine-menu,
-  .context-menu,
-  .page-context-menu,
-  .site-tile-icon,
-  .chip {
+.settings-submenu,
+.engine-menu,
+.context-menu,
+.page-context-menu,
+.site-tile-icon {
     transition: none !important;
   }
 }
