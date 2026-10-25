@@ -14,12 +14,12 @@ const wallpaperState = {
 };
 
 window.wallpaperState = wallpaperState;
+window.openWallpaperModal = openWallpaperModal;
 
 const MAX_WALLPAPER_UPLOAD_BYTES = 15 * 1024 * 1024;
 const WALLPAPER_UPLOAD_COOLDOWN_MS = 10 * 1000;
 const LAST_WALLPAPER_UPLOAD_AT_KEY = 'wallpaper_last_upload_at';
-
-// ── Caching for faster loading ───────────────────────────────────────
+// ?? Caching for faster loading ???????????????????????????????????????
 const WALLPAPER_CACHE_KEY = 'wp_cache_data';
 const CATEGORIES_CACHE_KEY = 'wp_cats_cache';
 const WALLPAPER_CACHE_TTL = 5 * 60 * 1000;   // 5 min for wallpaper list
@@ -41,8 +41,9 @@ function getCache(key, ttl) {
 function setCache(key, data) {
   try {
     localStorage.setItem(key, JSON.stringify({ data, ts: Date.now() }));
-  } catch { /* quota exceeded — silently ignore */ }
+  } catch { /* quota exceeded ? silently ignore */ }
 }
+
 
 // Initialize wallpaper system
 async function initializeWallpaper() {
@@ -136,8 +137,8 @@ async function loadCategories() {
 
     if (data && data.length > 0) {
       wallpaperState.categories = data;
-      wallpaperState.activeCategory = data[0].name;
       setCache(CATEGORIES_CACHE_KEY, data);
+      wallpaperState.activeCategory = data[0].name;
     }
   } catch (err) {
     console.error('Load categories exception:', err);
@@ -190,13 +191,14 @@ async function loadWallpapers() {
 // Apply wallpaper to page
 function applyWallpaper(wallpaperId, options = {}) {
   const shouldSync = options.sync !== false;
-  const syncWallpaperSelection = () => {
-    if (!shouldSync || !window.authState || !window.authState.isLoggedIn) return;
+  const syncWallpaperSelection = async () => {
+    if (!shouldSync || !window.authState || !window.authState.isLoggedIn) return true;
     if (window.saveUserDataToBackend) {
-      window.saveUserDataToBackend(true);
+      return await window.saveUserDataToBackend(true);
     } else if (window.markHomeConfigUpdated) {
-      window.markHomeConfigUpdated();
+      return await window.markHomeConfigUpdated();
     }
+    return true;
   };
 
   if (!wallpaperId) {
@@ -205,8 +207,7 @@ function applyWallpaper(wallpaperId, options = {}) {
     wallpaperState.selectedWallpaper = null;
     localStorage.removeItem('selectedWallpaper');
 
-    syncWallpaperSelection();
-    return;
+    return syncWallpaperSelection();
   }
 
   if (wallpaperId.startsWith('#') || wallpaperId.startsWith('rgb')) {
@@ -222,7 +223,7 @@ function applyWallpaper(wallpaperId, options = {}) {
   wallpaperState.selectedWallpaper = wallpaperId;
   localStorage.setItem('selectedWallpaper', wallpaperId);
 
-  syncWallpaperSelection();
+  return syncWallpaperSelection();
 }
 
 // Open wallpaper selection modal
@@ -388,7 +389,7 @@ function renderWallpaperUI() {
       : wallpaperState.selectedWallpaper;
     gridContainer.innerHTML = filteredWallpapers.map(w => `
       <div class="wallpaper-item ${currentSelected === w.url ? 'selected' : ''}" onclick="selectWallpaper('${w.url}')">
-        <img src="${w.url}" alt="Wallpaper" title="Wallpaper" loading="lazy">
+        <img src="${w.url}" alt="Wallpaper" title="Wallpaper">
       </div>
     `).join('');
   }
@@ -641,6 +642,11 @@ async function addCustomWallpaperByUrl() {
   }
 }
 
+window.toggleCustomWallpaperAdd = toggleCustomWallpaperAdd;
+window.setCustomWallpaperAddMode = setCustomWallpaperAddMode;
+window.addCustomWallpaperByUrl = addCustomWallpaperByUrl;
+window.uploadCustomWallpaperFromUrl = uploadCustomWallpaperFromUrl;
+
 // Helper functions for CSP-safe onclick in dynamic HTML (extension compatibility)
 window.wpOpenLoginFromWallpaper = function() {
   if (window.closeWallpaperModal) window.closeWallpaperModal();
@@ -654,11 +660,6 @@ window.wpTriggerFileInput = function() {
   var input = document.getElementById('wallpaperFileInput');
   if (input) input.click();
 };
-
-window.toggleCustomWallpaperAdd = toggleCustomWallpaperAdd;
-window.setCustomWallpaperAddMode = setCustomWallpaperAddMode;
-window.addCustomWallpaperByUrl = addCustomWallpaperByUrl;
-window.uploadCustomWallpaperFromUrl = uploadCustomWallpaperFromUrl;
 
 // User Wallpaper Upload Logic (Tier 2+ only)
 async function handleUserWallpaperUpload(event) {
@@ -934,7 +935,7 @@ function setupWallpaperEventListeners() {
   if (closeWallpaperModalBtn) closeWallpaperModalBtn.addEventListener('click', closeWallpaperModal);
   if (restoreBtn) restoreBtn.addEventListener('click', restoreDefaultWallpaper);
   if (saveBtn) {
-    saveBtn.addEventListener('click', () => {
+    saveBtn.addEventListener('click', async () => {
       const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
       const next = wallpaperState.pendingWallpaper;
 
@@ -943,7 +944,12 @@ function setupWallpaperEventListeners() {
         return;
       }
 
-      applyWallpaper(next || null);
+      const saved = await applyWallpaper(next || null);
+      if (saved === false) {
+        showNotification(typeof i18n !== 'undefined' ? i18n.t('syncSaveFailed') : (currentLocale === 'zh' ? '保存失败，暂未同步到云端' : 'Save failed. Your changes were not synced to the cloud yet.'), 'error');
+        return;
+      }
+
       wallpaperState.pendingWallpaper = undefined;
       wallpaperState.baseWallpaper = null;
 

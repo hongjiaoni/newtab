@@ -131,7 +131,8 @@ function loadDataSync(options = {}) {
     },
     supabase,
     window: {
-      authState: { isLoggedIn: true, user: { id: '11111111-1111-4111-8111-111111111111' } },
+      supabase,
+        authState: { isLoggedIn: true, user: { id: '11111111-1111-4111-8111-111111111111' } },
       themeState: {
         currentTheme: 'comic',
         customSettings: {
@@ -214,3 +215,5 @@ describe('data sync fallback', () => {
   test('keeps saving when optional sync tables are missing', testOptionalTablesCanBeMissing);
   test('keeps theme save working when theme/font tables are missing', testThemeSaveFallsBackWhenThemeTablesAreMissing);
 });
+
+

@@ -36,38 +36,30 @@
 
   <!-- Settings Menu in top-right -->
   <div class="top-right-controls">
-    <button id="settingsToggle" class="settings-btn">⋯</button>
+    <button id="settingsToggle" class="settings-btn hamburger-btn" aria-label="Menu">
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
     <div id="settingsMenu" class="settings-menu hidden">
-      <div class="settings-menu-item" onclick="toggleTheme()">
-        <span id="themeText">深色模式</span>
-      </div>
-      <div class="settings-menu-item" id="languageMenuItem">
-        <span id="langText">语言</span>
-        <div id="languageSubmenu" class="settings-submenu hidden">
-          <div onclick="i18n.setLocale('en')">English</div>
-          <div onclick="i18n.setLocale('zh')">中文</div>
+      <div class="settings-menu-item" id="modeMenuItem">
+        <span id="modeMenuText">模式</span>
+        <div id="modeSubmenu" class="settings-submenu hidden">
+          <div onclick="setAppearanceViewMode('general')" data-mode-option="general" id="modeGeneral">一般</div>
+          <div onclick="setAppearanceViewMode('minimalist')" data-mode-option="minimalist" id="modeMinimalist">极简</div>
         </div>
       </div>
-      <div class="settings-menu-item" onclick="toggleMinimalist()">
-        <span id="minimalistText">极简模式</span>
+      <div class="settings-menu-item" id="appearanceMenuItem">
+        <span id="appearanceMenuText">外观</span>
+      </div>
+      <div class="settings-menu-item" id="wallpaperMenuItem">
+        <span id="wallpaperMenuText">壁纸</span>
+      </div>
+      <div class="settings-menu-item" id="settingsMenuItem">
+        <span id="settingsMenuText">设置</span>
       </div>
       <div class="settings-menu-divider"></div>
-      <div class="settings-menu-item" id="wallpaperBtn">
-        <span id="wallpaperText">壁纸</span>
-      </div>
-      <div class="settings-menu-item" id="themeCustomizationBtn">
-        <span id="themeCustomizationText">主题</span>
-      </div>
-      <div class="settings-menu-divider"></div>
-      <div class="settings-menu-item" id="aboutMenuItem">
-        <span id="aboutText">关于</span>
-      </div>
-      <div class="settings-menu-divider"></div>
-      <div id="authMenuContainer">
-        <div class="settings-menu-item" id="loginMenuItem">
-          <span id="loginText">登录</span>
-        </div>
-      </div>
+      <div id="authMenuContainer"></div>
     </div>
   </div>
 
@@ -92,6 +84,8 @@
     </div>
   </div>
 
+  <div id="screens" class="screens">
+    <div id="screenHome" class="screen screen-home">
   <div class="container">
     <div id="time" class="time">00:00</div>
     <div id="date" class="date"></div>
@@ -112,6 +106,22 @@
     <div id="content" class="content-area"></div>
 
     <div id="homeFooter" class="home-footer" style="display:none;"></div>
+  </div>
+
+    </div>
+    <div id="screenWorkbench" class="screen screen-workbench">
+      <div class="workbench">
+        <div class="workbench-header" id="workbenchHeader"></div>
+        <div class="workbench-plugins">
+          <div class="workbench-section-title" id="pluginsSectionTitle">工作台</div>
+          <div class="plugin-cards" id="pluginCards"></div>
+        </div>
+        <div class="workbench-agent">
+          <div class="workbench-section-title" id="agentSectionTitle">个人 Agent</div>
+          <div class="agent-panel" id="agentPanel"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Context Menu -->
@@ -167,6 +177,57 @@
 
   <!-- Modals -->
   <div id="modalOverlay" class="modal-overlay hidden">
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+      <h3 id="settingsModalTitle">设置</h3>
+      <div class="appearance-panel">
+        <div class="appearance-row">
+          <label id="timeFormatLabel">时间格式</label>
+          <div class="segmented-control" id="timeFormatGroup">
+            <button class="seg-btn" data-time-format="24h" id="tf24">24 小时</button>
+            <button class="seg-btn" data-time-format="12h" id="tf12">12 小时</button>
+          </div>
+        </div>
+        <div class="appearance-row">
+          <label id="settingsLangLabel">语言</label>
+          <select id="settingsLangSelect" class="modal-input">
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+            <option value="fr">Français</option>
+            <option value="es">Español</option>
+            <option value="ja">日本語</option>
+            <option value="ko">한국어</option>
+          </select>
+        </div>
+        <div class="appearance-row">
+          <label id="openBehaviorLabel">页面打开方式</label>
+          <div class="segmented-control" id="openBehaviorGroup">
+            <button class="seg-btn" data-open-behavior="newtab" id="obNew">新标签页打开</button>
+            <button class="seg-btn" data-open-behavior="current" id="obCurrent">当前页打开</button>
+          </div>
+        </div>
+        <div class="appearance-row">
+          <button id="settingsAboutBtn" class="cancel-btn" style="width:100%;">关于</button>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="closeSettingsModal" class="cancel-btn">关闭</button>
+      </div>
+    </div>
+
+    <!-- Rename Modal -->
+    <div id="renameModal" class="modal hidden">
+      <h3 id="renameTitle">重命名</h3>
+      <div class="modal-section">
+        <label class="section-label" id="renameLabel">文件夹名称</label>
+        <input type="text" id="renameInput" class="modal-input" placeholder="输入新名称" />
+      </div>
+      <div class="modal-actions">
+        <button id="closeRenameModal" class="cancel-btn">取消</button>
+        <button id="saveRename" class="primary-btn">保存</button>
+      </div>
+    </div>
+
     <!-- Add/Edit Modal -->
     <div id="addModal" class="modal hidden">
       <h3 id="addModalTitle">Add New</h3>
@@ -256,6 +317,11 @@
     </div>
   </div>
 
+  <!-- Paddle Inline Checkout Container (used in extension mode) -->
+  <div id="paddle-checkout-container" class="hidden" style="position: fixed; inset: 0; z-index: 10000; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center;">
+    <div id="paddle-inline-root" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; background: var(--modal-bg, #fff); border-radius: 12px; padding: 20px;"></div>
+  </div>
+
   <!-- About Modal -->
   <div id="aboutModal" class="modal-overlay hidden">
     <div class="modal" style="max-width: 500px;">
@@ -340,8 +406,8 @@
     <div class="context-menu-item" onclick="openAddSiteFromContext()">
       <span id="ctxAddSite">添加网站</span>
     </div>
-    <div class="context-menu-item" onclick="openAddTagFromContext()">
-      <span id="ctxAddTag">添加标签</span>
+    <div class="context-menu-item" data-onclick="openAddFolderFromContext()">
+      <span id="ctxAddFolder">添加文件夹</span>
     </div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" onclick="openWallpaperFromContext()">

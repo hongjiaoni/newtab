@@ -172,6 +172,10 @@ async function handleSession(session) {
   authState.isLoggedIn = true;
   authState.user = session.user;
   window.authState = authState; // Ensure window reference is updated
+  try {
+    localStorage.setItem('lastAuthUid', session.user.id);
+  } catch (_err) {
+  }
 
   const pendingLoginAt = Number(localStorage.getItem(AUTH_PENDING_LOGIN_AT_KEY) || 0);
   if (pendingLoginAt) {
@@ -380,7 +384,7 @@ async function handleLogout() {
 function signOutLocally() {
   // Clear only NewTab-related local storage data
   const keysToRemove = [
-    'auth_last_login_at', 'auth_pending_login_at',
+    'auth_last_login_at', 'auth_pending_login_at', 'lastAuthUid',
     'user_sites', 'user_tags', 'user_site_tags',
     'user_site_order', 'user_tag_order',
     'cached_user_data', 'cached_settings',

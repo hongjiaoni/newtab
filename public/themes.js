@@ -28,7 +28,7 @@ const themeState = {
   }
 };
 
-const APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
+var APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
 
 function readAppearanceSnapshot() {
   if (typeof localStorage === 'undefined') return null;
@@ -218,58 +218,20 @@ function applyStyleTheme(style) {
 function openThemeCustomization() {
   window.closeSettingsLayers?.();
 
-  /* Guest users can preview customization; login is required only when saving.
-  if (!window.authState || !window.authState.isLoggedIn) {
-    console.log('Not logged in, showing login modal');
-    window.showNotification?.(
-      (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
-        ? 'Please login to customize theme'
-        : '请先登录后再设置主题',
-      'info'
-    );
-    if (window.openGoogleSignInModal) {
-      window.openGoogleSignInModal();
-    } else {
-      document.getElementById('googleSignInModal')?.classList.remove('hidden');
-    }
-    return;
-  }
-
-  */
-  // Then check membership tier
-  const effectiveTier = window.membershipState?.tier ?? window.authState?.profile?.membership_tier ?? 1;
-  if (effectiveTier < 1) {
-    window.showNotification?.(
-      (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
-        ? 'Theme customization is not available for this account'
-        : '当前账号暂不可使用主题设置',
-      'info'
-    );
-    window.closeSettingsLayers?.();
-
-    setTimeout(() => {
-      if (window.showUpgradeModal) {
-        window.showUpgradeModal('theme');
-      }
-    }, 300);
-    return;
-  }
-
   try {
     createThemeModal();
-    // Store original theme for restore on cancel
     originalThemeOnOpen = themeState.currentTheme;
-    const modal = document.getElementById('themeCustomizationModal');
+    const modal = document.getElementById('appearanceModal');
     if (modal) {
       modal.classList.remove('hidden');
+      syncAppearanceModalUI();
     }
-    renderThemePreview();
   } catch (error) {
-    console.error('Failed to open theme customization modal:', error);
+    console.error('Failed to open appearance panel:', error);
     window.showNotification?.(
       (typeof i18n !== 'undefined' && i18n.currentLocale === 'en')
-        ? 'Theme panel failed to open'
-        : '主题设置面板打开失败',
+        ? 'Appearance panel failed to open'
+        : '外观面板打开失败',
       'error'
     );
   }
@@ -280,7 +242,7 @@ let currentThemeTab = 'font';
 
 // Create theme customization modal
 function createThemeModal() {
-  const existing = document.getElementById('themeCustomizationModal');
+  const existing = document.getElementById('appearanceModal');
   if (existing) {
     existing.remove();
   }
@@ -289,195 +251,61 @@ function createThemeModal() {
   const isZh = currentLocale === 'zh';
 
   const modalHTML = `
-    <div id="themeCustomizationModal" class="modal-overlay hidden" onclick="handleThemeModalOverlayClick(event)">
-      <div class="modal" style="max-width: 700px; max-height: 85vh; overflow-y: auto;" onclick="event.stopPropagation()">
-        <h3>${isZh ? '主题定制' : 'Theme Customization'}</h3>
-        
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
-          <!-- Left: Settings with Tabs -->
-          <div>
-            <!-- Tab Buttons -->
-            <div style="display: flex; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
-              <button class="theme-tab-btn" id="tabStyle" onclick="switchThemeTab('style')">
-                ${isZh ? '风格' : 'Style'}
-              </button>
-              <button class="theme-tab-btn active" id="tabFont" onclick="switchThemeTab('font')">
-                ${isZh ? '字体' : 'Font'}
-              </button>
-              <button class="theme-tab-btn" id="tabLight" onclick="switchThemeTab('light')">
-                ${isZh ? '浅色模式' : 'Light'}
-              </button>
-              <button class="theme-tab-btn" id="tabDark" onclick="switchThemeTab('dark')">
-                ${isZh ? '深色模式' : 'Dark'}
-              </button>
-            </div>
-
-            <!-- Style Tab -->
-            <div id="themePanelStyle" class="theme-panel hidden">
-              <div class="theme-color-row">
-                <label>${isZh ? '当前风格' : 'Current Style'}</label>
-                <select id="themeStyleSelect" class="modal-input" onchange="updateThemePreview()">
-                  <option value="handdrawn" ${themeState.currentTheme === 'handdrawn' ? 'selected' : ''}>
-                    ${isZh ? '手绘（默认）' : 'Hand-drawn (Default)'}
-                  </option>
-                  <option value="comic" ${themeState.currentTheme === 'comic' ? 'selected' : ''}>
-                    ${isZh ? '漫画' : 'Comic'}
-                  </option>
-                  <option value="cyber" ${themeState.currentTheme === 'cyber' ? 'selected' : ''}>
-                    ${isZh ? '赛博（黑白）' : 'Cyber (Mono)'}
-                  </option>
-                </select>
-              </div>
-              <div style="font-size: 12px; opacity: 0.7; line-height: 1.4;">
-                ${isZh ? '更多付费风格后续会陆续上线。' : 'More premium styles will be available later.'}
-              </div>
-            </div>
-
-            <!-- Font Tab -->
-            <div id="themePanelFont" class="theme-panel">
-              <div class="theme-color-row">
-                <label>${isZh ? '英文字体' : 'English Font'}</label>
-                <select id="fontEnglishSelect" class="modal-input" onchange="handleThemeFontChange()">
-                  ${AVAILABLE_FONTS.english.map(f => `
-                    <option value="${f.value}" ${themeState.customSettings.fontEnglish === f.value ? 'selected' : ''}>
-                      ${f.name}
-                    </option>
-                  `).join('')}
-                </select>
-              </div>
-              <div class="theme-color-row">
-                <label>${isZh ? '中文字体' : 'Chinese Font'}</label>
-                <select id="fontChineseSelect" class="modal-input" onchange="handleThemeFontChange()">
-                  ${AVAILABLE_FONTS.chinese.map(f => `
-                    <option value="${f.value}" ${themeState.customSettings.fontChinese === f.value ? 'selected' : ''}>
-                      ${f.name}
-                    </option>
-                  `).join('')}
-                </select>
-              </div>
-            </div>
-
-            <!-- Light Mode Tab -->
-            <div id="themePanelLight" class="theme-panel hidden">
-              <div class="theme-color-grid">
-                <div class="theme-color-item">
-                  <label>${isZh ? '背景' : 'Background'}</label>
-                  <input type="color" id="bgColorInput" value="${themeState.customSettings.bgColor}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '按钮' : 'Button'}</label>
-                  <input type="color" id="buttonBgInput" value="${themeState.customSettings.buttonBg}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '输入框' : 'Input'}</label>
-                  <input type="color" id="inputBgInput" value="${themeState.customSettings.inputBg}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '边框' : 'Border'}</label>
-                  <input type="color" id="borderColorInput" value="${themeState.customSettings.borderColor}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '文字' : 'Text'}</label>
-                  <input type="color" id="textColorInput" value="${themeState.customSettings.textColor}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '文字(按下)' : 'Text Active'}</label>
-                  <input type="color" id="textActiveColorInput" value="${themeState.customSettings.textActiveColor}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '弹窗' : 'Modal'}</label>
-                  <input type="color" id="modalBgInput" value="${themeState.customSettings.modalBg}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '悬浮' : 'Hover'}</label>
-                  <input type="color" id="hoverBgInput" value="${themeState.customSettings.hoverBg}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '强调' : 'Accent'}</label>
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '阴影' : 'Shadow'}</label>
-                  <input type="color" id="shadowColorInput" value="${toHexColor(themeState.customSettings.shadowColor)}" onchange="updateThemePreview()">
-                </div>
-              </div>
-            </div>
-
-            <!-- Dark Mode Tab -->
-            <div id="themePanelDark" class="theme-panel hidden">
-              <div class="theme-color-grid">
-                <div class="theme-color-item">
-                  <label>${isZh ? '背景' : 'Background'}</label>
-                  <input type="color" id="bgColorDarkInput" value="${themeState.customSettings.darkMode.bgColor}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '按钮' : 'Button'}</label>
-                  <input type="color" id="buttonBgDarkInput" value="${themeState.customSettings.darkMode.buttonBg}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '输入框' : 'Input'}</label>
-                  <input type="color" id="inputBgDarkInput" value="${themeState.customSettings.darkMode.inputBg}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '边框' : 'Border'}</label>
-                  <input type="color" id="borderColorDarkInput" value="${themeState.customSettings.darkMode.borderColor}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '文字' : 'Text'}</label>
-                  <input type="color" id="textColorDarkInput" value="${themeState.customSettings.darkMode.textColor}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '文字(按下)' : 'Text Active'}</label>
-                  <input type="color" id="textActiveColorDarkInput" value="${themeState.customSettings.darkMode.textActiveColor}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '弹窗' : 'Modal'}</label>
-                  <input type="color" id="modalBgDarkInput" value="${themeState.customSettings.darkMode.modalBg}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '悬浮' : 'Hover'}</label>
-                  <input type="color" id="hoverBgDarkInput" value="${themeState.customSettings.darkMode.hoverBg}" onchange="updateThemePreview()">
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '强调' : 'Accent'}</label>
-                </div>
-                <div class="theme-color-item">
-                  <label>${isZh ? '阴影' : 'Shadow'}</label>
-                  <input type="color" id="shadowColorDarkInput" value="${toHexColor(themeState.customSettings.darkMode.shadowColor)}" onchange="updateThemePreview()">
-                </div>
-              </div>
+    <div id="appearanceModal" class="modal-overlay hidden" onclick="handleAppearanceOverlayClick(event)">
+      <div class="modal" style="max-width: 440px; max-height: 88vh; overflow-y: auto;" onclick="event.stopPropagation()">
+        <h3>${isZh ? '外观' : 'Appearance'}</h3>
+        <div class="appearance-panel">
+          <div class="appearance-row">
+            <label>${isZh ? '风格' : 'Style'}</label>
+            <select id="themeStyleSelect" class="modal-input" onchange="handleAppearanceStyleChange(event)">
+              <option value="handdrawn" ${themeState.currentTheme === 'handdrawn' ? 'selected' : ''}>
+                ${isZh ? '手绘（默认）' : 'Hand-drawn (Default)'}
+              </option>
+              <option value="comic" ${themeState.currentTheme === 'comic' ? 'selected' : ''}>
+                ${isZh ? '漫画' : 'Comic'}
+              </option>
+              <option value="cyber" ${themeState.currentTheme === 'cyber' ? 'selected' : ''}>
+                ${isZh ? '赛博（黑白）' : 'Cyber (Mono)'}
+              </option>
+            </select>
+          </div>
+          <div class="appearance-row">
+            <label>Font</label>
+            <select id="fontEnglishSelect" class="modal-input" onchange="handleAppearanceFontChange(event)">
+              ${AVAILABLE_FONTS.english.map(f => `
+                <option value="${f.value}" ${themeState.customSettings.fontEnglish === f.value ? 'selected' : ''}>
+                  ${f.name}
+                </option>
+              `).join('')}
+            </select>
+          </div>
+          <div class="appearance-row">
+            <label>${isZh ? '缩放比例' : 'Zoom'}</label>
+            <div class="segmented-control" id="appearanceZoomGroup">
+              <button class="seg-btn" data-zoom="100" onclick="setZoomLevel('100')">100%</button>
+              <button class="seg-btn" data-zoom="125" onclick="setZoomLevel('125')">125%</button>
+              <button class="seg-btn" data-zoom="150" onclick="setZoomLevel('150')">150%</button>
             </div>
           </div>
-
-          <!-- Right: Preview -->
-          <div>
-            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-              <button class="theme-tab-btn active" onclick="setPreviewMode('light')" id="previewLightBtn">
-                ${isZh ? '浅色预览' : 'Light'}
-              </button>
-              <button class="theme-tab-btn" onclick="setPreviewMode('dark')" id="previewDarkBtn">
-                ${isZh ? '深色预览' : 'Dark'}
-              </button>
+          <div class="appearance-row">
+            <label>${isZh ? '颜色模式' : 'Color Mode'}</label>
+            <div class="segmented-control" id="appearanceColorModeGroup">
+              <button class="seg-btn" data-theme-mode="light" onclick="setThemeMode('light')">${isZh ? '浅色' : 'Light'}</button>
+              <button class="seg-btn" data-theme-mode="dark" onclick="setThemeMode('dark')">${isZh ? '深色' : 'Dark'}</button>
+              <button class="seg-btn" data-theme-mode="system" onclick="setThemeMode('system')">${isZh ? '跟随系统' : 'System'}</button>
             </div>
-            <div id="themePreview" style="border: 2px solid var(--border-color); border-radius: 8px; padding: 15px; min-height: 280px;">
-            </div>
+          </div>
+          <div class="appearance-row">
+            <button id="appearanceWallpaperBtn" class="cancel-btn" onclick="openWallpaperFromAppearance()">${isZh ? '壁纸' : 'Wallpaper'}</button>
           </div>
         </div>
-
-        <div class="modal-actions" style="margin-top: 20px;">
-          <button class="cancel-btn" onclick="closeThemeModal()">${isZh ? '取消' : 'Cancel'}</button>
-          <button class="cancel-btn" onclick="resetThemeCustomization()">${isZh ? '重置' : 'Reset'}</button>
-          <button class="primary-btn" onclick="saveThemeCustomization()">${isZh ? '保存' : 'Save'}</button>
+        <div class="modal-actions">
+          <button id="appearanceResetBtn" class="cancel-btn" onclick="resetThemeCustomization()">${isZh ? '恢复默认' : 'Reset'}</button>
+          <button id="appearanceDoneBtn" class="primary-btn" onclick="closeThemeModal(false)">${isZh ? '完成' : 'Done'}</button>
         </div>
       </div>
-    </div>
-  `;
-
+    </div>`;
   document.body.insertAdjacentHTML('beforeend', modalHTML);
-  document.querySelectorAll('#themeCustomizationModal .theme-color-item').forEach((item) => {
-    if (!item.querySelector('input')) {
-      item.remove();
-    }
-  });
 }
 
 function getThemeDisplayName(style) {
@@ -1018,89 +846,18 @@ function updateThemePreview() {
 
 // Save theme settings
 async function saveThemeCustomization() {
-  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
-  const isZh = currentLocale === 'zh';
-
-  if (!window.authState || !window.authState.isLoggedIn) {
-    window.requireLoginForPersistentChange?.();
-    return;
-  }
-
-  const shadowLightHex = document.getElementById('shadowColorInput')?.value || toHexColor(themeState.customSettings.shadowColor);
-  const shadowDarkHex = document.getElementById('shadowColorDarkInput')?.value || toHexColor(themeState.customSettings.darkMode?.shadowColor);
-
-  const settings = {
-    style: document.getElementById('themeStyleSelect')?.value || themeState.currentTheme,
-    fontChinese: document.getElementById('fontChineseSelect').value,
-    fontEnglish: document.getElementById('fontEnglishSelect').value,
-    bgColor: document.getElementById('bgColorInput').value,
-    buttonBg: document.getElementById('buttonBgInput').value,
-    inputBg: document.getElementById('inputBgInput').value,
-    borderColor: document.getElementById('borderColorInput').value,
-    textColor: document.getElementById('textColorInput').value,
-    textActiveColor: document.getElementById('textActiveColorInput').value,
-    modalBg: document.getElementById('modalBgInput').value,
-    hoverBg: document.getElementById('hoverBgInput').value,
-    shadowColor: hexToRgba(shadowLightHex, 0.1),
-    darkMode: {
-      bgColor: document.getElementById('bgColorDarkInput').value,
-      buttonBg: document.getElementById('buttonBgDarkInput').value,
-      inputBg: document.getElementById('inputBgDarkInput').value,
-      borderColor: document.getElementById('borderColorDarkInput').value,
-      textColor: document.getElementById('textColorDarkInput').value,
-      textActiveColor: document.getElementById('textActiveColorDarkInput').value,
-      modalBg: document.getElementById('modalBgDarkInput').value,
-      hoverBg: document.getElementById('hoverBgDarkInput').value,
-      shadowColor: hexToRgba(shadowDarkHex, 0.1)
-    }
-  };
-
-  themeState.currentTheme = settings.style;
-
-  applyStyleTheme(themeState.currentTheme);
-  try {
-    if (typeof state !== 'undefined') {
-      state.currentTheme = themeState.currentTheme;
-    }
-    localStorage.setItem('currentTheme', themeState.currentTheme);
-  } catch (_err) {
-  }
-
-  // Apply to current page (respect current mode)
-  applyThemeSettings(settings);
-  applyCustomThemeForCurrentMode();
-  requestAnimationFrame(() => {
-    applyStyleTheme(themeState.currentTheme);
-    applyCustomThemeForCurrentMode();
+  const style = document.getElementById('themeStyleSelect')?.value || themeState.currentTheme;
+  applyAppearanceStyle(style);
+  const fontEnglish = document.getElementById('fontEnglishSelect')?.value || themeState.customSettings.fontEnglish;
+  themeState.customSettings.fontEnglish = fontEnglish;
+  ensureThemeFontAssets({ fontChinese: themeState.customSettings.fontChinese || '优设好身体', fontEnglish }).then(() => {
+    applyFontSettings({ fontChinese: themeState.customSettings.fontChinese || '优设好身体', fontEnglish });
   });
-
-  // Save to database
-  try {
-    if (window.initializeMembership) {
-      await window.initializeMembership();
-    }
-    if (!window.membershipState || window.membershipState.tier < 1) {
-      throw new Error('premium membership required');
-    }
-    if (window.saveThemeSettings) {
-      await window.saveThemeSettings(settings);
-    }
-    originalThemeOnOpen = null;
-    closeThemeModal(false);
-    requestAnimationFrame(() => {
-      applyStyleTheme(themeState.currentTheme);
-      applyCustomThemeForCurrentMode();
-    });
-
-    if (window.showNotification) {
-      window.showNotification(i18n.t('saveThemeSuccess'), 'success');
-    }
-  } catch (err) {
-    console.error('Failed to persist theme customization:', err);
-    if (window.showNotification) {
-      window.showNotification(i18n.t('saveThemeFailed'), 'error');
-    }
+  if (window.markHomeConfigUpdated) window.markHomeConfigUpdated();
+  if (window.showNotification) {
+    window.showNotification(i18n.t('saveThemeSuccess'), 'success');
   }
+  closeThemeModal(false);
 }
 
 // Apply theme settings to page
@@ -1192,92 +949,35 @@ function applyFontSettings(fontSettings) {
 }
 
 async function resetThemeCustomization() {
-  const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
-  const isZh = currentLocale === 'zh';
-
   themeState.currentTheme = 'handdrawn';
   themeState.customSettings = JSON.parse(JSON.stringify(DEFAULT_CUSTOM_SETTINGS));
 
-  lastStyleValue = themeState.currentTheme;
   applyStyleTheme(themeState.currentTheme);
+  if (typeof state !== 'undefined') {
+    state.currentTheme = themeState.currentTheme;
+    state.viewMode = 'general';
+    state.zoomLevel = '100';
+  }
   try {
-    if (typeof state !== 'undefined') {
-      state.currentTheme = themeState.currentTheme;
-    }
     localStorage.setItem('currentTheme', themeState.currentTheme);
+    localStorage.setItem('viewMode', 'general');
+    localStorage.setItem('zoomLevel', '100');
   } catch (_err) {
   }
 
-  applyThemeSettings(themeState.customSettings);
-  applyCustomThemeForCurrentMode();
-
-  const fontEn = document.getElementById('fontEnglishSelect');
-  const fontZh = document.getElementById('fontChineseSelect');
-  const styleSelect = document.getElementById('themeStyleSelect');
-  if (fontEn) fontEn.value = themeState.customSettings.fontEnglish;
-  if (fontZh) fontZh.value = themeState.customSettings.fontChinese;
-  if (styleSelect) styleSelect.value = themeState.currentTheme;
-
-  const bg = document.getElementById('bgColorInput');
-  const card = document.getElementById('buttonBgInput');
-  const input = document.getElementById('inputBgInput');
-  const border = document.getElementById('borderColorInput');
-  const text = document.getElementById('textColorInput');
-  const textActive = document.getElementById('textActiveColorInput');
-  const modal = document.getElementById('modalBgInput');
-  const hover = document.getElementById('hoverBgInput');
-  const shadow = document.getElementById('shadowColorInput');
-
-  if (bg) bg.value = themeState.customSettings.bgColor;
-  if (card) card.value = themeState.customSettings.buttonBg;
-  if (input) input.value = themeState.customSettings.inputBg;
-  if (border) border.value = themeState.customSettings.borderColor;
-  if (text) text.value = themeState.customSettings.textColor;
-  if (textActive) textActive.value = themeState.customSettings.textActiveColor; // Added
-  if (modal) modal.value = themeState.customSettings.modalBg;
-  if (hover) hover.value = themeState.customSettings.hoverBg;
-  if (shadow) shadow.value = toHexColor(themeState.customSettings.shadowColor);
-
-  const bgD = document.getElementById('bgColorDarkInput');
-  const cardD = document.getElementById('buttonBgDarkInput');
-  const inputD = document.getElementById('inputBgDarkInput');
-  const borderD = document.getElementById('borderColorDarkInput');
-  const textD = document.getElementById('textColorDarkInput');
-  const textActiveD = document.getElementById('textActiveColorDarkInput'); // Added
-  const modalD = document.getElementById('modalBgDarkInput');
-  const hoverD = document.getElementById('hoverBgDarkInput');
-  const shadowD = document.getElementById('shadowColorDarkInput');
-
-  if (bgD) bgD.value = themeState.customSettings.darkMode.bgColor;
-  if (cardD) cardD.value = themeState.customSettings.darkMode.buttonBg;
-  if (inputD) inputD.value = themeState.customSettings.darkMode.inputBg;
-  if (borderD) borderD.value = themeState.customSettings.darkMode.borderColor;
-  if (textD) textD.value = themeState.customSettings.darkMode.textColor;
-  if (textActiveD) textActiveD.value = themeState.customSettings.darkMode.textActiveColor; // Added
-  if (modalD) modalD.value = themeState.customSettings.darkMode.modalBg;
-  if (hoverD) hoverD.value = themeState.customSettings.darkMode.hoverBg;
-  if (shadowD) shadowD.value = toHexColor(themeState.customSettings.darkMode.shadowColor);
-
-  renderThemePreview();
-
-  const resetPayload = {
-    style: themeState.currentTheme,
-    ...JSON.parse(JSON.stringify(themeState.customSettings))
-  };
-
-  if (window.saveThemeSettings) {
-    await window.saveThemeSettings(resetPayload);
-  } else if (window.resetThemeCustomizationOnBackend) {
-    await window.resetThemeCustomizationOnBackend();
-  }
-
-  if (window.markHomeConfigUpdated) {
-    window.markHomeConfigUpdated();
-  }
-
+  setThemeMode('light');
+  applyFontSettings({
+    fontChinese: themeState.customSettings.fontChinese,
+    fontEnglish: themeState.customSettings.fontEnglish
+  });
+  if (typeof window.applyZoomLevel === 'function') window.applyZoomLevel('100', true);
+  if (typeof window.renderHome === 'function') window.renderHome();
+  if (typeof window.updateAllText === 'function') window.updateAllText();
+  if (window.markHomeConfigUpdated) window.markHomeConfigUpdated();
   if (window.showNotification) {
     window.showNotification(i18n.t('resetThemeSuccess'), 'success');
   }
+  syncAppearanceModalUI();
 }
 
 // Store original theme for restore
@@ -1285,13 +985,12 @@ let originalThemeOnOpen = null;
 
 // Close theme modal and restore original theme
 function closeThemeModal(restoreOriginal = true) {
-  // Restore original theme if changed
   if (restoreOriginal && originalThemeOnOpen !== null) {
     themeState.currentTheme = originalThemeOnOpen;
     applyStyleTheme(originalThemeOnOpen);
     originalThemeOnOpen = null;
   }
-  document.getElementById('themeCustomizationModal')?.classList.add('hidden');
+  document.getElementById('appearanceModal')?.classList.add('hidden');
 }
 
 // Before opening modal, store the original theme
@@ -1399,3 +1098,133 @@ window.handleThemeModalOverlayClick = handleThemeModalOverlayClick;
 window.setPreviewMode = setPreviewMode;
 window.updateThemePreview = updateThemePreview;
 window.handleThemeCustomizationMenuClick = handleThemeCustomizationMenuClick;
+
+
+// ===== Appearance panel helpers (2026-08) =====
+let themeMode = (typeof localStorage !== 'undefined')
+  ? (localStorage.getItem('themeMode') || localStorage.getItem('theme') || 'light')
+  : 'light';
+
+function applyThemeMode() {
+  const effective = themeMode === 'system'
+    ? ((window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light')
+    : themeMode;
+  document.body.classList.toggle('dark', effective === 'dark');
+  document.body.classList.toggle('light', effective !== 'dark');
+  try {
+    localStorage.setItem('theme', effective);
+  } catch (_err) {
+  }
+  window.applyCustomThemeForCurrentMode?.();
+  if (typeof updateSettingsMenu === 'function') updateSettingsMenu();
+}
+
+function setThemeMode(mode) {
+  themeMode = ['light', 'dark', 'system'].includes(mode) ? mode : 'light';
+  try {
+    localStorage.setItem('themeMode', themeMode);
+  } catch (_err) {
+  }
+  if (typeof state !== 'undefined') state.themeMode = themeMode;
+  applyThemeMode();
+  syncAppearanceModalUI();
+  if (window.markHomeConfigUpdated) window.markHomeConfigUpdated();
+}
+
+function initThemeModeSystemListener() {
+  if (!window.matchMedia) return;
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  const onChange = () => {
+    if (themeMode === 'system') applyThemeMode();
+  };
+  if (mq.addEventListener) mq.addEventListener('change', onChange);
+  else if (mq.addListener) mq.addListener(onChange);
+}
+
+function handleAppearanceStyleChange(event) {
+  applyAppearanceStyle(event?.target?.value);
+}
+
+function applyAppearanceStyle(style) {
+  const v = ['handdrawn', 'comic', 'cyber'].includes(String(style || '')) ? String(style) : 'handdrawn';
+  themeState.currentTheme = v;
+  applyStyleTheme(v);
+  if (typeof state !== 'undefined') state.currentTheme = v;
+  try {
+    localStorage.setItem('currentTheme', v);
+  } catch (_err) {
+  }
+  syncAppearanceModalUI();
+  updateSettingsMenu?.();
+  if (window.markHomeConfigUpdated) window.markHomeConfigUpdated();
+}
+
+function handleAppearanceFontChange() {
+  const fontEnglish = document.getElementById('fontEnglishSelect')?.value || themeState.customSettings.fontEnglish;
+  themeState.customSettings.fontEnglish = fontEnglish;
+  ensureThemeFontAssets({
+    fontChinese: themeState.customSettings.fontChinese || '优设好身体',
+    fontEnglish
+  }).then(() => {
+    applyFontSettings({
+      fontChinese: themeState.customSettings.fontChinese || '优设好身体',
+      fontEnglish
+    });
+  });
+  syncAppearanceModalUI();
+  if (window.markHomeConfigUpdated) window.markHomeConfigUpdated();
+}
+
+function setAppearanceViewMode(mode) {
+  if (typeof state === 'undefined') return;
+  state.viewMode = mode === 'minimalist' ? 'minimalist' : 'general';
+  try {
+    localStorage.setItem('viewMode', state.viewMode);
+  } catch (_err) {
+  }
+  syncAppearanceModalUI();
+  if (typeof window.renderHome === 'function') window.renderHome();
+  if (typeof window.updateAllText === 'function') window.updateAllText();
+  if (typeof window.saveData === 'function') window.saveData();
+}
+
+function syncAppearanceModalUI() {
+  const styleSel = document.getElementById('themeStyleSelect');
+  if (styleSel) styleSel.value = themeState.currentTheme || 'handdrawn';
+  const fontSel = document.getElementById('fontEnglishSelect');
+  if (fontSel) fontSel.value = themeState.customSettings.fontEnglish || 'Patrick Hand';
+  document.querySelectorAll('#appearanceZoomGroup .seg-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.zoom === (typeof state !== 'undefined' ? state.zoomLevel : '100'));
+  });
+  document.querySelectorAll('#appearanceViewModeGroup .seg-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.viewMode === (typeof state !== 'undefined' ? state.viewMode : 'general'));
+  });
+  document.querySelectorAll('#appearanceColorModeGroup .seg-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.themeMode === themeMode);
+  });
+}
+
+function openWallpaperFromAppearance() {
+  if (window.openWallpaperModal) {
+    window.openWallpaperModal();
+    return;
+  }
+  document.getElementById('wallpaperModal')?.classList.remove('hidden');
+}
+
+function handleAppearanceOverlayClick(event) {
+  if (event.target && event.target.id === 'appearanceModal') {
+    closeThemeModal(false);
+  }
+}
+
+window.setThemeMode = setThemeMode;
+window.applyThemeMode = applyThemeMode;
+window.setAppearanceViewMode = setAppearanceViewMode;
+window.applyAppearanceStyle = applyAppearanceStyle;
+window.handleAppearanceStyleChange = handleAppearanceStyleChange;
+window.handleAppearanceFontChange = handleAppearanceFontChange;
+window.syncAppearanceModalUI = syncAppearanceModalUI;
+window.openWallpaperFromAppearance = openWallpaperFromAppearance;
+window.handleAppearanceOverlayClick = handleAppearanceOverlayClick;
+initThemeModeSystemListener();

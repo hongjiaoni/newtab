@@ -1,5 +1,17 @@
 // ===== Configuration =====
 
+// === Extension Detection ===
+const IS_EXTENSION = (() => {
+  try { return typeof chrome !== 'undefined' && !!chrome.runtime && !!chrome.runtime.id; }
+  catch (_) { return false; }
+})();
+const EXTENSION_ID = IS_EXTENSION ? chrome.runtime.id : '';
+const EXTENSION_ORIGIN = IS_EXTENSION ? 'chrome-extension://' + EXTENSION_ID : '';
+
+window.IS_EXTENSION = IS_EXTENSION;
+window.EXTENSION_ID = EXTENSION_ID;
+window.EXTENSION_ORIGIN = EXTENSION_ORIGIN;
+
 // Google OAuth Configuration
 // Replace with your actual Google Client ID from Google Cloud Console
 let GOOGLE_CLIENT_ID = '';
@@ -81,6 +93,18 @@ const APP_ENV_CONFIG = {
 
 const resolvedAppConfig = APP_ENV_CONFIG[APP_ENV] || APP_ENV_CONFIG.staging;
 
+// === Extension-specific overrides ===
+if (IS_EXTENSION) {
+  // Extension always uses production Supabase backend — the staging
+  // Supabase project may be paused/inactive on the free tier, and the
+  // extension is a client-side app that shares the same data anyway.
+  // OAuth and site URLs still point to the extension origin.
+  resolvedAppConfig.oauthRedirectUrl = EXTENSION_ORIGIN + '/';
+  resolvedAppConfig.siteUrl = EXTENSION_ORIGIN + '/';
+  resolvedAppConfig.supabase = APP_ENV_CONFIG.production.supabase;
+  // Keep Paddle in sandbox mode for extension (safe for testing)
+}
+
 // Google OAuth Configuration
 GOOGLE_CLIENT_ID = resolvedAppConfig.googleClientId;
 
@@ -95,7 +119,9 @@ const SUPABASE_ENV = {
   }
 };
 
-const resolvedSupabase = SUPABASE_ENV[APP_ENV] || SUPABASE_ENV.staging;
+const resolvedSupabase = IS_EXTENSION
+  ? SUPABASE_ENV.production   // Extension always uses production Supabase
+  : (SUPABASE_ENV[APP_ENV] || SUPABASE_ENV.staging);
 const SUPABASE_URL = resolvedSupabase.url;
 const SUPABASE_ANON_KEY = resolvedSupabase.anonKey;
 
@@ -124,6 +150,12 @@ window.PADDLE_PRICE_TIER3_YEARLY = PADDLE_PRICE_TIER3_YEARLY;
 window.GUMROAD_COFFEE_LINK_TEMPLATE = GUMROAD_COFFEE_LINK_TEMPLATE;
 
 window.GOOGLE_CLIENT_ID = GOOGLE_CLIENT_ID;
+
+// Agent chat API endpoint (serverless proxy)
+// Web: same-origin /api/agent-chat; Extension: production site API
+window.AGENT_API_URL = IS_EXTENSION
+  ? 'https://newtab.online/api/agent-chat'
+  : (window.location.origin + '/api/agent-chat');
 
 // Feature Flags
 const FEATURES = {

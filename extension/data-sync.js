@@ -14,6 +14,14 @@ let userDataLoadPromise = null;
 let userDataRefreshTimer = null;
 let lastSyncNotificationAt = 0;
 
+function getSupabaseClient() {
+    const client = window.supabase;
+    if (client && typeof client.from === 'function') {
+        return client;
+    }
+    return null;
+}
+
 function notifySyncStatus(messageKey, fallback, type = 'warning') {
     if (typeof window.showNotification !== 'function') return;
     const now = Date.now();
@@ -260,6 +268,83 @@ function toFontPayloadFromLegacy(fontSettings) {
     };
 }
 
+function isMissingRelationError(err) {
+    const message = String(err?.message || '').toLowerCase();
+    const details = String(err?.details || '').toLowerCase();
+    return String(err?.code || '') === '42P01'
+        || ((message + details).includes('relation') && (message + details).includes('does not exist'));
+}
+
+function isMissingFunctionError(err) {
+    const message = String(err?.message || '').toLowerCase();
+    const details = String(err?.details || '').toLowerCase();
+    return String(err?.code || '') === '42883'
+        || ((message + details).includes('function') && (message + details).includes('does not exist'));
+}
+
+function isNoRowsError(err) {
+    return String(err?.code || '') === 'PGRST116';
+}
+
+function isUuidLike(value) {
+    return typeof value === 'string'
+        && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function generateSyncUuid() {
+    if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+        return globalThis.crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+
+function ensureSiteIdsAreUuid() {
+    if (typeof state === 'undefined' || !Array.isArray(state.sites)) return;
+
+    const idMap = new Map();
+    let changed = false;
+
+    state.sites = state.sites.map((site) => {
+        if (isUuidLike(site?.id)) return site;
+        const nextId = generateSyncUuid();
+        idMap.set(String(site?.id), nextId);
+        changed = true;
+        return { ...site, id: nextId };
+    });
+
+    if (!changed) return;
+
+    if (Array.isArray(state.siteOrder)) {
+        state.siteOrder = state.siteOrder.map((id) => idMap.get(String(id)) || id);
+    }
+
+    try {
+        localStorage.setItem('sites', JSON.stringify(state.sites));
+        localStorage.setItem('siteOrder', JSON.stringify(state.siteOrder || []));
+    } catch (_err) {
+    }
+}
+
+function compactSupabaseError(err) {
+    if (!err) return '';
+    return [err.code, err.message, err.details].filter(Boolean).join(' | ');
+}
+
+async function readMaybe(queryPromise) {
+    const res = await queryPromise;
+    if (res?.error && !isNoRowsError(res.error) && !isMissingRelationError(res.error)) {
+        console.warn('Optional sync read failed:', compactSupabaseError(res.error));
+    }
+    if (res?.error) {
+        return { data: null, error: res.error };
+    }
+    return res || { data: null, error: null };
+}
+
 function buildHomeConfigFromLegacy(legacy) {
     if (!legacy || !legacy.settingsRow) return null;
 
@@ -274,9 +359,11 @@ function buildHomeConfigFromLegacy(legacy) {
     const sites = (legacy.sitesRows || []).map((row) => ({
         id: row.id,
         name: row.name,
-        url: row.url,
+        url: row.url || '',
         showOnHome: row.show_on_home !== false,
-        tags: siteTagMap.get(row.id) || []
+        tags: siteTagMap.get(row.id) || [],
+        type: row.type === 'folder' ? 'folder' : 'link',
+        children: row.type === 'folder' ? (Array.isArray(row.children) ? row.children : []) : undefined
     }));
 
     const orderedSiteIds = (legacy.siteOrderRows || [])
@@ -317,12 +404,20 @@ function buildHomeConfigFromLegacy(legacy) {
             theme: legacy.settingsRow.theme || 'handdrawn',
             colorMode: legacy.settingsRow.color_mode || 'light',
             fontChinese: savedFontChinese,
-            fontEnglish: savedFontEnglish
-        }
+            fontEnglish: savedFontEnglish,
+            zoomLevel: legacy.settingsRow?.zoom_level || '100',
+            openBehavior: legacy.settingsRow?.open_behavior || 'newtab'
+        },
+        workbench: legacy.settingsRow?.workbench || null
     };
 }
 
 async function fetchLegacyConfigs(uid) {
+    const db = getSupabaseClient();
+    if (!db) {
+        throw new Error('Supabase client is not ready');
+    }
+
     const [
         settingsRes,
         sitesRes,
@@ -333,23 +428,23 @@ async function fetchLegacyConfigs(uid) {
         themeSettingsRes,
         fontSettingsRes
     ] = await Promise.all([
-        supabase.from('user_home_settings').select('*').eq('user_id', uid).single(),
-        supabase.from('user_sites').select('id,name,url,show_on_home').eq('user_id', uid),
-        supabase.from('user_tags').select('name').eq('user_id', uid),
-        supabase.from('user_site_tags').select('site_id,tag_name').eq('user_id', uid),
-        supabase.from('user_site_order').select('site_id,position').eq('user_id', uid),
-        supabase.from('user_tag_order').select('tag_name,position').eq('user_id', uid),
-        supabase.from('user_theme_settings').select('theme_settings, updated_at').eq('user_id', uid).single(),
-        supabase.from('user_font_settings').select('font_settings, updated_at').eq('user_id', uid).single()
+        readMaybe(db.from('user_home_settings').select('*').eq('user_id', uid).single()),
+        readSitesRows(db, uid),
+        readMaybe(db.from('user_tags').select('name').eq('user_id', uid)),
+        readMaybe(db.from('user_site_tags').select('site_id,tag_name').eq('user_id', uid)),
+        readMaybe(db.from('user_site_order').select('site_id,position').eq('user_id', uid)),
+        readMaybe(db.from('user_tag_order').select('tag_name,position').eq('user_id', uid)),
+        readMaybe(db.from('user_theme_settings').select('theme_settings, updated_at').eq('user_id', uid).single()),
+        readMaybe(db.from('user_font_settings').select('font_settings, updated_at').eq('user_id', uid).single())
     ]);
 
     const homeConfig = buildHomeConfigFromLegacy({
         settingsRow: settingsRes.data,
-        sitesRows: sitesRes.data,
-        tagsRows: tagsRes.data,
-        siteTagsRows: siteTagsRes.data,
-        siteOrderRows: siteOrderRes.data,
-        tagOrderRows: tagOrderRes.data,
+        sitesRows: Array.isArray(sitesRes) ? sitesRes : (sitesRes?.data || []),
+        tagsRows: tagsRes.data || [],
+        siteTagsRows: siteTagsRes.data || [],
+        siteOrderRows: siteOrderRes.data || [],
+        tagOrderRows: tagOrderRes.data || [],
         fontSettings: fontSettingsRes.data?.font_settings
     });
 
@@ -363,24 +458,255 @@ async function fetchLegacyConfigs(uid) {
     };
 }
 
+async function readSitesRows(db, uid) {
+    const full = await readMaybe(db.from('user_sites').select('id,name,url,show_on_home,type,children').eq('user_id', uid));
+    if (full && Array.isArray(full.data)) {
+        return full.data;
+    }
+    // Columns may not exist yet (migration not applied) — fall back to the basic schema.
+    const basic = await readMaybe(db.from('user_sites').select('id,name,url,show_on_home').eq('user_id', uid));
+    if (basic && Array.isArray(basic.data)) {
+        return basic.data;
+    }
+    return [];
+}
+
+function buildHomeSettingsRow(uid, payload, syncedAt) {
+    const s = payload?.settings || {};
+    return {
+        user_id: uid,
+        view_mode: s.viewMode || 'general',
+        engine_index: Number.isFinite(s.engineIndex) ? s.engineIndex : 0,
+        engine_id: s.engineId || null,
+        enabled_engine_ids: Array.isArray(s.enabledEngineIds) ? s.enabledEngineIds : [],
+        date_format_index: Number.isFinite(s.dateFormatIndex) ? s.dateFormatIndex : 0,
+        time_format: s.timeFormat || '24h',
+        locale: s.locale || 'zh',
+        wallpaper: Object.prototype.hasOwnProperty.call(s, 'wallpaper') ? s.wallpaper : null,
+        theme: s.theme || 'handdrawn',
+        color_mode: s.colorMode === 'dark' ? 'dark' : 'light',
+        zoom_level: s.zoomLevel || '100',
+        open_behavior: s.openBehavior || 'newtab',
+        workbench: payload?.workbench || null,
+        updated_at: syncedAt
+    };
+}
+
+async function writeOptionalTable(operationName, runner) {
+    const res = await runner();
+    if (res?.error) {
+        if (isMissingRelationError(res.error)) {
+            console.warn(`Skipping missing optional sync table during ${operationName}:`, compactSupabaseError(res.error));
+            return false;
+        }
+        throw res.error;
+    }
+    return true;
+}
+
+async function writeRequiredTable(operationName, runner) {
+    const res = await runner();
+    if (res?.error) {
+        throw new Error(`${operationName} failed: ${compactSupabaseError(res.error)}`);
+    }
+    return true;
+}
+
+async function writeHomeSettingsRow(uid, payload, syncedAt) {
+    const db = getSupabaseClient();
+    try {
+        await writeRequiredTable('home settings upsert', () => (
+            db
+                .from('user_home_settings')
+                .upsert(buildHomeSettingsRow(uid, payload, syncedAt), { onConflict: 'user_id' })
+        ));
+        return;
+    } catch (err) {
+        // Migration not applied yet: the new columns (zoom_level / open_behavior / workbench)
+        // are missing, so retry with the legacy column set instead of failing the whole sync.
+        const msg = compactSupabaseError(err).toLowerCase();
+        if (msg.includes('zoom_level') || msg.includes('open_behavior') || msg.includes('workbench') || msg.includes('column')) {
+            const s = payload?.settings || {};
+            await writeRequiredTable('home settings upsert (legacy)', () => (
+                db
+                    .from('user_home_settings')
+                    .upsert({
+                        user_id: uid,
+                        view_mode: s.viewMode || 'general',
+                        engine_index: Number.isFinite(s.engineIndex) ? s.engineIndex : 0,
+                        engine_id: s.engineId || null,
+                        enabled_engine_ids: Array.isArray(s.enabledEngineIds) ? s.enabledEngineIds : [],
+                        date_format_index: Number.isFinite(s.dateFormatIndex) ? s.dateFormatIndex : 0,
+                        time_format: s.timeFormat || '24h',
+                        locale: s.locale || 'zh',
+                        wallpaper: Object.prototype.hasOwnProperty.call(s, 'wallpaper') ? s.wallpaper : null,
+                        theme: s.theme || 'handdrawn',
+                        color_mode: s.colorMode === 'dark' ? 'dark' : 'light',
+                        updated_at: syncedAt
+                    }, { onConflict: 'user_id' })
+            ));
+            return;
+        }
+        throw err;
+    }
+}
+
+async function saveLegacyHomeConfigFallback(uid, payload, syncedAt) {
+    const db = getSupabaseClient();
+    if (!db) {
+        throw new Error('Supabase client is not ready');
+    }
+
+    const sites = Array.isArray(payload?.sites) ? payload.sites : [];
+    const tags = Array.isArray(payload?.tags) ? payload.tags : [];
+    const siteOrder = Array.isArray(payload?.site_order) ? payload.site_order : [];
+    const tagOrder = Array.isArray(payload?.tag_order) ? payload.tag_order : [];
+
+    await writeHomeSettingsRow(uid, payload, syncedAt);
+
+    const hasSitesTable = await writeOptionalTable('sites delete', () => (
+        db.from('user_sites').delete().eq('user_id', uid)
+    ));
+    if (hasSitesTable && sites.length) {
+        const rowsFull = sites.map((site) => ({
+            id: site.id,
+            user_id: uid,
+            name: site.name || '',
+            url: site.url || '',
+            show_on_home: site.showOnHome !== false,
+            type: site.type === 'folder' ? 'folder' : 'link',
+            children: site.type === 'folder' ? (Array.isArray(site.children) ? site.children : []) : [],
+            updated_at: syncedAt
+        }));
+        const ok = await writeOptionalTable('sites insert', () => db.from('user_sites').insert(rowsFull));
+        if (!ok) {
+            // Migration not applied: retry without type/children columns
+            const rowsLegacy = rowsFull.map((r) => ({
+                id: r.id,
+                user_id: r.user_id,
+                name: r.name,
+                url: r.url,
+                show_on_home: r.show_on_home,
+                updated_at: r.updated_at
+            }));
+            await writeOptionalTable('sites insert (legacy)', () => db.from('user_sites').insert(rowsLegacy));
+        }
+    }
+
+    const hasTagsTable = await writeOptionalTable('tags delete', () => (
+        db.from('user_tags').delete().eq('user_id', uid)
+    ));
+    if (hasTagsTable && tags.length) {
+        await writeOptionalTable('tags insert', () => (
+            db.from('user_tags').insert(tags.map((name) => ({
+                user_id: uid,
+                name,
+                updated_at: syncedAt
+            })))
+        ));
+    }
+
+    const hasSiteTagsTable = await writeOptionalTable('site tags delete', () => (
+        db.from('user_site_tags').delete().eq('user_id', uid)
+    ));
+    if (hasSiteTagsTable) {
+        const rows = [];
+        for (const site of sites) {
+            if (!site?.id || !Array.isArray(site.tags)) continue;
+            for (const tagName of site.tags) {
+                if (tagName) {
+                    rows.push({
+                        user_id: uid,
+                        site_id: site.id,
+                        tag_name: tagName
+                    });
+                }
+            }
+        }
+        if (rows.length) {
+            await writeOptionalTable('site tags insert', () => db.from('user_site_tags').insert(rows));
+        }
+    }
+
+    const hasSiteOrderTable = await writeOptionalTable('site order delete', () => (
+        db.from('user_site_order').delete().eq('user_id', uid)
+    ));
+    if (hasSiteOrderTable && siteOrder.length) {
+        await writeOptionalTable('site order insert', () => (
+            db.from('user_site_order').insert(siteOrder.map((siteId, index) => ({
+                user_id: uid,
+                site_id: siteId,
+                position: index
+            })))
+        ));
+    }
+
+    const hasTagOrderTable = await writeOptionalTable('tag order delete', () => (
+        db.from('user_tag_order').delete().eq('user_id', uid)
+    ));
+    if (hasTagOrderTable && tagOrder.length) {
+        await writeOptionalTable('tag order insert', () => (
+            db.from('user_tag_order').insert(tagOrder.map((tagName, index) => ({
+                user_id: uid,
+                tag_name: tagName,
+                position: index
+            })))
+        ));
+    }
+}
+
+let rpcDisabledForSession = false;
+
 async function saveLegacyHomeConfig(payload, syncedAt) {
-    const { error } = await supabase.rpc('sync_home_config', {
+    const db = getSupabaseClient();
+    if (!db) {
+        throw new Error('Supabase client is not ready');
+    }
+
+    const uid = window.authState?.user?.id;
+    if (!uid) throw new Error('Missing authenticated user id');
+
+    // If the RPC proved incompatible (e.g. missing ::uuid casts on an old schema),
+    // skip it for the rest of the session and write tables directly.
+    if (rpcDisabledForSession) {
+        await saveLegacyHomeConfigFallback(uid, payload, syncedAt);
+        return;
+    }
+
+    const { error } = await db.rpc('sync_home_config', {
         p_payload: {
             ...payload,
             updated_at: syncedAt
         }
     });
-    if (error) throw error;
+    if (!error) return;
+
+    const code = String(error.code || '');
+    const detail = String(error.message || '') + ' ' + String(error.details || '');
+    if (['42804', '42703', '42P01', '42704'].includes(code) || /uuid|type text|type mismatch|does not exist|column .* does not exist|relation .* does not exist/i.test(detail)) {
+        // Deployed RPC predates the latest schema (missing ::uuid casts / columns).
+        // Table sync still works, so disable the RPC for this session and log once.
+        rpcDisabledForSession = true;
+        console.warn('sync_home_config RPC incompatible with the current schema (' + code + '). Using direct table sync for this session. Re-run supabase_folders_migration.sql to re-enable the RPC.');
+    } else {
+        console.warn('sync_home_config failed, falling back to table sync:', compactSupabaseError(error));
+    }
+    await saveLegacyHomeConfigFallback(uid, payload, syncedAt);
 }
 
 async function saveLegacyThemeConfig(uid, settings, syncedAt) {
+    const db = getSupabaseClient();
+    if (!db) {
+        throw new Error('Supabase client is not ready');
+    }
+
     const [themeRes, fontRes] = await Promise.all([
-        supabase.from('user_theme_settings').upsert({
+        db.from('user_theme_settings').upsert({
             user_id: uid,
             theme_settings: settings,
             updated_at: syncedAt
         }, { onConflict: 'user_id' }),
-        supabase.from('user_font_settings').upsert({
+        db.from('user_font_settings').upsert({
             user_id: uid,
             font_settings: {
                 fontChinese: settings.fontChinese || '',
@@ -389,20 +715,36 @@ async function saveLegacyThemeConfig(uid, settings, syncedAt) {
             updated_at: syncedAt
         }, { onConflict: 'user_id' })
     ]);
-    if (themeRes.error) throw themeRes.error;
-    if (fontRes.error) throw fontRes.error;
+    if (themeRes.error && !isMissingRelationError(themeRes.error)) throw themeRes.error;
+    if (fontRes.error && !isMissingRelationError(fontRes.error)) throw fontRes.error;
+
+    if (themeRes.error || fontRes.error) {
+        console.warn('Theme/font table missing, keeping theme metadata in home settings:', compactSupabaseError(themeRes.error || fontRes.error));
+        await writeOptionalTable('theme metadata fallback', () => (
+            db
+                .from('user_home_settings')
+                .upsert({
+                    user_id: uid,
+                    theme: settings.style || 'handdrawn',
+                    updated_at: syncedAt
+                }, { onConflict: 'user_id' })
+        ));
+    }
 }
 
 function buildCurrentHomePayload() {
+    ensureSiteIdsAreUuid();
     const colorMode = document.body.classList.contains('dark') ? 'dark' : 'light';
 
     return {
         sites: (state.sites || []).map(s => ({
             id: s.id,
             name: s.name,
-            url: s.url,
+            url: s.url || '',
             tags: Array.isArray(s.tags) ? s.tags : [],
-            showOnHome: !!s.showOnHome
+            showOnHome: !!s.showOnHome,
+            type: s.type === 'folder' ? 'folder' : 'link',
+            children: s.type === 'folder' ? (Array.isArray(s.children) ? s.children : []) : undefined
         })),
         tags: state.tags || [],
         tag_order: state.tagOrder || [],
@@ -419,8 +761,11 @@ function buildCurrentHomePayload() {
             theme: state.currentTheme || 'handdrawn',
             colorMode,
             fontChinese: window.themeState?.customSettings?.fontChinese || '优设好身体',
-            fontEnglish: window.themeState?.customSettings?.fontEnglish || 'Patrick Hand'
-        }
+            fontEnglish: window.themeState?.customSettings?.fontEnglish || 'Patrick Hand',
+            zoomLevel: state.zoomLevel || '100',
+            openBehavior: state.openBehavior || 'newtab'
+        },
+        workbench: (typeof window.workbench !== 'undefined' && window.workbench) ? window.workbench : undefined
     };
 }
 
@@ -456,6 +801,8 @@ function applyHomeConfig(config) {
     if (Array.isArray(config.tag_order)) state.tagOrder = config.tag_order;
 
     const s = config.settings || {};
+    state.openFolderId = null;
+
     if (typeof s.viewMode === 'string') state.viewMode = s.viewMode;
     if (Number.isFinite(s.engineIndex)) state.engineIndex = s.engineIndex;
     if (typeof s.engineId === 'string') state.engineId = normalizeEngineId(s.engineId);
@@ -472,6 +819,19 @@ function applyHomeConfig(config) {
         } else {
             localStorage.setItem('locale', s.locale);
         }
+    }
+
+    if (typeof s.openBehavior === 'string') {
+        state.openBehavior = s.openBehavior === 'current' ? 'current' : 'newtab';
+        localStorage.setItem('openBehavior', state.openBehavior);
+    }
+
+    if (config.workbench && typeof window.applyRemoteWorkbench === 'function') {
+        window.applyRemoteWorkbench(config.workbench);
+    }
+
+    if (typeof s.zoomLevel === 'string' && window.applyZoomLevel) {
+        window.applyZoomLevel(s.zoomLevel, false);
     }
 
     if (Object.prototype.hasOwnProperty.call(s, 'wallpaper') && window.applyWallpaper) {
@@ -550,7 +910,8 @@ function applyColorConfig(config) {
 // user_home_settings + user_sites + user_tags + user_site_tags + order tables
 // plus user_theme_settings / user_font_settings.
 async function loadUserData(options = {}) {
-    if (!window.authState || !window.authState.isLoggedIn || !supabase) {
+    const db = getSupabaseClient();
+    if (!window.authState || !window.authState.isLoggedIn || !db) {
         return;
     }
 
@@ -649,7 +1010,7 @@ async function loadUserData(options = {}) {
 
 // Aggressive overwrite save for Home Config
 async function saveUserDataToBackend(immediate = true) {
-    if (!window.authState || !window.authState.isLoggedIn || !supabase) return;
+    if (!window.authState || !window.authState.isLoggedIn || !getSupabaseClient()) return false;
 
     const doSync = async () => {
         try {
@@ -657,26 +1018,28 @@ async function saveUserDataToBackend(immediate = true) {
             const syncedAt = new Date().toISOString();
             const payload = buildCurrentHomePayload();
             await persistHomeConfig(uid, payload, syncedAt);
+            return true;
         } catch (err) {
             console.error('Error saving home config:', err);
-            notifySyncStatus('syncSaveFailed', 'Save failed. Your changes were not synced to the cloud yet.', 'error');
+            notifySyncStatus('syncSaveFailed', 'Save failed: ' + String(err?.message || err), 'error');
+            return false;
         }
     };
 
     if (immediate !== false) {
-        await doSync();
-        return;
+        return await doSync();
     }
 
     if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
     syncDebounceTimer = setTimeout(async () => {
         await doSync();
     }, SYNC_DEBOUNCE_MS);
+    return true;
 }
 
 // Specialized save for strictly Color Configurations
 async function saveThemeSettings(settings) {
-    if (!window.authState || !window.authState.isLoggedIn || !supabase) return;
+    if (!window.authState || !window.authState.isLoggedIn || !getSupabaseClient()) return false;
 
     try {
         const uid = window.authState.user.id;
@@ -714,6 +1077,7 @@ async function saveThemeSettings(settings) {
         await saveLegacyThemeConfig(uid, settings, syncedAt);
 
         clearPendingMeta(uid, 'color', syncedAt);
+        return true;
 
     } catch (e) {
         console.error('Error saving color config:', e);
@@ -724,11 +1088,11 @@ async function saveThemeSettings(settings) {
 // Proxies existing API bindings to the new system
 async function saveFontSettings(fontSettings) {
     // Fonts are now embedded inside the Home Config payload
-    await saveUserDataToBackend(true);
+    return await saveUserDataToBackend(true);
 }
 
 async function resetThemeCustomizationOnBackend() {
-    if (!window.authState || !window.authState.isLoggedIn || !supabase) return;
+    if (!window.authState || !window.authState.isLoggedIn || !getSupabaseClient()) return false;
     try {
         const uid = window.authState.user.id;
         const syncedAt = new Date().toISOString();
@@ -744,17 +1108,19 @@ async function resetThemeCustomizationOnBackend() {
         });
         
         window.clearCustomThemeSettings?.();
+        return true;
     } catch (e) {
         console.error('Failed resetting theme', e);
+        return false;
     }
 }
 
 function markHomeConfigUpdated() {
-    saveUserDataToBackend(true);
+    return saveUserDataToBackend(true);
 }
 
 function flushPendingProfileSync() {
-    if (!navigator.onLine || !window.authState?.user || !supabase) {
+    if (!navigator.onLine || !window.authState?.user || !getSupabaseClient()) {
         return Promise.resolve();
     }
 
@@ -803,8 +1169,33 @@ function applyCachedUserData() {
     }
 }
 
+function hydrateCachedConfigFromLastUser() {
+    // Instantly apply the last user's cached config (theme, zoom, sites, workbench...)
+    // so a second open renders immediately, before the remote fetch completes.
+    try {
+        const uid = localStorage.getItem('lastAuthUid');
+        if (!uid) return false;
+        const h = localStorage.getItem(getHomeConfigCacheKey(uid));
+        if (!h) return false;
+        applyHomeConfig(JSON.parse(h));
+        const c = localStorage.getItem(getColorConfigCacheKey(uid));
+        if (c) applyColorConfig(JSON.parse(c));
+        window.renderHome?.();
+        window.renderSearchEngine?.();
+        window.updateAllText?.();
+        window.updateTime?.();
+        window.renderWorkbench?.();
+        return true;
+    } catch (err) {
+        console.warn('Cached config hydration failed:', err);
+        return false;
+    }
+}
+
+window.hydrateCachedConfigFromLastUser = hydrateCachedConfigFromLastUser;
+
 function shouldRefreshUserData() {
-    return !!(window.authState && window.authState.isLoggedIn && supabase && navigator.onLine && !document.hidden);
+    return !!(window.authState && window.authState.isLoggedIn && getSupabaseClient() && navigator.onLine && !document.hidden);
 }
 
 function scheduleUserDataRefresh() {

@@ -71,3 +71,53 @@ npx serve public -l 3000
 
 - 导出 `profiles` 表
 - 对 Storage 做周期性备份（按 bucket 维度）
+
+## 7. Chrome 插件（开发与上架）
+
+### 7.1 本地开发
+
+1. 代码统一在 `public/` 修改，运行 `npm run build:extension` 重新生成 `extension/`
+2. 打开 `chrome://extensions` → 开启「开发者模式」→「加载已解压的扩展程序」→ 选择 `extension/` 目录
+3. 扩展 ID 由 `manifest.json` 的 `key` 字段固定，重装/换机器不变
+
+### 7.2 必需的外部配置
+
+- **Supabase Auth Redirect URL**：登录用 `chrome.identity.launchWebAuthFlow`，redirect 地址为 `https://<extension-id>.chromiumapp.org/`，必须加入 Supabase → Authentication → URL Configuration → Redirect URLs
+- 扩展固定使用生产环境 Supabase 项目（`config.js` 中 `IS_EXTENSION` 分支），与 Web 版共享同一份数据
+- 扩展内 Paddle 支付保持 sandbox 模式（`config.js`），上架前如需收款请切换为 production 并配置对应价格 ID
+
+### 7.3 打包与上架 Chrome Web Store
+
+1. `npm run pack:extension` → 生成 `dist/newtab-extension-<version>.zip`
+2. 上传到 [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole)
+3. 填写商店素材：图标（128x128）、截图（1280x800 或 640x400）、简介、隐私政策（指向 `landing/privacy/`）
+4. 权限说明：`storage`（本地设置缓存）、`identity`（Google 登录）；`host_permissions` 用于访问 Supabase API 与字体 CDN
+5. 上架后 Chrome 商店会分配正式扩展 ID；若与本地 `key` 派生的 ID 不同，需把正式 ID 追加到 Supabase Redirect URLs
+6. 之后每次更新：改 `public/` → `npm run build:extension` → 重新打包上传，版本号统一以 `package.json` 为准
+### 1.3 文件夹 / 缩放字段迁移（2026-08）
+
+新功能（文件夹、缩放比例）需要额外的数据库字段,在 SQL Editor 执行:
+
+- `supabase_folders_migration.sql`
+
+包含:
+
+- `user_sites.type`(link/folder)、`user_sites.children`(子项 id 数组)
+- `user_home_settings.zoom_level`(100/125/150)
+- 更新后的 `sync_home_config` RPC(持久化以上字段)
+
+> 未执行该迁移时,文件夹与缩放仍可本地使用;云端同步会退化为旧 schema(文件夹降级为普通条目),建议部署前先执行。
+### 1.4 工作台 / 打开方式字段迁移（2026-08）
+
+- 同上执行 `supabase_folders_migration.sql`(已包含 `user_home_settings.open_behavior`、`workbench` 字段与更新后的 RPC)
+
+### 8. 个人 Agent 配置
+
+- 聊天请求通过 Vercel Serverless 函数 `api/agent-chat.js` 转发到模型提供商
+- 在 Vercel 项目 Settings → Environment Variables 配置对应 API Key:
+  - `DEEPSEEK_API_KEY`(DeepSeek)
+  - `ARK_API_KEY`(豆包 / 火山方舟)
+  - `DASHSCOPE_API_KEY`(通义千问 / DashScope)
+  - `MINIMAX_API_KEY`(MiniMax)
+- 未配置对应 Key 时,聊天窗口会返回友好提示,不影响其他功能
+- Chrome 插件版请求 `https://newtab.online/api/agent-chat`,需部署后才可用

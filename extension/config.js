@@ -151,6 +151,12 @@ window.GUMROAD_COFFEE_LINK_TEMPLATE = GUMROAD_COFFEE_LINK_TEMPLATE;
 
 window.GOOGLE_CLIENT_ID = GOOGLE_CLIENT_ID;
 
+// Agent chat API endpoint (serverless proxy)
+// Web: same-origin /api/agent-chat; Extension: production site API
+window.AGENT_API_URL = IS_EXTENSION
+  ? 'https://newtab.online/api/agent-chat'
+  : (window.location.origin + '/api/agent-chat');
+
 // Feature Flags
 const FEATURES = {
   enableAutoLogin: true,
