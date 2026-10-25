@@ -3112,14 +3112,52 @@ document.addEventListener('click', (e) => {
 });
 
 // ===== Content Rendering =====
-function getSiteFaviconUrl(url) {
+// Favicon sources, best first. The extension reads Chrome's own favicon cache
+// (offline, no third-party request); the web build tries Google, then DuckDuckGo.
+function getFaviconSources(url) {
+  let host = '';
   try {
-    const u = new URL(String(url || ''), window.location.href);
-    if (!u.hostname) return '';
-    return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(u.hostname) + '&sz=64';
+    host = new URL(String(url || ''), window.location.href).hostname;
   } catch (_err) {
-    return '';
+    return [];
   }
+  if (!host) return [];
+  const sources = [];
+  if (typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION && typeof chrome !== 'undefined' && chrome.runtime?.getURL) {
+    sources.push(chrome.runtime.getURL('/_favicon/?pageUrl=' + encodeURIComponent(url) + '&size=64'));
+  }
+  sources.push('https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=128');
+  sources.push('https://icons.duckduckgo.com/ip3/' + encodeURIComponent(host) + '.ico');
+  return sources;
+}
+
+function getSiteFaviconUrl(url) {
+  return getFaviconSources(url)[0] || '';
+}
+
+// Walks the source list on error. A tiny first hit (Google's 16px globe for
+// unknown sites) is kept as a fallback while a sharper source is tried.
+function loadFavicon(img, sources, onFail) {
+  let i = 0;
+  let lowRes = '';
+  img.onload = () => {
+    if (img.naturalWidth < 32 && i < sources.length - 1) {
+      lowRes = lowRes || img.src;
+      img.src = sources[++i];
+    }
+  };
+  img.onerror = () => {
+    if (i < sources.length - 1) {
+      img.src = sources[++i];
+    } else if (lowRes) {
+      i = sources.length;
+      img.src = lowRes;
+      lowRes = '';
+    } else {
+      onFail();
+    }
+  };
+  img.src = sources[0];
 }
 
 function getSiteInitial(site) {
@@ -3129,42 +3167,55 @@ function getSiteInitial(site) {
 
 function createFaviconIcon(site) {
   const icon = document.createElement('div');
-  icon.className = 'site-tile-icon';
+  icon.className = 'site-tile-icon glass';
 
   const letter = document.createElement('span');
   letter.className = 'site-tile-letter';
   letter.textContent = getSiteInitial(site);
   icon.appendChild(letter);
 
-  const faviconUrl = getSiteFaviconUrl(site.url);
-  if (faviconUrl) {
-    const img = document.createElement('img');
-    img.className = 'site-tile-favicon';
-    img.loading = 'lazy';
-    img.alt = '';
-    img.src = faviconUrl;
-    img.onerror = () => {
-      img.remove();
-      letter.style.display = 'flex';
-    };
-    icon.appendChild(img);
+  const sources = getFaviconSources(site.url);
+  if (!sources.length) {
+    icon.classList.add('is-letter');
+    return icon;
   }
+  const img = document.createElement('img');
+  img.className = 'site-tile-favicon';
+  img.loading = 'lazy';
+  img.alt = '';
+  icon.appendChild(img);
+  loadFavicon(img, sources, () => {
+    img.remove();
+    icon.classList.add('is-letter');
+  });
   return icon;
 }
 
-function createFolderIcon(count) {
+function createFolderIcon(children) {
   const icon = document.createElement('div');
-  icon.className = 'site-tile-icon folder-tile-icon';
-  icon.innerHTML =
-    '<svg class="folder-svg" viewBox="0 0 24 24" aria-hidden="true">' +
-    '<path d="M3 6.5C3 5.67 3.67 5 4.5 5h4.6c.42 0 .82.17 1.1.46l1.2 1.24c.28.29.68.46 1.1.46H19.5c.83 0 1.5.67 1.5 1.5v8c0 .83-.67 1.5-1.5 1.5h-15C3.67 18 3 17.33 3 16.5v-10z"/>' +
-    '</svg>';
-  if (count > 0) {
-    const badge = document.createElement('span');
-    badge.className = 'folder-count';
-    badge.textContent = count > 99 ? '99+' : String(count);
-    icon.appendChild(badge);
-  }
+  icon.className = 'site-tile-icon folder-tile-icon glass';
+  children.slice(0, 9).forEach((child) => {
+    const mini = document.createElement('span');
+    mini.className = 'folder-mini';
+    const sources = getFaviconSources(child.url);
+    const showLetter = () => {
+      mini.textContent = getSiteInitial(child);
+      mini.classList.add('is-letter');
+    };
+    if (sources.length) {
+      const img = document.createElement('img');
+      img.alt = '';
+      img.loading = 'lazy';
+      mini.appendChild(img);
+      loadFavicon(img, sources, () => {
+        img.remove();
+        showLetter();
+      });
+    } else {
+      showLetter();
+    }
+    icon.appendChild(mini);
+  });
   return icon;
 }
 
@@ -3183,8 +3234,7 @@ function createSiteTile(site, index, source) {
   tile.dataset.id = site.id;
   tile.title = site.name || '';
 
-  const children = isFolder ? (Array.isArray(site.children) ? site.children : []) : [];
-  tile.appendChild(isFolder ? createFolderIcon(children.length) : createFaviconIcon(site));
+  tile.appendChild(isFolder ? createFolderIcon(getFolderChildren(site)) : createFaviconIcon(site));
 
   const name = document.createElement('span');
   name.className = 'site-tile-name';
@@ -3247,9 +3297,11 @@ function renderHome() {
     ? state.tagOrder.filter((tag) => state.tags.includes(tag))
     : state.tags;
 
+  const tagRow = document.createElement('div');
+  tagRow.className = 'tag-row';
   orderedTags.forEach((tag, index) => {
     const chip = document.createElement('div');
-    chip.className = 'chip tag';
+    chip.className = 'chip tag glass glass--capsule glass--clear';
     chip.textContent = '# ' + tag;
     chip.onclick = () => openTagView(tag);
     chip.oncontextmenu = (e) => showContextMenu(e, tag, 'tag');
@@ -3258,8 +3310,9 @@ function renderHome() {
     chip.addEventListener('dragover', handleDragOver);
     chip.addEventListener('drop', (e) => handleDrop(e, tag, 'tag'));
     chip.addEventListener('dragend', handleDragEnd);
-    contentEl.appendChild(chip);
+    tagRow.appendChild(chip);
   });
+  if (tagRow.children.length) contentEl.appendChild(tagRow);
 
   // 2. Sites grid (favicon tiles + folder tiles)
   const grid = document.createElement('div');
@@ -3271,8 +3324,9 @@ function renderHome() {
   // 3. Add tile
   const addTile = document.createElement('div');
   addTile.className = 'site-tile add-tile';
+  addTile.title = i18n.t('addSite') || 'Add Site';
   addTile.innerHTML =
-    '<div class="site-tile-icon add-tile-icon"><span class="add-glyph">＋</span></div>' +
+    '<div class="site-tile-icon add-tile-icon glass glass--clear"><svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></div>' +
     '<span class="site-tile-name"></span>';
   addTile.onclick = openAddSiteModal;
   grid.appendChild(addTile);
@@ -3284,8 +3338,10 @@ function renderFolderView(folder) {
   const header = document.createElement('div');
   header.className = 'folder-header';
   const backBtn = document.createElement('button');
-  backBtn.className = 'folder-back-btn';
-  backBtn.textContent = '← ' + (i18n.t('back') || 'Back');
+  backBtn.type = 'button';
+  backBtn.className = 'folder-back-btn glass glass--capsule glass--interactive';
+  backBtn.innerHTML = '<svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
+  backBtn.append(i18n.t('back') || 'Back');
   backBtn.onclick = closeFolder;
   const title = document.createElement('span');
   title.className = 'folder-title';
@@ -3559,6 +3615,8 @@ function updateSettingsMenu() {
   if (modeText) modeText.textContent = i18n.t('mode') || '模式';
   if (wallpaperText) wallpaperText.textContent = i18n.t('wallpaper') || 'Wallpaper';
   if (settingsText) settingsText.textContent = i18n.t('settings') || 'Settings';
+  settingsToggle?.setAttribute('aria-label', i18n.t('settings') || 'Settings');
+  document.getElementById('toolbarAddBtn')?.setAttribute('aria-label', i18n.t('addSite') || 'Add Site');
   syncSettingsModalUI?.();
   syncModeSubmenuUI?.();
 }
@@ -3568,11 +3626,13 @@ function closeSettingsLayers(options = {}) {
   modeSubmenu?.classList.add('hidden');
   if (!keepMenuOpen) {
     settingsMenu?.classList.add('hidden');
+    settingsToggle?.setAttribute('aria-expanded', 'false');
   }
 }
 
 function openSettingsMenu() {
   settingsMenu?.classList.remove('hidden');
+  settingsToggle?.setAttribute('aria-expanded', 'true');
 }
 
 function toggleSettingsMenu() {
@@ -3606,6 +3666,12 @@ function syncModeSubmenuUI() {
 }
 
 window.closeSettingsLayers = closeSettingsLayers;
+
+document.getElementById('toolbarAddBtn')?.addEventListener('click', (e) => {
+  e.stopPropagation();
+  closeSettingsLayers();
+  openAddSiteModal();
+});
 
 settingsToggle.addEventListener('click', (e) => {
   e.stopPropagation();
@@ -5244,6 +5310,9 @@ try {
 } catch (_err) { /* ignore */ }
 applyZoomLevel(state.zoomLevel, false);
 setupPager();
+// Edge refraction on the toolbar, search and page dots (Chromium only; skipped
+// when the user asked the system for less transparency).
+if (!window.matchMedia?.('(prefers-reduced-transparency: reduce)').matches) window.LiquidGlass?.enable();
 window.initWorkbench?.();
 searchInput.focus();
 updateAllText();

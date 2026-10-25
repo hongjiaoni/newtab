@@ -1,0 +1,653 @@
+/* =====================================================================
+ * NewTab home page — Liquid Glass
+ * Wallpaper, clock, search, app-icon site tiles, folders, the top-right
+ * toolbar and the floating menus. Built only from tokens.css / glass.css.
+ * ===================================================================== */
+
+/* ---------- Wallpaper ----------
+ * wallpaper.js paints a chosen wallpaper inline on <body>; without one the
+ * built-in mesh below shows. body[data-wallpaper-tone="light"] flips the text
+ * that sits directly on the wallpaper to dark ink. */
+:root {
+  --default-wallpaper:
+    radial-gradient(45% 55% at 15% 20%, #ffb38a 0%, transparent 70%),
+    radial-gradient(50% 60% at 85% 15%, #8f7bff 0%, transparent 72%),
+    radial-gradient(55% 65% at 75% 90%, #3cc6d6 0%, transparent 70%),
+    radial-gradient(45% 55% at 15% 90%, #ff7aa2 0%, transparent 70%),
+    linear-gradient(135deg, #4a56a8, #2a8fb0);
+}
+
+:root[data-appearance="dark"] {
+  --default-wallpaper:
+    radial-gradient(45% 55% at 15% 20%, #7a3e2c 0%, transparent 70%),
+    radial-gradient(50% 60% at 85% 15%, #3b2f8a 0%, transparent 72%),
+    radial-gradient(55% 65% at 75% 90%, #0f5a66 0%, transparent 70%),
+    radial-gradient(45% 55% at 15% 90%, #6b2340 0%, transparent 70%),
+    linear-gradient(135deg, #14183a, #0b2a3a);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-appearance="light"]) {
+    --default-wallpaper:
+      radial-gradient(45% 55% at 15% 20%, #7a3e2c 0%, transparent 70%),
+      radial-gradient(50% 60% at 85% 15%, #3b2f8a 0%, transparent 72%),
+      radial-gradient(55% 65% at 75% 90%, #0f5a66 0%, transparent 70%),
+      radial-gradient(45% 55% at 15% 90%, #6b2340 0%, transparent 70%),
+      linear-gradient(135deg, #14183a, #0b2a3a);
+  }
+}
+
+body {
+  background-color: var(--surface-base);
+  background-image: var(--default-wallpaper);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+body[data-wallpaper-tone="light"] {
+  --on-wallpaper: rgba(0, 0, 0, 0.84);
+  --on-wallpaper-shadow: 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+/* ---------- Home layout ---------- */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 920px;
+  padding: var(--space-16) var(--space-6) calc(var(--space-16) + var(--space-6));
+  text-align: center;
+}
+
+.page-home .container > .time + .date {
+  margin-top: calc(-1 * var(--space-8) + var(--space-2));
+}
+
+/* ---------- Clock ---------- */
+.time {
+  font: var(--text-clock);
+  font-size: clamp(72px, 9vw, 112px);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-wallpaper);
+  text-shadow: var(--on-wallpaper-shadow);
+  cursor: default;
+  user-select: none;
+}
+
+.date {
+  font: var(--text-title3);
+  font-weight: 500;
+  color: var(--on-wallpaper);
+  text-shadow: var(--on-wallpaper-shadow);
+  opacity: 0.92;
+  cursor: default;
+  user-select: none;
+}
+
+/* ---------- Search (glass capsule) ---------- */
+.search-box {
+  z-index: 10; /* above the tile grid so the engine menu can overlap it */
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: min(640px, 100%);
+  height: var(--control-lg);
+  padding: 0 var(--space-4) 0 var(--space-2);
+  border-radius: var(--radius-capsule);
+}
+
+.search-box:focus-within {
+  box-shadow:
+    0 0 0 0.5px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-rim),
+    0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent),
+    var(--glass-shadow);
+}
+
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  box-shadow: none;
+  font: 400 16px/1 var(--font-text);
+  color: var(--glass-label);
+}
+
+.search-box input::placeholder {
+  color: var(--glass-label-2);
+  opacity: 1;
+}
+
+.search-engine {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 40px;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border-radius: var(--radius-capsule);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.search-engine:hover {
+  background: var(--glass-hover);
+}
+
+.search-engine::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 6px;
+  border-right: 1.75px solid var(--glass-label-2);
+  border-bottom: 1.75px solid var(--glass-label-2);
+  transform: rotate(45deg);
+}
+
+#engineIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  object-fit: contain;
+}
+
+/* ---------- Floating menus ----------
+ * Menus that live inside another glass element (engine menu, mode submenu)
+ * cannot blur the page behind it — Chrome scopes backdrop-filter to the
+ * nearest glass ancestor — so they use a near-opaque surface instead. */
+.settings-menu,
+.context-menu,
+.page-context-menu {
+  background: var(--glass-tint-thick);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+.engine-menu,
+.settings-submenu {
+  background: color-mix(in srgb, var(--surface-raised) 96%, transparent);
+}
+
+.settings-menu,
+.settings-submenu,
+.engine-menu,
+.context-menu,
+.page-context-menu {
+  padding: var(--space-1);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 0 0 0.5px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-rim),
+    var(--glass-shadow-lifted);
+  color: var(--label-1);
+  font: var(--text-body);
+  text-align: left;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-spring),
+    visibility 0s linear 0s;
+}
+
+.settings-menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  min-width: 220px;
+  z-index: 100;
+  transform-origin: top right;
+}
+
+.settings-submenu {
+  position: absolute;
+  top: calc(-1 * var(--space-1));
+  right: calc(100% + var(--space-2));
+  min-width: 150px;
+  z-index: 101;
+  transform-origin: top right;
+}
+
+.engine-menu {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  left: 0;
+  z-index: 100;
+  width: max-content;
+  min-width: 200px;
+  transform-origin: top left;
+}
+
+.context-menu {
+  position: fixed;
+  min-width: 160px;
+  z-index: 2000;
+  transform-origin: top left;
+}
+
+.page-context-menu {
+  position: fixed;
+  min-width: 160px;
+  z-index: 10000;
+  transform-origin: top left;
+}
+
+.settings-menu.hidden,
+.settings-submenu.hidden,
+.context-menu.hidden,
+.page-context-menu.hidden {
+  display: block !important;
+}
+
+.engine-menu.hidden {
+  display: block !important;
+}
+
+.settings-menu.hidden,
+.settings-submenu.hidden,
+.engine-menu.hidden,
+.context-menu.hidden,
+.page-context-menu.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.94);
+  transition:
+    opacity var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-spring),
+    visibility 0s linear var(--dur-base);
+}
+
+/* Menu rows */
+.settings-menu-item,
+.settings-submenu div,
+.context-menu-item,
+.engine-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-xs);
+  color: var(--label-1);
+  font: var(--text-body);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.settings-menu-item:hover,
+.settings-submenu div:hover,
+.context-menu-item:hover,
+.engine-option:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.settings-menu-item:hover .user-info-menu,
+.settings-menu-item:hover .membership-badge {
+  color: inherit;
+}
+
+.settings-menu-divider,
+.context-menu-divider,
+.engine-menu-divider {
+  height: 0.5px;
+  margin: var(--space-1) var(--space-3);
+  background: var(--separator);
+}
+
+/* Current value in the Mode submenu (set inline by syncModeSubmenuUI) */
+#modeMenuItem::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
+  border-left: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.5;
+}
+
+.user-info-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.user-info-menu img {
+  flex: none;
+}
+
+/* Engine menu rows */
+.engine-option-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 34px;
+}
+
+.engine-option img {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.engine-option.active .engine-option-main::after {
+  content: "";
+  width: 5px;
+  height: 9px;
+  margin-left: auto;
+  border: solid currentColor;
+  border-width: 0 2px 2px 0;
+  transform: translateY(-1px) rotate(45deg);
+}
+
+.engine-remove {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-right: calc(-1 * var(--space-1));
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.engine-remove:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.engine-add {
+  padding: 0;
+}
+
+.engine-add-btn {
+  width: 100%;
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-xs);
+  background: transparent;
+  box-shadow: none;
+  color: var(--accent);
+  font: var(--text-body);
+  text-align: left;
+}
+
+.engine-add-btn:hover {
+  background: var(--fill-3);
+}
+
+/* ---------- Top-right toolbar ---------- */
+.top-right-controls {
+  position: fixed;
+  top: var(--space-5);
+  right: var(--space-5);
+  z-index: 3000;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-1);
+}
+
+.toolbar .icon-btn[aria-expanded="true"] {
+  background: var(--glass-press);
+}
+
+/* ---------- Content: tags + site grid ---------- */
+.content-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-capsule);
+  font: var(--text-subhead);
+  cursor: pointer;
+  user-select: none;
+  transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-standard);
+}
+
+.chip:hover {
+  background-color: color-mix(in srgb, var(--glass-tint-clear), var(--glass-hover));
+}
+
+.chip:active {
+  transform: scale(0.95);
+}
+
+.chip.dragging {
+  opacity: 0.5;
+}
+
+.sites-grid {
+  /* auto-fit collapses unused tracks, so a short row stays centered; the
+     max-width caps a row at 8 icons (8 x 88 + 7 x 16 = 816px). */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 88px);
+  gap: var(--space-5) var(--space-4);
+  justify-content: center;
+  width: 100%;
+  max-width: 816px;
+}
+
+@media (max-width: 640px) {
+  .sites-grid { grid-template-columns: repeat(auto-fit, 76px); gap: var(--space-4) var(--space-2); }
+}
+
+/* App-icon tile: glass plate + favicon, name below in wallpaper ink */
+.site-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-drag: element;
+}
+
+.site-tile.dragging {
+  opacity: 0.45;
+}
+
+.site-tile-icon {
+  display: grid;
+  place-items: center;
+  width: var(--icon-tile);
+  height: var(--icon-tile);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-standard);
+}
+
+.site-tile:hover .site-tile-icon {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.site-tile:active .site-tile-icon {
+  transform: scale(0.94);
+}
+
+.site-tile-favicon {
+  position: relative;
+  z-index: 2;
+  width: var(--icon-glyph);
+  height: var(--icon-glyph);
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+/* Letter fallback when no favicon could be loaded */
+.site-tile-letter {
+  display: none;
+}
+
+.site-tile-icon.is-letter {
+  background: linear-gradient(135deg, var(--letter-a, #7c6cf0), var(--letter-b, #4f8ef7));
+}
+
+.site-tile-icon.is-letter .site-tile-letter {
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  font: 600 26px/1 var(--font-rounded);
+  color: #fff;
+}
+
+.site-tile-name {
+  max-width: 100%;
+  overflow: hidden;
+  font: var(--text-subhead);
+  color: var(--on-wallpaper);
+  text-shadow: var(--on-wallpaper-shadow);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Folder: glass plate with a 3x3 grid of member icons, like iOS */
+.folder-tile-icon {
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 4px;
+  padding: 10px;
+  place-items: stretch;
+}
+
+.folder-mini {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.folder-mini img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.folder-mini.is-letter {
+  background: var(--fill-1);
+  font: 600 8px/1 var(--font-rounded);
+  color: var(--glass-label);
+}
+
+/* Add tile: clear glass with a plus */
+.add-tile-icon {
+  color: var(--glass-label);
+}
+
+.add-tile-icon .sym {
+  position: relative;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+}
+
+/* ---------- Open folder view ---------- */
+.folder-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.folder-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  height: var(--control-md);
+  padding: 0 var(--space-4) 0 var(--space-3);
+  border: 0;
+  font: var(--text-headline);
+  color: var(--glass-label);
+  cursor: pointer;
+}
+
+.folder-back-btn .sym {
+  position: relative;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+}
+
+.folder-title {
+  font: var(--text-title2);
+  color: var(--on-wallpaper);
+  text-shadow: var(--on-wallpaper-shadow);
+}
+
+.folder-empty-hint {
+  grid-column: 1 / -1;
+  max-width: 420px;
+  padding: var(--space-4) var(--space-5);
+  font: var(--text-callout);
+  color: var(--glass-label-2);
+  line-height: 1.5;
+}
+
+.home-footer {
+  color: var(--on-wallpaper);
+  text-shadow: var(--on-wallpaper-shadow);
+}
+
+.to-workspace {
+  color: var(--glass-label);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-menu,
+  .settings-submenu,
+  .engine-menu,
+  .context-menu,
+  .page-context-menu,
+  .site-tile-icon,
+  .chip {
+    transition: none !important;
+  }
+}

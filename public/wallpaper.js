@@ -99,22 +99,50 @@ async function initializeWallpaper() {
   }
 }
 
-function previewWallpaper(wallpaperId) {
-  if (!wallpaperId) {
-    document.body.style.backgroundImage = '';
-    document.body.style.backgroundColor = '';
-    return;
-  }
-
-  if (wallpaperId.startsWith('#') || wallpaperId.startsWith('rgb')) {
-    document.body.style.backgroundColor = wallpaperId;
-    document.body.style.backgroundImage = '';
+// Relative luminance (0..1) of a #hex or rgb() color, or null if unparsable.
+function wallpaperColorLuminance(color) {
+  let rgb = null;
+  const hex = String(color).trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hex) {
+    const h = hex[1].length === 3 ? hex[1].replace(/./g, '$&$&') : hex[1];
+    rgb = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
   } else {
-    document.body.style.backgroundImage = `url('${wallpaperId}')`;
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundAttachment = 'fixed';
+    const m = String(color).match(/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/i);
+    if (m) rgb = [m[1], m[2], m[3]].map(Number);
   }
+  if (!rgb) return null;
+  const [r, g, b] = rgb.map((v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+// Paints a wallpaper on <body>. No id falls back to the built-in mesh in
+// home.css; a solid color must also clear that mesh image. The tone tells the
+// clock and icon labels whether to use white or dark ink.
+function paintWallpaper(wallpaperId) {
+  const style = document.body.style;
+  let tone = 'dark';
+  if (!wallpaperId) {
+    style.backgroundImage = '';
+    style.backgroundColor = '';
+  } else if (wallpaperId.startsWith('#') || wallpaperId.startsWith('rgb')) {
+    style.backgroundColor = wallpaperId;
+    style.backgroundImage = 'none';
+    const lum = wallpaperColorLuminance(wallpaperId);
+    if (lum !== null && lum > 0.45) tone = 'light';
+  } else {
+    style.backgroundImage = `url('${wallpaperId}')`;
+    style.backgroundSize = 'cover';
+    style.backgroundPosition = 'center';
+    style.backgroundAttachment = 'fixed';
+  }
+  document.body.dataset.wallpaperTone = tone;
+}
+
+function previewWallpaper(wallpaperId) {
+  paintWallpaper(wallpaperId);
 }
 
 // Load categories from Supabase
@@ -201,23 +229,12 @@ function applyWallpaper(wallpaperId, options = {}) {
     return true;
   };
 
+  paintWallpaper(wallpaperId);
   if (!wallpaperId) {
-    document.body.style.backgroundImage = '';
-    document.body.style.backgroundColor = '';
     wallpaperState.selectedWallpaper = null;
     localStorage.removeItem('selectedWallpaper');
 
     return syncWallpaperSelection();
-  }
-
-  if (wallpaperId.startsWith('#') || wallpaperId.startsWith('rgb')) {
-    document.body.style.backgroundColor = wallpaperId;
-    document.body.style.backgroundImage = '';
-  } else {
-    document.body.style.backgroundImage = `url('${wallpaperId}')`;
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundAttachment = 'fixed';
   }
 
   wallpaperState.selectedWallpaper = wallpaperId;

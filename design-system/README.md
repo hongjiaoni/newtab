@@ -8,6 +8,7 @@ NewTab 的视觉和交互规范，参照 Apple Human Interface Guidelines 与 20
 | `public/tokens.css` | 设计变量：字体、字号、间距、圆角、颜色、玻璃材质、动效，含浅色/深色与无障碍覆盖 |
 | `public/glass.css` | 玻璃材质和基础组件：按钮、图标按钮、分段控件、开关、输入框、菜单、图标块、组件卡片、页面指示点 |
 | `public/glass.js` | 折射效果（渐进增强）：仅 Chromium 内核启用，其他浏览器保持普通毛玻璃 |
+| `public/home.css` | 首页：默认壁纸、时钟、玻璃搜索框、App 图标、文件夹、右上角工具栏、玻璃菜单 |
 | `public/appearance.js` | 外观切换（浅色/深色/自动），在 `<head>` 中加载以避免闪烁 |
 | `design-system/preview.html` | 视觉样张：首页 + 工作站 + 设置菜单 + 添加网站弹窗 |
 
@@ -125,7 +126,7 @@ NewTab 的视觉和交互规范，参照 Apple Human Interface Guidelines 与 20
 | `themes.js`、`data-style` 分支、`sketchy` 样式 | 已删除（阶段 2），改用 `tokens.css` + `glass.css` |
 | 手绘字体、Google Fonts、中文字体 CDN | 已删除（阶段 2），改用系统字体 |
 | `body.dark` | `html[data-appearance]` + `appearance.js`，支持跟随系统；`body.dark` 仍同步，供旧样式过渡 |
-| `.site-tile` / `.site-tile-icon` | `.tile` / `.tile-icon.glass` |
-| `.settings-menu` 汉堡菜单 | 右上角工具栏 `.toolbar` + 设置菜单 `.settings.menu` |
-| `.modal` | `.scrim > .sheet.glass--thick` |
+| `.site-tile` / `.site-tile-icon` | 保留类名，图标加 `.glass`，样式在 `home.css`（阶段 4） |
+| `.settings-menu` 汉堡菜单 | 右上角工具栏 `.toolbar`（＋ / 齿轮）+ 玻璃菜单 `.settings-menu`（阶段 4） |
+| `.modal` | 厚玻璃样式直接用在 `.modal` 上（阶段 4） |
 | 横向两屏 `#screens` | 纵向翻页 `.pager > .page` |

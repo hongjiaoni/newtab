@@ -28,6 +28,8 @@ export const COPY_FILES = [
   'pager.js',
   'tokens.css',
   'glass.css',
+  'glass.js',
+  'home.css',
   'script.js',
   'style.css',
   'wallpaper-modal.css',

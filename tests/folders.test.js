@@ -41,7 +41,9 @@ function extractFunction(src, name) {
 }
 
 const FUNCS = [
+  'getFaviconSources',
   'getSiteFaviconUrl',
+  'loadFavicon',
   'getSiteInitial',
   'createFaviconIcon',
   'createFolderIcon',
@@ -131,12 +133,26 @@ describe('site tiles rendering', () => {
     expect(tiles[0].querySelector('.site-tile-icon')).toBeTruthy();
   });
 
-  it('renders folder tiles with count badge', () => {
+  it('renders folder tiles as a grid of member icons', () => {
     ctx.renderHome();
     const folderTile = ctx.contentEl.querySelector('.site-tile.folder-tile');
     expect(folderTile).toBeTruthy();
-    expect(folderTile.querySelector('.folder-count').textContent).toBe('1');
-    expect(folderTile.querySelector('.folder-svg')).toBeTruthy();
+    const minis = folderTile.querySelectorAll('.folder-tile-icon .folder-mini');
+    expect(minis.length).toBe(1);
+    expect(minis[0].querySelector('img').src).toContain('google.com');
+  });
+
+  it('falls back through favicon sources, then to the letter tile', () => {
+    ctx.renderHome();
+    const icon = ctx.contentEl.querySelector('.site-tile.link-tile .site-tile-icon');
+    const img = icon.querySelector('img.site-tile-favicon');
+    expect(img.src).toContain('google.com/s2/favicons');
+    img.dispatchEvent(new Event('error'));
+    expect(img.src).toContain('icons.duckduckgo.com');
+    img.dispatchEvent(new Event('error'));
+    expect(icon.querySelector('img')).toBeNull();
+    expect(icon.classList.contains('is-letter')).toBe(true);
+    expect(icon.querySelector('.site-tile-letter').textContent).toBe('G');
   });
 
   it('renders folder view with back button when open', () => {

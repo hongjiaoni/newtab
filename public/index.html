@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="glass.css?v=20261025-glass" />
   <link rel="stylesheet" href="style.css?v=20261025-glass" />
   <link rel="stylesheet" href="wallpaper-modal.css?v=20261025-glass" />
+  <link rel="stylesheet" href="home.css?v=20261025-glass" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260131">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20260131">
   <link rel="shortcut icon" href="/favicon.png?v=20260131">
@@ -29,14 +30,18 @@
 
 <body>
 
-  <!-- Settings Menu in top-right -->
+  <!-- Top-right toolbar. The menu is a sibling of the glass capsule, not a
+       child: a nested backdrop-filter would only blur the capsule itself. -->
   <div class="top-right-controls">
-    <button id="settingsToggle" class="settings-btn hamburger-btn" aria-label="Menu">
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-      <span class="hamburger-line"></span>
-    </button>
-    <div id="settingsMenu" class="settings-menu hidden">
+    <div class="toolbar glass glass--capsule" data-refract>
+      <button type="button" id="toolbarAddBtn" class="icon-btn" aria-label="添加网站">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+      </button>
+      <button type="button" id="settingsToggle" class="icon-btn settings-btn" aria-label="设置" aria-haspopup="menu" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
+      </button>
+    </div>
+    <div id="settingsMenu" class="settings-menu hidden" role="menu">
       <div class="settings-menu-item" id="modeMenuItem">
         <span id="modeMenuText">模式</span>
         <div id="modeSubmenu" class="settings-submenu hidden">
@@ -82,7 +87,7 @@
         <div id="time" class="time">00:00</div>
         <div id="date" class="date"></div>
 
-        <form id="searchForm" class="search-box">
+        <form id="searchForm" class="search-box glass glass--capsule" data-refract>
           <div id="searchEngine" class="search-engine">
             <img id="engineIcon" src="" alt="Engine" />
             <div id="engineMenu" class="engine-menu hidden">
@@ -119,7 +124,7 @@
     </section>
   </main>
 
-  <nav id="pagerDots" class="pager-dock glass glass--capsule glass--clear" aria-label="Pages">
+  <nav id="pagerDots" class="pager-dock glass glass--capsule glass--clear" data-refract aria-label="Pages">
     <div class="pager-dots">
       <button type="button" id="dotHome" aria-label="首页" aria-current="true"></button>
       <button type="button" id="dotWorkspace" aria-label="工作台" aria-current="false"></button>
@@ -450,6 +455,7 @@
   <script src="membership.js?v=20261025-glass"></script>
   <script src="auth.js?v=20261025-glass"></script>
   <script src="data-sync.js?v=20261025-glass"></script>
+  <script src="glass.js?v=20261025-glass"></script>
   <script src="pager.js?v=20261025-glass"></script>
   <script src="/script.js?v=20261025-glass"></script>
 </body>

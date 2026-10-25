@@ -90,9 +90,10 @@
   }
 
   function applyTo(el) {
-    const rect = el.getBoundingClientRect();
-    const w = Math.round(rect.width);
-    const h = Math.round(rect.height);
+    // Layout size, not getBoundingClientRect(): the latter is scaled by CSS
+    // zoom (the app zooms <html>), which would leave part of the element unfiltered.
+    const w = el.offsetWidth;
+    const h = el.offsetHeight;
     if (!w || !h) return;
     const css = getComputedStyle(el);
     const radius = parseFloat(css.borderTopLeftRadius) || 0;

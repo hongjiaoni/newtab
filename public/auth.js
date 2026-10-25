@@ -407,8 +407,7 @@ function signOutLocally() {
   // Reset wallpaper
   if (window.wallpaperState) {
     window.wallpaperState.selectedWallpaper = null;
-    document.body.style.backgroundImage = '';
-    document.body.style.backgroundColor = '';
+    if (window.previewWallpaper) window.previewWallpaper(null);
   }
 
   // Clear chrome.storage.local in extension mode, then reload
