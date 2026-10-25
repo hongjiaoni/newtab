@@ -1823,7 +1823,6 @@ let ENGINE_CATALOG = [
   { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo', ja: 'Yahoo!' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://www.google.com/s2/favicons?domain=yahoo.com&sz=64' },
   { id: 'yandex', name: { zh: 'Yandex', en: 'Yandex' }, url: 'https://yandex.com/search/?text=', icon: 'https://yandex.com/favicon.ico' },
   { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
-  { id: 'brave', name: { zh: 'Brave', en: 'Brave' }, url: 'https://search.brave.com/search?q=', icon: 'https://brave.com/static-assets/images/brave-logo-sans-text.svg' },
   { id: 'startpage', name: { zh: 'Startpage', en: 'Startpage' }, url: 'https://www.startpage.com/sp/search?query=', icon: 'https://www.startpage.com/favicon.ico' },
 
   // Chinese Specific
@@ -1839,14 +1838,10 @@ let ENGINE_CATALOG = [
   // Dev / Tech
   { id: 'github', name: { zh: 'GitHub', en: 'GitHub' }, url: 'https://github.com/search?q=', icon: 'https://github.com/favicon.ico' },
   { id: 'stackoverflow', name: { zh: 'StackOverflow', en: 'StackOverflow' }, url: 'https://stackoverflow.com/search?q=', icon: 'https://stackoverflow.com/favicon.ico' },
-  { id: 'npm', name: { zh: 'NPM', en: 'NPM' }, url: 'https://www.npmjs.com/search?q=', icon: 'https://static.npmjs.com/b0f1a8318363185cc2ea6a40ac23eeb2.png' },
-  { id: 'mdn', name: { zh: 'MDN', en: 'MDN' }, url: 'https://developer.mozilla.org/search?q=', icon: 'https://developer.mozilla.org/favicon.ico' },
 
   // Social / Media
-  { id: 'youtube', name: { zh: 'YouTube', en: 'YouTube' }, url: 'https://www.youtube.com/results?search_query=', icon: 'https://www.youtube.com/favicon.ico' },
   { id: 'twitter', name: { zh: 'Twitter', en: 'Twitter' }, url: 'https://twitter.com/search?q=', icon: 'https://abs.twimg.com/favicons/twitter.2.ico' },
   { id: 'reddit', name: { zh: 'Reddit', en: 'Reddit' }, url: 'https://www.reddit.com/search/?q=', icon: 'https://www.reddit.com/favicon.ico' },
-  { id: 'pinterest', name: { zh: 'Pinterest', en: 'Pinterest' }, url: 'https://www.pinterest.com/search/pins/?q=', icon: 'https://www.pinterest.com/favicon.ico' },
   { id: 'instagram', name: { zh: 'Instagram', en: 'Instagram' }, url: 'https://www.instagram.com/explore/tags/', icon: 'https://www.instagram.com/favicon.ico' },
 
   // Knowledge
@@ -1861,6 +1856,8 @@ let ENGINE_CATALOG = [
 ];
 
 const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
+// Offered nowhere, even when the server list still has them
+const HIDDEN_ENGINE_IDS = new Set(['youtube', 'pinterest', 'npm', 'mdn', 'brave']);
 
 // Engine names exist in zh and en (a few carry more); other UI languages use
 // the English (brand) name.
@@ -1915,6 +1912,7 @@ async function loadGlobalEngineCatalog() {
     const list = rows
       .filter((r) => r && r.id && r.url)
       .filter((r) => r.is_active !== false)
+      .filter((r) => !HIDDEN_ENGINE_IDS.has(String(r.id)))
       .map((r) => ({
         id: String(r.id),
         name: {
@@ -2763,6 +2761,7 @@ function renderEngineQuickList() {
 function openEngineModal() {
   const engineModal = document.getElementById('engineModal');
   if (!engineModal) return;
+  engineMenu?.classList.add('hidden'); // one glass layer at a time
   engineModal.classList.remove('hidden');
 
   // Ensure the shared overlay is not blocking clicks
@@ -2804,7 +2803,17 @@ function toggleEngineSelection(id) {
     }
     enginePageState.selectedIds.push(id);
   }
-  renderEngineModal();
+  syncEngineModalSelection();
+}
+
+// Updates checks and the count without rebuilding the grid, so the icons are
+// not reloaded on every click.
+function syncEngineModalSelection() {
+  document.querySelectorAll('#engineList .engine-item').forEach((el) => {
+    el.classList.toggle('selected', enginePageState.selectedIds.includes(el.dataset.engineId));
+  });
+  const hint = document.getElementById('engineCountHint');
+  if (hint) hint.textContent = i18n.t('engineSelected').replace('{n}', enginePageState.selectedIds.length);
 }
 
 function setEnginePage(p) {
@@ -2817,22 +2826,28 @@ function renderEngineModal() {
   const pag = document.getElementById('enginePagination');
   const hint = document.getElementById('engineCountHint');
 
-  // The whole catalog in one scrolling grid (no pages)
+  // The whole catalog in one scrolling grid (no pages). Built once per
+  // catalog and language; later opens only resync the selection.
   const items = ENGINE_CATALOG;
+  const key = items.map((e) => e.id).join(',') + '|' + i18n.currentLocale;
+  if (grid.dataset.key === key) {
+    syncEngineModalSelection();
+    return;
+  }
+  grid.dataset.key = key;
 
   grid.innerHTML = items.map(eng => {
     const isSelected = enginePageState.selectedIds.includes(eng.id);
     const name = getEngineName(eng);
     return `
-      <div class="engine-item ${isSelected ? 'selected' : ''}" onclick="toggleEngineSelection('${eng.id}')">
+      <div class="engine-item ${isSelected ? 'selected' : ''}" data-engine-id="${eng.id}" onclick="toggleEngineSelection('${eng.id}')">
         <div class="engine-check">✓</div>
-        <img src="${eng.icon}" data-fallback-src="https://www.google.com/favicon.ico">
+        <img src="${eng.icon}" alt="" width="32" height="32" loading="lazy" decoding="async" data-fallback-src="https://www.google.com/favicon.ico">
         <span>${name}</span>
       </div>
     `;
   }).join('');
 
-  if (pag) pag.innerHTML = '';
 
   // Hint text
   const count = enginePageState.selectedIds.length;

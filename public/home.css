@@ -185,9 +185,28 @@ body[data-wallpaper-tone="light"] {
 .engine-menu,
 .context-menu,
 .page-context-menu {
-  background: var(--ctl-sheen), var(--glass-tint-menu);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  background: var(--glass-glow), var(--glass-tint-menu);
+  -webkit-backdrop-filter: var(--glass-menu-filter);
+  backdrop-filter: var(--glass-menu-filter);
+}
+
+/* Specular rim: a 1px gradient ring, bright where light hits the edge */
+.settings-menu::before,
+.settings-submenu::before,
+.engine-menu::before,
+.context-menu::before,
+.page-context-menu::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--glass-specular);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .settings-menu,
@@ -208,9 +227,14 @@ body[data-wallpaper-tone="light"] {
   inset: 0;
   z-index: -1;
   border-radius: inherit;
+  -webkit-backdrop-filter: var(--glass-menu-filter);
+  backdrop-filter: var(--glass-menu-filter);
+  pointer-events: none;
+}
+
+.search-box.glass::after {
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
-  pointer-events: none;
 }
 
 .lg-refraction .search-box.glass[data-refract]::after {
@@ -228,8 +252,8 @@ body[data-wallpaper-tone="light"] {
   border-radius: 20px;
   box-shadow:
     0 0 0 0.5px var(--glass-edge),
-    inset 0 1px 0 0 var(--glass-rim),
-    var(--glass-shadow-lifted);
+    0 12px 32px rgba(0, 0, 0, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.06);
   color: var(--label-1);
   font: var(--text-body);
   text-align: left;

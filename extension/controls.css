@@ -787,9 +787,9 @@ button:disabled {
 }
 
 /* ---------- Liquid Glass controls ----------
- * Inside a glass sheet a nested backdrop-filter cannot see the page, so the
- * controls are glass by their surface: a light-to-clear gradient, a bright
- * top rim and a hairline edge. */
+ * A nested backdrop-filter cannot see past the sheet, so controls are glass
+ * by their surface: a clear tint with a top sheen (padding-box) inside a 1px
+ * specular rim (border-box), like the rim on every .glass element. */
 .modal-input,
 .field,
 select,
@@ -802,15 +802,21 @@ select.modal-input,
 .engine-item,
 .segmented-control,
 .settings-group {
-  background: var(--ctl-glass-bg);
-  box-shadow: var(--ctl-glass-shadow);
+  border: 1px solid transparent;
+  background:
+    var(--ctl-sheen) padding-box,
+    linear-gradient(var(--ctl-tint), var(--ctl-tint)) padding-box,
+    var(--glass-specular) border-box;
+  box-shadow: var(--ctl-shadow);
 }
 
 select,
 select.modal-input {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e93' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"), var(--ctl-glass-bg);
-  background-repeat: no-repeat, no-repeat;
-  background-position: right 12px center, 0 0;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e93' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 12px center / 10px 6px no-repeat padding-box,
+    var(--ctl-sheen) padding-box,
+    linear-gradient(var(--ctl-tint), var(--ctl-tint)) padding-box,
+    var(--glass-specular) border-box;
 }
 
 .cancel-btn:hover,
@@ -819,23 +825,64 @@ select.modal-input {
 .wallpaper-tab:hover,
 .page-btn:hover,
 .engine-item:hover {
-  background: var(--ctl-glass-bg-hover);
+  background:
+    var(--ctl-sheen) padding-box,
+    linear-gradient(var(--ctl-tint-hover), var(--ctl-tint-hover)) padding-box,
+    var(--glass-specular) border-box;
 }
 
 .modal-input:focus,
 .field:focus,
 select:focus-visible {
-  box-shadow: var(--ctl-glass-shadow), 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: var(--ctl-shadow), 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
-/* Accent controls keep their color under a glass sheen */
+/* Accent controls: the color shows through the same sheen and rim */
 .primary-btn,
 .wallpaper-tab.active,
 .page-btn.active,
 .seg-btn.active,
 .seg-btn:has(input:checked) {
-  background: var(--ctl-sheen), var(--accent);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 0 0.5px color-mix(in srgb, var(--accent) 60%, #000), 0 2px 6px color-mix(in srgb, var(--accent) 30%, transparent);
+  border: 1px solid transparent;
+  background:
+    var(--ctl-sheen) padding-box,
+    linear-gradient(var(--accent), var(--accent)) padding-box,
+    linear-gradient(150deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.1) 40%, rgba(255, 255, 255, 0.05) 60%, rgba(255, 255, 255, 0.45)) border-box,
+    linear-gradient(var(--accent), var(--accent)) border-box;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+.engine-item.selected {
+  background:
+    var(--ctl-sheen) padding-box,
+    linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 18%, transparent)) padding-box,
+    linear-gradient(var(--accent), var(--accent)) border-box;
+}
+
+/* The sign-in prompt sits above every other layer */
+#googleSignInModal { z-index: 5000; }
+
+/* Liquid Glass scroll bar: a thin clear capsule with a bright rim that
+   floats over the content and widens a little on hover */
+.engine-grid::-webkit-scrollbar { width: 12px; }
+.engine-grid::-webkit-scrollbar-track { background: transparent; margin: 6px; }
+.engine-grid::-webkit-scrollbar-thumb {
+  min-height: 40px;
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.25)) padding-box,
+    linear-gradient(rgba(120, 120, 128, 0.35), rgba(120, 120, 128, 0.35)) padding-box;
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.engine-grid::-webkit-scrollbar-thumb:hover {
+  border-width: 2px;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.35)) padding-box,
+    linear-gradient(rgba(120, 120, 128, 0.5), rgba(120, 120, 128, 0.5)) padding-box;
+}
+@supports not selector(::-webkit-scrollbar) {
+  .engine-grid { scrollbar-width: thin; scrollbar-color: rgba(120, 120, 128, 0.45) transparent; }
 }
 
 /* Engine picker: the full catalog scrolls inside the sheet */
@@ -853,11 +900,3 @@ select:focus-visible {
   font: var(--text-subhead);
   color: var(--label-2);
 }
-
-.engine-item.selected {
-  background: var(--ctl-sheen), color-mix(in srgb, var(--accent) 16%, transparent);
-  box-shadow: var(--ctl-glass-shadow), inset 0 0 0 1.5px var(--accent);
-}
-
-/* The sign-in prompt sits above every other layer */
-#googleSignInModal { z-index: 5000; }
