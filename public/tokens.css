@@ -111,6 +111,7 @@
   --ctl-tint-hover: rgba(255, 255, 255, 0.46);
   --ctl-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0) 60%);
   --ctl-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.04);
+  --ctl-rim: inset 1px 1px 0 rgba(255, 255, 255, 0.85), inset -1px -1px 0 rgba(255, 255, 255, 0.3), 0 0 0 0.5px rgba(0, 0, 0, 0.06);
   --glass-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.22), 0 2px 6px -2px rgba(0, 0, 0, 0.12);
   --glass-shadow-lifted: 0 24px 60px -12px rgba(0, 0, 0, 0.32), 0 4px 12px -4px rgba(0, 0, 0, 0.16);
   --glass-label: var(--label-1);
@@ -174,6 +175,7 @@
   --ctl-tint-hover: rgba(255, 255, 255, 0.13);
   --ctl-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 60%);
   --ctl-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15);
+  --ctl-rim: inset 1px 1px 0 rgba(255, 255, 255, 0.22), inset -1px -1px 0 rgba(255, 255, 255, 0.06), 0 0 0 0.5px rgba(0, 0, 0, 0.35);
     --glass-hover: rgba(255, 255, 255, 0.08);
     --glass-press: rgba(255, 255, 255, 0.04);
     --scrim: rgba(0, 0, 0, 0.42);
@@ -215,6 +217,7 @@
   --ctl-tint-hover: rgba(255, 255, 255, 0.13);
   --ctl-sheen: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 60%);
   --ctl-shadow: 0 1px 2px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.15);
+  --ctl-rim: inset 1px 1px 0 rgba(255, 255, 255, 0.22), inset -1px -1px 0 rgba(255, 255, 255, 0.06), 0 0 0 0.5px rgba(0, 0, 0, 0.35);
   --glass-hover: rgba(255, 255, 255, 0.08);
   --glass-press: rgba(255, 255, 255, 0.04);
   --scrim: rgba(0, 0, 0, 0.42);

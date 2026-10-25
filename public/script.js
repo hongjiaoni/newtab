@@ -1842,7 +1842,7 @@ let ENGINE_CATALOG = [
   // Social / Media
   { id: 'twitter', name: { zh: 'Twitter', en: 'Twitter' }, url: 'https://twitter.com/search?q=', icon: 'https://abs.twimg.com/favicons/twitter.2.ico' },
   { id: 'reddit', name: { zh: 'Reddit', en: 'Reddit' }, url: 'https://www.reddit.com/search/?q=', icon: 'https://www.reddit.com/favicon.ico' },
-  { id: 'instagram', name: { zh: 'Instagram', en: 'Instagram' }, url: 'https://www.instagram.com/explore/tags/', icon: 'https://www.instagram.com/favicon.ico' },
+  { id: 'instagram', name: { zh: 'Instagram', en: 'Instagram' }, url: 'https://www.instagram.com/explore/tags/', icon: 'https://www.google.com/s2/favicons?domain=instagram.com&sz=64' },
 
   // Knowledge
   { id: 'wikipedia', name: { zh: '维基百科', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: 'https://en.wikipedia.org/favicon.ico' },

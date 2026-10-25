@@ -584,7 +584,7 @@ body[data-wallpaper-tone="light"] {
 }
 .icon-custom-row .section-label { min-width: 52px; margin: 0; }
 .icon-custom-row .modal-input { flex: 1; }
-.icon-custom .accent-swatches { flex-wrap: wrap; }
+.icon-custom .accent-swatches { flex-wrap: wrap; gap: 6px; }
 .icon-upload-btn { align-self: flex-start; }
 
 .site-tile-icon {

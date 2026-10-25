@@ -788,8 +788,8 @@ button:disabled {
 
 /* ---------- Liquid Glass controls ----------
  * A nested backdrop-filter cannot see past the sheet, so controls are glass
- * by their surface: a clear tint with a top sheen (padding-box) inside a 1px
- * specular rim (border-box), like the rim on every .glass element. */
+ * by their surface: a clear tint with a top sheen, and a specular rim drawn
+ * with inner shadows (bright top-left, softer bottom-right). */
 .modal-input,
 .field,
 select,
@@ -802,21 +802,17 @@ select.modal-input,
 .engine-item,
 .segmented-control,
 .settings-group {
-  border: 1px solid transparent;
-  background:
-    var(--ctl-sheen) padding-box,
-    linear-gradient(var(--ctl-tint), var(--ctl-tint)) padding-box,
-    var(--glass-specular) border-box;
-  box-shadow: var(--ctl-shadow);
+  border-color: transparent;
+  background: var(--ctl-sheen), linear-gradient(var(--ctl-tint), var(--ctl-tint));
+  box-shadow: var(--ctl-rim), var(--ctl-shadow);
 }
 
 select,
 select.modal-input {
   background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e93' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 12px center / 10px 6px no-repeat padding-box,
-    var(--ctl-sheen) padding-box,
-    linear-gradient(var(--ctl-tint), var(--ctl-tint)) padding-box,
-    var(--glass-specular) border-box;
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%238e8e93' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 12px center / 10px 6px no-repeat,
+    var(--ctl-sheen),
+    linear-gradient(var(--ctl-tint), var(--ctl-tint));
 }
 
 .cancel-btn:hover,
@@ -825,38 +821,28 @@ select.modal-input {
 .wallpaper-tab:hover,
 .page-btn:hover,
 .engine-item:hover {
-  background:
-    var(--ctl-sheen) padding-box,
-    linear-gradient(var(--ctl-tint-hover), var(--ctl-tint-hover)) padding-box,
-    var(--glass-specular) border-box;
+  background: var(--ctl-sheen), linear-gradient(var(--ctl-tint-hover), var(--ctl-tint-hover));
 }
 
 .modal-input:focus,
 .field:focus,
 select:focus-visible {
-  box-shadow: var(--ctl-shadow), 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+  box-shadow: var(--ctl-rim), var(--ctl-shadow), 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
-/* Accent controls: the color shows through the same sheen and rim */
+/* Accent controls: the color under the same sheen and rim */
 .primary-btn,
 .wallpaper-tab.active,
 .page-btn.active,
 .seg-btn.active,
 .seg-btn:has(input:checked) {
-  border: 1px solid transparent;
-  background:
-    var(--ctl-sheen) padding-box,
-    linear-gradient(var(--accent), var(--accent)) padding-box,
-    linear-gradient(150deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.1) 40%, rgba(255, 255, 255, 0.05) 60%, rgba(255, 255, 255, 0.45)) border-box,
-    linear-gradient(var(--accent), var(--accent)) border-box;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--accent) 32%, transparent);
+  background: var(--ctl-sheen), var(--accent);
+  box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.4), inset -1px -1px 0 rgba(255, 255, 255, 0.12), 0 2px 8px color-mix(in srgb, var(--accent) 32%, transparent);
 }
 
 .engine-item.selected {
-  background:
-    var(--ctl-sheen) padding-box,
-    linear-gradient(color-mix(in srgb, var(--accent) 18%, transparent), color-mix(in srgb, var(--accent) 18%, transparent)) padding-box,
-    linear-gradient(var(--accent), var(--accent)) border-box;
+  background: var(--ctl-sheen), linear-gradient(color-mix(in srgb, var(--accent) 20%, transparent), color-mix(in srgb, var(--accent) 20%, transparent));
+  box-shadow: var(--ctl-rim), inset 0 0 0 1.5px var(--accent), var(--ctl-shadow);
 }
 
 /* The sign-in prompt sits above every other layer */
