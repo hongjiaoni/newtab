@@ -2124,11 +2124,13 @@ function finishFolderHover(targetId) {
   const draggedId = dragState.draggedId;
   clearFolderHover();
   if (!draggedId || draggedId === targetId) return;
+  const wasFolder = (state.sites || []).some((x) => x && x.id === targetId && x.type === 'folder');
   const folderId = mergeIntoFolder(draggedId, targetId);
   dragState.draggedId = null; // the drag is consumed
   saveData();
   renderHome();
-  if (folderId) {
+  // Only a newly made folder opens for naming
+  if (folderId && !wasFolder) {
     openFolder(folderId);
     // Name it right away, like iOS
     setTimeout(() => { folderNameInput?.focus(); folderNameInput?.select(); }, 60);
@@ -2436,16 +2438,21 @@ window.renameFolderFromContext = function () {
   if (item) openRenameModal(item.id, 'folder');
 };
 
-window.deleteFolderFromContext = function () {
+window.deleteFolderFromContext = async function () {
   const item = contextMenuState.targetItem;
-  if (!item) return;
-  const itemName = item.name || (i18n.t('folder') || 'Folder');
-  pendingDelete = { item, type: 'folder' };
-  document.getElementById('deleteTitle').textContent = i18n.t('delete');
-  document.getElementById('deleteMessage').textContent = i18n.t('deleteFolderConfirm') || 'Delete this folder?';
-  document.getElementById('deleteModal').classList.remove('hidden');
-  modalOverlay.classList.remove('hidden');
   hideContextMenu();
+  if (!item) return;
+  const ok = await window.showConfirmDialog({
+    title: i18n.t('delete'),
+    message: i18n.t('deleteFolderConfirm'),
+    confirmText: i18n.t('delete'),
+    cancelText: i18n.t('cancel'),
+    tone: 'danger'
+  });
+  if (!ok) return;
+  deleteFolder(item.id);
+  saveData();
+  renderHome();
 };
 
 window.moveOutSiteFromContext = function () {
@@ -3491,16 +3498,6 @@ function renderHome() {
     grid.appendChild(createSiteTile(site, index, 'home'));
   });
 
-  // Add tile
-  const addTile = document.createElement('div');
-  addTile.className = 'site-tile add-tile';
-  addTile.title = i18n.t('addSite') || 'Add Site';
-  addTile.innerHTML =
-    '<div class="site-tile-icon add-tile-icon glass glass--clear"><svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></div>' +
-    '<span class="site-tile-name"></span>';
-  addTile.onclick = () => openAddSiteModal('site');
-  grid.appendChild(addTile);
-
   contentEl.appendChild(grid);
   renderFolderPopup();
 }
@@ -3531,7 +3528,8 @@ function renderFolderPopup() {
   folderNameInput.setAttribute('aria-label', i18n.t('renameLabel') || 'Folder name');
   const children = getFolderChildren(folder);
   folderGrid.replaceChildren(...children.map((site, index) => createSiteTile(site, index, 'folder')));
-  folderHint.textContent = children.length ? i18n.t('folderDragOutHint') : i18n.t('emptyFolder');
+  folderHint.textContent = children.length ? '' : i18n.t('emptyFolder');
+  folderHint.classList.toggle('hidden', children.length > 0);
   folderOverlay.classList.remove('hidden');
 }
 

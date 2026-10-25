@@ -430,7 +430,35 @@ function signOutLocally() {
 }
 
 // Update auth UI (Avatar vs Login button)
+// Toolbar avatar: Google photo when signed in, a default glyph otherwise.
+function updateToolbarAvatar() {
+  const btn = document.getElementById('toolbarAvatarBtn');
+  if (!btn) return;
+  const img = btn.querySelector('.avatar-img');
+  const glyph = btn.querySelector('.avatar-default');
+  const meta = (authState.isLoggedIn && authState.user && authState.user.user_metadata) || {};
+  const url = meta.avatar_url || meta.picture || '';
+  const t = (k, fb) => (typeof i18n !== 'undefined' && i18n.t(k)) || fb;
+  btn.setAttribute('aria-label', authState.isLoggedIn ? (getUserNickname() || t('profile', 'Profile')) : t('login', 'Login'));
+  if (url) {
+    img.onerror = () => { img.classList.add('hidden'); glyph.classList.remove('hidden'); };
+    if (img.getAttribute('src') !== url) img.src = url;
+    img.classList.remove('hidden');
+    glyph.classList.add('hidden');
+  } else {
+    img.removeAttribute('src');
+    img.classList.add('hidden');
+    glyph.classList.remove('hidden');
+  }
+}
+
+function handleToolbarAvatarClick() {
+  if (authState.isLoggedIn && authState.user) window.openUserProfile();
+  else openGoogleSignInModal();
+}
+
 function updateAuthUI() {
+  updateToolbarAvatar();
   const authMenuContainer = document.getElementById('authMenuContainer');
   if (!authMenuContainer) return;
 
@@ -790,6 +818,7 @@ function showConfirmDialog({
 
 // Event Listeners Setup
 function setupAuthEventListeners() {
+  document.getElementById('toolbarAvatarBtn')?.addEventListener('click', handleToolbarAvatarClick);
   const authMenuContainer = document.getElementById('authMenuContainer');
   if (authMenuContainer) {
     authMenuContainer.onclick = (event) => {

@@ -53,6 +53,7 @@
   /* ---------- Sizes ---------- */
   --icon-tile: 56px;
   --icon-glyph: 40px;
+  --page-side-clear: 64px; /* room kept free for the pager dots on the right */
   --menu-row-h: 38px;    /* every menu row */
   --control-h: 32px;     /* every button / select / tab inside menus and dialogs */
   --control-sm: 28px;

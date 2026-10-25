@@ -110,7 +110,7 @@ body[data-wallpaper-tone="light"] {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  width: min(640px, 100%);
+  width: min(640px, 100%, calc(var(--vw-full) - 2 * var(--page-side-clear)));
   height: var(--control-lg);
   padding: 0 var(--space-4) 0 var(--space-2);
   border-radius: var(--radius-capsule);
@@ -480,21 +480,28 @@ body[data-wallpaper-tone="light"] {
 }
 
 .sites-grid {
-  /* auto-fit collapses unused tracks, so a short row stays centered; the
-     max-width caps a row at 8 icons (8 x 88 + 7 x 16 = 816px). */
-  display: grid;
-  grid-template-columns: repeat(auto-fit, 88px);
+  /* Wrapping flex rows: every row, the last one too, is centered. The
+     max-width caps a row at 8 icons (8 x 88 + 7 x 16 = 816px) and shrinks
+     with the window so the grid never reaches the pager dots. */
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--space-5) var(--space-4);
   justify-content: center;
   width: 100%;
-  max-width: 816px;
+  max-width: min(816px, calc(var(--vw-full) - 2 * var(--page-side-clear)));
 }
 
 @media (max-width: 640px) {
-  .sites-grid { grid-template-columns: repeat(auto-fit, 76px); gap: var(--space-4) var(--space-2); }
+  .sites-grid { gap: var(--space-4) var(--space-2); }
+  .sites-grid > .site-tile { flex-basis: 76px; width: 76px; }
 }
 
 /* App-icon tile: glass plate + favicon, name below in wallpaper ink */
+.sites-grid > .site-tile {
+  flex: 0 0 88px;
+  width: 88px;
+}
+
 .site-tile {
   display: flex;
   flex-direction: column;
@@ -914,3 +921,17 @@ body[data-wallpaper-tone="light"] {
   border-radius: 0;
   object-fit: cover;
 }
+
+/* Toolbar avatar */
+.avatar-btn {
+  padding: 0;
+  overflow: hidden;
+}
+.avatar-btn .avatar-img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.avatar-btn .avatar-img.hidden,
+.avatar-btn .avatar-default.hidden { display: none; }
