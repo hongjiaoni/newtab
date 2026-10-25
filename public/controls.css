@@ -67,7 +67,7 @@ select,
 select.modal-input {
   appearance: none;
   -webkit-appearance: none;
-  height: var(--control-sm);
+  height: var(--control-h);
   min-width: 120px;
   padding: 0 30px 0 var(--space-4);
   border: 0;
@@ -178,7 +178,7 @@ button:disabled {
   justify-content: center;
   gap: var(--space-2);
   min-width: 76px;
-  height: var(--control-md);
+  height: var(--control-h);
   padding: 0 var(--space-5);
   border: 0;
   border-radius: var(--radius-capsule);
@@ -248,7 +248,7 @@ button:disabled {
   align-items: center;
   justify-content: center;
   min-width: 0;
-  height: var(--control-sm);
+  height: calc(var(--control-h) - 4px); /* track adds 2px padding each side */
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-capsule);
@@ -603,8 +603,8 @@ button:disabled {
 .page-btn {
   display: grid;
   place-items: center;
-  min-width: var(--control-sm);
-  height: var(--control-sm);
+  min-width: var(--control-h);
+  height: var(--control-h);
   padding: 0 var(--space-2);
   border: 0;
   border-radius: var(--radius-capsule);
@@ -641,7 +641,7 @@ button:disabled {
 }
 
 .wallpaper-tab {
-  height: var(--control-sm);
+  height: var(--control-h);
   padding: 0 var(--space-3);
   border: 0;
   border-radius: var(--radius-capsule);

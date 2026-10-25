@@ -176,10 +176,13 @@ body[data-wallpaper-tone="light"] {
 }
 
 /* ---------- Floating menus ----------
- * Menus that live inside another glass element (engine menu, mode submenu)
- * cannot blur the page behind it — Chrome scopes backdrop-filter to the
- * nearest glass ancestor — so they use a near-opaque surface instead. */
+ * Every menu is Liquid Glass. An element with backdrop-filter becomes the
+ * backdrop root for its descendants, so the hosts of nested menus (the
+ * settings menu, the search capsule) paint their blur on a pseudo-element
+ * instead; the nested menu then blurs the page itself. */
 .settings-menu,
+.settings-submenu,
+.engine-menu,
 .context-menu,
 .page-context-menu {
   background: var(--glass-tint-thick);
@@ -187,9 +190,32 @@ body[data-wallpaper-tone="light"] {
   backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
 }
 
-.engine-menu,
-.settings-submenu {
-  background: color-mix(in srgb, var(--surface-raised) 96%, transparent);
+.settings-menu,
+.search-box.glass,
+.lg-refraction .search-box.glass[data-refract] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.settings-menu {
+  isolation: isolate;
+}
+
+.settings-menu::after,
+.search-box.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  pointer-events: none;
+}
+
+.lg-refraction .search-box.glass[data-refract]::after {
+  -webkit-backdrop-filter: var(--lg-refract);
+  backdrop-filter: var(--lg-refract);
 }
 
 .settings-menu,
@@ -219,7 +245,7 @@ body[data-wallpaper-tone="light"] {
   position: absolute;
   top: calc(100% + var(--space-2));
   right: 0;
-  min-width: 220px;
+  width: 220px;
   z-index: 100;
   transform-origin: top right;
 }
@@ -228,7 +254,7 @@ body[data-wallpaper-tone="light"] {
   position: absolute;
   top: calc(-1 * var(--space-1));
   right: calc(100% + var(--space-2));
-  min-width: 150px;
+  width: 188px;
   z-index: 101;
   transform-origin: top right;
 }
@@ -243,16 +269,20 @@ body[data-wallpaper-tone="light"] {
   transform-origin: top left;
 }
 
+/* Every right-click menu (site, folder, page, widget) shares one width */
+.context-menu,
+.page-context-menu {
+  width: 188px;
+}
+
 .context-menu {
   position: fixed;
-  min-width: 160px;
   z-index: 2000;
   transform-origin: top left;
 }
 
 .page-context-menu {
   position: fixed;
-  min-width: 160px;
   z-index: 10000;
   transform-origin: top left;
 }
@@ -299,7 +329,7 @@ body[data-wallpaper-tone="light"] {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 38px;
+  min-height: var(--menu-row-h);
   padding: 0 14px;
   border-radius: 14px;
   color: var(--label-1);
@@ -511,9 +541,9 @@ body[data-wallpaper-tone="light"] {
   display: grid;
   place-items: center;
   color: #fff;
-  font-size: 7px;
+  font-size: 11px;
   font-weight: 700;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 /* Icon editor */
@@ -561,6 +591,24 @@ body[data-wallpaper-tone="light"] {
   object-fit: contain;
 }
 
+/* Favicon with its own background: edge to edge, no glass rim */
+.site-tile-icon.is-full-bleed {
+  background: transparent;
+}
+.site-tile-icon.is-full-bleed::before { display: none; }
+.site-tile-icon.is-full-bleed .site-tile-favicon {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+/* Transparent favicon: the plate takes a soft tint of its main color */
+.site-tile-icon.is-tinted {
+  background: color-mix(in srgb, var(--icon-fill) 20%, #fff);
+}
+.site-tile-icon.is-tinted::before { display: none; }
+
 /* Letter fallback when no favicon could be loaded */
 .site-tile-letter {
   display: none;
@@ -593,10 +641,11 @@ body[data-wallpaper-tone="light"] {
 
 /* Folder: glass plate with a 3x3 grid of member icons, like iOS */
 .folder-tile-icon {
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 1fr;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  align-content: start;
   gap: 4px;
-  padding: 10px;
+  padding: 6px;
   place-items: stretch;
 }
 
@@ -607,19 +656,23 @@ body[data-wallpaper-tone="light"] {
   place-items: center;
   min-width: 0;
   aspect-ratio: 1;
-  border-radius: 3px;
+  border-radius: 6px;
   overflow: hidden;
+  background: var(--fill-1);
 }
 
 .folder-mini img {
-  width: 100%;
-  height: 100%;
+  width: 72%;
+  height: 72%;
   object-fit: contain;
 }
 
+.folder-mini.is-tinted { background: color-mix(in srgb, var(--icon-fill) 22%, #fff); }
+.folder-mini.is-full-bleed img { width: 100%; height: 100%; object-fit: cover; }
+
 .folder-mini.is-letter {
   background: var(--fill-1);
-  font: 600 8px/1 var(--font-rounded);
+  font: 600 11px/1 var(--font-rounded);
   color: var(--glass-label);
 }
 

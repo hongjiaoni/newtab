@@ -586,13 +586,7 @@ function showWidgetMenu(type, x, y) {
     (canResize ? '<div class="context-menu-item" role="menuitem" data-widget-action="size">' + escapeHtml(wsT('changeSize')) + '…</div>' : '') +
     '<div class="context-menu-item context-menu-item--danger" role="menuitem" data-widget-action="remove">' + escapeHtml(wsT('removeWidget')) + '</div>';
   menu.classList.remove('hidden');
-  const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
-  const rect = menu.getBoundingClientRect();
-  const left = Math.min(x, window.innerWidth - rect.width - 8);
-  const top = Math.min(y, window.innerHeight - rect.height - 8);
-  // context-menu positions are in zoomed CSS px
-  menu.style.left = (left / zoom) + 'px';
-  menu.style.top = (top / zoom) + 'px';
+  window.placeMenuAt(menu, x, y);
 }
 
 function hideWidgetMenu() {

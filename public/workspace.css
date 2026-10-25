@@ -1189,9 +1189,6 @@
 }
 
 /* ---------- Widget context menu ---------- */
-.widget-menu {
-  min-width: 180px;
-}
 
 .context-menu-item--danger {
   color: var(--red);

@@ -51,8 +51,10 @@
   --radius-capsule: 999px;
 
   /* ---------- Sizes ---------- */
-  --icon-tile: 64px;
-  --icon-glyph: 36px;
+  --icon-tile: 56px;
+  --icon-glyph: 40px;
+  --menu-row-h: 38px;    /* every menu row */
+  --control-h: 32px;     /* every button / select / tab inside menus and dialogs */
   --control-sm: 28px;
   --control-md: 36px;
   --control-lg: 52px;     /* 搜索胶囊高度 */

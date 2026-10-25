@@ -3034,9 +3034,8 @@ function renderContextMenu() {
   }
 
   contextMenu.innerHTML = itemsHtml;
-  contextMenu.style.left = contextMenuState.x + 'px';
-  contextMenu.style.top = contextMenuState.y + 'px';
   contextMenu.classList.remove('hidden');
+  placeMenuAt(contextMenu, contextMenuState.x, contextMenuState.y);
 }window.editItem = function () {
   const item = contextMenuState.targetItem;
   const type = contextMenuState.targetType;
@@ -3259,6 +3258,89 @@ function createTextIcon(text, color) {
   return icon;
 }
 
+// Places a fixed menu next to the pointer. Pointer coordinates are viewport
+// pixels but `left`/`top` are in the html's zoomed CSS pixels, so divide by
+// the zoom; flip to the other side of the pointer near the viewport edges.
+function placeMenuAt(menu, clientX, clientY) {
+  const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+  const w = menu.offsetWidth * zoom;
+  const h = menu.offsetHeight * zoom;
+  const gap = 2;
+  let x = clientX + gap;
+  let y = clientY + gap;
+  if (x + w > window.innerWidth - 8) x = Math.max(8, clientX - w - gap);
+  if (y + h > window.innerHeight - 8) y = Math.max(8, clientY - h - gap);
+  menu.style.left = (x / zoom) + 'px';
+  menu.style.top = (y / zoom) + 'px';
+}
+window.placeMenuAt = placeMenuAt;
+
+// ---- Icon plate fill ----
+// A favicon fills its plate. When the image has its own opaque background it
+// is shown edge to edge; when it is transparent the plate takes a soft tint of
+// the icon's main color. Results are cached per image URL.
+const iconFillCache = new Map();
+
+function analyzeIconImage(src) {
+  if (iconFillCache.has(src)) return iconFillCache.get(src);
+  const job = new Promise((resolve) => {
+    const probe = new Image();
+    probe.crossOrigin = 'anonymous';
+    probe.onload = () => {
+      try {
+        const n = 24;
+        const canvas = document.createElement('canvas');
+        canvas.width = n;
+        canvas.height = n;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(probe, 0, 0, n, n);
+        const data = ctx.getImageData(0, 0, n, n).data;
+        const alphaAt = (x, y) => data[(y * n + x) * 4 + 3];
+        const corners = [alphaAt(1, 1), alphaAt(n - 2, 1), alphaAt(1, n - 2), alphaAt(n - 2, n - 2)];
+        const opaque = corners.every((a) => a > 230);
+        // Main color: most common saturated-enough bucket among opaque pixels
+        const buckets = new Map();
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] < 200) continue;
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          const weight = max - min > 40 ? 3 : 1; // prefer colorful over gray/white
+          if (max > 245 && min > 235) continue; // skip near-white
+          const key = (r >> 5) + ',' + (g >> 5) + ',' + (b >> 5);
+          const bk = buckets.get(key) || { r: 0, g: 0, b: 0, n: 0, w: 0 };
+          bk.r += r; bk.g += g; bk.b += b; bk.n += 1; bk.w += weight;
+          buckets.set(key, bk);
+        }
+        let best = null;
+        buckets.forEach((bk) => { if (!best || bk.w > best.w) best = bk; });
+        const color = best ? [best.r / best.n, best.g / best.n, best.b / best.n].map(Math.round) : null;
+        resolve({ opaque, color });
+      } catch (_err) {
+        resolve(null); // tainted canvas (no CORS): keep the default plate
+      }
+    };
+    probe.onerror = () => resolve(null);
+    probe.src = src;
+  });
+  iconFillCache.set(src, job);
+  return job;
+}
+
+function applyIconFill(plate, img) {
+  const src = img.currentSrc || img.src;
+  if (!src || img.naturalWidth < 24) return; // tiny fallbacks stay centered
+  analyzeIconImage(src).then((info) => {
+    if (!info || !plate.isConnected && !plate.parentNode) return;
+    if (info.opaque) {
+      plate.classList.add('is-full-bleed');
+    } else if (info.color) {
+      const [r, g, b] = info.color;
+      plate.classList.add('is-tinted');
+      plate.style.setProperty('--icon-fill', 'rgb(' + r + ' ' + g + ' ' + b + ')');
+    }
+  });
+}
+
 function createFaviconIcon(site) {
   if (site.iconText && isValidIconColor(site.iconColor)) return createTextIcon(site.iconText, site.iconColor);
   const icon = document.createElement('div');
@@ -3283,6 +3365,9 @@ function createFaviconIcon(site) {
   img.loading = 'lazy';
   img.alt = '';
   icon.appendChild(img);
+  if (!icon.classList.contains('has-custom-icon')) {
+    img.addEventListener('load', () => applyIconFill(icon, img));
+  }
   loadFavicon(img, sources, () => {
     img.remove();
     icon.classList.add('is-letter');
@@ -3293,7 +3378,8 @@ function createFaviconIcon(site) {
 function createFolderIcon(children) {
   const icon = document.createElement('div');
   icon.className = 'site-tile-icon folder-tile-icon glass';
-  children.slice(0, 9).forEach((child) => {
+  // Up to four members, 2 x 2, filling the plate left to right, top to bottom
+  children.slice(0, 4).forEach((child) => {
     const mini = document.createElement('span');
     mini.className = 'folder-mini';
     if (child.iconText && isValidIconColor(child.iconColor)) {
@@ -3314,6 +3400,8 @@ function createFolderIcon(children) {
       img.alt = '';
       img.loading = 'lazy';
       mini.appendChild(img);
+      if (!isValidSiteIcon(child.customIcon)) img.addEventListener('load', () => applyIconFill(mini, img));
+      else mini.classList.add('is-full-bleed');
       loadFavicon(img, sources, () => {
         img.remove();
         showLetter();
@@ -4306,18 +4394,8 @@ function showPageContextMenu(e) {
   }
 
   // Show page context menu (with wallpaper option)
-  pageContextMenu.style.left = e.clientX + 'px';
-  pageContextMenu.style.top = e.clientY + 'px';
   pageContextMenu.classList.remove('hidden');
-
-  // Adjust position if menu goes off screen
-  const rect = pageContextMenu.getBoundingClientRect();
-  if (rect.right > window.innerWidth) {
-    pageContextMenu.style.left = (e.clientX - rect.width) + 'px';
-  }
-  if (rect.bottom > window.innerHeight) {
-    pageContextMenu.style.top = (e.clientY - rect.height) + 'px';
-  }
+  placeMenuAt(pageContextMenu, e.clientX, e.clientY);
 }
 
 function showItemContextMenu(e, type) {
@@ -4335,18 +4413,8 @@ function showItemContextMenu(e, type) {
   }
 
   itemContextMenu.dataset.type = type;
-  itemContextMenu.style.left = e.clientX + 'px';
-  itemContextMenu.style.top = e.clientY + 'px';
   itemContextMenu.classList.remove('hidden');
-
-  // Adjust position if menu goes off screen
-  const rect = itemContextMenu.getBoundingClientRect();
-  if (rect.right > window.innerWidth) {
-    itemContextMenu.style.left = (e.clientX - rect.width) + 'px';
-  }
-  if (rect.bottom > window.innerHeight) {
-    itemContextMenu.style.top = (e.clientY - rect.height) + 'px';
-  }
+  placeMenuAt(itemContextMenu, e.clientX, e.clientY);
 }
 
 function hideAllContextMenus() {
