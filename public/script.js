@@ -1800,7 +1800,6 @@ window.updateAllText = function () {
 
   // Re-render content to update any dynamic text
   renderHome();
-  renderHomeFooter();
 
   // Search engine menu contains localized names
   renderSearchEngine();
@@ -3330,9 +3329,18 @@ function analyzeIconImage(src) {
   return job;
 }
 
+// Only images whose pixels can be read: data URLs and same-origin files
+// (the extension's _favicon). Remote favicon services send no CORS header, so
+// probing them would only fail and log errors.
+function canReadIconPixels(src) {
+  if (src.startsWith('data:')) return true;
+  try { return new URL(src, location.href).origin === location.origin; } catch (_err) { return false; }
+}
+
 function applyIconFill(plate, img) {
   const src = img.currentSrc || img.src;
   if (!src || img.naturalWidth < 24) return; // tiny fallbacks stay centered
+  if (!canReadIconPixels(src)) return;
   analyzeIconImage(src).then((info) => {
     if (!info || !plate.isConnected && !plate.parentNode) return;
     if (info.opaque) {
