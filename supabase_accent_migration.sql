@@ -116,9 +116,10 @@ begin
     coalesce((value->>'showOnHome')::boolean, true),
     case when value->>'type' = 'folder' then 'folder' else 'link' end,
     case when value->>'type' = 'folder' then coalesce(value->'children', '[]'::jsonb) else '[]'::jsonb end,
-    -- custom icon: https URL or small data:image, else null (falls back to favicon)
+    -- custom icon: https URL, small data:image, or a text icon "text:#rrggbb:Label";
+    -- anything else is null (falls back to favicon)
     case
-      when value->>'customIcon' ~ '^(https://|data:image/(png|jpeg|webp|gif);base64,)'
+      when value->>'customIcon' ~ '^(https://|data:image/(png|jpeg|webp|gif);base64,|text:#[0-9a-fA-F]{6}:.)'
         and length(value->>'customIcon') <= 60000 then value->>'customIcon'
       else null
     end,

@@ -577,6 +577,9 @@ function ensureWidgetMenu() {
 
 function showWidgetMenu(type, x, y) {
   const menu = ensureWidgetMenu();
+  // Only one context menu at a time
+  window.hideAllContextMenus?.();
+  window.hideContextMenu?.();
   widgetMenuTarget = type;
   const canResize = (WIDGET_SIZES[type] || []).length > 1;
   menu.innerHTML =

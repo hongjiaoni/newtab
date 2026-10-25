@@ -7,13 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="referrer" content="no-referrer-when-downgrade" />
 
-  <script src="appearance.js?v=20261026-p9"></script>
-  <link rel="stylesheet" href="tokens.css?v=20261026-p9" />
-  <link rel="stylesheet" href="glass.css?v=20261026-p9" />
-  <link rel="stylesheet" href="style.css?v=20261026-p9" />
-  <link rel="stylesheet" href="controls.css?v=20261026-p9" />
-  <link rel="stylesheet" href="home.css?v=20261026-p9" />
-  <link rel="stylesheet" href="workspace.css?v=20261026-p9" />
+  <script src="appearance.js?v=20261026-p10"></script>
+  <link rel="stylesheet" href="tokens.css?v=20261026-p10" />
+  <link rel="stylesheet" href="glass.css?v=20261026-p10" />
+  <link rel="stylesheet" href="style.css?v=20261026-p10" />
+  <link rel="stylesheet" href="controls.css?v=20261026-p10" />
+  <link rel="stylesheet" href="home.css?v=20261026-p10" />
+  <link rel="stylesheet" href="workspace.css?v=20261026-p10" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260131">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20260131">
   <link rel="shortcut icon" href="/favicon.png?v=20260131">
@@ -280,27 +280,31 @@
           <label class="section-label" id="siteIconLabel">图标</label>
           <div class="site-icon-picker">
             <div class="site-icon-preview" id="siteIconPreview"></div>
-            <button type="button" class="btn btn--sm" id="siteIconUpload">上传图片</button>
-            <button type="button" class="btn btn--sm btn--plain hidden" id="siteIconAuto">自动获取</button>
+            <div class="segmented-control icon-mode-tabs" id="iconModeGroup">
+              <button type="button" class="seg-btn" data-icon-mode="auto" id="iconModeAuto">自动获取</button>
+              <button type="button" class="seg-btn" data-icon-mode="text" id="iconModeCustom">自定义</button>
+            </div>
+          </div>
+          <div class="icon-custom hidden" id="iconCustomPanel">
+            <div class="icon-custom-row">
+              <label class="section-label" id="iconTextLabel" for="iconTextInput">文字</label>
+              <input type="text" id="iconTextInput" class="modal-input" maxlength="4" autocomplete="off" />
+            </div>
+            <div class="icon-custom-row">
+              <span class="section-label" id="iconColorLabel">背景色</span>
+              <div class="accent-swatches" id="iconColorGroup" role="radiogroup" aria-labelledby="iconColorLabel"></div>
+            </div>
+            <button type="button" class="btn btn--plain btn--sm icon-upload-btn" id="siteIconUpload">上传图片</button>
             <input type="file" id="siteIconFile" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" class="hidden" />
           </div>
         </div>
 
-        <div class="modal-section">
-          <label class="checkbox-label">
-            <input type="checkbox" id="showOnHome" checked> <span id="pinToHomeLabel">Pin to Home</span>
-          </label>
-        </div>
       </div>
 
       <div id="folderForm" class="hidden">
         <div class="modal-section">
           <label class="section-label" id="newFolderNameLabel" for="newFolderName">文件夹名称</label>
           <input type="text" id="newFolderName" class="modal-input" />
-        </div>
-        <div class="modal-section">
-          <span class="section-label" id="folderSitesLabel">放入文件夹的网站</span>
-          <div class="folder-site-picker" id="folderSitePicker"></div>
         </div>
       </div>
 
@@ -454,17 +458,17 @@
     </div>
   </div>
 
-  <script src="config.js?v=20261026-p9"></script>
+  <script src="config.js?v=20261026-p10"></script>
   <script src="supabase-client.js"></script>
-  <script src="wallpaper.js?v=20261026-p9"></script>
+  <script src="wallpaper.js?v=20261026-p10"></script>
   <script src="paddle.js"></script>
-  <script src="membership.js?v=20261026-p9"></script>
-  <script src="auth.js?v=20261026-p9"></script>
-  <script src="data-sync.js?v=20261026-p9"></script>
-  <script src="glass.js?v=20261026-p9"></script>
-  <script src="pager.js?v=20261026-p9"></script>
-  <script src="/script.js?v=20261026-p9"></script>
-  <script src="workspace.js?v=20261026-p9"></script>
+  <script src="membership.js?v=20261026-p10"></script>
+  <script src="auth.js?v=20261026-p10"></script>
+  <script src="data-sync.js?v=20261026-p10"></script>
+  <script src="glass.js?v=20261026-p10"></script>
+  <script src="pager.js?v=20261026-p10"></script>
+  <script src="/script.js?v=20261026-p10"></script>
+  <script src="workspace.js?v=20261026-p10"></script>
 </body>
 
 </html>

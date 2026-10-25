@@ -30,6 +30,7 @@ const translations = {
     tagName: '标签名称',
     selectTags: '选择标签',
     pinToHome: '固定在首页',
+    iconTextLabel: '文字', iconColorLabel: '背景色', iconCustom: '自定义',
     done: '完成', accentLabel: '主题色', accentCustom: '自定义', accentBlue: '蓝色', accentPurple: '紫色', accentPink: '粉色', accentRed: '红色', accentOrange: '橙色', accentYellow: '黄色', accentGreen: '绿色', accentGraphite: '石墨色', folderSitesLabel: '放入文件夹的网站', folderNoSites: '首页还没有可以放入的网站', folderDragOutHint: '把图标拖到窗口外即可移出文件夹',
     iconLabel: '图标', iconUpload: '上传图片', iconAuto: '自动获取', iconInvalid: '无法读取这张图片',
     cancel: '取消',
@@ -207,6 +208,7 @@ const translations = {
     tagName: 'Tag Name',
     selectTags: 'Select Tags',
     pinToHome: 'Pin to Home',
+    iconTextLabel: 'Text', iconColorLabel: 'Background', iconCustom: 'Custom',
     done: 'Done', accentLabel: 'Accent Color', accentCustom: 'Custom', accentBlue: 'Blue', accentPurple: 'Purple', accentPink: 'Pink', accentRed: 'Red', accentOrange: 'Orange', accentYellow: 'Yellow', accentGreen: 'Green', accentGraphite: 'Graphite', folderSitesLabel: 'Sites to put in the folder', folderNoSites: 'There are no sites on the home page to add yet', folderDragOutHint: 'Drag an icon outside this window to move it out',
     iconLabel: 'Icon', iconUpload: 'Upload Image', iconAuto: 'Automatic', iconInvalid: 'Could not read this image',
     cancel: 'Cancel',
@@ -298,6 +300,7 @@ const translations = {
     tagName: "Nom de l'étiquette",
     selectTags: 'Sélectionner les étiquettes',
     pinToHome: "Épingler à l'accueil",
+    iconTextLabel: 'Texte', iconColorLabel: 'Fond', iconCustom: 'Personnalisée',
     done: 'OK', accentLabel: 'Couleur d\'accent', accentCustom: 'Personnalisée', accentBlue: 'Bleu', accentPurple: 'Violet', accentPink: 'Rose', accentRed: 'Rouge', accentOrange: 'Orange', accentYellow: 'Jaune', accentGreen: 'Vert', accentGraphite: 'Graphite', folderSitesLabel: 'Sites à placer dans le dossier', folderNoSites: 'Aucun site de l\'accueil à ajouter pour l\'instant', folderDragOutHint: 'Faites glisser une icône hors de cette fenêtre pour la sortir du dossier',
     iconLabel: 'Icône', iconUpload: 'Importer une image', iconAuto: 'Automatique', iconInvalid: 'Impossible de lire cette image',
     cancel: 'Annuler',
@@ -515,6 +518,7 @@ const translations = {
     tagName: 'Nombre de etiqueta',
     selectTags: 'Seleccionar etiquetas',
     pinToHome: 'Fijar en inicio',
+    iconTextLabel: 'Texto', iconColorLabel: 'Fondo', iconCustom: 'Personalizado',
     done: 'Listo', accentLabel: 'Color de acento', accentCustom: 'Personalizado', accentBlue: 'Azul', accentPurple: 'Morado', accentPink: 'Rosa', accentRed: 'Rojo', accentOrange: 'Naranja', accentYellow: 'Amarillo', accentGreen: 'Verde', accentGraphite: 'Grafito', folderSitesLabel: 'Sitios para la carpeta', folderNoSites: 'Todavía no hay sitios en el inicio para añadir', folderDragOutHint: 'Arrastra un icono fuera de esta ventana para sacarlo de la carpeta',
     iconLabel: 'Icono', iconUpload: 'Subir imagen', iconAuto: 'Automático', iconInvalid: 'No se pudo leer esta imagen',
     cancel: 'Cancelar',
@@ -732,6 +736,7 @@ const translations = {
     tagName: 'タグ名',
     selectTags: 'タグを選択',
     pinToHome: 'ホームに固定',
+    iconTextLabel: 'テキスト', iconColorLabel: '背景色', iconCustom: 'カスタム',
     done: '完了', accentLabel: 'アクセントカラー', accentCustom: 'カスタム', accentBlue: 'ブルー', accentPurple: 'パープル', accentPink: 'ピンク', accentRed: 'レッド', accentOrange: 'オレンジ', accentYellow: 'イエロー', accentGreen: 'グリーン', accentGraphite: 'グラファイト', folderSitesLabel: 'フォルダに入れるサイト', folderNoSites: 'ホームに追加できるサイトがまだありません', folderDragOutHint: 'アイコンをウインドウの外へドラッグするとフォルダから出せます',
     iconLabel: 'アイコン', iconUpload: '画像をアップロード', iconAuto: '自動取得', iconInvalid: 'この画像を読み込めませんでした',
     cancel: 'キャンセル',
@@ -949,6 +954,7 @@ const translations = {
     tagName: '태그 이름',
     selectTags: '태그 선택',
     pinToHome: '홈에 고정',
+    iconTextLabel: '텍스트', iconColorLabel: '배경색', iconCustom: '사용자 지정',
     done: '완료', accentLabel: '강조 색상', accentCustom: '사용자 지정', accentBlue: '파란색', accentPurple: '보라색', accentPink: '분홍색', accentRed: '빨간색', accentOrange: '주황색', accentYellow: '노란색', accentGreen: '초록색', accentGraphite: '그래파이트', folderSitesLabel: '폴더에 넣을 사이트', folderNoSites: '아직 홈에 추가할 사이트가 없습니다', folderDragOutHint: '아이콘을 창 밖으로 드래그하면 폴더에서 꺼낼 수 있습니다',
     iconLabel: '아이콘', iconUpload: '이미지 업로드', iconAuto: '자동', iconInvalid: '이 이미지를 읽을 수 없습니다',
     cancel: '취소',
@@ -1542,9 +1548,7 @@ window.updateAllText = function () {
   if (nameLabel) nameLabel.textContent = i18n.t('name');
   if (urlLabel) urlLabel.textContent = i18n.t('url');
   const newFolderNameLabel = document.getElementById('newFolderNameLabel');
-  const folderSitesLabel = document.getElementById('folderSitesLabel');
   if (newFolderNameLabel) newFolderNameLabel.textContent = i18n.t('renameLabel');
-  if (folderSitesLabel) folderSitesLabel.textContent = i18n.t('folderSitesLabel');
 
   // Update input placeholders
   document.getElementById('siteName').placeholder = i18n.t('name');
@@ -1552,13 +1556,14 @@ window.updateAllText = function () {
   document.getElementById('newFolderName').placeholder = i18n.t('newFolder');
 
   // Update checkbox label
-  const iconLabels = { siteIconLabel: 'iconLabel', siteIconUpload: 'iconUpload', siteIconAuto: 'iconAuto' };
+  const iconLabels = {
+    siteIconLabel: 'iconLabel', siteIconUpload: 'iconUpload', iconModeAuto: 'iconAuto',
+    iconModeCustom: 'iconCustom', iconTextLabel: 'iconTextLabel', iconColorLabel: 'iconColorLabel'
+  };
   Object.entries(iconLabels).forEach(([id, key]) => {
     const el = document.getElementById(id);
     if (el) el.textContent = i18n.t(key);
   });
-  const pinToHomeLabel = document.getElementById('pinToHomeLabel');
-  if (pinToHomeLabel) pinToHomeLabel.textContent = i18n.t('pinToHome');
 
   // Update modal buttons
   document.getElementById('closeAddModal').textContent = i18n.t('cancel');
@@ -2052,106 +2057,170 @@ const dragState = {
 };
 
 // ===== Drag and Drop Event Handlers =====
+// Home grid drag & drop, iOS style:
+// - the icon itself follows the pointer (custom drag image);
+// - moving between icons slides the others aside (FLIP animation);
+// - holding over another icon for a moment makes (or adds to) a folder,
+//   then opens that folder so it can be named.
+const FOLDER_HOVER_MS = 650;
+
 function handleDragStart(event, id, type, source, index) {
   dragState.draggedId = id;
   dragState.draggedType = type;
   dragState.draggedSource = source || 'home';
   dragState.draggedElement = event.target.closest('.site-tile');
+  dragState.reordered = false;
 
   event.dataTransfer.effectAllowed = 'move';
   event.dataTransfer.setData('text/plain', String(id));
-  if (dragState.draggedElement) dragState.draggedElement.classList.add('dragging');
+  const iconEl = dragState.draggedElement?.querySelector('.site-tile-icon');
+  if (iconEl && event.dataTransfer.setDragImage) {
+    const r = iconEl.getBoundingClientRect();
+    event.dataTransfer.setDragImage(iconEl, r.width / 2, r.height / 2);
+  }
+  const el = dragState.draggedElement;
+  // After the browser has snapshotted the drag image, leave a ghost behind.
+  requestAnimationFrame(() => el?.classList.add('dragging'));
+}
+
+function clearFolderHover() {
+  clearTimeout(dragState.hoverTimer);
+  dragState.hoverTimer = null;
+  dragState.hoverTargetId = null;
+  document.querySelectorAll('.site-tile.merge-target').forEach((t) => t.classList.remove('merge-target'));
+}
+
+// Reorders tiles in place and animates every tile from its old position.
+function animateTileReorder(grid, mutate) {
+  const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+  const tiles = Array.from(grid.children);
+  const before = new Map(tiles.map((t) => [t, t.getBoundingClientRect()]));
+  mutate();
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  tiles.forEach((t) => {
+    const a = before.get(t);
+    const b = t.getBoundingClientRect();
+    const dx = (a.left - b.left) / zoom;
+    const dy = (a.top - b.top) / zoom;
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+    t.animate([{ transform: 'translate(' + dx + 'px, ' + dy + 'px)' }, { transform: 'none' }],
+      { duration: 300, easing: 'cubic-bezier(0.2, 0.9, 0.25, 1.15)' });
+  });
+}
+
+function mergeIntoFolder(draggedId, targetId) {
+  const target = (state.sites || []).find((s) => s && s.id === targetId);
+  if (!target) return null;
+  if (target.type === 'folder') {
+    addSitesToFolder(targetId, [draggedId]);
+    return targetId;
+  }
+  mergeSitesIntoNewFolder(draggedId, targetId);
+  return state.sites.find((s) => s.type === 'folder' && Array.isArray(s.children)
+    && s.children.includes(draggedId) && s.children.includes(targetId))?.id || null;
+}
+
+function finishFolderHover(targetId) {
+  const draggedId = dragState.draggedId;
+  clearFolderHover();
+  if (!draggedId || draggedId === targetId) return;
+  const folderId = mergeIntoFolder(draggedId, targetId);
+  dragState.draggedId = null; // the drag is consumed
+  saveData();
+  renderHome();
+  if (folderId) {
+    openFolder(folderId);
+    // Name it right away, like iOS
+    setTimeout(() => { folderNameInput?.focus(); folderNameInput?.select(); }, 60);
+  }
 }
 
 function handleDragOver(event) {
   event.preventDefault();
   event.dataTransfer.dropEffect = 'move';
+  if (!dragState.draggedId) return false;
 
-  const target = event.target.closest('.site-tile');
-  if (!target || target === dragState.draggedElement) return false;
-  dragState.dropTarget = target;
-
-  if (dragState.draggedType !== 'site' && dragState.draggedType !== 'folder') return false;
-
-  const targetTile = target.closest('.site-tile');
-  if (!targetTile || targetTile.classList.contains('add-tile')) return false;
+  const targetTile = event.target.closest('.site-tile');
+  if (!targetTile || targetTile === dragState.draggedElement || targetTile.classList.contains('add-tile')) {
+    if (!targetTile?.classList.contains('merge-target')) clearFolderHover();
+    return false;
+  }
   const grid = targetTile.parentElement;
   if (!grid || !grid.classList.contains('sites-grid')) return false;
+  const targetId = targetTile.dataset.id;
 
-  const isFolderView = !!state.openFolderId;
-  if (dragState.draggedSource === 'home' && !isFolderView) {
-    // Reorder top-level siteOrder
-    const fromIndex = state.siteOrder.indexOf(dragState.draggedId);
-    const toIndex = state.siteOrder.indexOf(targetTile.dataset.id);
-    if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-      const item = state.siteOrder[fromIndex];
-      state.siteOrder.splice(fromIndex, 1);
-      state.siteOrder.splice(toIndex, 0, item);
-      renderHome();
+  // Inside a folder window: plain reorder of its children.
+  if (dragState.draggedSource === 'folder') {
+    const folder = getOpenFolder();
+    if (!folder || !Array.isArray(folder.children)) return false;
+    const from = folder.children.indexOf(dragState.draggedId);
+    const to = folder.children.indexOf(targetId);
+    if (from !== -1 && to !== -1 && from !== to) {
+      animateTileReorder(grid, () => {
+        folder.children.splice(from, 1);
+        folder.children.splice(to, 0, dragState.draggedId);
+        const draggedEl = dragState.draggedElement;
+        grid.insertBefore(draggedEl, from < to ? targetTile.nextSibling : targetTile);
+      });
+      dragState.reordered = true;
     }
-  } else if (dragState.draggedSource === 'folder' && isFolderView) {
-    // Reorder folder children
-    const folder = (state.sites || []).find((s) => s && s.id === state.openFolderId);
-    if (folder && Array.isArray(folder.children)) {
-      const fromIndex = folder.children.indexOf(dragState.draggedId);
-      const toIndex = folder.children.indexOf(targetTile.dataset.id);
-      if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-        const item = folder.children[fromIndex];
-        folder.children.splice(fromIndex, 1);
-        folder.children.splice(toIndex, 0, item);
-        renderHome();
-      }
-    }
+    return false;
   }
+
+  // Home grid: over the icon itself -> folder intent; between icons -> reorder.
+  const iconRect = targetTile.querySelector('.site-tile-icon').getBoundingClientRect();
+  const inset = iconRect.width * 0.18;
+  const overIcon = event.clientX > iconRect.left + inset && event.clientX < iconRect.right - inset
+    && event.clientY > iconRect.top + inset && event.clientY < iconRect.bottom - inset;
+
+  if (overIcon && dragState.draggedType === 'site') {
+    if (dragState.hoverTargetId !== targetId) {
+      clearFolderHover();
+      dragState.hoverTargetId = targetId;
+      targetTile.classList.add('merge-target');
+      dragState.hoverTimer = setTimeout(() => finishFolderHover(targetId), FOLDER_HOVER_MS);
+    }
+    return false;
+  }
+  clearFolderHover();
+
+  const from = state.siteOrder.indexOf(dragState.draggedId);
+  const to = state.siteOrder.indexOf(targetId);
+  if (from === -1 || to === -1 || from === to) return false;
+  const r = targetTile.getBoundingClientRect();
+  const after = event.clientX > r.left + r.width / 2;
+  const next = state.siteOrder.filter((id) => id !== dragState.draggedId);
+  next.splice(next.indexOf(targetId) + (after ? 1 : 0), 0, dragState.draggedId);
+  if (next.join() === state.siteOrder.join()) return false;
+  animateTileReorder(grid, () => {
+    state.siteOrder = next;
+    const draggedEl = dragState.draggedElement;
+    grid.insertBefore(draggedEl, after ? targetTile.nextSibling : targetTile);
+  });
+  dragState.reordered = true;
   return false;
 }
 
 function handleDrop(event, targetId, targetType) {
   event.preventDefault();
   event.stopPropagation();
-
-  const draggedId = dragState.draggedId;
-  const draggedType = dragState.draggedType;
-
-  if (!draggedId || draggedId === targetId) return false;
-
-  const isFolderView = !!state.openFolderId;
-
-  // Same-view reorder was already applied in handleDragOver; just persist.
-  if (
-    (dragState.draggedSource === 'home' && !isFolderView && (targetType === 'site' || targetType === 'folder'))
-    || (dragState.draggedSource === 'folder' && isFolderView && targetType === 'site')
-  ) {
-    saveData();
-    return false;
+  // Dropped while still over another icon: make the folder now.
+  if (dragState.hoverTargetId === targetId && dragState.draggedId && dragState.draggedId !== targetId) {
+    finishFolderHover(targetId);
   }
-
-  // Home view: drop onto a folder tile -> merge into that folder
-  if (!isFolderView && targetType === 'folder') {
-    addSitesToFolder(targetId, [draggedId]);
-    saveData();
-    renderHome();
-    return false;
-  }
-
-  // Home view: drop a site onto a link tile -> merge both into a new folder
-  if (!isFolderView && targetType === 'site' && draggedType === 'site') {
-    mergeSitesIntoNewFolder(draggedId, targetId);
-    saveData();
-    renderHome();
-    return false;
-  }
-
   return false;
 }
 
 function handleDragEnd(event) {
+  clearFolderHover();
   if (dragState.draggedElement) dragState.draggedElement.classList.remove('dragging');
+  if (dragState.reordered) saveData();
   dragState.draggedId = null;
   dragState.draggedType = null;
   dragState.draggedSource = null;
   dragState.draggedElement = null;
   dragState.dropTarget = null;
+  dragState.reordered = false;
 }
 
 // ===== Folder Operations =====
@@ -2925,6 +2994,9 @@ renderSearchEngine();
 function showContextMenu(event, item, type) {
   event.preventDefault();
   event.stopPropagation();
+  // Only one context menu at a time
+  hideAllContextMenus();
+  window.hideWidgetMenu?.();
   contextMenuState.visible = true;
   contextMenuState.targetItem = item;
   contextMenuState.targetType = type;
@@ -2973,8 +3045,7 @@ function renderContextMenu() {
   setAddType('site');
   document.getElementById('siteName').value = item.name;
   document.getElementById('siteUrl').value = item.url;
-  document.getElementById('showOnHome').checked = item.showOnHome;
-  pendingSiteIcon = undefined;
+  resetIconDraft(item);
 
   // Store the item being edited for save logic
   window.editingItem = { item, type };
@@ -3164,7 +3235,32 @@ function getSiteInitial(site) {
   return name ? name.charAt(0).toUpperCase() : '?';
 }
 
+// Text icon chosen in the editor: a short label on a solid color.
+const ICON_TEXT_MAX = 4;
+
+function isValidIconColor(color) {
+  return typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color);
+}
+
+function createTextIcon(text, color) {
+  const icon = document.createElement('div');
+  icon.className = 'site-tile-icon is-text-icon';
+  icon.style.setProperty('--icon-bg', color);
+  const hex = color.replace('#', '');
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  // perceived brightness decides white or dark text
+  icon.classList.toggle('is-light-bg', (r * 299 + g * 587 + b * 114) / 1000 > 170);
+  const label = document.createElement('span');
+  label.className = 'site-tile-text';
+  const chars = Array.from(String(text).trim()).slice(0, ICON_TEXT_MAX);
+  label.textContent = chars.join('');
+  label.dataset.len = String(chars.length);
+  icon.appendChild(label);
+  return icon;
+}
+
 function createFaviconIcon(site) {
+  if (site.iconText && isValidIconColor(site.iconColor)) return createTextIcon(site.iconText, site.iconColor);
   const icon = document.createElement('div');
   icon.className = 'site-tile-icon glass';
 
@@ -3200,6 +3296,13 @@ function createFolderIcon(children) {
   children.slice(0, 9).forEach((child) => {
     const mini = document.createElement('span');
     mini.className = 'folder-mini';
+    if (child.iconText && isValidIconColor(child.iconColor)) {
+      mini.classList.add('is-text-mini');
+      mini.style.background = child.iconColor;
+      mini.textContent = Array.from(child.iconText)[0] || '';
+      icon.appendChild(mini);
+      return;
+    }
     const sources = getFaviconSources(child.url);
     if (isValidSiteIcon(child.customIcon)) sources.unshift(child.customIcon);
     const showLetter = () => {
@@ -3388,53 +3491,113 @@ folderOverlay?.addEventListener('dragover', (e) => {
   saveData();
 });
 
-// Home sites that can go into a new folder (links not already in one).
-function renderFolderSitePicker() {
-  const picker = document.getElementById('folderSitePicker');
-  if (!picker) return;
-  const inFolder = new Set((state.sites || [])
-    .filter((s) => s && s.type === 'folder')
-    .flatMap((f) => (Array.isArray(f.children) ? f.children : [])));
-  const sites = getVisibleSites().filter((s) => s.type !== 'folder' && !inFolder.has(s.id));
-  picker.replaceChildren();
-  if (!sites.length) {
-    const empty = document.createElement('p');
-    empty.className = 'folder-picker-empty';
-    empty.textContent = i18n.t('folderNoSites');
-    picker.appendChild(empty);
-    return;
-  }
-  sites.forEach((site) => {
-    const row = document.createElement('label');
-    row.className = 'folder-picker-row';
-    const box = document.createElement('input');
-    box.type = 'checkbox';
-    box.value = site.id;
-    const name = document.createElement('span');
-    name.className = 'folder-picker-name';
-    name.textContent = site.name || site.url;
-    row.append(box, createFaviconIcon(site), name);
-    picker.appendChild(row);
-  });
+
+// Icon draft in the add/edit dialog.
+//   mode 'auto': favicon (or an uploaded image in `image`)
+//   mode 'text': `text` on the `color` background
+let iconDraft = { mode: 'auto', image: '', text: '', color: '' };
+
+const ICON_COLORS = ['#007aff', '#af52de', '#ff2d55', '#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#8e8e93', '#1c1c1e', '#ffffff'];
+
+function resetIconDraft(site) {
+  iconDraft = {
+    mode: site && site.iconText ? 'text' : 'auto',
+    image: (site && site.customIcon) || '',
+    text: (site && site.iconText) || '',
+    color: (site && isValidIconColor(site.iconColor) && site.iconColor) || ICON_COLORS[0]
+  };
+  const textInput = document.getElementById('iconTextInput');
+  if (textInput) textInput.value = iconDraft.text;
 }
 
-// Icon chosen in the add/edit dialog: undefined = leave as is, '' = automatic
-// (favicon), otherwise a data URL.
-let pendingSiteIcon;
+function iconDraftText() {
+  const name = (document.getElementById('siteName')?.value || '').trim();
+  return iconDraft.text.trim() || Array.from(name)[0] || '';
+}
+
+function renderIconColorSwatches() {
+  const group = document.getElementById('iconColorGroup');
+  if (!group) return;
+  if (group.children.length !== ICON_COLORS.length + 1) {
+    group.innerHTML = ICON_COLORS.map((c) =>
+      '<button type="button" class="accent-swatch" role="radio" data-icon-color="' + c + '" style="--swatch:' + c + '"></button>'
+    ).join('') + '<label class="accent-swatch accent-swatch--custom" role="radio" data-icon-color="custom">' +
+      '<input type="color" id="iconColorCustom" aria-label="custom"></label>';
+    group.querySelectorAll('button[data-icon-color]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        iconDraft.color = btn.dataset.iconColor;
+        renderSiteIconPreview();
+      });
+    });
+    document.getElementById('iconColorCustom').addEventListener('input', (e) => {
+      iconDraft.color = e.target.value;
+      renderSiteIconPreview();
+    });
+  }
+  group.querySelectorAll('[data-icon-color]').forEach((el) => {
+    const isCustom = el.dataset.iconColor === 'custom';
+    const checked = isCustom ? !ICON_COLORS.includes(iconDraft.color) : el.dataset.iconColor === iconDraft.color;
+    el.setAttribute('aria-checked', String(checked));
+    if (isCustom) el.style.setProperty('--swatch', checked ? iconDraft.color : 'transparent');
+  });
+}
 
 function renderSiteIconPreview() {
   const preview = document.getElementById('siteIconPreview');
   if (!preview) return;
-  const editingIcon = window.editingItem?.type === 'site' ? window.editingItem.item.customIcon : '';
-  const icon = pendingSiteIcon === undefined ? editingIcon : pendingSiteIcon;
   const url = (document.getElementById('siteUrl')?.value || '').trim();
-  const site = {
-    name: (document.getElementById('siteName')?.value || '').trim() || url,
-    url: url && !/^https?:\/\//i.test(url) ? 'https://' + url : url,
-    customIcon: icon
-  };
-  preview.replaceChildren(createFaviconIcon(site));
-  document.getElementById('siteIconAuto')?.classList.toggle('hidden', !icon);
+  const isText = iconDraft.mode === 'text';
+  document.querySelectorAll('#iconModeGroup .seg-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.iconMode === iconDraft.mode);
+  });
+  document.getElementById('iconCustomPanel')?.classList.toggle('hidden', !isText && !iconDraft.image);
+  document.querySelectorAll('#iconCustomPanel .icon-custom-row').forEach((row) => row.classList.toggle('hidden', !isText));
+  const textInput = document.getElementById('iconTextInput');
+  if (textInput) textInput.placeholder = Array.from((document.getElementById('siteName')?.value || '').trim())[0] || 'A';
+  renderIconColorSwatches();
+
+  let icon;
+  if (isText) {
+    icon = iconDraftText() ? createTextIcon(iconDraftText(), iconDraft.color) : createTextIcon('', iconDraft.color);
+  } else if (iconDraft.image) {
+    icon = createFaviconIcon({ url, customIcon: iconDraft.image });
+  } else if (!url) {
+    // Nothing to fetch yet: an empty plate, no placeholder glyph.
+    icon = document.createElement('div');
+    icon.className = 'site-tile-icon is-empty';
+  } else {
+    icon = createFaviconIcon({
+      name: (document.getElementById('siteName')?.value || '').trim() || url,
+      url: /^https?:\/\//i.test(url) ? url : 'https://' + url
+    });
+  }
+  preview.replaceChildren(icon);
+}
+
+document.querySelectorAll('#iconModeGroup .seg-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    iconDraft.mode = btn.dataset.iconMode;
+    if (iconDraft.mode === 'auto') iconDraft.image = '';
+    renderSiteIconPreview();
+    if (iconDraft.mode === 'text') document.getElementById('iconTextInput')?.focus();
+  });
+});
+document.getElementById('iconTextInput')?.addEventListener('input', (e) => {
+  iconDraft.text = e.target.value;
+  renderSiteIconPreview();
+});
+
+// Writes the dialog's icon choice onto a site object.
+function applyIconDraft(site) {
+  delete site.customIcon;
+  delete site.iconText;
+  delete site.iconColor;
+  if (iconDraft.mode === 'text' && iconDraftText()) {
+    site.iconText = iconDraftText();
+    site.iconColor = iconDraft.color;
+  } else if (iconDraft.image) {
+    site.customIcon = iconDraft.image;
+  }
 }
 
 function setAddType(type) {
@@ -3447,13 +3610,12 @@ function setAddType(type) {
 
 // type: 'site' (default) or 'folder'
 function openAddSiteModal(type) {
-  pendingSiteIcon = undefined;
+  resetIconDraft(null);
   window.editingItem = undefined;
   document.getElementById('siteName').value = '';
   document.getElementById('siteUrl').value = '';
   document.getElementById('newFolderName').value = '';
   setAddType(type === 'folder' ? 'folder' : 'site');
-  renderFolderSitePicker();
   renderSiteIconPreview();
   addModal.classList.remove('hidden');
   modalOverlay.classList.remove('hidden');
@@ -3474,14 +3636,12 @@ document.getElementById('siteIconFile')?.addEventListener('change', (e) => {
   const file = e.target.files && e.target.files[0];
   e.target.value = '';
   imageFileToIcon(file).then((icon) => {
-    pendingSiteIcon = icon;
+    iconDraft.mode = 'auto';
+    iconDraft.image = icon;
     renderSiteIconPreview();
   }).catch(() => window.showNotification?.(i18n.t('iconInvalid'), 'warning'));
 });
-document.getElementById('siteIconAuto')?.addEventListener('click', () => {
-  pendingSiteIcon = '';
-  renderSiteIconPreview();
-});// ===== Add/Edit Modal =====
+// ===== Add/Edit Modal =====
 // Note: Add button is now rendered as a chip in renderHome()
 
 function closeModals() {
@@ -3501,7 +3661,7 @@ modalOverlay.onclick = (e) => {
 addTypeRadios.forEach(radio => {
   radio.addEventListener('change', (e) => {
     setAddType(e.target.value);
-    if (e.target.value === 'folder') renderFolderSitePicker();
+
   });
 });
 
@@ -3525,7 +3685,8 @@ saveItemBtn.addEventListener('click', async () => {
 
     if (!url.startsWith('http')) url = 'https://' + url;
 
-    const showOnHome = document.getElementById('showOnHome').checked;
+    // Every site is pinned to the home page (the option was removed).
+    const showOnHome = true;
 
     if (isEditing) {
       // Update existing site
@@ -3534,10 +3695,7 @@ saveItemBtn.addEventListener('click', async () => {
         state.sites[siteIndex].name = name;
         state.sites[siteIndex].url = url;
         state.sites[siteIndex].showOnHome = showOnHome;
-        if (pendingSiteIcon !== undefined) {
-          if (pendingSiteIcon) state.sites[siteIndex].customIcon = pendingSiteIcon;
-          else delete state.sites[siteIndex].customIcon;
-        }
+        applyIconDraft(state.sites[siteIndex]);
 
         // Update siteOrder if showOnHome changed
         const inOrder = state.siteOrder.includes(state.sites[siteIndex].id);
@@ -3556,7 +3714,7 @@ saveItemBtn.addEventListener('click', async () => {
         tags: [],
         showOnHome
       };
-      if (pendingSiteIcon) newSite.customIcon = pendingSiteIcon;
+      applyIconDraft(newSite);
 
       state.sites.push(newSite);
 
@@ -3567,7 +3725,7 @@ saveItemBtn.addEventListener('click', async () => {
     }
   } else {
     const name = document.getElementById('newFolderName').value.trim() || i18n.t('newFolder') || 'New Folder';
-    const ids = Array.from(document.querySelectorAll('#folderSitePicker input:checked')).map((cb) => cb.value);
+    const ids = [];
     const folder = { id: generateUuid(), type: 'folder', name, url: '', showOnHome: true, tags: [], children: ids };
     state.sites.push(folder);
     // The folder takes the place of the first site it swallowed.
@@ -3579,7 +3737,6 @@ saveItemBtn.addEventListener('click', async () => {
 
   // Clear editing state
   window.editingItem = undefined;
-  pendingSiteIcon = undefined;
 
   const saved = await saveData();
   if (saved === false) return;
@@ -4106,8 +4263,10 @@ function showPageContextMenu(e) {
   // Always prevent default browser context menu
   e.preventDefault();
 
-  // Hide any existing context menus first
+  // Hide any existing context menus first (including an icon's or widget's menu)
   hideAllContextMenus();
+  hideContextMenu();
+  window.hideWidgetMenu?.();
 
   // Do not show any context menu on search/time/date
   const noMenuSelectors = [
@@ -4297,6 +4456,8 @@ document.addEventListener('click', hideAllContextMenus);
 document.addEventListener('scroll', hideAllContextMenus);
 
 // Export context menu functions
+window.hideAllContextMenus = hideAllContextMenus;
+window.hideContextMenu = hideContextMenu;
 window.openAddSiteFromContext = openAddSiteFromContext;
 window.openAddFolderFromContext = openAddFolderFromContext;
 window.openWallpaperFromContext = openWallpaperFromContext;

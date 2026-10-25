@@ -264,7 +264,7 @@ function buildHomeConfigFromLegacy(legacy) {
         type: row.type === 'folder' ? 'folder' : 'link',
         children: row.type === 'folder' ? (Array.isArray(row.children) ? row.children : []) : undefined,
         customIcon: row.icon || undefined
-    }));
+    })).map(decodeSiteIcon);
 
     const orderedSiteIds = (legacy.siteOrderRows || [])
         .slice()
@@ -467,7 +467,7 @@ async function saveLegacyHomeConfigFallback(uid, payload, syncedAt) {
             show_on_home: site.showOnHome !== false,
             type: site.type === 'folder' ? 'folder' : 'link',
             children: site.type === 'folder' ? (Array.isArray(site.children) ? site.children : []) : [],
-            icon: site.customIcon || null,
+            icon: encodeSiteIcon(site) || null,
             updated_at: syncedAt
         }));
         let ok;
@@ -608,7 +608,7 @@ function buildCurrentHomePayload() {
             showOnHome: !!s.showOnHome,
             type: s.type === 'folder' ? 'folder' : 'link',
             children: s.type === 'folder' ? (Array.isArray(s.children) ? s.children : []) : undefined,
-            customIcon: s.customIcon || undefined
+            customIcon: encodeSiteIcon(s)
         })),
         tags: state.tags || [],
         tag_order: state.tagOrder || [],
@@ -648,6 +648,28 @@ async function persistHomeConfig(uid, payload, syncedAt) {
     clearPendingMeta(uid, 'home', syncedAt);
 }
 
+// Text icons travel in the same `icon` column as images: "text:#rrggbb:Label".
+const TEXT_ICON_RE = /^text:(#[0-9a-f]{6}):(.{1,16})$/is;
+
+function encodeSiteIcon(site) {
+    if (site && site.iconText && /^#[0-9a-f]{6}$/i.test(site.iconColor || '')) {
+        return 'text:' + site.iconColor + ':' + Array.from(String(site.iconText)).slice(0, 4).join('');
+    }
+    return (site && site.customIcon) || undefined;
+}
+
+// Splits a stored icon back into customIcon or iconText/iconColor.
+function decodeSiteIcon(site) {
+    if (!site) return site;
+    const m = typeof site.customIcon === 'string' && site.customIcon.match(TEXT_ICON_RE);
+    if (m) {
+        delete site.customIcon;
+        site.iconColor = m[1].toLowerCase();
+        site.iconText = m[2];
+    }
+    return site;
+}
+
 // Applies the parsed Home Config payload directly to internal running state
 function applyHomeConfig(config) {
     if (!config || typeof config !== 'object') return;
@@ -655,10 +677,14 @@ function applyHomeConfig(config) {
     if (Array.isArray(config.sites)) {
         // Without the icon column the server can't return custom icons; keep
         // the ones this device has instead of wiping them on every refresh.
+        config.sites.forEach(decodeSiteIcon);
         if (siteIconColumnMissing && Array.isArray(state.sites)) {
-            const localIcons = new Map(state.sites.filter((x) => x && x.customIcon).map((x) => [x.id, x.customIcon]));
+            const localIcons = new Map(state.sites.filter((x) => x && (x.customIcon || x.iconText)).map((x) => [x.id, x]));
             config.sites.forEach((site) => {
-                if (site && !site.customIcon && localIcons.has(site.id)) site.customIcon = localIcons.get(site.id);
+                const local = site && !site.customIcon && !site.iconText && localIcons.get(site.id);
+                if (!local) return;
+                if (local.customIcon) site.customIcon = local.customIcon;
+                if (local.iconText) { site.iconText = local.iconText; site.iconColor = local.iconColor; }
             });
         }
         state.sites = config.sites;

@@ -81,6 +81,10 @@ body[data-wallpaper-tone="light"] {
 /* ---------- Clock ---------- */
 .time {
   font: var(--text-clock);
+  /* DIN: built into macOS / iOS (DIN Alternate); D-DIN or DIN Next if installed;
+     otherwise the system rounded face. */
+  font-family: "DIN Alternate", "DIN Next LT Pro", "D-DIN", "DIN", "Bahnschrift", var(--font-rounded);
+  font-weight: 700;
   font-size: clamp(72px, 9vw, 112px);
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
@@ -165,9 +169,9 @@ body[data-wallpaper-tone="light"] {
 }
 
 #engineIcon {
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
   object-fit: contain;
 }
 
@@ -193,8 +197,9 @@ body[data-wallpaper-tone="light"] {
 .engine-menu,
 .context-menu,
 .page-context-menu {
-  padding: var(--space-1);
-  border-radius: var(--radius-lg);
+  /* concentric: row radius (14) = menu radius (20) - padding (6) */
+  padding: 6px;
+  border-radius: 20px;
   box-shadow:
     0 0 0 0.5px var(--glass-edge),
     inset 0 1px 0 0 var(--glass-rim),
@@ -278,7 +283,14 @@ body[data-wallpaper-tone="light"] {
     visibility 0s linear var(--dur-base);
 }
 
-/* Menu rows */
+/* Menu rows (2px apart so hover pills never touch) */
+.settings-menu-item + .settings-menu-item,
+.settings-submenu div + div,
+.context-menu-item + .context-menu-item,
+.engine-option + .engine-option {
+  margin-top: 2px;
+}
+
 .settings-menu-item,
 .settings-submenu div,
 .context-menu-item,
@@ -287,9 +299,9 @@ body[data-wallpaper-tone="light"] {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-height: 34px;
-  padding: 0 var(--space-3);
-  border-radius: var(--radius-xs);
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 14px;
   color: var(--label-1);
   font: var(--text-body);
   white-space: nowrap;
@@ -347,7 +359,7 @@ body[data-wallpaper-tone="light"] {
   flex: 1;
   align-items: center;
   gap: var(--space-2);
-  min-height: 34px;
+  min-height: 38px;
 }
 
 .engine-option img {
@@ -394,10 +406,10 @@ body[data-wallpaper-tone="light"] {
 
 .engine-add-btn {
   width: 100%;
-  min-height: 34px;
-  padding: 0 var(--space-3);
+  min-height: 38px;
+  padding: 0 14px;
   border: 0;
-  border-radius: var(--radius-xs);
+  border-radius: 14px;
   background: transparent;
   box-shadow: none;
   color: var(--accent);
@@ -466,8 +478,61 @@ body[data-wallpaper-tone="light"] {
 }
 
 .site-tile.dragging {
-  opacity: 0.45;
+  opacity: 0.25;
+  transform: scale(0.9);
+  transition: opacity 0.15s, transform 0.2s;
 }
+
+/* Held over another icon: it swells to show a folder will be made */
+.site-tile.merge-target .site-tile-icon {
+  transform: scale(1.14);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent), var(--shadow-2, none);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.25, 1.2), box-shadow 0.2s;
+}
+
+/* Text icon: label on a solid color */
+.site-tile-icon.is-text-icon {
+  background: var(--icon-bg);
+  color: #fff;
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  overflow: hidden;
+}
+.site-tile-icon.is-text-icon.is-light-bg { color: #1c1c1e; }
+.site-tile-text { font-size: 26px; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; }
+.site-tile-text[data-len="2"] { font-size: 21px; }
+.site-tile-text[data-len="3"] { font-size: 16px; }
+.site-tile-text[data-len="4"] { font-size: 13px; }
+.site-tile-icon.is-empty {
+  background: var(--fill-tertiary, rgba(120, 120, 128, 0.12));
+  border: 1px dashed var(--separator, rgba(120, 120, 128, 0.3));
+}
+.is-text-mini {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 7px;
+  font-weight: 700;
+  border-radius: 4px;
+}
+
+/* Icon editor */
+.icon-mode-tabs { flex: 1; }
+.icon-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+.icon-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.icon-custom-row .section-label { min-width: 52px; margin: 0; }
+.icon-custom-row .modal-input { flex: 1; }
+.icon-custom .accent-swatches { flex-wrap: wrap; }
+.icon-upload-btn { align-self: flex-start; }
 
 .site-tile-icon {
   display: grid;

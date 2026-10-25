@@ -580,7 +580,7 @@
   height: var(--control-sm);
   padding: 0 var(--space-2);
   border: 0;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-capsule);
   background: var(--fill-3);
   box-shadow: none;
   font: var(--text-subhead);
