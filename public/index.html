@@ -10,8 +10,8 @@
   <script src="appearance.js?v=20261025-glass"></script>
   <link rel="stylesheet" href="tokens.css?v=20261025-glass" />
   <link rel="stylesheet" href="glass.css?v=20261025-glass" />
-  <link rel="stylesheet" href="style.css?v=20260326-uifix-4" />
-  <link rel="stylesheet" href="wallpaper-modal.css?v=20260326-uifix-4" />
+  <link rel="stylesheet" href="style.css?v=20261025-glass" />
+  <link rel="stylesheet" href="wallpaper-modal.css?v=20261025-glass" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260131">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20260131">
   <link rel="shortcut icon" href="/favicon.png?v=20260131">
@@ -76,32 +76,35 @@
     </div>
   </div>
 
-  <div id="screens" class="screens">
-    <div id="screenHome" class="screen screen-home">
-  <div class="container">
-    <div id="time" class="time">00:00</div>
-    <div id="date" class="date"></div>
+  <main id="pager" class="pager">
+    <section id="pageHome" class="page page-home" data-page="home" aria-labelledby="time">
+      <div class="container">
+        <div id="time" class="time">00:00</div>
+        <div id="date" class="date"></div>
 
-    <form id="searchForm" class="search-box">
-      <div id="searchEngine" class="search-engine">
-        <img id="engineIcon" src="" alt="Engine" />
-        <div id="engineMenu" class="engine-menu hidden">
-          <!-- Populated by JS -->
-        </div>
+        <form id="searchForm" class="search-box">
+          <div id="searchEngine" class="search-engine">
+            <img id="engineIcon" src="" alt="Engine" />
+            <div id="engineMenu" class="engine-menu hidden">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+          <input id="searchInput" type="text" placeholder="想要搜点什么吗？" autocomplete="off" />
+        </form>
+
+        <!-- Content Area: pinned sites and tags -->
+        <div id="content" class="content-area"></div>
+
+        <div id="homeFooter" class="home-footer" style="display:none;"></div>
       </div>
-      <input id="searchInput" type="text" placeholder="想要搜点什么吗？" autocomplete="off" />
-    </form>
-  
-    <!-- <div id="engineQuickList" class="engine-quick-list"></div> -->
-  
-    <!-- Content Area: pinned sites and tags -->
-    <div id="content" class="content-area"></div>
 
-    <div id="homeFooter" class="home-footer" style="display:none;"></div>
-  </div>
+      <button type="button" id="toWorkspaceBtn" class="to-workspace glass glass--capsule glass--clear">
+        <span id="toWorkspaceText">工作台</span>
+        <svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </section>
 
-    </div>
-    <div id="screenWorkbench" class="screen screen-workbench">
+    <section id="pageWorkspace" class="page page-workspace" data-page="workspace" data-hash="workspace" aria-labelledby="workbenchHeader">
       <div class="workbench">
         <div class="workbench-header" id="workbenchHeader"></div>
         <div class="workbench-plugins">
@@ -113,8 +116,15 @@
           <div class="agent-panel" id="agentPanel"></div>
         </div>
       </div>
+    </section>
+  </main>
+
+  <nav id="pagerDots" class="pager-dock glass glass--capsule glass--clear" aria-label="Pages">
+    <div class="pager-dots">
+      <button type="button" id="dotHome" aria-label="首页" aria-current="true"></button>
+      <button type="button" id="dotWorkspace" aria-label="工作台" aria-current="false"></button>
     </div>
-  </div>
+  </nav>
 
   <!-- Context Menu -->
   <div id="contextMenu" class="context-menu hidden"></div>
@@ -433,14 +443,15 @@
     </div>
   </div>
 
-  <script src="config.js?v=20260326-uifix-4"></script>
+  <script src="config.js?v=20261025-glass"></script>
   <script src="supabase-client.js"></script>
-  <script src="wallpaper.js?v=20260326-uifix-4"></script>
+  <script src="wallpaper.js?v=20261025-glass"></script>
   <script src="paddle.js"></script>
-  <script src="membership.js?v=20260326-uifix-4"></script>
-  <script src="auth.js?v=20260326-uifix-4"></script>
-  <script src="data-sync.js?v=20260326-uifix-4"></script>
-  <script src="/script.js?v=20260326-uifix-4"></script>
+  <script src="membership.js?v=20261025-glass"></script>
+  <script src="auth.js?v=20261025-glass"></script>
+  <script src="data-sync.js?v=20261025-glass"></script>
+  <script src="pager.js?v=20261025-glass"></script>
+  <script src="/script.js?v=20261025-glass"></script>
 </body>
 
 </html>

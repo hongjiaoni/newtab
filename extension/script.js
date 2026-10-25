@@ -139,7 +139,7 @@ const translations = {
     todoPlaceholder: '添加待办事项',
     calendarEmpty: '当日暂无日程',
     eventPlaceholder: '添加日程',
-    workbenchHint: '鼠标滚轮在首页滚动，切换到工作台',
+    workbenchHint: '向上滚动或按 PageUp 返回首页',
     agentProject: '项目',
     agentChats: '对话',
     agentNewProject: '新建项目',
@@ -446,7 +446,7 @@ const translations = {
     todoPlaceholder: 'Ajouter une tâche',
     calendarEmpty: 'Aucun événement ce jour',
     eventPlaceholder: 'Ajouter un événement',
-    workbenchHint: 'Faites défiler la page d\'accueil pour accéder au tableau de bord',
+    workbenchHint: 'Faites défiler vers le haut ou appuyez sur Page précédente pour revenir à l\'accueil',
     agentProject: 'Projet',
     agentChats: 'Conversations',
     agentNewProject: 'Nouveau projet',
@@ -661,7 +661,7 @@ const translations = {
     todoPlaceholder: 'Añadir tarea',
     calendarEmpty: 'Sin eventos hoy',
     eventPlaceholder: 'Añadir evento',
-    workbenchHint: 'Desplázate en la página de inicio para ir al panel',
+    workbenchHint: 'Desplázate hacia arriba o pulsa RePág para volver al inicio',
     agentProject: 'Proyecto',
     agentChats: 'Conversaciones',
     agentNewProject: 'Nuevo proyecto',
@@ -876,7 +876,7 @@ const translations = {
     todoPlaceholder: 'タスクを追加',
     calendarEmpty: '当日の予定はありません',
     eventPlaceholder: '予定を追加',
-    workbenchHint: 'ホームページでスクロールするとワークスペースへ',
+    workbenchHint: '上にスクロールするか PageUp でホームに戻ります',
     agentProject: 'プロジェクト',
     agentChats: 'チャット',
     agentNewProject: '新規プロジェクト',
@@ -1091,7 +1091,7 @@ const translations = {
     todoPlaceholder: '할 일 추가',
     calendarEmpty: '일정이 없습니다',
     eventPlaceholder: '일정 추가',
-    workbenchHint: '홈페이지에서 스크롤하면 워크스페이스로 이동합니다',
+    workbenchHint: '위로 스크롤하거나 PageUp을 눌러 홈으로 돌아갑니다',
     agentProject: '프로젝트',
     agentChats: '채팅',
     agentNewProject: '새 프로젝트',
@@ -1357,7 +1357,7 @@ const TRANSLATION_OVERRIDES = {
     todoPlaceholder: 'Add a todo item',
     calendarEmpty: 'No events for this day',
     eventPlaceholder: 'Add an event',
-    workbenchHint: 'Scroll on the home page to switch to the workbench',
+    workbenchHint: 'Scroll up or press PageUp to return home',
     agentProject: 'Project',
     agentChats: 'Chats',
     agentNewProject: 'New Project',
@@ -1612,6 +1612,10 @@ window.updateAllText = function () {
   if (obCurrentEl) obCurrentEl.textContent = i18n.t('obCurrent') || 'Current tab';
   if (settingsAboutBtnEl) settingsAboutBtnEl.textContent = i18n.t('settingsAbout') || 'About';
   if (closeSettingsModalEl) closeSettingsModalEl.textContent = i18n.t('close') || 'Close';
+  const toWorkspaceTextEl = document.getElementById('toWorkspaceText');
+  if (toWorkspaceTextEl) toWorkspaceTextEl.textContent = i18n.t('workbench') || 'Workbench';
+  document.getElementById('dotHome')?.setAttribute('aria-label', i18n.t('wbBackHome') || 'Home');
+  document.getElementById('dotWorkspace')?.setAttribute('aria-label', i18n.t('workbench') || 'Workbench');
   const appearanceLabels = {
     appearanceLabel: i18n.t('appearance') || 'Appearance',
     apLight: i18n.t('lightMode') || 'Light',
@@ -3707,55 +3711,23 @@ document.getElementById('settingsAboutBtn')?.addEventListener('click', () => {
 });
 document.getElementById('closeSettingsModal')?.addEventListener('click', closeSettingsModal);
 
-// ===== Two-screen horizontal scroll =====
-function setupScreensScroll() {
-  const screens = document.getElementById('screens');
-  if (!screens) return;
+// ===== Vertical pager: home <-> workspace =====
+let pager = null;
 
-  function canScroll(el, deltaY) {
-    if (!el) return false;
-    if (deltaY > 0) return el.scrollTop < el.scrollHeight - el.clientHeight - 1;
-    return el.scrollTop > 1;
-  }
-
-  screens.addEventListener('wheel', (e) => {
-    const deltaX = e.deltaX || 0;
-    const deltaY = e.deltaY || 0;
-    // Horizontal wheel / trackpad swipe -> horizontal scroll directly
-    if (Math.abs(deltaX) > Math.abs(deltaY)) {
-      e.preventDefault();
-      screens.scrollLeft += deltaX;
-      return;
+function setupPager() {
+  const container = document.getElementById('pager');
+  if (!container || typeof window.createPager !== 'function') return;
+  pager = window.createPager({
+    container,
+    dots: document.querySelectorAll('#pagerDots button'),
+    // Modals and menus own the wheel/keyboard while they are open.
+    isBlocked: () => hasOpenTransientUi(),
+    onChange: (_index, name) => {
+      if (name === 'home') searchInput?.focus({ preventScroll: true });
     }
-    const screenEl = e.target.closest('.screen');
-    if (!screenEl) return;
-
-    if (screenEl.id === 'screenWorkbench') {
-      const inner = e.target.closest('.agent-messages, .plugin-editor, .agent-sidebar');
-      if (inner && canScroll(inner, deltaY)) return; // inner panel scrolls
-      if (canScroll(screenEl, deltaY)) {
-        screenEl.scrollTop += deltaY;
-        e.preventDefault();
-        return;
-      }
-    }
-    e.preventDefault();
-    screens.scrollLeft += deltaY;
-  }, { passive: false });
-
-  let ticking = false;
-  screens.addEventListener('scroll', () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(() => {
-      const threshold = screens.clientWidth * 0.5;
-      document.body.classList.toggle('workbench-visible', screens.scrollLeft >= threshold);
-      ticking = false;
-    });
   });
+  document.getElementById('toWorkspaceBtn')?.addEventListener('click', () => pager.go(1));
 }
-
-window.setupScreensScroll = setupScreensScroll;
 
 function isElementVisible(element) {
   return !!element && !element.classList.contains('hidden');
@@ -3774,7 +3746,6 @@ function hasOpenTransientUi() {
     pageContextMenu,
     itemContextMenu,
     settingsModal,
-    document.getElementById('appearanceModal'),
     document.getElementById('pluginModal')
   ].some(isElementVisible);
 }
@@ -4396,18 +4367,16 @@ function pluginName(type) {
 }
 
 function initWorkbench() {
-  if (!document.getElementById('screenWorkbench')) return;
+  if (!document.getElementById('pageWorkspace')) return;
   renderWorkbench();
 }
 
 function scrollToHomeScreen() {
-  const screens = document.getElementById('screens');
-  if (screens) screens.scrollTo({ left: 0, behavior: 'smooth' });
+  pager?.go(0);
 }
 
 function scrollToWorkbenchScreen() {
-  const screens = document.getElementById('screens');
-  if (screens) screens.scrollTo({ left: screens.clientWidth, behavior: 'smooth' });
+  pager?.go(1);
 }
 
 function renderWorkbench() {
@@ -4416,7 +4385,7 @@ function renderWorkbench() {
     header.innerHTML = '';
     const back = document.createElement('button');
     back.className = 'workbench-back-btn';
-    back.textContent = '←';
+    back.innerHTML = '<svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>';
     back.setAttribute('aria-label', i18n.t('wbBackHome') || 'Home');
     back.title = i18n.t('wbBackHome') || 'Home';
     back.addEventListener('click', scrollToHomeScreen);
@@ -5274,7 +5243,7 @@ try {
   if (cb) cb.remove();
 } catch (_err) { /* ignore */ }
 applyZoomLevel(state.zoomLevel, false);
-setupScreensScroll();
+setupPager();
 window.initWorkbench?.();
 searchInput.focus();
 updateAllText();

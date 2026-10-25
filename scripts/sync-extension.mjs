@@ -25,6 +25,7 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // sync with the script tags referenced by index.html.
 export const COPY_FILES = [
   'appearance.js',
+  'pager.js',
   'tokens.css',
   'glass.css',
   'script.js',

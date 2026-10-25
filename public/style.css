@@ -1615,38 +1615,89 @@ input:disabled {
 }
 
 /* =====================================================================
-   Workspace (2026-08): two-screen horizontal layout, workbench,
+   Workspace (2026-08): vertical pager, workbench,
    hamburger menu, settings modal, appearance panel, agent chat
    ===================================================================== */
 
-/* ---------- Two-screen layout ---------- */
-.screens {
-  display: flex;
+/* ---------- Vertical pager (pager.js) ---------- */
+.pager {
   width: 100%;
   height: var(--vh-full);
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
   scrollbar-width: none;
+  overscroll-behavior: contain;
 }
 
-.screens::-webkit-scrollbar {
+.pager::-webkit-scrollbar {
   display: none;
 }
 
-.screen {
-  flex: 0 0 var(--vw-full);
-  width: var(--vw-full);
+/* Each page scrolls on its own; pager.js turns the page only at its edge. */
+.page {
+  position: relative;
   height: var(--vh-full);
   overflow-y: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
   scroll-snap-align: start;
-  position: relative;
+  scroll-snap-stop: always;
+  display: flex;
+  justify-content: center;
 }
 
-body.workbench-visible .home-footer {
+.page-home {
+  align-items: center;
+}
+
+.page-workspace {
+  align-items: flex-start;
+}
+
+.pager-dock {
+  position: fixed;
+  right: var(--space-5);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+}
+
+.to-workspace {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-6);
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  font: var(--text-footnote);
+  cursor: pointer;
+  transition: transform var(--dur-base) var(--ease-spring), opacity var(--dur-base) var(--ease-standard);
+}
+
+.to-workspace .sym {
+  width: 14px;
+  height: 14px;
+  animation: to-workspace-nudge 2.4s var(--ease-standard) infinite;
+}
+
+.to-workspace:active {
+  transform: translateX(-50%) scale(0.95);
+}
+
+@keyframes to-workspace-nudge {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .to-workspace .sym { animation: none; }
+}
+
+body[data-page="workspace"] .home-footer {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.25s ease;
@@ -2543,10 +2594,6 @@ customize-button {
 /* =====================================================================
    Workbench — Notion-style layout (2026-08)
    ===================================================================== */
-.screen-workbench {
-  align-items: flex-start;
-}
-
 .workbench {
   max-width: 900px;
   width: 100%;
@@ -2570,6 +2617,7 @@ customize-button {
   align-items: center;
   justify-content: center;
   flex: 0 0 36px;
+  padding: 0;
   background: var(--button-bg);
   border: 1.5px solid var(--border-color);
   color: var(--text-color);
@@ -2581,9 +2629,13 @@ customize-button {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
+.workbench-back-btn .sym {
+  flex: none;
+}
+
 .workbench-back-btn:hover {
   background: var(--hover-bg);
-  transform: translateX(-2px);
+  transform: translateY(-2px);
 }
 
 .workbench-title {
