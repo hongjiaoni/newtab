@@ -30,6 +30,9 @@ const translations = {
     tagName: '标签名称',
     selectTags: '选择标签',
     pinToHome: '固定在首页',
+    engineLimit: '最多只能选择 5 个搜索引擎', engineSelected: '已选 {n}/5',
+    iconTextLabel: '文字', iconColorLabel: '背景色', iconCustom: '自定义',
+    done: '完成', accentLabel: '主题色', accentCustom: '自定义', accentBlue: '蓝色', accentPurple: '紫色', accentPink: '粉色', accentRed: '红色', accentOrange: '橙色', accentYellow: '黄色', accentGreen: '绿色', accentGraphite: '石墨色', folderSitesLabel: '放入文件夹的网站', folderNoSites: '首页还没有可以放入的网站', folderDragOutHint: '把图标拖到窗口外即可移出文件夹',
     iconLabel: '图标', iconUpload: '上传图片', iconAuto: '自动获取', iconInvalid: '无法读取这张图片',
     cancel: '取消',
     save: '保存',
@@ -206,6 +209,9 @@ const translations = {
     tagName: 'Tag Name',
     selectTags: 'Select Tags',
     pinToHome: 'Pin to Home',
+    engineLimit: 'You can select up to 5 search engines', engineSelected: 'Selected {n}/5',
+    iconTextLabel: 'Text', iconColorLabel: 'Background', iconCustom: 'Custom',
+    done: 'Done', accentLabel: 'Accent Color', accentCustom: 'Custom', accentBlue: 'Blue', accentPurple: 'Purple', accentPink: 'Pink', accentRed: 'Red', accentOrange: 'Orange', accentYellow: 'Yellow', accentGreen: 'Green', accentGraphite: 'Graphite', folderSitesLabel: 'Sites to put in the folder', folderNoSites: 'There are no sites on the home page to add yet', folderDragOutHint: 'Drag an icon outside this window to move it out',
     iconLabel: 'Icon', iconUpload: 'Upload Image', iconAuto: 'Automatic', iconInvalid: 'Could not read this image',
     cancel: 'Cancel',
     save: 'Save',
@@ -296,6 +302,9 @@ const translations = {
     tagName: "Nom de l'étiquette",
     selectTags: 'Sélectionner les étiquettes',
     pinToHome: "Épingler à l'accueil",
+    engineLimit: 'Vous pouvez choisir jusqu\'à 5 moteurs', engineSelected: '{n}/5 sélectionnés',
+    iconTextLabel: 'Texte', iconColorLabel: 'Fond', iconCustom: 'Personnalisée',
+    done: 'OK', accentLabel: 'Couleur d\'accent', accentCustom: 'Personnalisée', accentBlue: 'Bleu', accentPurple: 'Violet', accentPink: 'Rose', accentRed: 'Rouge', accentOrange: 'Orange', accentYellow: 'Jaune', accentGreen: 'Vert', accentGraphite: 'Graphite', folderSitesLabel: 'Sites à placer dans le dossier', folderNoSites: 'Aucun site de l\'accueil à ajouter pour l\'instant', folderDragOutHint: 'Faites glisser une icône hors de cette fenêtre pour la sortir du dossier',
     iconLabel: 'Icône', iconUpload: 'Importer une image', iconAuto: 'Automatique', iconInvalid: 'Impossible de lire cette image',
     cancel: 'Annuler',
     save: 'Enregistrer',
@@ -512,6 +521,9 @@ const translations = {
     tagName: 'Nombre de etiqueta',
     selectTags: 'Seleccionar etiquetas',
     pinToHome: 'Fijar en inicio',
+    engineLimit: 'Puedes elegir hasta 5 motores', engineSelected: '{n}/5 seleccionados',
+    iconTextLabel: 'Texto', iconColorLabel: 'Fondo', iconCustom: 'Personalizado',
+    done: 'Listo', accentLabel: 'Color de acento', accentCustom: 'Personalizado', accentBlue: 'Azul', accentPurple: 'Morado', accentPink: 'Rosa', accentRed: 'Rojo', accentOrange: 'Naranja', accentYellow: 'Amarillo', accentGreen: 'Verde', accentGraphite: 'Grafito', folderSitesLabel: 'Sitios para la carpeta', folderNoSites: 'Todavía no hay sitios en el inicio para añadir', folderDragOutHint: 'Arrastra un icono fuera de esta ventana para sacarlo de la carpeta',
     iconLabel: 'Icono', iconUpload: 'Subir imagen', iconAuto: 'Automático', iconInvalid: 'No se pudo leer esta imagen',
     cancel: 'Cancelar',
     save: 'Guardar',
@@ -728,6 +740,9 @@ const translations = {
     tagName: 'タグ名',
     selectTags: 'タグを選択',
     pinToHome: 'ホームに固定',
+    engineLimit: '選択できる検索エンジンは 5 つまでです', engineSelected: '{n}/5 選択中',
+    iconTextLabel: 'テキスト', iconColorLabel: '背景色', iconCustom: 'カスタム',
+    done: '完了', accentLabel: 'アクセントカラー', accentCustom: 'カスタム', accentBlue: 'ブルー', accentPurple: 'パープル', accentPink: 'ピンク', accentRed: 'レッド', accentOrange: 'オレンジ', accentYellow: 'イエロー', accentGreen: 'グリーン', accentGraphite: 'グラファイト', folderSitesLabel: 'フォルダに入れるサイト', folderNoSites: 'ホームに追加できるサイトがまだありません', folderDragOutHint: 'アイコンをウインドウの外へドラッグするとフォルダから出せます',
     iconLabel: 'アイコン', iconUpload: '画像をアップロード', iconAuto: '自動取得', iconInvalid: 'この画像を読み込めませんでした',
     cancel: 'キャンセル',
     save: '保存',
@@ -944,6 +959,9 @@ const translations = {
     tagName: '태그 이름',
     selectTags: '태그 선택',
     pinToHome: '홈에 고정',
+    engineLimit: '검색 엔진은 최대 5개까지 선택할 수 있습니다', engineSelected: '{n}/5 선택됨',
+    iconTextLabel: '텍스트', iconColorLabel: '배경색', iconCustom: '사용자 지정',
+    done: '완료', accentLabel: '강조 색상', accentCustom: '사용자 지정', accentBlue: '파란색', accentPurple: '보라색', accentPink: '분홍색', accentRed: '빨간색', accentOrange: '주황색', accentYellow: '노란색', accentGreen: '초록색', accentGraphite: '그래파이트', folderSitesLabel: '폴더에 넣을 사이트', folderNoSites: '아직 홈에 추가할 사이트가 없습니다', folderDragOutHint: '아이콘을 창 밖으로 드래그하면 폴더에서 꺼낼 수 있습니다',
     iconLabel: '아이콘', iconUpload: '이미지 업로드', iconAuto: '자동', iconInvalid: '이 이미지를 읽을 수 없습니다',
     cancel: '취소',
     save: '저장',
@@ -1528,36 +1546,34 @@ window.updateAllText = function () {
   const typeLabel1 = document.getElementById('typeLabel1');
   const typeLabel2 = document.getElementById('typeLabel2');
   if (typeLabel1) typeLabel1.textContent = i18n.t('site');
-  if (typeLabel2) typeLabel2.textContent = i18n.t('tag');
+  if (typeLabel2) typeLabel2.textContent = i18n.t('folder');
 
   // Update section labels
   const nameLabel = document.getElementById('nameLabel');
   const urlLabel = document.getElementById('urlLabel');
-  const selectTagsLabel = document.getElementById('selectTagsLabel');
-  const tagNameLabel = document.getElementById('tagNameLabel');
   if (nameLabel) nameLabel.textContent = i18n.t('name');
   if (urlLabel) urlLabel.textContent = i18n.t('url');
-  if (selectTagsLabel) selectTagsLabel.textContent = i18n.t('selectTags');
-  if (tagNameLabel) tagNameLabel.textContent = i18n.t('tagName');
+  const newFolderNameLabel = document.getElementById('newFolderNameLabel');
+  if (newFolderNameLabel) newFolderNameLabel.textContent = i18n.t('renameLabel');
 
   // Update input placeholders
   document.getElementById('siteName').placeholder = i18n.t('name');
   document.getElementById('siteUrl').placeholder = i18n.t('urlPlaceholder');
-  document.getElementById('tagName').placeholder = i18n.t('tagName');
+  document.getElementById('newFolderName').placeholder = i18n.t('newFolder');
 
   // Update checkbox label
-  const iconLabels = { siteIconLabel: 'iconLabel', siteIconUpload: 'iconUpload', siteIconAuto: 'iconAuto' };
+  const iconLabels = {
+    siteIconLabel: 'iconLabel', siteIconUpload: 'iconUpload', iconModeAuto: 'iconAuto',
+    iconModeCustom: 'iconCustom', iconTextLabel: 'iconTextLabel', iconColorLabel: 'iconColorLabel'
+  };
   Object.entries(iconLabels).forEach(([id, key]) => {
     const el = document.getElementById(id);
     if (el) el.textContent = i18n.t(key);
   });
-  const pinToHomeLabel = document.getElementById('pinToHomeLabel');
-  if (pinToHomeLabel) pinToHomeLabel.textContent = i18n.t('pinToHome');
 
   // Update modal buttons
   document.getElementById('closeAddModal').textContent = i18n.t('cancel');
   document.getElementById('saveItem').textContent = i18n.t('save');
-  document.getElementById('closeTagModal').textContent = i18n.t('cancel');
 
   // Update time and date display
   updateTime();
@@ -1622,7 +1638,7 @@ window.updateAllText = function () {
   if (obNewEl) obNewEl.textContent = i18n.t('obNew') || 'New tab';
   if (obCurrentEl) obCurrentEl.textContent = i18n.t('obCurrent') || 'Current tab';
   if (settingsAboutBtnEl) settingsAboutBtnEl.textContent = i18n.t('settingsAbout') || 'About';
-  if (closeSettingsModalEl) closeSettingsModalEl.textContent = i18n.t('close') || 'Close';
+  if (closeSettingsModalEl) closeSettingsModalEl.textContent = i18n.t('done') || 'Done';
   const toWorkspaceTextEl = document.getElementById('toWorkspaceText');
   if (toWorkspaceTextEl) toWorkspaceTextEl.textContent = i18n.t('workbench') || 'Workbench';
   document.getElementById('dotHome')?.setAttribute('aria-label', i18n.t('wbBackHome') || 'Home');
@@ -1632,6 +1648,7 @@ window.updateAllText = function () {
     apLight: i18n.t('lightMode') || 'Light',
     apDark: i18n.t('darkMode') || 'Dark',
     apAuto: i18n.t('followSystem') || 'Auto',
+    accentLabel: i18n.t('accentLabel') || 'Accent Color',
     zoomLabel: i18n.t('zoom') || 'Zoom'
   };
   Object.entries(appearanceLabels).forEach(([id, text]) => {
@@ -1803,18 +1820,17 @@ let ENGINE_CATALOG = [
   { id: 'google', name: { zh: '谷歌', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
   { id: 'bing', name: { zh: '必应', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
   { id: 'duckduckgo', name: { zh: 'DuckDuckGo', en: 'DuckDuckGo' }, url: 'https://duckduckgo.com/?q=', icon: 'https://duckduckgo.com/favicon.ico' },
-  { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://search.yahoo.com/favicon.ico' },
+  { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo', ja: 'Yahoo!' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://www.google.com/s2/favicons?domain=yahoo.com&sz=64' },
   { id: 'yandex', name: { zh: 'Yandex', en: 'Yandex' }, url: 'https://yandex.com/search/?text=', icon: 'https://yandex.com/favicon.ico' },
   { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
-  { id: 'brave', name: { zh: 'Brave', en: 'Brave' }, url: 'https://search.brave.com/search?q=', icon: 'https://brave.com/static-assets/images/brave-logo-sans-text.svg' },
   { id: 'startpage', name: { zh: 'Startpage', en: 'Startpage' }, url: 'https://www.startpage.com/sp/search?query=', icon: 'https://www.startpage.com/favicon.ico' },
 
   // Chinese Specific
   { id: 'baidu', name: { zh: '百度', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
-  { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: 'https://www.sogou.com/favicon.ico' },
+  { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: 'https://www.google.com/s2/favicons?domain=sogou.com&sz=64' },
   { id: 'so360', name: { zh: '360 搜索', en: '360 Search' }, url: 'https://www.so.com/s?q=', icon: 'https://www.so.com/favicon.ico' },
   { id: 'zhihu', name: { zh: '知乎', en: 'Zhihu' }, url: 'https://www.zhihu.com/search?q=', icon: 'https://static.zhihu.com/heifetz/favicon.ico' },
-  { id: 'bilibili', name: { zh: 'B站', en: 'Bilibili' }, url: 'https://search.bilibili.com/all?keyword=', icon: 'https://www.bilibili.com/favicon.ico' },
+  { id: 'bilibili', name: { zh: '哔哩哔哩', en: 'Bilibili' }, url: 'https://search.bilibili.com/all?keyword=', icon: 'https://www.bilibili.com/favicon.ico' },
   { id: 'xiaohongshu', name: { zh: '小红书', en: 'Xiaohongshu' }, url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: 'https://www.xiaohongshu.com/favicon.ico' },
   { id: 'weibo', name: { zh: '微博', en: 'Weibo' }, url: 'https://s.weibo.com/weibo?q=', icon: 'https://weibo.com/favicon.ico' },
   { id: 'douban', name: { zh: '豆瓣', en: 'Douban' }, url: 'https://www.douban.com/search?q=', icon: 'https://img3.doubanio.com/favicon.ico' },
@@ -1822,15 +1838,11 @@ let ENGINE_CATALOG = [
   // Dev / Tech
   { id: 'github', name: { zh: 'GitHub', en: 'GitHub' }, url: 'https://github.com/search?q=', icon: 'https://github.com/favicon.ico' },
   { id: 'stackoverflow', name: { zh: 'StackOverflow', en: 'StackOverflow' }, url: 'https://stackoverflow.com/search?q=', icon: 'https://stackoverflow.com/favicon.ico' },
-  { id: 'npm', name: { zh: 'NPM', en: 'NPM' }, url: 'https://www.npmjs.com/search?q=', icon: 'https://static.npmjs.com/b0f1a8318363185cc2ea6a40ac23eeb2.png' },
-  { id: 'mdn', name: { zh: 'MDN', en: 'MDN' }, url: 'https://developer.mozilla.org/search?q=', icon: 'https://developer.mozilla.org/favicon.ico' },
 
   // Social / Media
-  { id: 'youtube', name: { zh: 'YouTube', en: 'YouTube' }, url: 'https://www.youtube.com/results?search_query=', icon: 'https://www.youtube.com/favicon.ico' },
   { id: 'twitter', name: { zh: 'Twitter', en: 'Twitter' }, url: 'https://twitter.com/search?q=', icon: 'https://abs.twimg.com/favicons/twitter.2.ico' },
   { id: 'reddit', name: { zh: 'Reddit', en: 'Reddit' }, url: 'https://www.reddit.com/search/?q=', icon: 'https://www.reddit.com/favicon.ico' },
-  { id: 'pinterest', name: { zh: 'Pinterest', en: 'Pinterest' }, url: 'https://www.pinterest.com/search/pins/?q=', icon: 'https://www.pinterest.com/favicon.ico' },
-  { id: 'instagram', name: { zh: 'Instagram', en: 'Instagram' }, url: 'https://www.instagram.com/explore/tags/', icon: 'https://www.instagram.com/favicon.ico' },
+  { id: 'instagram', name: { zh: 'Instagram', en: 'Instagram' }, url: 'https://www.instagram.com/explore/tags/', icon: 'https://www.google.com/s2/favicons?domain=instagram.com&sz=64' },
 
   // Knowledge
   { id: 'wikipedia', name: { zh: '维基百科', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: 'https://en.wikipedia.org/favicon.ico' },
@@ -1838,16 +1850,21 @@ let ENGINE_CATALOG = [
 
   // Shopping
   { id: 'amazon', name: { zh: '亚马逊', en: 'Amazon' }, url: 'https://www.amazon.com/s?k=', icon: 'https://www.amazon.com/favicon.ico' },
-  { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.taobao.com/favicon.ico' },
+  { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.google.com/s2/favicons?domain=taobao.com&sz=64' },
   { id: 'jd', name: { zh: '京东', en: 'JD' }, url: 'https://search.jd.com/Search?keyword=', icon: 'https://www.jd.com/favicon.ico' },
 
 ];
 
 const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
+// Offered nowhere, even when the server list still has them
+const HIDDEN_ENGINE_IDS = new Set(['youtube', 'pinterest', 'npm', 'mdn', 'brave']);
 
+// Engine names exist in zh and en (a few carry more); other UI languages use
+// the English (brand) name.
 function getEngineName(engine) {
-  const lang = (typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh') === 'en' ? 'en' : 'zh';
-  return engine?.name?.[lang] || engine?.name?.en || engine?.id || '';
+  const locale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  const names = engine?.name || {};
+  return names[locale] || (locale === 'zh' ? names.zh : names.en) || names.en || engine?.id || '';
 }
 
 function reconcileEngineStateAfterCatalogLoad() {
@@ -1895,6 +1912,7 @@ async function loadGlobalEngineCatalog() {
     const list = rows
       .filter((r) => r && r.id && r.url)
       .filter((r) => r.is_active !== false)
+      .filter((r) => !HIDDEN_ENGINE_IDS.has(String(r.id)))
       .map((r) => ({
         id: String(r.id),
         name: {
@@ -1906,7 +1924,9 @@ async function loadGlobalEngineCatalog() {
       }));
 
     if (!list.length) return false;
-    ENGINE_CATALOG = list;
+    // The server list leads; built-in engines it lacks are kept after it.
+    const serverIds = new Set(list.map((e) => e.id));
+    ENGINE_CATALOG = list.concat(ENGINE_CATALOG.filter((e) => !serverIds.has(e.id)));
     return true;
   } catch (err) {
     console.warn('Failed to load global search engines:', err);
@@ -2046,125 +2066,172 @@ const dragState = {
 };
 
 // ===== Drag and Drop Event Handlers =====
+// Home grid drag & drop, iOS style:
+// - the icon itself follows the pointer (custom drag image);
+// - moving between icons slides the others aside (FLIP animation);
+// - holding over another icon for a moment makes (or adds to) a folder,
+//   then opens that folder so it can be named.
+const FOLDER_HOVER_MS = 650;
+
 function handleDragStart(event, id, type, source, index) {
   dragState.draggedId = id;
   dragState.draggedType = type;
   dragState.draggedSource = source || 'home';
-  dragState.draggedElement = event.target.closest('.site-tile, .chip');
+  dragState.draggedElement = event.target.closest('.site-tile');
+  dragState.reordered = false;
 
   event.dataTransfer.effectAllowed = 'move';
   event.dataTransfer.setData('text/plain', String(id));
-  if (dragState.draggedElement) dragState.draggedElement.classList.add('dragging');
+  const iconEl = dragState.draggedElement?.querySelector('.site-tile-icon');
+  if (iconEl && event.dataTransfer.setDragImage) {
+    const r = iconEl.getBoundingClientRect();
+    event.dataTransfer.setDragImage(iconEl, r.width / 2, r.height / 2);
+  }
+  const el = dragState.draggedElement;
+  // After the browser has snapshotted the drag image, leave a ghost behind.
+  requestAnimationFrame(() => el?.classList.add('dragging'));
+}
+
+function clearFolderHover() {
+  clearTimeout(dragState.hoverTimer);
+  dragState.hoverTimer = null;
+  dragState.hoverTargetId = null;
+  document.querySelectorAll('.site-tile.merge-target').forEach((t) => t.classList.remove('merge-target'));
+}
+
+// Reorders tiles in place and animates every tile from its old position.
+function animateTileReorder(grid, mutate) {
+  const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+  const tiles = Array.from(grid.children);
+  const before = new Map(tiles.map((t) => [t, t.getBoundingClientRect()]));
+  mutate();
+  if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+  tiles.forEach((t) => {
+    const a = before.get(t);
+    const b = t.getBoundingClientRect();
+    const dx = (a.left - b.left) / zoom;
+    const dy = (a.top - b.top) / zoom;
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+    t.animate([{ transform: 'translate(' + dx + 'px, ' + dy + 'px)' }, { transform: 'none' }],
+      { duration: 300, easing: 'cubic-bezier(0.2, 0.9, 0.25, 1.15)' });
+  });
+}
+
+function mergeIntoFolder(draggedId, targetId) {
+  const target = (state.sites || []).find((s) => s && s.id === targetId);
+  if (!target) return null;
+  if (target.type === 'folder') {
+    addSitesToFolder(targetId, [draggedId]);
+    return targetId;
+  }
+  mergeSitesIntoNewFolder(draggedId, targetId);
+  return state.sites.find((s) => s.type === 'folder' && Array.isArray(s.children)
+    && s.children.includes(draggedId) && s.children.includes(targetId))?.id || null;
+}
+
+function finishFolderHover(targetId) {
+  const draggedId = dragState.draggedId;
+  clearFolderHover();
+  if (!draggedId || draggedId === targetId) return;
+  const wasFolder = (state.sites || []).some((x) => x && x.id === targetId && x.type === 'folder');
+  const folderId = mergeIntoFolder(draggedId, targetId);
+  dragState.draggedId = null; // the drag is consumed
+  saveData();
+  renderHome();
+  // Only a newly made folder opens for naming
+  if (folderId && !wasFolder) {
+    openFolder(folderId);
+    // Name it right away, like iOS
+    setTimeout(() => { folderNameInput?.focus(); folderNameInput?.select(); }, 60);
+  }
 }
 
 function handleDragOver(event) {
   event.preventDefault();
   event.dataTransfer.dropEffect = 'move';
+  if (!dragState.draggedId) return false;
 
-  const target = event.target.closest('.site-tile, .chip');
-  if (!target || target === dragState.draggedElement) return false;
-  dragState.dropTarget = target;
+  const targetTile = event.target.closest('.site-tile');
+  if (!targetTile || targetTile === dragState.draggedElement || targetTile.classList.contains('add-tile')) {
+    if (!targetTile?.classList.contains('merge-target')) clearFolderHover();
+    return false;
+  }
+  const grid = targetTile.parentElement;
+  if (!grid || !grid.classList.contains('sites-grid')) return false;
+  const targetId = targetTile.dataset.id;
 
-  // Tag chips: reorder tagOrder
-  if (dragState.draggedType === 'tag' && target.classList.contains('chip')) {
-    const chips = Array.from(contentEl.querySelectorAll('.chip.tag'));
-    const fromIndex = chips.indexOf(dragState.draggedElement);
-    const toIndex = chips.indexOf(target);
-    if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-      const item = state.tagOrder[fromIndex];
-      state.tagOrder.splice(fromIndex, 1);
-      state.tagOrder.splice(toIndex, 0, item);
-      renderHome();
+  // Inside a folder window: plain reorder of its children.
+  if (dragState.draggedSource === 'folder') {
+    const folder = getOpenFolder();
+    if (!folder || !Array.isArray(folder.children)) return false;
+    const from = folder.children.indexOf(dragState.draggedId);
+    const to = folder.children.indexOf(targetId);
+    if (from !== -1 && to !== -1 && from !== to) {
+      animateTileReorder(grid, () => {
+        folder.children.splice(from, 1);
+        folder.children.splice(to, 0, dragState.draggedId);
+        const draggedEl = dragState.draggedElement;
+        grid.insertBefore(draggedEl, from < to ? targetTile.nextSibling : targetTile);
+      });
+      dragState.reordered = true;
     }
     return false;
   }
 
-  if (dragState.draggedType !== 'site' && dragState.draggedType !== 'folder') return false;
+  // Home grid: over the icon itself -> folder intent; between icons -> reorder.
+  const iconRect = targetTile.querySelector('.site-tile-icon').getBoundingClientRect();
+  const inset = iconRect.width * 0.18;
+  const overIcon = event.clientX > iconRect.left + inset && event.clientX < iconRect.right - inset
+    && event.clientY > iconRect.top + inset && event.clientY < iconRect.bottom - inset;
 
-  const targetTile = target.closest('.site-tile');
-  if (!targetTile || targetTile.classList.contains('add-tile')) return false;
-  const grid = targetTile.parentElement;
-  if (!grid || !grid.classList.contains('sites-grid')) return false;
-
-  const isFolderView = !!state.openFolderId;
-  if (dragState.draggedSource === 'home' && !isFolderView) {
-    // Reorder top-level siteOrder
-    const fromIndex = state.siteOrder.indexOf(dragState.draggedId);
-    const toIndex = state.siteOrder.indexOf(targetTile.dataset.id);
-    if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-      const item = state.siteOrder[fromIndex];
-      state.siteOrder.splice(fromIndex, 1);
-      state.siteOrder.splice(toIndex, 0, item);
-      renderHome();
+  if (overIcon && dragState.draggedType === 'site') {
+    if (dragState.hoverTargetId !== targetId) {
+      clearFolderHover();
+      dragState.hoverTargetId = targetId;
+      targetTile.classList.add('merge-target');
+      dragState.hoverTimer = setTimeout(() => finishFolderHover(targetId), FOLDER_HOVER_MS);
     }
-  } else if (dragState.draggedSource === 'folder' && isFolderView) {
-    // Reorder folder children
-    const folder = (state.sites || []).find((s) => s && s.id === state.openFolderId);
-    if (folder && Array.isArray(folder.children)) {
-      const fromIndex = folder.children.indexOf(dragState.draggedId);
-      const toIndex = folder.children.indexOf(targetTile.dataset.id);
-      if (fromIndex !== -1 && toIndex !== -1 && fromIndex !== toIndex) {
-        const item = folder.children[fromIndex];
-        folder.children.splice(fromIndex, 1);
-        folder.children.splice(toIndex, 0, item);
-        renderHome();
-      }
-    }
+    return false;
   }
+  clearFolderHover();
+
+  const from = state.siteOrder.indexOf(dragState.draggedId);
+  const to = state.siteOrder.indexOf(targetId);
+  if (from === -1 || to === -1 || from === to) return false;
+  const r = targetTile.getBoundingClientRect();
+  const after = event.clientX > r.left + r.width / 2;
+  const next = state.siteOrder.filter((id) => id !== dragState.draggedId);
+  next.splice(next.indexOf(targetId) + (after ? 1 : 0), 0, dragState.draggedId);
+  if (next.join() === state.siteOrder.join()) return false;
+  animateTileReorder(grid, () => {
+    state.siteOrder = next;
+    const draggedEl = dragState.draggedElement;
+    grid.insertBefore(draggedEl, after ? targetTile.nextSibling : targetTile);
+  });
+  dragState.reordered = true;
   return false;
 }
 
 function handleDrop(event, targetId, targetType) {
   event.preventDefault();
   event.stopPropagation();
-
-  const draggedId = dragState.draggedId;
-  const draggedType = dragState.draggedType;
-
-  if (draggedType === 'tag') {
-    saveData();
-    return false;
+  // Dropped while still over another icon: make the folder now.
+  if (dragState.hoverTargetId === targetId && dragState.draggedId && dragState.draggedId !== targetId) {
+    finishFolderHover(targetId);
   }
-
-  if (!draggedId || draggedId === targetId) return false;
-
-  const isFolderView = !!state.openFolderId;
-
-  // Same-view reorder was already applied in handleDragOver; just persist.
-  if (
-    (dragState.draggedSource === 'home' && !isFolderView && (targetType === 'site' || targetType === 'folder'))
-    || (dragState.draggedSource === 'folder' && isFolderView && targetType === 'site')
-  ) {
-    saveData();
-    return false;
-  }
-
-  // Home view: drop onto a folder tile -> merge into that folder
-  if (!isFolderView && targetType === 'folder') {
-    addSitesToFolder(targetId, [draggedId]);
-    saveData();
-    renderHome();
-    return false;
-  }
-
-  // Home view: drop a site onto a link tile -> merge both into a new folder
-  if (!isFolderView && targetType === 'site' && draggedType === 'site') {
-    mergeSitesIntoNewFolder(draggedId, targetId);
-    saveData();
-    renderHome();
-    return false;
-  }
-
   return false;
 }
 
 function handleDragEnd(event) {
+  clearFolderHover();
   if (dragState.draggedElement) dragState.draggedElement.classList.remove('dragging');
+  if (dragState.reordered) saveData();
   dragState.draggedId = null;
   dragState.draggedType = null;
   dragState.draggedSource = null;
   dragState.draggedElement = null;
   dragState.dropTarget = null;
+  dragState.reordered = false;
 }
 
 // ===== Folder Operations =====
@@ -2233,6 +2300,9 @@ function moveSiteOutOfFolder(siteId) {
   const folder = (state.sites || []).find((s) => s && s.id === state.openFolderId && s.type === 'folder');
   if (!folder || !Array.isArray(folder.children)) return;
   folder.children = folder.children.filter((id) => id !== siteId);
+  // A site taken out of a folder lands on the home grid, so it must be visible there.
+  const site = (state.sites || []).find((s) => s && s.id === siteId);
+  if (site) site.showOnHome = true;
   const folderIndex = state.siteOrder.indexOf(folder.id);
   const insertAt = folderIndex === -1 ? state.siteOrder.length : Math.min(folderIndex, state.siteOrder.length);
   if (!state.siteOrder.includes(siteId)) state.siteOrder.splice(insertAt, 0, siteId);
@@ -2250,6 +2320,43 @@ function deleteFolder(folderId) {
   state.siteOrder.splice(insertAt, 0, ...missing);
   if (state.openFolderId === folderId) state.openFolderId = null;
 }
+
+// Tags were retired in favor of folders. Each tag becomes a folder holding the
+// sites that carried it (the first tag in display order wins; sites already in
+// a folder stay where they are). Returns true when anything changed.
+function migrateTagsToFolders() {
+  const tags = Array.isArray(state.tags) ? state.tags : [];
+  const order = Array.isArray(state.tagOrder) ? state.tagOrder.filter((t) => tags.includes(t)) : [];
+  const orderedTags = order.concat(tags.filter((t) => !order.includes(t)));
+  const hasSiteTags = (state.sites || []).some((s) => s && Array.isArray(s.tags) && s.tags.length);
+  if (!orderedTags.length && !hasSiteTags) return false;
+
+  const inFolder = new Set((state.sites || [])
+    .filter((s) => s && s.type === 'folder')
+    .flatMap((f) => (Array.isArray(f.children) ? f.children : [])));
+  const claimed = new Set();
+  orderedTags.forEach((tag) => {
+    const members = (state.sites || []).filter((s) => s && s.type !== 'folder'
+      && Array.isArray(s.tags) && s.tags.includes(tag) && !claimed.has(s.id) && !inFolder.has(s.id));
+    if (!members.length) return;
+    const ids = members.map((m) => m.id);
+    ids.forEach((id) => claimed.add(id));
+    const positions = ids.map((id) => state.siteOrder.indexOf(id)).filter((i) => i >= 0);
+    const folder = {
+      id: generateUuid(), type: 'folder', name: tag, url: '', showOnHome: true, tags: [], children: ids
+    };
+    state.sites.push(folder);
+    state.siteOrder = state.siteOrder.filter((id) => !ids.includes(id));
+    const at = positions.length ? Math.min(Math.min(...positions), state.siteOrder.length) : state.siteOrder.length;
+    state.siteOrder.splice(at, 0, folder.id);
+  });
+  (state.sites || []).forEach((s) => { if (s && Array.isArray(s.tags)) s.tags = []; });
+  state.tags = [];
+  state.tagOrder = [];
+  return true;
+}
+
+window.migrateTagsToFolders = migrateTagsToFolders;
 
 // ===== Rename Modal =====
 const renameModal = document.getElementById('renameModal');
@@ -2340,16 +2447,21 @@ window.renameFolderFromContext = function () {
   if (item) openRenameModal(item.id, 'folder');
 };
 
-window.deleteFolderFromContext = function () {
+window.deleteFolderFromContext = async function () {
   const item = contextMenuState.targetItem;
-  if (!item) return;
-  const itemName = item.name || (i18n.t('folder') || 'Folder');
-  pendingDelete = { item, type: 'folder' };
-  document.getElementById('deleteTitle').textContent = i18n.t('delete');
-  document.getElementById('deleteMessage').textContent = i18n.t('deleteFolderConfirm') || 'Delete this folder?';
-  document.getElementById('deleteModal').classList.remove('hidden');
-  modalOverlay.classList.remove('hidden');
   hideContextMenu();
+  if (!item) return;
+  const ok = await window.showConfirmDialog({
+    title: i18n.t('delete'),
+    message: i18n.t('deleteFolderConfirm'),
+    confirmText: i18n.t('delete'),
+    cancelText: i18n.t('cancel'),
+    tone: 'danger'
+  });
+  if (!ok) return;
+  deleteFolder(item.id);
+  saveData();
+  renderHome();
 };
 
 window.moveOutSiteFromContext = function () {
@@ -2431,10 +2543,7 @@ if (state.sites.length === 0) {
   saveData(false);
 }
 
-// Initialize order arrays if empty (data migration)
-if (state.tagOrder.length === 0 && state.tags.length > 0) {
-  state.tagOrder = [...state.tags];
-}
+if (migrateTagsToFolders()) saveData(false);
 if (state.siteOrder.length === 0 && state.sites.length > 0) {
   state.siteOrder = state.sites.map(s => s.id);
 }
@@ -2464,6 +2573,9 @@ async function saveData(syncToBackend = true) {
   return true;
 }
 
+// appearance.js (view mode) and data-sync.js (tag migration) save through this.
+window.saveData = saveData;
+
 async function toggleMinimalist() {
   state.viewMode = state.viewMode === 'general' ? 'minimalist' : 'general';
   await saveData();
@@ -2488,13 +2600,11 @@ const languageSubmenu = document.getElementById('languageSubmenu');
 // Modals
 const modalOverlay = document.getElementById('modalOverlay');
 const addModal = document.getElementById('addModal');
-const tagViewModal = document.getElementById('tagViewModal');
 const closeAddModalBtn = document.getElementById('closeAddModal');
-const closeTagModalBtn = document.getElementById('closeTagModal');
 const saveItemBtn = document.getElementById('saveItem');
 const addTypeRadios = document.getElementsByName('addType');
 const siteForm = document.getElementById('siteForm');
-const tagForm = document.getElementById('tagForm');
+const folderForm = document.getElementById('folderForm');
 
 // Context Menu
 const contextMenu = document.getElementById('contextMenu');
@@ -2651,6 +2761,7 @@ function renderEngineQuickList() {
 function openEngineModal() {
   const engineModal = document.getElementById('engineModal');
   if (!engineModal) return;
+  engineMenu?.classList.add('hidden'); // one glass layer at a time
   engineModal.classList.remove('hidden');
 
   // Ensure the shared overlay is not blocking clicks
@@ -2686,13 +2797,23 @@ function toggleEngineSelection(id) {
   } else {
     // Select
     if (enginePageState.selectedIds.length >= 5) {
-      const msg = i18n.currentLocale === 'zh' ? '最多只能选择 5 个搜索引擎' : 'You can select up to 5 search engines';
+      const msg = i18n.t('engineLimit');
       if (window.showNotification) window.showNotification(msg, 'info');
       return;
     }
     enginePageState.selectedIds.push(id);
   }
-  renderEngineModal();
+  syncEngineModalSelection();
+}
+
+// Updates checks and the count without rebuilding the grid, so the icons are
+// not reloaded on every click.
+function syncEngineModalSelection() {
+  document.querySelectorAll('#engineList .engine-item').forEach((el) => {
+    el.classList.toggle('selected', enginePageState.selectedIds.includes(el.dataset.engineId));
+  });
+  const hint = document.getElementById('engineCountHint');
+  if (hint) hint.textContent = i18n.t('engineSelected').replace('{n}', enginePageState.selectedIds.length);
 }
 
 function setEnginePage(p) {
@@ -2705,55 +2826,32 @@ function renderEngineModal() {
   const pag = document.getElementById('enginePagination');
   const hint = document.getElementById('engineCountHint');
 
-  const total = ENGINE_CATALOG.length;
-  const totalPages = Math.ceil(total / enginePageState.pageSize);
-
-  // Ensure page validity
-  if (enginePageState.page < 1) enginePageState.page = 1;
-  if (enginePageState.page > totalPages) enginePageState.page = totalPages;
-
-  const start = (enginePageState.page - 1) * enginePageState.pageSize;
-  const end = start + enginePageState.pageSize;
-  const items = ENGINE_CATALOG.slice(start, end);
+  // The whole catalog in one scrolling grid (no pages). Built once per
+  // catalog and language; later opens only resync the selection.
+  const items = ENGINE_CATALOG;
+  const key = items.map((e) => e.id).join(',') + '|' + i18n.currentLocale;
+  if (grid.dataset.key === key) {
+    syncEngineModalSelection();
+    return;
+  }
+  grid.dataset.key = key;
 
   grid.innerHTML = items.map(eng => {
     const isSelected = enginePageState.selectedIds.includes(eng.id);
     const name = getEngineName(eng);
     return `
-      <div class="engine-item ${isSelected ? 'selected' : ''}" onclick="toggleEngineSelection('${eng.id}')">
+      <div class="engine-item ${isSelected ? 'selected' : ''}" data-engine-id="${eng.id}" onclick="toggleEngineSelection('${eng.id}')">
         <div class="engine-check">✓</div>
-        <img src="${eng.icon}" data-fallback-src="https://www.google.com/favicon.ico">
+        <img src="${eng.icon}" alt="" width="32" height="32" loading="lazy" decoding="async" data-fallback-src="https://www.google.com/favicon.ico">
         <span>${name}</span>
       </div>
     `;
   }).join('');
 
-  // Pagination
-  let pageHtml = `
-    <button class="page-btn" ${enginePageState.page === 1 ? 'disabled' : ''} onclick="setEnginePage(${enginePageState.page - 1})">‹</button>
-  `;
-
-  for (let i = 1; i <= totalPages; i++) {
-    // Show first, last, current, and surrounding
-    if (i === 1 || i === totalPages || (i >= enginePageState.page - 1 && i <= enginePageState.page + 1)) {
-      pageHtml += `<button class="page-btn ${i === enginePageState.page ? 'active' : ''}" onclick="setEnginePage(${i})">${i}</button>`;
-    } else if (i === enginePageState.page - 2 || i === enginePageState.page + 2) {
-      pageHtml += `<span style="opacity:0.5">...</span>`;
-    }
-  }
-
-  pageHtml += `
-    <button class="page-btn" ${enginePageState.page === totalPages ? 'disabled' : ''} onclick="setEnginePage(${enginePageState.page + 1})">›</button>
-  `;
-
-  pag.innerHTML = pageHtml;
 
   // Hint text
   const count = enginePageState.selectedIds.length;
-  const text = i18n.currentLocale === 'zh'
-    ? `已选 ${count}/5`
-    : `Selected ${count}/5`;
-  hint.textContent = text;
+  hint.textContent = i18n.t('engineSelected').replace('{n}', count);
 }
 
 // Bind events
@@ -2819,7 +2917,7 @@ window.addEngineById = async (id) => {
   const set = new Set(state.enabledEngineIds || []);
   if (set.has(id)) return;
   if ((state.enabledEngineIds || []).length >= 5) {
-    const msg = i18n.currentLocale === 'zh' ? '最多只能选择 5 个搜索引擎' : 'You can select up to 5 search engines';
+    const msg = i18n.t('engineLimit');
     if (window.showNotification) window.showNotification(msg, 'info');
     return;
   }
@@ -2894,80 +2992,15 @@ renderSearchEngine();
   }
 })();
 
-let homeFooterConfig = null;
 
-async function loadHomeFooterConfig() {
-  if (!window.supabase) {
-    homeFooterConfig = null;
-    return false;
-  }
-
-  try {
-    const { data, error } = await window.supabase
-      .from('app_settings')
-      .select('key,value')
-      .eq('key', 'home_footer')
-      .maybeSingle();
-
-    if (error) {
-      console.warn('Failed to load home footer config:', error);
-      homeFooterConfig = null;
-      return false;
-    }
-
-    const v = data?.value;
-    if (!v || typeof v !== 'object') {
-      homeFooterConfig = null;
-      return false;
-    }
-
-    homeFooterConfig = v;
-    return true;
-  } catch (err) {
-    console.warn('Failed to load home footer config:', err);
-    homeFooterConfig = null;
-    return false;
-  }
-}
-
-function renderHomeFooter() {
-  const el = document.getElementById('homeFooter');
-  if (!el) return;
-
-  const cfg = homeFooterConfig;
-  if (!cfg) {
-    el.style.display = 'none';
-    el.innerHTML = '';
-    return;
-  }
-
-  const locale = (typeof i18n !== 'undefined' ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'));
-  const text = String((locale === 'en' ? cfg.text_en : cfg.text_zh) || cfg.text_en || cfg.text_zh || '').trim();
-  const url = String(cfg.url || '').trim();
-
-  if (!text) {
-    el.style.display = 'none';
-    el.innerHTML = '';
-    return;
-  }
-
-  if (url) {
-    el.innerHTML = `<a href="${url}" target="_blank" rel="noopener noreferrer">${text}</a>`;
-  } else {
-    el.textContent = text;
-  }
-  el.style.display = 'block';
-}
-
-(async () => {
-  await loadHomeFooterConfig();
-  renderHomeFooter();
-})();
 
 // ===== Context Menu Functions =====
 function showContextMenu(event, item, type) {
   event.preventDefault();
   event.stopPropagation();
+  // Only one context menu at a time
+  hideAllContextMenus();
+  window.hideWidgetMenu?.();
   contextMenuState.visible = true;
   contextMenuState.targetItem = item;
   contextMenuState.targetType = type;
@@ -3005,41 +3038,17 @@ function renderContextMenu() {
   }
 
   contextMenu.innerHTML = itemsHtml;
-  contextMenu.style.left = contextMenuState.x + 'px';
-  contextMenu.style.top = contextMenuState.y + 'px';
   contextMenu.classList.remove('hidden');
+  placeMenuAt(contextMenu, contextMenuState.x, contextMenuState.y);
 }window.editItem = function () {
   const item = contextMenuState.targetItem;
   const type = contextMenuState.targetType;
 
-  // Reset form
-  document.getElementById('siteName').value = '';
-  document.getElementById('siteUrl').value = '';
-  document.getElementById('tagName').value = '';
-
-  if (type === 'site') {
-    // Set form to site type
-    document.querySelector('input[name="addType"][value="site"]').checked = true;
-    document.getElementById('siteForm').classList.remove('hidden');
-    document.getElementById('tagForm').classList.add('hidden');
-
-    // Pre-fill site data
-    document.getElementById('siteName').value = item.name;
-    document.getElementById('siteUrl').value = item.url;
-    document.getElementById('showOnHome').checked = item.showOnHome;
-    pendingSiteIcon = undefined;
-
-    // Render tag checkboxes (with current site selection)
-    renderTagSelector(item.tags);
-  } else {
-    // Set form to tag type
-    document.querySelector('input[name="addType"][value="tag"]').checked = true;
-    document.getElementById('siteForm').classList.add('hidden');
-    document.getElementById('tagForm').classList.remove('hidden');
-
-    // Pre-fill tag data
-    document.getElementById('tagName').value = item;
-  }
+  if (type !== 'site') return;
+  setAddType('site');
+  document.getElementById('siteName').value = item.name;
+  document.getElementById('siteUrl').value = item.url;
+  resetIconDraft(item);
 
   // Store the item being edited for save logic
   window.editingItem = { item, type };
@@ -3090,13 +3099,6 @@ document.getElementById('confirmDelete').addEventListener('click', async () => {
       if (ss.type === 'folder' && Array.isArray(ss.children)) {
         ss.children = ss.children.filter(cid => cid !== item.id);
       }
-    });
-  } else {
-    state.tags = state.tags.filter(t => t !== item);
-    state.tagOrder = state.tagOrder.filter(t => t !== item);
-    // Remove tag from all sites
-    state.sites.forEach(site => {
-      site.tags = site.tags.filter(t => t !== item);
     });
   }
   const saved = await saveData();
@@ -3236,7 +3238,115 @@ function getSiteInitial(site) {
   return name ? name.charAt(0).toUpperCase() : '?';
 }
 
+// Text icon chosen in the editor: a short label on a solid color.
+const ICON_TEXT_MAX = 4;
+
+function isValidIconColor(color) {
+  return typeof color === 'string' && /^#[0-9a-f]{6}$/i.test(color);
+}
+
+function createTextIcon(text, color) {
+  const icon = document.createElement('div');
+  icon.className = 'site-tile-icon is-text-icon';
+  icon.style.setProperty('--icon-bg', color);
+  const hex = color.replace('#', '');
+  const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  // perceived brightness decides white or dark text
+  icon.classList.toggle('is-light-bg', (r * 299 + g * 587 + b * 114) / 1000 > 170);
+  const label = document.createElement('span');
+  label.className = 'site-tile-text';
+  const chars = Array.from(String(text).trim()).slice(0, ICON_TEXT_MAX);
+  label.textContent = chars.join('');
+  label.dataset.len = String(chars.length);
+  icon.appendChild(label);
+  return icon;
+}
+
+// Places a fixed menu next to the pointer. Pointer coordinates are viewport
+// pixels but `left`/`top` are in the html's zoomed CSS pixels, so divide by
+// the zoom; flip to the other side of the pointer near the viewport edges.
+function placeMenuAt(menu, clientX, clientY) {
+  const zoom = parseFloat(getComputedStyle(document.documentElement).zoom) || 1;
+  const w = menu.offsetWidth * zoom;
+  const h = menu.offsetHeight * zoom;
+  const gap = 2;
+  let x = clientX + gap;
+  let y = clientY + gap;
+  if (x + w > window.innerWidth - 8) x = Math.max(8, clientX - w - gap);
+  if (y + h > window.innerHeight - 8) y = Math.max(8, clientY - h - gap);
+  menu.style.left = (x / zoom) + 'px';
+  menu.style.top = (y / zoom) + 'px';
+}
+window.placeMenuAt = placeMenuAt;
+
+// ---- Icon plate fill ----
+// A favicon fills its plate. When the image has its own opaque background it
+// is shown edge to edge; when it is transparent the plate takes a soft tint of
+// the icon's main color. Results are cached per image URL.
+const iconFillCache = new Map();
+
+function analyzeIconImage(src) {
+  if (iconFillCache.has(src)) return iconFillCache.get(src);
+  const job = new Promise((resolve) => {
+    const probe = new Image();
+    probe.crossOrigin = 'anonymous';
+    probe.onload = () => {
+      try {
+        const n = 24;
+        const canvas = document.createElement('canvas');
+        canvas.width = n;
+        canvas.height = n;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(probe, 0, 0, n, n);
+        const data = ctx.getImageData(0, 0, n, n).data;
+        const alphaAt = (x, y) => data[(y * n + x) * 4 + 3];
+        const corners = [alphaAt(1, 1), alphaAt(n - 2, 1), alphaAt(1, n - 2), alphaAt(n - 2, n - 2)];
+        const opaque = corners.every((a) => a > 230);
+        // Main color: most common saturated-enough bucket among opaque pixels
+        const buckets = new Map();
+        for (let i = 0; i < data.length; i += 4) {
+          if (data[i + 3] < 200) continue;
+          const r = data[i], g = data[i + 1], b = data[i + 2];
+          const max = Math.max(r, g, b), min = Math.min(r, g, b);
+          const weight = max - min > 40 ? 3 : 1; // prefer colorful over gray/white
+          if (max > 245 && min > 235) continue; // skip near-white
+          const key = (r >> 5) + ',' + (g >> 5) + ',' + (b >> 5);
+          const bk = buckets.get(key) || { r: 0, g: 0, b: 0, n: 0, w: 0 };
+          bk.r += r; bk.g += g; bk.b += b; bk.n += 1; bk.w += weight;
+          buckets.set(key, bk);
+        }
+        let best = null;
+        buckets.forEach((bk) => { if (!best || bk.w > best.w) best = bk; });
+        const color = best ? [best.r / best.n, best.g / best.n, best.b / best.n].map(Math.round) : null;
+        resolve({ opaque, color });
+      } catch (_err) {
+        resolve(null); // tainted canvas (no CORS): keep the default plate
+      }
+    };
+    probe.onerror = () => resolve(null);
+    probe.src = src;
+  });
+  iconFillCache.set(src, job);
+  return job;
+}
+
+function applyIconFill(plate, img) {
+  const src = img.currentSrc || img.src;
+  if (!src || img.naturalWidth < 24) return; // tiny fallbacks stay centered
+  analyzeIconImage(src).then((info) => {
+    if (!info || !plate.isConnected && !plate.parentNode) return;
+    if (info.opaque) {
+      plate.classList.add('is-full-bleed');
+    } else if (info.color) {
+      const [r, g, b] = info.color;
+      plate.classList.add('is-tinted');
+      plate.style.setProperty('--icon-fill', 'rgb(' + r + ' ' + g + ' ' + b + ')');
+    }
+  });
+}
+
 function createFaviconIcon(site) {
+  if (site.iconText && isValidIconColor(site.iconColor)) return createTextIcon(site.iconText, site.iconColor);
   const icon = document.createElement('div');
   icon.className = 'site-tile-icon glass';
 
@@ -3259,6 +3369,9 @@ function createFaviconIcon(site) {
   img.loading = 'lazy';
   img.alt = '';
   icon.appendChild(img);
+  if (!icon.classList.contains('has-custom-icon')) {
+    img.addEventListener('load', () => applyIconFill(icon, img));
+  }
   loadFavicon(img, sources, () => {
     img.remove();
     icon.classList.add('is-letter');
@@ -3269,9 +3382,17 @@ function createFaviconIcon(site) {
 function createFolderIcon(children) {
   const icon = document.createElement('div');
   icon.className = 'site-tile-icon folder-tile-icon glass';
-  children.slice(0, 9).forEach((child) => {
+  // Up to four members, 2 x 2, filling the plate left to right, top to bottom
+  children.slice(0, 4).forEach((child) => {
     const mini = document.createElement('span');
     mini.className = 'folder-mini';
+    if (child.iconText && isValidIconColor(child.iconColor)) {
+      mini.classList.add('is-text-mini');
+      mini.style.background = child.iconColor;
+      mini.textContent = Array.from(child.iconText)[0] || '';
+      icon.appendChild(mini);
+      return;
+    }
     const sources = getFaviconSources(child.url);
     if (isValidSiteIcon(child.customIcon)) sources.unshift(child.customIcon);
     const showLetter = () => {
@@ -3283,6 +3404,8 @@ function createFolderIcon(children) {
       img.alt = '';
       img.loading = 'lazy';
       mini.appendChild(img);
+      if (!isValidSiteIcon(child.customIcon)) img.addEventListener('load', () => applyIconFill(mini, img));
+      else mini.classList.add('is-full-bleed');
       loadFavicon(img, sources, () => {
         img.remove();
         showLetter();
@@ -3360,157 +3483,222 @@ function getFolderChildren(folder) {
 function renderHome() {
   contentEl.innerHTML = '';
 
-  if (state.viewMode === 'minimalist') return;
-
-  const openFolder = state.openFolderId
-    ? (state.sites || []).find((s) => s && s.id === state.openFolderId && s.type === 'folder')
-    : null;
-
-  if (openFolder) {
-    renderFolderView(openFolder);
+  if (state.viewMode === 'minimalist') {
+    renderFolderPopup();
     return;
   }
 
-  // 1. Tags (sorted by tagOrder)
-  const orderedTags = state.tagOrder.length > 0
-    ? state.tagOrder.filter((tag) => state.tags.includes(tag))
-    : state.tags;
-
-  const tagRow = document.createElement('div');
-  tagRow.className = 'tag-row';
-  orderedTags.forEach((tag, index) => {
-    const chip = document.createElement('div');
-    chip.className = 'chip tag glass glass--capsule glass--clear';
-    chip.textContent = '# ' + tag;
-    chip.onclick = () => openTagView(tag);
-    chip.oncontextmenu = (e) => showContextMenu(e, tag, 'tag');
-    chip.draggable = true;
-    chip.addEventListener('dragstart', (e) => handleDragStart(e, tag, 'tag', 'home', index));
-    chip.addEventListener('dragover', handleDragOver);
-    chip.addEventListener('drop', (e) => handleDrop(e, tag, 'tag'));
-    chip.addEventListener('dragend', handleDragEnd);
-    tagRow.appendChild(chip);
-  });
-  if (tagRow.children.length) contentEl.appendChild(tagRow);
-
-  // 2. Sites grid (favicon tiles + folder tiles)
+  // Sites grid (favicon tiles + folder tiles)
   const grid = document.createElement('div');
   grid.className = 'sites-grid';
   getVisibleSites().forEach((site, index) => {
     grid.appendChild(createSiteTile(site, index, 'home'));
   });
 
-  // 3. Add tile
-  const addTile = document.createElement('div');
-  addTile.className = 'site-tile add-tile';
-  addTile.title = i18n.t('addSite') || 'Add Site';
-  addTile.innerHTML =
-    '<div class="site-tile-icon add-tile-icon glass glass--clear"><svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></div>' +
-    '<span class="site-tile-name"></span>';
-  addTile.onclick = openAddSiteModal;
-  grid.appendChild(addTile);
-
   contentEl.appendChild(grid);
+  renderFolderPopup();
 }
 
-function renderFolderView(folder) {
-  const header = document.createElement('div');
-  header.className = 'folder-header';
-  const backBtn = document.createElement('button');
-  backBtn.type = 'button';
-  backBtn.className = 'folder-back-btn glass glass--capsule glass--interactive';
-  backBtn.innerHTML = '<svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>';
-  backBtn.append(i18n.t('back') || 'Back');
-  backBtn.onclick = closeFolder;
-  const title = document.createElement('span');
-  title.className = 'folder-title';
-  title.textContent = folder.name || (i18n.t('folder') || 'Folder');
-  header.appendChild(backBtn);
-  header.appendChild(title);
-  contentEl.appendChild(header);
+// ===== Folder window =====
+// A folder opens as a centered glass window over a blurred home page. Its
+// icons can be edited/deleted from the context menu, reordered by dragging,
+// and dragged outside the window to take them out (like iOS).
+const folderOverlay = document.getElementById('folderOverlay');
+const folderGrid = document.getElementById('folderGrid');
+const folderNameInput = document.getElementById('folderNameInput');
+const folderHint = document.getElementById('folderHint');
 
-  const grid = document.createElement('div');
-  grid.className = 'sites-grid';
-  getFolderChildren(folder).forEach((site, index) => {
-    grid.appendChild(createSiteTile(site, index, 'folder'));
-  });
+function getOpenFolder() {
+  if (!state.openFolderId) return null;
+  return (state.sites || []).find((s) => s && s.id === state.openFolderId && s.type === 'folder') || null;
+}
 
-  if (grid.children.length === 0) {
-    const hint = document.createElement('div');
-    hint.className = 'folder-empty-hint';
-    hint.textContent = i18n.t('emptyFolder') || 'This folder is empty. Drag a site onto the folder icon to add it.';
-    grid.appendChild(hint);
+function renderFolderPopup() {
+  if (!folderOverlay) return;
+  const folder = getOpenFolder();
+  if (!folder) {
+    folderOverlay.classList.add('hidden');
+    return;
   }
-
-  contentEl.appendChild(grid);
+  if (document.activeElement !== folderNameInput) folderNameInput.value = folder.name || '';
+  folderNameInput.placeholder = i18n.t('newFolder') || 'New Folder';
+  folderNameInput.setAttribute('aria-label', i18n.t('renameLabel') || 'Folder name');
+  const children = getFolderChildren(folder);
+  folderGrid.replaceChildren(...children.map((site, index) => createSiteTile(site, index, 'folder')));
+  folderHint.textContent = children.length ? '' : i18n.t('emptyFolder');
+  folderHint.classList.toggle('hidden', children.length > 0);
+  folderOverlay.classList.remove('hidden');
 }
 
 function openFolder(folderId) {
   state.openFolderId = folderId;
-  renderHome();
+  renderFolderPopup();
 }
 
 function closeFolder() {
+  if (!state.openFolderId) return;
+  commitFolderName();
   state.openFolderId = null;
+  renderFolderPopup();
   renderHome();
 }
 
-function renderTagSelector(selectedTags) {
-  const tagSelector = document.getElementById('tagSelector');
-  if (!tagSelector) return;
-  const selected = Array.isArray(selectedTags) ? selectedTags : [];
-  tagSelector.innerHTML = '';
-  state.tags.forEach((tag) => {
-    const label = document.createElement('label');
-    label.className = 'chip tag';
-    label.style.border = '1px solid transparent';
-    label.style.opacity = '0.6';
-    label.style.cursor = 'pointer';
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.value = tag;
-    checkbox.checked = selected.includes(tag);
-    checkbox.style.display = 'none';
-    checkbox.addEventListener('change', () => {
-      label.style.opacity = checkbox.checked ? '1' : '0.6';
-      label.style.borderColor = checkbox.checked ? 'var(--text-color)' : 'transparent';
-    });
-    if (checkbox.checked) {
-      label.style.opacity = '1';
-      label.style.borderColor = 'var(--text-color)';
-    }
-    label.appendChild(checkbox);
-    label.appendChild(document.createTextNode(' ' + tag));
-    tagSelector.appendChild(label);
-  });
+function commitFolderName() {
+  const folder = getOpenFolder();
+  if (!folder || !folderNameInput) return;
+  const name = folderNameInput.value.trim() || i18n.t('newFolder') || 'New Folder';
+  if (name === folder.name) return;
+  folder.name = name;
+  saveData();
 }
 
-// Icon chosen in the add/edit dialog: undefined = leave as is, '' = automatic
-// (favicon), otherwise a data URL.
-let pendingSiteIcon;
+folderNameInput?.addEventListener('change', () => {
+  commitFolderName();
+  renderHome();
+});
+folderNameInput?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.isComposing) folderNameInput.blur();
+});
+folderOverlay?.addEventListener('click', (e) => {
+  if (e.target === folderOverlay) closeFolder();
+});
+// Dragging an icon out of the window takes it out of the folder; the drag
+// then continues on the home grid (reorder there, or drop on another folder).
+folderOverlay?.addEventListener('dragover', (e) => {
+  if (dragState.draggedSource !== 'folder' || e.target.closest('.folder-sheet')) return;
+  e.preventDefault();
+  moveSiteOutOfFolder(dragState.draggedId);
+  dragState.draggedSource = 'home';
+  state.openFolderId = null;
+  renderHome();
+  saveData();
+});
+
+
+// Icon draft in the add/edit dialog.
+//   mode 'auto': favicon (or an uploaded image in `image`)
+//   mode 'text': `text` on the `color` background
+let iconDraft = { mode: 'auto', image: '', text: '', color: '' };
+
+const ICON_COLORS = ['#007aff', '#af52de', '#ff2d55', '#ff3b30', '#ff9500', '#ffcc00', '#34c759', '#8e8e93', '#1c1c1e', '#ffffff'];
+
+function resetIconDraft(site) {
+  iconDraft = {
+    mode: site && site.iconText ? 'text' : 'auto',
+    image: (site && site.customIcon) || '',
+    text: (site && site.iconText) || '',
+    color: (site && isValidIconColor(site.iconColor) && site.iconColor) || ICON_COLORS[0]
+  };
+  const textInput = document.getElementById('iconTextInput');
+  if (textInput) textInput.value = iconDraft.text;
+}
+
+function iconDraftText() {
+  const name = (document.getElementById('siteName')?.value || '').trim();
+  return iconDraft.text.trim() || Array.from(name)[0] || '';
+}
+
+function renderIconColorSwatches() {
+  const group = document.getElementById('iconColorGroup');
+  if (!group) return;
+  if (group.children.length !== ICON_COLORS.length + 1) {
+    group.innerHTML = ICON_COLORS.map((c) =>
+      '<button type="button" class="accent-swatch" role="radio" data-icon-color="' + c + '" style="--swatch:' + c + '"></button>'
+    ).join('') + '<label class="accent-swatch accent-swatch--custom" role="radio" data-icon-color="custom">' +
+      '<input type="color" id="iconColorCustom" aria-label="custom"></label>';
+    group.querySelectorAll('button[data-icon-color]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        iconDraft.color = btn.dataset.iconColor;
+        renderSiteIconPreview();
+      });
+    });
+    document.getElementById('iconColorCustom').addEventListener('input', (e) => {
+      iconDraft.color = e.target.value;
+      renderSiteIconPreview();
+    });
+  }
+  group.querySelectorAll('[data-icon-color]').forEach((el) => {
+    const isCustom = el.dataset.iconColor === 'custom';
+    const checked = isCustom ? !ICON_COLORS.includes(iconDraft.color) : el.dataset.iconColor === iconDraft.color;
+    el.setAttribute('aria-checked', String(checked));
+    if (isCustom) el.style.setProperty('--swatch', checked ? iconDraft.color : 'transparent');
+  });
+}
 
 function renderSiteIconPreview() {
   const preview = document.getElementById('siteIconPreview');
   if (!preview) return;
-  const editingIcon = window.editingItem?.type === 'site' ? window.editingItem.item.customIcon : '';
-  const icon = pendingSiteIcon === undefined ? editingIcon : pendingSiteIcon;
   const url = (document.getElementById('siteUrl')?.value || '').trim();
-  const site = {
-    name: (document.getElementById('siteName')?.value || '').trim() || url,
-    url: url && !/^https?:\/\//i.test(url) ? 'https://' + url : url,
-    customIcon: icon
-  };
-  preview.replaceChildren(createFaviconIcon(site));
-  document.getElementById('siteIconAuto')?.classList.toggle('hidden', !icon);
+  const isText = iconDraft.mode === 'text';
+  document.querySelectorAll('#iconModeGroup .seg-btn').forEach((b) => {
+    b.classList.toggle('active', b.dataset.iconMode === iconDraft.mode);
+  });
+  document.getElementById('iconCustomPanel')?.classList.toggle('hidden', !isText && !iconDraft.image);
+  document.querySelectorAll('#iconCustomPanel .icon-custom-row').forEach((row) => row.classList.toggle('hidden', !isText));
+  const textInput = document.getElementById('iconTextInput');
+  if (textInput) textInput.placeholder = Array.from((document.getElementById('siteName')?.value || '').trim())[0] || 'A';
+  renderIconColorSwatches();
+
+  let icon;
+  if (isText) {
+    icon = iconDraftText() ? createTextIcon(iconDraftText(), iconDraft.color) : createTextIcon('', iconDraft.color);
+  } else if (iconDraft.image) {
+    icon = createFaviconIcon({ url, customIcon: iconDraft.image });
+  } else if (!url) {
+    // Nothing to fetch yet: an empty plate, no placeholder glyph.
+    icon = document.createElement('div');
+    icon.className = 'site-tile-icon is-empty';
+  } else {
+    icon = createFaviconIcon({
+      name: (document.getElementById('siteName')?.value || '').trim() || url,
+      url: /^https?:\/\//i.test(url) ? url : 'https://' + url
+    });
+  }
+  preview.replaceChildren(icon);
 }
 
-function openAddSiteModal() {
-  pendingSiteIcon = undefined;
+document.querySelectorAll('#iconModeGroup .seg-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    iconDraft.mode = btn.dataset.iconMode;
+    if (iconDraft.mode === 'auto') iconDraft.image = '';
+    renderSiteIconPreview();
+    if (iconDraft.mode === 'text') document.getElementById('iconTextInput')?.focus();
+  });
+});
+document.getElementById('iconTextInput')?.addEventListener('input', (e) => {
+  iconDraft.text = e.target.value;
+  renderSiteIconPreview();
+});
+
+// Writes the dialog's icon choice onto a site object.
+function applyIconDraft(site) {
+  delete site.customIcon;
+  delete site.iconText;
+  delete site.iconColor;
+  if (iconDraft.mode === 'text' && iconDraftText()) {
+    site.iconText = iconDraftText();
+    site.iconColor = iconDraft.color;
+  } else if (iconDraft.image) {
+    site.customIcon = iconDraft.image;
+  }
+}
+
+function setAddType(type) {
+  const isFolder = type === 'folder';
+  const radio = document.querySelector('input[name="addType"][value="' + (isFolder ? 'folder' : 'site') + '"]');
+  if (radio) radio.checked = true;
+  siteForm.classList.toggle('hidden', isFolder);
+  folderForm.classList.toggle('hidden', !isFolder);
+}
+
+// type: 'site' (default) or 'folder'
+function openAddSiteModal(type) {
+  resetIconDraft(null);
   window.editingItem = undefined;
   document.getElementById('siteName').value = '';
   document.getElementById('siteUrl').value = '';
-  document.getElementById('tagName').value = '';
-  renderTagSelector();
+  document.getElementById('newFolderName').value = '';
+  setAddType(type === 'folder' ? 'folder' : 'site');
   renderSiteIconPreview();
   addModal.classList.remove('hidden');
   modalOverlay.classList.remove('hidden');
@@ -3531,27 +3719,23 @@ document.getElementById('siteIconFile')?.addEventListener('change', (e) => {
   const file = e.target.files && e.target.files[0];
   e.target.value = '';
   imageFileToIcon(file).then((icon) => {
-    pendingSiteIcon = icon;
+    iconDraft.mode = 'auto';
+    iconDraft.image = icon;
     renderSiteIconPreview();
   }).catch(() => window.showNotification?.(i18n.t('iconInvalid'), 'warning'));
 });
-document.getElementById('siteIconAuto')?.addEventListener('click', () => {
-  pendingSiteIcon = '';
-  renderSiteIconPreview();
-});// ===== Add/Edit Modal =====
+// ===== Add/Edit Modal =====
 // Note: Add button is now rendered as a chip in renderHome()
 
 function closeModals() {
   modalOverlay.classList.add('hidden');
   addModal.classList.add('hidden');
-  tagViewModal.classList.add('hidden');
   document.getElementById('deleteModal').classList.add('hidden'); // Close delete modal
   renameModal?.classList.add('hidden');
   settingsModal?.classList.add('hidden');
 }
 
 closeAddModalBtn.onclick = closeModals;
-closeTagModalBtn.onclick = closeModals;
 modalOverlay.onclick = (e) => {
   if (e.target === modalOverlay) closeModals();
 };
@@ -3559,13 +3743,8 @@ modalOverlay.onclick = (e) => {
 // Switch Add Type
 addTypeRadios.forEach(radio => {
   radio.addEventListener('change', (e) => {
-    if (e.target.value === 'site') {
-      siteForm.classList.remove('hidden');
-      tagForm.classList.add('hidden');
-    } else {
-      siteForm.classList.add('hidden');
-      tagForm.classList.remove('hidden');
-    }
+    setAddType(e.target.value);
+
   });
 });
 
@@ -3589,8 +3768,8 @@ saveItemBtn.addEventListener('click', async () => {
 
     if (!url.startsWith('http')) url = 'https://' + url;
 
-    const selectedTags = Array.from(document.querySelectorAll('#tagSelector input:checked')).map(cb => cb.value);
-    const showOnHome = document.getElementById('showOnHome').checked;
+    // Every site is pinned to the home page (the option was removed).
+    const showOnHome = true;
 
     if (isEditing) {
       // Update existing site
@@ -3598,12 +3777,8 @@ saveItemBtn.addEventListener('click', async () => {
       if (siteIndex !== -1) {
         state.sites[siteIndex].name = name;
         state.sites[siteIndex].url = url;
-        state.sites[siteIndex].tags = selectedTags;
         state.sites[siteIndex].showOnHome = showOnHome;
-        if (pendingSiteIcon !== undefined) {
-          if (pendingSiteIcon) state.sites[siteIndex].customIcon = pendingSiteIcon;
-          else delete state.sites[siteIndex].customIcon;
-        }
+        applyIconDraft(state.sites[siteIndex]);
 
         // Update siteOrder if showOnHome changed
         const inOrder = state.siteOrder.includes(state.sites[siteIndex].id);
@@ -3619,10 +3794,10 @@ saveItemBtn.addEventListener('click', async () => {
         id: generateUuid(),
         name,
         url,
-        tags: selectedTags,
+        tags: [],
         showOnHome
       };
-      if (pendingSiteIcon) newSite.customIcon = pendingSiteIcon;
+      applyIconDraft(newSite);
 
       state.sites.push(newSite);
 
@@ -3632,55 +3807,19 @@ saveItemBtn.addEventListener('click', async () => {
       }
     }
   } else {
-    const tagName = document.getElementById('tagName').value.trim();
-    if (!tagName) {
-      window.showNotification?.(i18n.t('tagNameRequired'), 'warning');
-      return;
-    }
-
-    if (isEditing) {
-      // Update existing tag
-      const oldTagName = window.editingItem.item;
-      const tagIndex = state.tags.indexOf(oldTagName);
-      if (tagIndex !== -1) {
-        // Check if new name already exists
-        if (state.tags.includes(tagName) && tagName !== oldTagName) {
-          window.showNotification?.(i18n.t('tagExists'), 'warning');
-          return;
-        }
-
-        state.tags[tagIndex] = tagName;
-
-        // Update tagOrder
-        const orderIndex = state.tagOrder.indexOf(oldTagName);
-        if (orderIndex !== -1) {
-          state.tagOrder[orderIndex] = tagName;
-        }
-
-        // Update all sites that have this tag
-        state.sites.forEach(site => {
-          const siteTagIndex = site.tags.indexOf(oldTagName);
-          if (siteTagIndex !== -1) {
-            site.tags[siteTagIndex] = tagName;
-          }
-        });
-      }
-    } else {
-      // Create new tag
-      if (state.tags.includes(tagName)) {
-        window.showNotification?.(i18n.t('tagExists'), 'warning');
-        return;
-      }
-      state.tags.push(tagName);
-
-      // Add to tagOrder
-      state.tagOrder.push(tagName);
-    }
+    const name = document.getElementById('newFolderName').value.trim() || i18n.t('newFolder') || 'New Folder';
+    const ids = [];
+    const folder = { id: generateUuid(), type: 'folder', name, url: '', showOnHome: true, tags: [], children: ids };
+    state.sites.push(folder);
+    // The folder takes the place of the first site it swallowed.
+    const positions = ids.map((id) => state.siteOrder.indexOf(id)).filter((i) => i >= 0);
+    state.siteOrder = state.siteOrder.filter((id) => !ids.includes(id));
+    const at = positions.length ? Math.min(Math.min(...positions), state.siteOrder.length) : state.siteOrder.length;
+    state.siteOrder.splice(at, 0, folder.id);
   }
 
   // Clear editing state
   window.editingItem = undefined;
-  pendingSiteIcon = undefined;
 
   const saved = await saveData();
   if (saved === false) return;
@@ -3689,47 +3828,6 @@ saveItemBtn.addEventListener('click', async () => {
   closeModals();
 });
 
-// ===== Tag View Logic =====
-function openTagView(tagName) {
-  document.getElementById('tagViewTitle').textContent = '# ' + tagName;
-  const grid = document.getElementById('tagViewLinks');
-  grid.innerHTML = '';
-
-  const tagSites = state.sites.filter(s => s.tags.includes(tagName));
-
-  if (tagSites.length === 0) {
-    grid.innerHTML = `<div style="grid-column: 1/-1; opacity: 0.5;">${i18n.t('noSites')}</div>`;
-  } else {
-    // Collect all links first
-    tagSites.forEach((site, index) => {
-      const el = document.createElement('a');
-      el.className = 'tag-link-item';
-      el.href = site.url;
-      el.textContent = site.name;
-      el.oncontextmenu = (e) => showContextMenu(e, site, 'site');
-      // Middle-click opens in new tab
-      el.onmousedown = (e) => {
-        if (e.button === 1) {
-          e.preventDefault();
-          window.recordVisit?.(site.url, site.name);
-          window.open(site.url, '_blank');
-        }
-      };
-      grid.appendChild(el);
-
-      // Add separator if not last
-      if (index < tagSites.length - 1) {
-        const sep = document.createElement('span');
-        sep.className = 'tag-view-separator';
-        sep.textContent = '、';
-        grid.appendChild(sep);
-      }
-    });
-  }
-
-  tagViewModal.classList.remove('hidden');
-  modalOverlay.classList.remove('hidden');
-}
 
 
 // ===== Language Toggle =====
@@ -3791,8 +3889,7 @@ function syncModeSubmenuUI() {
   if (!modeSubmenu) return;
   const current = (typeof state !== 'undefined' && state.viewMode) || 'general';
   modeSubmenu.querySelectorAll('[data-mode-option]').forEach((el) => {
-    el.style.fontWeight = el.dataset.modeOption === current ? '800' : '400';
-    el.style.opacity = el.dataset.modeOption === current ? '1' : '0.7';
+    el.classList.toggle('is-selected', el.dataset.modeOption === current);
   });
 }
 
@@ -3846,6 +3943,44 @@ function syncSettingsModalUI() {
   const appearance = window.getAppearance?.() || 'auto';
   document.querySelectorAll('#appearanceGroup .seg-btn').forEach((b) => b.classList.toggle('active', b.dataset.appearance === appearance));
   document.querySelectorAll('#zoomGroup .seg-btn').forEach((b) => b.classList.toggle('active', b.dataset.zoom === state.zoomLevel));
+  renderAccentSwatches();
+}
+
+// Accent swatches: the eight system colors plus a custom color wheel.
+function renderAccentSwatches() {
+  const group = document.getElementById('accentGroup');
+  if (!group || !window.ACCENT_PRESETS) return;
+  const current = window.getAccent?.() || 'blue';
+  const dark = !!window.isDarkAppearance?.();
+  const names = Object.keys(window.ACCENT_PRESETS);
+  if (group.children.length !== names.length + 1) {
+    group.innerHTML = names.map((name) =>
+      '<button type="button" class="accent-swatch" role="radio" data-accent="' + name + '"></button>'
+    ).join('') +
+      '<label class="accent-swatch accent-swatch--custom" role="radio" data-accent="custom">' +
+      '<input type="color" id="accentCustomInput" aria-label="custom"></label>';
+    group.querySelectorAll('button[data-accent]').forEach((btn) => {
+      btn.addEventListener('click', () => window.setAccent?.(btn.dataset.accent));
+    });
+    const picker = document.getElementById('accentCustomInput');
+    // 'input' previews live; 'change' (picker closed) saves and syncs once.
+    picker.addEventListener('input', () => window.setAccent?.(picker.value, { sync: false }));
+    picker.addEventListener('change', () => window.setAccent?.(picker.value));
+  }
+  const nameKey = (name) => 'accent' + name.charAt(0).toUpperCase() + name.slice(1);
+  group.querySelectorAll('[data-accent]').forEach((el) => {
+    const name = el.dataset.accent;
+    const isCustom = name === 'custom';
+    const checked = isCustom ? !window.ACCENT_PRESETS[current] : name === current;
+    el.setAttribute('aria-checked', String(checked));
+    const label = i18n.t(isCustom ? 'accentCustom' : nameKey(name));
+    el.setAttribute('aria-label', label);
+    el.title = label;
+    if (!isCustom) el.style.setProperty('--swatch', window.ACCENT_PRESETS[name][dark ? 1 : 0]);
+    else el.style.setProperty('--swatch', checked ? current : 'transparent');
+  });
+  const picker = document.getElementById('accentCustomInput');
+  if (picker && !window.ACCENT_PRESETS[current]) picker.value = current;
 }
 window.syncSettingsModalUI = syncSettingsModalUI;
 
@@ -3945,7 +4080,9 @@ function hasOpenTransientUi() {
     pageContextMenu,
     itemContextMenu,
     settingsModal,
-    document.getElementById('pluginModal')
+    document.getElementById('pluginModal'),
+    document.getElementById('folderOverlay'),
+    document.getElementById('widgetMenu')
   ].some(isElementVisible);
 }
 
@@ -3962,11 +4099,30 @@ function closeTransientUi() {
   itemContextMenu?.classList.add('hidden');
 }
 
+// Escape closes the topmost layer: menus and dialogs first, then the folder window.
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Escape' || e.isComposing) return;
+  const modalOpen = [modalOverlay, engineModal, document.getElementById('wallpaperModal'),
+    document.getElementById('aboutModal'), document.getElementById('coffeeModal'),
+    document.getElementById('feedbackModal')].some(isElementVisible);
+  const menuOpen = [settingsMenu, pageContextMenu, contextMenu, document.getElementById('widgetMenu')].some(isElementVisible);
+  if (modalOpen || menuOpen) {
+    closeTransientUi();
+    hideContextMenu();
+    window.hideWidgetMenu?.();
+  } else if (state.openFolderId) {
+    closeFolder();
+  } else {
+    return;
+  }
+  e.preventDefault();
+});
+
 document.addEventListener('click', (e) => {
   if (!hasOpenTransientUi()) return;
 
   const insideInteractiveLayer = e.target.closest(
-    '.modal, .settings-menu, .settings-btn, .page-context-menu, .item-context-menu, .context-menu'
+    '.modal, .settings-menu, .settings-btn, .page-context-menu, .item-context-menu, .context-menu, .folder-overlay, .widget-menu'
   );
 
   if (insideInteractiveLayer) return;
@@ -4189,8 +4345,10 @@ function showPageContextMenu(e) {
   // Always prevent default browser context menu
   e.preventDefault();
 
-  // Hide any existing context menus first
+  // Hide any existing context menus first (including an icon's or widget's menu)
   hideAllContextMenus();
+  hideContextMenu();
+  window.hideWidgetMenu?.();
 
   // Do not show any context menu on search/time/date
   const noMenuSelectors = [
@@ -4230,18 +4388,8 @@ function showPageContextMenu(e) {
   }
 
   // Show page context menu (with wallpaper option)
-  pageContextMenu.style.left = e.clientX + 'px';
-  pageContextMenu.style.top = e.clientY + 'px';
   pageContextMenu.classList.remove('hidden');
-
-  // Adjust position if menu goes off screen
-  const rect = pageContextMenu.getBoundingClientRect();
-  if (rect.right > window.innerWidth) {
-    pageContextMenu.style.left = (e.clientX - rect.width) + 'px';
-  }
-  if (rect.bottom > window.innerHeight) {
-    pageContextMenu.style.top = (e.clientY - rect.height) + 'px';
-  }
+  placeMenuAt(pageContextMenu, e.clientX, e.clientY);
 }
 
 function showItemContextMenu(e, type) {
@@ -4259,18 +4407,8 @@ function showItemContextMenu(e, type) {
   }
 
   itemContextMenu.dataset.type = type;
-  itemContextMenu.style.left = e.clientX + 'px';
-  itemContextMenu.style.top = e.clientY + 'px';
   itemContextMenu.classList.remove('hidden');
-
-  // Adjust position if menu goes off screen
-  const rect = itemContextMenu.getBoundingClientRect();
-  if (rect.right > window.innerWidth) {
-    itemContextMenu.style.left = (e.clientX - rect.width) + 'px';
-  }
-  if (rect.bottom > window.innerHeight) {
-    itemContextMenu.style.top = (e.clientY - rect.height) + 'px';
-  }
+  placeMenuAt(itemContextMenu, e.clientX, e.clientY);
 }
 
 function hideAllContextMenus() {
@@ -4289,12 +4427,7 @@ function openAddSiteFromContext() {
     window.requireLoginForPersistentChange?.();
     return;
   }
-  document.getElementById('modalOverlay').classList.remove('hidden');
-  document.getElementById('addModal').classList.remove('hidden');
-  document.querySelector('input[name="addType"][value="site"]').checked = true;
-  document.getElementById('siteForm').classList.remove('hidden');
-  document.getElementById('tagForm').classList.add('hidden');
-  renderTagSelector();
+  openAddSiteModal('site');
 }
 
 function openAddFolderFromContext() {
@@ -4303,20 +4436,7 @@ function openAddFolderFromContext() {
     window.requireLoginForPersistentChange?.();
     return;
   }
-  const folderId = generateUuid();
-  state.sites.push({
-    id: folderId,
-    type: 'folder',
-    name: i18n.t('newFolder') || 'New Folder',
-    url: '',
-    showOnHome: true,
-    tags: [],
-    children: []
-  });
-  state.siteOrder.push(folderId);
-  saveData();
-  renderHome();
-  openRenameModal(folderId, 'folder');
+  openAddSiteModal('folder');
 }
 
 function openWallpaperFromContext() {
@@ -4398,6 +4518,8 @@ document.addEventListener('click', hideAllContextMenus);
 document.addEventListener('scroll', hideAllContextMenus);
 
 // Export context menu functions
+window.hideAllContextMenus = hideAllContextMenus;
+window.hideContextMenu = hideContextMenu;
 window.openAddSiteFromContext = openAddSiteFromContext;
 window.openAddFolderFromContext = openAddFolderFromContext;
 window.openWallpaperFromContext = openWallpaperFromContext;

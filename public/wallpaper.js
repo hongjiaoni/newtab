@@ -298,26 +298,16 @@ function renderWallpaperUI() {
       if (memberTier < 2) {
         if (!isLoggedIn) {
           uploadContainer.innerHTML = `
-            <div style="text-align: center; padding: 24px 30px 10px;">
-              <p style="margin-bottom: 15px; opacity: 0.8;">
-                ${currentLocale === 'zh' ? '登录后可添加自定义壁纸' : 'Login to add custom wallpapers'}
-              </p>
-              <button onclick="wpOpenLoginFromWallpaper()" class="primary-btn"
-                style="padding: 15px 30px; margin: 0 auto; display: block;">
-                ${currentLocale === 'zh' ? '立即登录' : 'Login'}
-              </button>
+            <div class="wallpaper-gate">
+              <p>${currentLocale === 'zh' ? '登录后可添加自定义壁纸' : 'Login to add custom wallpapers'}</p>
+              <button onclick="wpOpenLoginFromWallpaper()" class="primary-btn">${currentLocale === 'zh' ? '立即登录' : 'Login'}</button>
             </div>
           `;
         } else {
           uploadContainer.innerHTML = `
-            <div style="text-align: center; padding: 24px 30px 10px;">
-              <p style="margin-bottom: 15px; opacity: 0.8;">
-                ${currentLocale === 'zh' ? '自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}
-              </p>
-              <button onclick="wpOpenUpgradeFromWallpaper()" class="primary-btn"
-                style="padding: 15px 30px; margin: 0 auto; display: block;">
-                ${currentLocale === 'zh' ? '升级会员' : 'Upgrade Membership'}
-              </button>
+            <div class="wallpaper-gate">
+              <p>${currentLocale === 'zh' ? '自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}</p>
+              <button onclick="wpOpenUpgradeFromWallpaper()" class="primary-btn">${currentLocale === 'zh' ? '升级会员' : 'Upgrade Membership'}</button>
             </div>
           `;
         }
@@ -333,44 +323,12 @@ function renderWallpaperUI() {
             const max = data?.max_wallpapers || 50;
 
             uploadContainer.innerHTML = `
-              <div style="text-align: center; padding: 12px 20px 0;">
-                <p style="margin: 0 0 10px; opacity: 0.7; font-size: 14px;">
-                  ${currentLocale === 'zh' ? `已添加 ${count}/${max} 张` : `Added ${count}/${max} images`}
-                </p>
-                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
-                  <input type="text" id="customWallpaperUrlInput" class="modal-input"
-                    placeholder="${t('pasteImageUrl')}" style="max-width: 360px; margin-bottom: 0;">
-                  <button class="primary-btn" onclick="uploadCustomWallpaperFromUrl()"
-                    style="padding: 10px 18px;">
-                    ${t('confirmUpload')}
-                  </button>
-                  <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
-                  <button class="cancel-btn" onclick="wpTriggerFileInput()"
-                    style="padding: 10px 18px;">
-                    ${t('localUpload')}
-                  </button>
-                </div>
-              </div>
+              <p class="wallpaper-upload-note">${currentLocale === 'zh' ? `已添加 ${count}/${max} 张` : `Added ${count}/${max} images`}</p>
+              ${wallpaperUploadRowHtml(t)}
             `;
           })
           .catch(() => {
-            uploadContainer.innerHTML = `
-              <div style="text-align: center; padding: 12px 20px 0;">
-                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
-                  <input type="text" id="customWallpaperUrlInput" class="modal-input"
-                    placeholder="${t('pasteImageUrl')}" style="max-width: 360px; margin-bottom: 0;">
-                  <button class="primary-btn" onclick="uploadCustomWallpaperFromUrl()"
-                    style="padding: 10px 18px;">
-                    ${t('confirmUpload')}
-                  </button>
-                  <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
-                  <button class="cancel-btn" onclick="wpTriggerFileInput()"
-                    style="padding: 10px 18px;">
-                    ${t('localUpload')}
-                  </button>
-                </div>
-              </div>
-            `;
+            uploadContainer.innerHTML = wallpaperUploadRowHtml(t);
           });
       }
     } else {
@@ -397,19 +355,52 @@ function renderWallpaperUI() {
 
   // Render Grid
   if (filteredWallpapers.length === 0 && !uploadContainer?.classList.contains('hidden') === false) {
-    gridContainer.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-color); opacity: 0.6;">
-        ${currentLocale === 'zh' ? '该分类下暂无壁纸' : 'No wallpapers in this category'}
-    </div>`;
+    gridContainer.innerHTML = `<div class="wallpaper-empty">${currentLocale === 'zh' ? '该分类下暂无壁纸' : 'No wallpapers in this category'}</div>`;
   } else {
-    const currentSelected = wallpaperState.pendingWallpaper !== undefined
-      ? wallpaperState.pendingWallpaper
-      : wallpaperState.selectedWallpaper;
+    // Thumbnails are lazy, decoded off the main thread and (when the storage
+    // supports it) a 480px rendition instead of the full-size image.
     gridContainer.innerHTML = filteredWallpapers.map(w => `
-      <div class="wallpaper-item ${currentSelected === w.url ? 'selected' : ''}" onclick="selectWallpaper('${w.url}')">
-        <img src="${w.url}" alt="Wallpaper" title="Wallpaper">
+      <div class="wallpaper-item" data-wallpaper-url="${w.url}" onclick="selectWallpaper('${w.url}')">
+        <img src="${wallpaperThumbUrl(w.url)}" data-fallback-src="${w.url}" alt="" loading="lazy" decoding="async" width="480" height="300">
       </div>
     `).join('');
+    gridContainer.querySelectorAll('img').forEach((img) => {
+      if (img.complete) img.classList.add('is-loaded');
+      else img.addEventListener('load', () => img.classList.add('is-loaded'), { once: true });
+    });
   }
+  markSelectedWallpaper();
+}
+
+function wallpaperUploadRowHtml(t) {
+  return `
+    <div class="wallpaper-upload-row">
+      <input type="text" id="customWallpaperUrlInput" class="modal-input" placeholder="${t('pasteImageUrl')}">
+      <button class="primary-btn" onclick="uploadCustomWallpaperFromUrl()">${t('confirmUpload')}</button>
+      <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
+      <button class="cancel-btn" onclick="wpTriggerFileInput()">${t('localUpload')}</button>
+    </div>
+  `;
+}
+
+// Supabase Storage public URLs can be served resized through the image
+// transformation endpoint. If the project doesn't have it, the request fails
+// and the delegated error handler in script.js swaps in data-fallback-src.
+function wallpaperThumbUrl(url) {
+  const marker = '/storage/v1/object/public/';
+  if (typeof url !== 'string' || !url.includes(marker) || url.includes('?')) return url;
+  return url.replace(marker, '/storage/v1/render/image/public/') + '?width=480&quality=70&resize=cover';
+}
+
+// Selection only toggles a class: re-rendering the grid on every click made
+// the browser re-create and re-decode every thumbnail, the main source of lag.
+function markSelectedWallpaper() {
+  const current = wallpaperState.pendingWallpaper !== undefined
+    ? wallpaperState.pendingWallpaper
+    : wallpaperState.selectedWallpaper;
+  document.querySelectorAll('#wallpaperGrid .wallpaper-item').forEach((el) => {
+    el.classList.toggle('selected', el.dataset.wallpaperUrl === current);
+  });
 }
 
 function toggleCustomWallpaperAdd() {
@@ -931,13 +922,13 @@ async function compressImage(file) {
 function selectWallpaper(wallpaperId) {
   wallpaperState.pendingWallpaper = wallpaperId;
   previewWallpaper(wallpaperId);
-  renderWallpaperUI();
+  markSelectedWallpaper();
 }
 
 function restoreDefaultWallpaper() {
   wallpaperState.pendingWallpaper = null;
   previewWallpaper(null);
-  renderWallpaperUI();
+  markSelectedWallpaper();
 }
 
 // Setup wallpaper event listeners

@@ -126,7 +126,16 @@ npx serve public -l 3000
 > 工作站同步内容为组件布局、便签、待办、日程、订阅源和 Agent 配置;**聊天记录只保存在本机**,不上传。
 > 旧的 `user_theme_settings` / `user_font_settings` 表不再读写,确认没有旧版客户端后可自行清理。
 
-### 1.6 RSS 代理
+### 1.6 主题色迁移（2026-10）
+
+在 `supabase_glass_migration.sql` 之后执行 `supabase_accent_migration.sql`:
+
+- `user_home_settings.accent_color`(系统色名或 `#rrggbb`)
+- 更新后的 `sync_home_config` RPC 写入主题色
+
+> 未执行时主题色只保存在本机,刷新同步不会覆盖它。
+
+### 1.7 RSS 代理
 
 - `api/rss-proxy.js` 随 Vercel 自动部署,无需环境变量;插件端请求 `https://newtab.online/api/rss-proxy`(已在 `host_permissions` 内)
 

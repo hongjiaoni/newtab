@@ -45,8 +45,19 @@ describe('workspace.js', () => {
     expect(wb.agent.provider).toBeUndefined();
   });
 
-  it('gives new users the default widget layout', () => {
-    expect(window.normalizeWorkbench(null).widgets).toEqual(['agent', 'calendar', 'notes', 'todo', 'history', 'rss']);
+  it('gives new users a default layout that fills the 4 x 4 grid', () => {
+    const wb = window.normalizeWorkbench(null);
+    expect(wb.widgets).toEqual(['agent', 'calendar', 'notes', 'history', 'rss', 'todo']);
+    expect(wb.widgetSizes).toEqual({ agent: 'l', calendar: 'v', notes: 's', history: 's', rss: 'l', todo: 'l' });
+    const units = { s: 1, m: 2, v: 2, l: 4 };
+    expect(wb.widgets.reduce((n, t) => n + units[wb.widgetSizes[t]], 0)).toBe(16);
+  });
+
+  it('keeps valid widget sizes and replaces sizes a widget does not offer', () => {
+    const wb = window.normalizeWorkbench({ widgets: ['todo', 'agent'], widgetSizes: { todo: 'v', agent: 's', notes: 'bogus' } });
+    expect(wb.widgetSizes.todo).toBe('v');
+    expect(wb.widgetSizes.agent).toBe('l');  // agent has no small size
+    expect(wb.widgetSizes.notes).toBe('s');
   });
 
   it('keeps an existing widget order and drops unknown or duplicate widgets', () => {

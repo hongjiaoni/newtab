@@ -73,32 +73,33 @@
   height: 14px;
 }
 
-/* ---------- Bento grid ---------- */
+/* ---------- Unit grid ----------
+ * 4 columns; widgets span whole units (see SIZES in workspace.js):
+ * small 1x1, medium wide 2x1, medium tall 1x2, large 2x2.
+ * `dense` packing lets the other widgets reflow around a moved or resized one. */
 .bento {
+  --ws-cols: 4;
   display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-auto-rows: clamp(176px, calc((var(--vh-full) - 200px) / 4), 260px);
+  grid-template-columns: repeat(var(--ws-cols), minmax(0, 1fr));
+  grid-auto-rows: clamp(176px, calc((var(--vh-full) - 200px) / 4), 240px);
   grid-auto-flow: row dense;
   gap: var(--space-4);
 }
 
-.w-agent { grid-column: span 6; grid-row: span 2; }
-.w-calendar { grid-column: span 3; grid-row: span 2; }
-.w-notes { grid-column: span 3; grid-row: span 1; }
-.w-todo { grid-column: span 3; grid-row: span 1; }
-.w-history { grid-column: span 5; grid-row: span 2; }
-.w-rss { grid-column: span 7; grid-row: span 2; }
+.widget.size-s { grid-column: span 1; grid-row: span 1; }
+.widget.size-m { grid-column: span 2; grid-row: span 1; }
+.widget.size-v { grid-column: span 1; grid-row: span 2; }
+.widget.size-l { grid-column: span 2; grid-row: span 2; }
 
 @media (max-width: 1100px) {
   .workspace { padding-left: var(--space-6); }
-  .w-agent { grid-column: span 12; }
-  .w-calendar { grid-column: span 6; }
-  .w-notes, .w-todo { grid-column: span 6; }
-  .w-history, .w-rss { grid-column: span 12; }
+  .bento { --ws-cols: 2; }
 }
 
-@media (max-width: 720px) {
-  .w-calendar, .w-notes, .w-todo { grid-column: span 12; }
+@media (max-width: 640px) {
+  .bento { --ws-cols: 1; }
+  .widget.size-m,
+  .widget.size-l { grid-column: span 1; }
 }
 
 .ws-empty {
@@ -214,43 +215,6 @@
 }
 
 /* Edit mode: jiggle-free, but clearly movable/removable */
-.bento.is-editing .widget {
-  cursor: grab;
-}
-
-.bento.is-editing .widget-body {
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.widget.is-dragging {
-  opacity: 0.4;
-  transform: scale(0.97);
-}
-
-.widget-remove {
-  position: absolute;
-  top: -8px;
-  left: -8px;
-  z-index: 5;
-  display: grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: var(--red);
-  color: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
-  cursor: pointer;
-}
-
-.widget-remove .sym {
-  width: 14px;
-  height: 14px;
-  stroke-width: 2.5;
-}
 
 /* ---------- List rows (history, RSS) ---------- */
 .list-row,
@@ -353,7 +317,7 @@
 .cal-month {
   margin-bottom: var(--space-1);
   font: var(--text-headline);
-  color: var(--red);
+  color: var(--accent);
 }
 
 .cal-mini {
@@ -397,13 +361,13 @@
 }
 
 .cal-cell.today {
-  background: var(--red);
-  color: #fff;
+  background: var(--accent);
+  color: var(--accent-contrast);
   font-weight: 600;
 }
 
 .cal-cell.selected {
-  box-shadow: inset 0 0 0 1.5px var(--red);
+  box-shadow: inset 0 0 0 1.5px var(--accent);
 }
 
 .cal-cell.has-ev::after {
@@ -439,38 +403,6 @@
 }
 
 /* ---------- Notes ---------- */
-.w-notes .widget-body {
-  flex-direction: row;
-  gap: var(--space-2);
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.note-card {
-  position: relative;
-  flex: 1 0 140px;
-  max-width: 100%;
-  padding: var(--space-3);
-  border: 0;
-  border-radius: var(--radius-sm);
-  background: var(--note);
-  box-shadow: none;
-  color: rgba(0, 0, 0, 0.8);
-  font: var(--text-callout);
-  line-height: 1.5;
-  text-align: left;
-  white-space: pre-line;
-  overflow: hidden;
-  cursor: pointer;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  -webkit-box-orient: vertical;
-}
-
-.note-pin {
-  float: right;
-  font-size: 11px;
-}
 
 .note-swatch {
   width: 16px;
@@ -487,11 +419,6 @@
 }
 
 /* ---------- Todo ---------- */
-.todo-list {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-}
 
 .todo-row {
   display: flex;
@@ -653,7 +580,7 @@
   height: var(--control-sm);
   padding: 0 var(--space-2);
   border: 0;
-  border-radius: var(--radius-xs);
+  border-radius: var(--radius-capsule);
   background: var(--fill-3);
   box-shadow: none;
   font: var(--text-subhead);
@@ -685,7 +612,7 @@
   align-self: flex-end;
   border-bottom-right-radius: 6px;
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
 }
 
 .msg--ai {
@@ -850,7 +777,7 @@
   border: 0;
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
   box-shadow: none;
   cursor: pointer;
   transition: transform var(--dur-base) var(--ease-spring);
@@ -927,7 +854,7 @@
   height: 32px;
   border-radius: 9px;
   background: var(--accent);
-  color: #fff;
+  color: var(--accent-contrast);
 }
 
 .ws-picker-plus {
@@ -1007,4 +934,619 @@
 @media (prefers-reduced-motion: reduce) {
   .sym.is-spinning { animation: none; }
   .widget, .send { transition: none; }
+}
+
+/* =====================================================================
+ * Sizes, drag, context menu, size picker (glass-polish)
+ * ===================================================================== */
+
+/* Drag from the title bar; the widget being moved stays in the grid as a
+   translucent placeholder while the others reflow around it. */
+.widget-head {
+  cursor: grab;
+  user-select: none;
+}
+
+.widget-head:active {
+  cursor: grabbing;
+}
+
+.widget.is-dragging {
+  opacity: 0.35;
+  transform: scale(0.97);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent), var(--glass-shadow);
+}
+
+/* Small widgets: tighter padding so content fits a single unit */
+.widget.size-s {
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4);
+}
+
+.widget.size-s .widget-head {
+  margin-bottom: var(--space-2);
+}
+
+/* ---------- Calendar layouts ---------- */
+.cal-layout {
+  display: grid;
+  gap: var(--space-4);
+  min-height: 0;
+}
+
+.cal-layout--m {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+.cal-layout--v {
+  grid-template-rows: auto 1fr;
+}
+
+.cal-agenda {
+  min-width: 0;
+  min-height: 0;
+}
+
+.cal-layout--m .cal-agenda {
+  padding-left: var(--space-4);
+  box-shadow: inset 0.5px 0 0 var(--separator);
+  align-self: stretch;
+}
+
+.cal-agenda-day {
+  margin-bottom: var(--space-2);
+  font: var(--text-headline);
+  color: var(--glass-label);
+}
+
+.cal-layout .cal-events {
+  margin-top: 0;
+}
+
+.cal-layout--v .cal-agenda {
+  padding-top: var(--space-3);
+  box-shadow: inset 0 0.5px 0 var(--separator);
+}
+
+/* small and medium: compact month so it fits one row unit */
+.size-s .cal-mini,
+.size-m .cal-mini {
+  row-gap: 0;
+}
+
+.size-s .cal-cell,
+.size-m .cal-cell {
+  width: 18px;
+  height: 18px;
+  font-size: 10.5px;
+}
+
+.size-s .cal-dow,
+.size-m .cal-dow {
+  padding-bottom: 0;
+  font-size: 9.5px;
+}
+
+.size-s .cal-month,
+.size-m .cal-month {
+  margin-bottom: 0;
+  font-size: 12px;
+}
+
+.w-calendar.size-s .widget-body {
+  overflow: hidden;
+}
+
+/* ---------- Notes ---------- */
+.note-cards {
+  display: grid;
+  gap: var(--space-2);
+  flex: 1;
+  min-height: 0;
+}
+
+.note-cards--s { grid-template-columns: 1fr; }
+.note-cards--m { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.note-cards--l { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: minmax(0, 1fr); }
+
+.note-card {
+  position: relative;
+  display: block;
+  min-width: 0;
+  min-height: 0;
+  padding: var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--note);
+  box-shadow: none;
+  color: rgba(0, 0, 0, 0.82);
+  text-align: left;
+  font: var(--text-callout);
+  line-height: 1.5;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.note-card:active {
+  transform: scale(0.98);
+}
+
+.note-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3; /* small and medium: at most three lines */
+  overflow: hidden;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.note-cards--l .note-text {
+  -webkit-line-clamp: 6;
+}
+
+.note-pin {
+  float: right;
+  margin-left: var(--space-1);
+  font-size: 11px;
+}
+
+/* ---------- Todo ---------- */
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.todo-list--m {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: min-content;
+  column-gap: var(--space-4);
+}
+
+/* ---------- Recently visited: small is a dense list ---------- */
+.w-history.size-s .list-row {
+  min-height: 32px;
+  padding: 2px var(--space-1);
+}
+
+.w-history.size-s .list-row .s,
+.w-history.size-s .list-row .meta {
+  display: none;
+}
+
+.w-history.size-s .list-row img {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- Agent: compact (medium) and expanded window ---------- */
+.agent--compact {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.agent--compact .agent-messages {
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  cursor: pointer;
+}
+
+.agent--compact .msg {
+  max-width: 90%;
+  padding: 6px var(--space-3);
+  font: var(--text-footnote);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.agent--compact .msg-foot {
+  display: none;
+}
+
+.agent--compact .agent-placeholder {
+  flex-direction: row;
+  gap: var(--space-2);
+  max-width: none;
+  font: var(--text-footnote);
+  white-space: nowrap;
+}
+
+.agent--compact .agent-placeholder .agent-login {
+  margin: 0;
+  padding: 0;
+}
+
+.agent--compact .agent-placeholder-ava {
+  font-size: 20px;
+}
+
+.agent--compact .composer {
+  min-height: 36px;
+  padding: 3px 3px 3px var(--space-2);
+}
+
+.agent--compact .composer textarea {
+  height: 28px;
+  padding: 4px 0;
+}
+
+.agent--compact .send {
+  width: 28px;
+  height: 28px;
+}
+
+.agent-switch {
+  max-width: 160px;
+}
+
+.agent--window {
+  height: min(64vh, 560px);
+}
+
+/* ---------- Widget context menu ---------- */
+
+.context-menu-item--danger {
+  color: var(--red);
+}
+
+.context-menu-item--danger:hover {
+  background: var(--red);
+  color: #fff;
+}
+
+/* ---------- Modal variants used by the workspace ---------- */
+.ws-modal--wide {
+  width: min(880px, calc(100vw - 48px));
+  max-width: none;
+}
+
+.ws-modal--size {
+  width: min(760px, calc(100vw - 48px));
+  max-width: none;
+}
+
+/* ---------- Size picker ---------- */
+.size-picker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 0 var(--space-2);
+}
+
+.size-stage {
+  display: grid;
+  place-items: center;
+  flex: none;
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--fill-3) 60%, transparent);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+}
+
+.size-preview {
+  position: relative;
+}
+
+.size-preview > .widget {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  transition: none;
+}
+
+.size-nav {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--glass-label);
+  cursor: pointer;
+}
+
+.size-nav .sym {
+  position: relative;
+  z-index: 2;
+  width: 18px;
+  height: 18px;
+}
+
+.size-caption {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.size-name {
+  font: var(--text-headline);
+  color: var(--label-1);
+}
+
+.size-dims {
+  font: var(--text-footnote);
+  color: var(--label-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.size-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: var(--space-3);
+}
+
+.size-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--label-4);
+  transition: background-color var(--dur-fast) var(--ease-standard), width var(--dur-base) var(--ease-spring);
+}
+
+.size-dots span.active {
+  width: 16px;
+  border-radius: var(--radius-capsule);
+  background: var(--accent);
+}
+
+/* ---------- Widget editors (sheets opened from a widget) ---------- */
+.plugin-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 46vh;
+  margin-bottom: var(--space-4);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.plugin-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--fill-3);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+}
+
+.plugin-list-item .item-text {
+  flex: 1;
+  min-width: 0;
+  font: var(--text-body);
+  word-break: break-word;
+}
+
+.plugin-list-item.done .item-text {
+  color: var(--label-3);
+  text-decoration: line-through;
+}
+
+.item-del {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--control-sm);
+  height: var(--control-sm);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+  color: var(--label-2);
+  cursor: pointer;
+}
+
+.item-del:hover {
+  background: var(--fill-2);
+  color: var(--label-1);
+}
+
+.plugin-add-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.plugin-add-row .modal-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.plugin-add-row .primary-btn {
+  min-width: var(--control-md);
+  padding: 0 var(--space-4);
+}
+
+.todo-main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.todo-meta {
+  font: var(--text-footnote);
+  color: var(--label-2);
+}
+
+.todo-progress-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  font: var(--text-subhead);
+  color: var(--label-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.todo-progress {
+  flex: 1;
+  height: 4px;
+  border-radius: var(--radius-capsule);
+  background: var(--fill-2);
+  overflow: hidden;
+}
+
+.todo-progress-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+  transition: width var(--dur-base) var(--ease-standard);
+}
+
+/* Month view: circular days like Calendar.app */
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.cal-month-label {
+  font: var(--text-headline);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  row-gap: var(--space-1);
+  text-align: center;
+}
+
+.cal-weekday {
+  padding-bottom: var(--space-1);
+  font: var(--text-caption);
+  color: var(--label-3);
+}
+
+.cal-day {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: 0 auto;
+  border-radius: 50%;
+  font: var(--text-body);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.cal-day:hover {
+  background: var(--fill-3);
+}
+
+.cal-day.blank {
+  visibility: hidden;
+}
+
+.cal-day.selected {
+  box-shadow: inset 0 0 0 1.5px var(--accent);
+}
+
+.cal-day.today {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 600;
+}
+
+.cal-dot {
+  position: absolute;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.55;
+}
+
+.calendar-events {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.calendar-events .folder-empty-hint,
+.plugin-editor .folder-empty-hint {
+  padding: var(--space-4) 0;
+  font: var(--text-callout);
+  color: var(--label-2);
+  text-align: center;
+}
+
+/* Notes editor */
+.plugin-note-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.plugin-note-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  color: rgba(0, 0, 0, 0.82);
+}
+
+.plugin-note-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.plugin-note-pin {
+  cursor: pointer;
+  font-size: 13px;
+  opacity: 0.55;
+}
+
+.plugin-note-pin.pinned {
+  opacity: 1;
+}
+
+.plugin-note-color {
+  display: flex;
+  flex: 1;
+  gap: 6px;
+}
+
+.plugin-note-card .item-del {
+  color: rgba(0, 0, 0, 0.55);
+}
+
+.plugin-note-card .item-del:hover {
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.plugin-note-text {
+  width: 100%;
+  min-height: 96px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  resize: vertical;
+  font: var(--text-body);
+  line-height: 1.5;
+  color: inherit;
+  outline: none;
 }

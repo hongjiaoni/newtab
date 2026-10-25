@@ -264,7 +264,7 @@ function buildHomeConfigFromLegacy(legacy) {
         type: row.type === 'folder' ? 'folder' : 'link',
         children: row.type === 'folder' ? (Array.isArray(row.children) ? row.children : []) : undefined,
         customIcon: row.icon || undefined
-    }));
+    })).map(decodeSiteIcon);
 
     const orderedSiteIds = (legacy.siteOrderRows || [])
         .slice()
@@ -292,6 +292,8 @@ function buildHomeConfigFromLegacy(legacy) {
             wallpaper: legacy.settingsRow.wallpaper || null,
             // color_mode now stores 'light' | 'dark' | 'auto'
             appearance: normalizeAppearanceValue(legacy.settingsRow.color_mode),
+            // undefined when the accent column doesn't exist yet: the local choice stays
+            accent: legacy.settingsRow.accent_color || undefined,
             zoomLevel: legacy.settingsRow?.zoom_level || '100',
             openBehavior: legacy.settingsRow?.open_behavior || 'newtab'
         },
@@ -373,6 +375,7 @@ function buildHomeSettingsRow(uid, payload, syncedAt) {
         wallpaper: Object.prototype.hasOwnProperty.call(s, 'wallpaper') ? s.wallpaper : null,
         theme: 'glass',
         color_mode: normalizeAppearanceValue(s.appearance),
+        accent_color: s.accent || 'blue',
         zoom_level: s.zoomLevel || '100',
         open_behavior: s.openBehavior || 'newtab',
         workbench: payload?.workbench || null,
@@ -413,7 +416,7 @@ async function writeHomeSettingsRow(uid, payload, syncedAt) {
         // Migration not applied yet: the new columns (zoom_level / open_behavior / workbench)
         // are missing, so retry with the legacy column set instead of failing the whole sync.
         const msg = compactSupabaseError(err).toLowerCase();
-        if (msg.includes('zoom_level') || msg.includes('open_behavior') || msg.includes('workbench') || msg.includes('column')) {
+        if (msg.includes('zoom_level') || msg.includes('open_behavior') || msg.includes('workbench') || msg.includes('accent_color') || msg.includes('column')) {
             const s = payload?.settings || {};
             await writeRequiredTable('home settings upsert (legacy)', () => (
                 db
@@ -464,7 +467,7 @@ async function saveLegacyHomeConfigFallback(uid, payload, syncedAt) {
             show_on_home: site.showOnHome !== false,
             type: site.type === 'folder' ? 'folder' : 'link',
             children: site.type === 'folder' ? (Array.isArray(site.children) ? site.children : []) : [],
-            icon: site.customIcon || null,
+            icon: encodeSiteIcon(site) || null,
             updated_at: syncedAt
         }));
         let ok;
@@ -605,7 +608,7 @@ function buildCurrentHomePayload() {
             showOnHome: !!s.showOnHome,
             type: s.type === 'folder' ? 'folder' : 'link',
             children: s.type === 'folder' ? (Array.isArray(s.children) ? s.children : []) : undefined,
-            customIcon: s.customIcon || undefined
+            customIcon: encodeSiteIcon(s)
         })),
         tags: state.tags || [],
         tag_order: state.tagOrder || [],
@@ -623,6 +626,7 @@ function buildCurrentHomePayload() {
             // Same value under the old key: the sync_home_config RPC deployed
             // before supabase_glass_migration.sql reads settings.colorMode.
             colorMode: normalizeAppearanceValue(window.getAppearance?.()),
+            accent: window.getAccent?.() || 'blue',
             zoomLevel: state.zoomLevel || '100',
             openBehavior: state.openBehavior || 'newtab'
         },
@@ -644,6 +648,28 @@ async function persistHomeConfig(uid, payload, syncedAt) {
     clearPendingMeta(uid, 'home', syncedAt);
 }
 
+// Text icons travel in the same `icon` column as images: "text:#rrggbb:Label".
+const TEXT_ICON_RE = /^text:(#[0-9a-f]{6}):(.{1,16})$/is;
+
+function encodeSiteIcon(site) {
+    if (site && site.iconText && /^#[0-9a-f]{6}$/i.test(site.iconColor || '')) {
+        return 'text:' + site.iconColor + ':' + Array.from(String(site.iconText)).slice(0, 4).join('');
+    }
+    return (site && site.customIcon) || undefined;
+}
+
+// Splits a stored icon back into customIcon or iconText/iconColor.
+function decodeSiteIcon(site) {
+    if (!site) return site;
+    const m = typeof site.customIcon === 'string' && site.customIcon.match(TEXT_ICON_RE);
+    if (m) {
+        delete site.customIcon;
+        site.iconColor = m[1].toLowerCase();
+        site.iconText = m[2];
+    }
+    return site;
+}
+
 // Applies the parsed Home Config payload directly to internal running state
 function applyHomeConfig(config) {
     if (!config || typeof config !== 'object') return;
@@ -651,10 +677,14 @@ function applyHomeConfig(config) {
     if (Array.isArray(config.sites)) {
         // Without the icon column the server can't return custom icons; keep
         // the ones this device has instead of wiping them on every refresh.
+        config.sites.forEach(decodeSiteIcon);
         if (siteIconColumnMissing && Array.isArray(state.sites)) {
-            const localIcons = new Map(state.sites.filter((x) => x && x.customIcon).map((x) => [x.id, x.customIcon]));
+            const localIcons = new Map(state.sites.filter((x) => x && (x.customIcon || x.iconText)).map((x) => [x.id, x]));
             config.sites.forEach((site) => {
-                if (site && !site.customIcon && localIcons.has(site.id)) site.customIcon = localIcons.get(site.id);
+                const local = site && !site.customIcon && !site.iconText && localIcons.get(site.id);
+                if (!local) return;
+                if (local.customIcon) site.customIcon = local.customIcon;
+                if (local.iconText) { site.iconText = local.iconText; site.iconColor = local.iconColor; }
             });
         }
         state.sites = config.sites;
@@ -662,6 +692,9 @@ function applyHomeConfig(config) {
     if (Array.isArray(config.tags)) state.tags = config.tags;
     if (Array.isArray(config.site_order)) state.siteOrder = config.site_order;
     if (Array.isArray(config.tag_order)) state.tagOrder = config.tag_order;
+    // Tags became folders: convert cloud data from older clients, then save the
+    // converted layout back (deferred so it doesn't run inside the load).
+    if (window.migrateTagsToFolders?.()) setTimeout(() => window.saveData?.(), 0);
 
     const s = config.settings || {};
     state.openFolderId = null;
@@ -703,6 +736,9 @@ function applyHomeConfig(config) {
 
     if (typeof s.appearance === 'string') {
         window.setAppearance?.(s.appearance, { sync: false });
+    }
+    if (typeof s.accent === 'string') {
+        window.setAccent?.(s.accent, { sync: false });
     }
 }
 

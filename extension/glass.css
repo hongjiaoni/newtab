@@ -154,7 +154,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
   transition: transform var(--dur-base) var(--ease-spring);
 }
-.switch input:checked + span { background: var(--green); }
+.switch input:checked + span { background: var(--accent); }
 .switch input:checked + span::after { transform: translateX(16px); }
 
 /* ---------- Text field ---------- */

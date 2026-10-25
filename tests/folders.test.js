@@ -52,9 +52,12 @@ const FUNCS = [
   'getVisibleSites',
   'getFolderChildren',
   'renderHome',
-  'renderFolderView',
+  'getOpenFolder',
+  'renderFolderPopup',
   'openFolder',
   'closeFolder',
+  'commitFolderName',
+  'migrateTagsToFolders',
   'openAddSiteModal',
   'addSitesToFolder',
   'mergeSitesIntoNewFolder',
@@ -66,7 +69,10 @@ const FUNCS = [
 function makeContext(initialState) {
   const contentEl = document.createElement('div');
   contentEl.className = 'content-area';
-  document.body.innerHTML = '';
+  document.body.innerHTML = `
+    <div id="folderOverlay" class="hidden"><div class="folder-sheet">
+      <input id="folderNameInput"><div id="folderGrid"></div><p id="folderHint"></p>
+    </div></div>`;
   document.body.appendChild(contentEl);
 
   const context = {
@@ -82,6 +88,10 @@ function makeContext(initialState) {
     ZOOM_FACTORS: { '100': 0.9, '125': 1.125, '150': 1.35 },
     SITE_ICON_MAX_CHARS: 60000,
     contentEl,
+    folderOverlay: document.getElementById('folderOverlay'),
+    folderGrid: document.getElementById('folderGrid'),
+    folderNameInput: document.getElementById('folderNameInput'),
+    folderHint: document.getElementById('folderHint'),
     document,
     window,
     saveData: () => {},
@@ -177,12 +187,26 @@ describe('site tiles rendering', () => {
     expect(icon.querySelector('.site-tile-letter').textContent).toBe('G');
   });
 
-  it('renders folder view with back button when open', () => {
-    ctx.state.openFolderId = 'f1';
+  it('opens a folder as a centered window and closes it again', () => {
     ctx.renderHome();
-    expect(ctx.contentEl.querySelector('.folder-header')).toBeTruthy();
-    expect(ctx.contentEl.querySelector('.folder-back-btn')).toBeTruthy();
-    expect(ctx.contentEl.querySelectorAll('.site-tile.link-tile').length).toBe(1);
+    ctx.openFolder('f1');
+    const overlay = document.getElementById('folderOverlay');
+    expect(overlay.classList.contains('hidden')).toBe(false);
+    expect(document.getElementById('folderNameInput').value).toBe('Tools');
+    expect(document.querySelectorAll('#folderGrid .site-tile.link-tile').length).toBe(1);
+    // the home grid stays rendered underneath
+    expect(ctx.contentEl.querySelectorAll('.site-tile.link-tile').length).toBe(2);
+
+    document.getElementById('folderNameInput').value = 'Dev';
+    ctx.closeFolder();
+    expect(overlay.classList.contains('hidden')).toBe(true);
+    expect(ctx.state.sites.find((s) => s.id === 'f1').name).toBe('Dev');
+  });
+
+  it('no longer renders tag chips', () => {
+    ctx.state.tags = ['dev'];
+    ctx.renderHome();
+    expect(ctx.contentEl.querySelector('.chip')).toBeNull();
   });
 });
 
@@ -223,12 +247,31 @@ describe('folder operations', () => {
     expect(ctx.state.siteOrder).toContain(folder.id);
   });
 
-  it('moves a site out of a folder', () => {
+  it('moves a site out of a folder and shows it on home', () => {
+    ctx.state.sites[0].showOnHome = false;
     ctx.state.openFolderId = 'f1';
     ctx.moveSiteOutOfFolder('a');
     const folder = ctx.state.sites.find((s) => s.id === 'f1');
     expect(folder.children).toEqual([]);
     expect(ctx.state.siteOrder).toContain('a');
+    expect(ctx.state.sites[0].showOnHome).toBe(true);
+  });
+
+  it('turns tags into folders (first tag wins, foldered sites stay put)', () => {
+    ctx.state.sites[0].tags = ['work'];          // 'a' is already in f1
+    ctx.state.sites[1].tags = ['work', 'fun'];   // 'b'
+    ctx.state.sites[2].tags = ['fun'];           // 'c'
+    ctx.state.tags = ['fun', 'work'];
+    ctx.state.tagOrder = ['work', 'fun'];
+    expect(ctx.migrateTagsToFolders()).toBe(true);
+    const work = ctx.state.sites.find((s) => s.type === 'folder' && s.name === 'work');
+    const fun = ctx.state.sites.find((s) => s.type === 'folder' && s.name === 'fun');
+    expect(work.children).toEqual(['b']);
+    expect(fun.children).toEqual(['c']);
+    expect(ctx.state.siteOrder).toEqual(['a', 'f1', work.id, fun.id]);
+    expect(ctx.state.tags).toEqual([]);
+    expect(ctx.state.sites.every((s) => !s.tags || s.tags.length === 0)).toBe(true);
+    expect(ctx.migrateTagsToFolders()).toBe(false); // idempotent
   });
 
   it('deletes a folder and moves children back home', () => {
