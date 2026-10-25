@@ -5,14 +5,20 @@ const SYNC_DEBOUNCE_MS = 500;
 const USER_DATA_REFRESH_MS = 20 * 1000;
 const PENDING_SYNC_MAX_AGE_MS = 2 * 60 * 1000;
 const HOME_CONFIG_KEY_PREFIX = 'user_home_config_';
-const COLOR_CONFIG_KEY_PREFIX = 'user_color_config_';
 const CONFIG_META_KEY_PREFIX = 'user_config_meta_';
-var APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
 const CURRENT_SYNC_SESSION_ID = `sync-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 const SYNC_ERROR_NOTIFICATION_THROTTLE_MS = 30 * 1000;
 let userDataLoadPromise = null;
 let userDataRefreshTimer = null;
 let lastSyncNotificationAt = 0;
+
+function getSupabaseClient() {
+    const client = window.supabase;
+    if (client && typeof client.from === 'function') {
+        return client;
+    }
+    return null;
+}
 
 function notifySyncStatus(messageKey, fallback, type = 'warning') {
     if (typeof window.showNotification !== 'function') return;
@@ -32,10 +38,7 @@ function isUserDataRuntimeReady() {
         typeof i18n !== 'undefined' &&
         typeof window.renderHome === 'function' &&
         typeof window.renderSearchEngine === 'function' &&
-        typeof window.updateTime === 'function' &&
-        !!window.themeState &&
-        typeof window.applyStyleTheme === 'function' &&
-        typeof window.applyCustomThemeForCurrentMode === 'function'
+        typeof window.updateTime === 'function'
     );
 }
 
@@ -54,29 +57,10 @@ function getHomeConfigCacheKey(uid) {
     return HOME_CONFIG_KEY_PREFIX + uid;
 }
 
-function getColorConfigCacheKey(uid) {
-    return COLOR_CONFIG_KEY_PREFIX + uid;
-}
-
 function parseTimestamp(value) {
     if (!value) return 0;
     const parsed = Date.parse(value);
     return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function latestTimestamp(...values) {
-    let winner = '';
-    let winnerTs = 0;
-
-    for (const value of values) {
-        const currentTs = parseTimestamp(value);
-        if (currentTs >= winnerTs) {
-            winnerTs = currentTs;
-            winner = value || winner;
-        }
-    }
-
-    return winner;
 }
 
 function getConfigMeta(uid) {
@@ -154,7 +138,7 @@ function hasPendingConfigSync(uid, section) {
 
 function hasAnyPendingUserConfig(uid) {
     if (!uid) return false;
-    return hasPendingConfigSync(uid, 'home') || hasPendingConfigSync(uid, 'color');
+    return hasPendingConfigSync(uid, 'home');
 }
 
 function clearPendingMeta(uid, section, syncedAt) {
@@ -167,62 +151,9 @@ function clearPendingMeta(uid, section, syncedAt) {
     });
 }
 
-function buildThemeSettingsFromLocalCache(uid) {
-    if (!uid) return null;
-
-    try {
-        const rawColor = localStorage.getItem(getColorConfigCacheKey(uid));
-        if (!rawColor) return null;
-
-        const colorPayload = JSON.parse(rawColor);
-        if (!colorPayload || typeof colorPayload !== 'object') return null;
-
-        const snapshot = JSON.parse(localStorage.getItem(APPEARANCE_SNAPSHOT_KEY) || '{}') || {};
-        const snapshotSettings = snapshot.customSettings || {};
-
-        return {
-            style: snapshot.currentTheme || window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
-            fontChinese: snapshotSettings.fontChinese || window.themeState?.customSettings?.fontChinese || '优设好身体',
-            fontEnglish: snapshotSettings.fontEnglish || window.themeState?.customSettings?.fontEnglish || 'Patrick Hand',
-            ...(colorPayload.light || {}),
-            darkMode: {
-                ...(colorPayload.dark || {})
-            }
-        };
-    } catch (_err) {
-        return null;
-    }
-}
-
-function mergeAppearanceSnapshot(partial) {
-    if (!partial || typeof partial !== 'object') return;
-
-    let current = {};
-    try {
-        current = JSON.parse(localStorage.getItem(APPEARANCE_SNAPSHOT_KEY) || '{}') || {};
-    } catch (_err) {
-        current = {};
-    }
-
-    const next = {
-        ...current,
-        ...partial
-    };
-
-    if (partial.customSettings || current.customSettings) {
-        const currentCustom = current.customSettings || {};
-        const partialCustom = partial.customSettings || {};
-        next.customSettings = {
-            ...currentCustom,
-            ...partialCustom,
-            darkMode: {
-                ...(currentCustom.darkMode || {}),
-                ...(partialCustom.darkMode || {})
-            }
-        };
-    }
-
-    localStorage.setItem(APPEARANCE_SNAPSHOT_KEY, JSON.stringify(next));
+function normalizeAppearanceValue(value) {
+    if (value === 'system') return 'auto';
+    return ['light', 'dark', 'auto'].includes(value) ? value : 'auto';
 }
 
 function normalizeEngineId(input) {
@@ -236,28 +167,81 @@ function normalizeEnabledEngineIds(input) {
     return cleaned.length ? cleaned : null;
 }
 
-function toColorPayloadFromLegacy(themeSettings) {
-    if (!themeSettings || typeof themeSettings !== 'object') return null;
-    if (themeSettings.light || themeSettings.dark) {
-        return {
-            light: { ...(themeSettings.light || {}) },
-            dark: { ...(themeSettings.dark || {}) }
-        };
-    }
-
-    const { style, fontChinese, fontEnglish, darkMode, ...light } = themeSettings;
-    return {
-        light,
-        dark: { ...(darkMode || {}) }
-    };
+function isMissingRelationError(err) {
+    const message = String(err?.message || '').toLowerCase();
+    const details = String(err?.details || '').toLowerCase();
+    return String(err?.code || '') === '42P01'
+        || ((message + details).includes('relation') && (message + details).includes('does not exist'));
 }
 
-function toFontPayloadFromLegacy(fontSettings) {
-    if (!fontSettings || typeof fontSettings !== 'object') return {};
-    return {
-        fontChinese: fontSettings.fontChinese || '',
-        fontEnglish: fontSettings.fontEnglish || ''
-    };
+function isMissingFunctionError(err) {
+    const message = String(err?.message || '').toLowerCase();
+    const details = String(err?.details || '').toLowerCase();
+    return String(err?.code || '') === '42883'
+        || ((message + details).includes('function') && (message + details).includes('does not exist'));
+}
+
+function isNoRowsError(err) {
+    return String(err?.code || '') === 'PGRST116';
+}
+
+function isUuidLike(value) {
+    return typeof value === 'string'
+        && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function generateSyncUuid() {
+    if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+        return globalThis.crypto.randomUUID();
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        const r = (Math.random() * 16) | 0;
+        const v = c === 'x' ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+    });
+}
+
+function ensureSiteIdsAreUuid() {
+    if (typeof state === 'undefined' || !Array.isArray(state.sites)) return;
+
+    const idMap = new Map();
+    let changed = false;
+
+    state.sites = state.sites.map((site) => {
+        if (isUuidLike(site?.id)) return site;
+        const nextId = generateSyncUuid();
+        idMap.set(String(site?.id), nextId);
+        changed = true;
+        return { ...site, id: nextId };
+    });
+
+    if (!changed) return;
+
+    if (Array.isArray(state.siteOrder)) {
+        state.siteOrder = state.siteOrder.map((id) => idMap.get(String(id)) || id);
+    }
+
+    try {
+        localStorage.setItem('sites', JSON.stringify(state.sites));
+        localStorage.setItem('siteOrder', JSON.stringify(state.siteOrder || []));
+    } catch (_err) {
+    }
+}
+
+function compactSupabaseError(err) {
+    if (!err) return '';
+    return [err.code, err.message, err.details].filter(Boolean).join(' | ');
+}
+
+async function readMaybe(queryPromise) {
+    const res = await queryPromise;
+    if (res?.error && !isNoRowsError(res.error) && !isMissingRelationError(res.error)) {
+        console.warn('Optional sync read failed:', compactSupabaseError(res.error));
+    }
+    if (res?.error) {
+        return { data: null, error: res.error };
+    }
+    return res || { data: null, error: null };
 }
 
 function buildHomeConfigFromLegacy(legacy) {
@@ -274,9 +258,12 @@ function buildHomeConfigFromLegacy(legacy) {
     const sites = (legacy.sitesRows || []).map((row) => ({
         id: row.id,
         name: row.name,
-        url: row.url,
+        url: row.url || '',
         showOnHome: row.show_on_home !== false,
-        tags: siteTagMap.get(row.id) || []
+        tags: siteTagMap.get(row.id) || [],
+        type: row.type === 'folder' ? 'folder' : 'link',
+        children: row.type === 'folder' ? (Array.isArray(row.children) ? row.children : []) : undefined,
+        customIcon: row.icon || undefined
     }));
 
     const orderedSiteIds = (legacy.siteOrderRows || [])
@@ -288,17 +275,6 @@ function buildHomeConfigFromLegacy(legacy) {
         .slice()
         .sort((a, b) => (a.position || 0) - (b.position || 0))
         .map((row) => row.tag_name);
-
-    const fontSettings = toFontPayloadFromLegacy(legacy.fontSettings);
-
-    // Fallback: read fonts from user_home_settings columns if user_font_settings is empty.
-    // This provides a second persistence path after the sync_home_config RPC migration.
-    const savedFontChinese = fontSettings.fontChinese
-        || legacy.settingsRow.font_chinese
-        || undefined;
-    const savedFontEnglish = fontSettings.fontEnglish
-        || legacy.settingsRow.font_english
-        || undefined;
 
     return {
         sites,
@@ -314,95 +290,322 @@ function buildHomeConfigFromLegacy(legacy) {
             timeFormat: legacy.settingsRow.time_format || '24h',
             locale: legacy.settingsRow.locale || 'zh',
             wallpaper: legacy.settingsRow.wallpaper || null,
-            theme: legacy.settingsRow.theme || 'handdrawn',
-            colorMode: legacy.settingsRow.color_mode || 'light',
-            fontChinese: savedFontChinese,
-            fontEnglish: savedFontEnglish
-        }
+            // color_mode now stores 'light' | 'dark' | 'auto'
+            appearance: normalizeAppearanceValue(legacy.settingsRow.color_mode),
+            zoomLevel: legacy.settingsRow?.zoom_level || '100',
+            openBehavior: legacy.settingsRow?.open_behavior || 'newtab'
+        },
+        workbench: legacy.settingsRow?.workbench || null
     };
 }
 
 async function fetchLegacyConfigs(uid) {
+    const db = getSupabaseClient();
+    if (!db) {
+        throw new Error('Supabase client is not ready');
+    }
+
     const [
         settingsRes,
         sitesRes,
         tagsRes,
         siteTagsRes,
         siteOrderRes,
-        tagOrderRes,
-        themeSettingsRes,
-        fontSettingsRes
+        tagOrderRes
     ] = await Promise.all([
-        supabase.from('user_home_settings').select('*').eq('user_id', uid).single(),
-        supabase.from('user_sites').select('id,name,url,show_on_home').eq('user_id', uid),
-        supabase.from('user_tags').select('name').eq('user_id', uid),
-        supabase.from('user_site_tags').select('site_id,tag_name').eq('user_id', uid),
-        supabase.from('user_site_order').select('site_id,position').eq('user_id', uid),
-        supabase.from('user_tag_order').select('tag_name,position').eq('user_id', uid),
-        supabase.from('user_theme_settings').select('theme_settings, updated_at').eq('user_id', uid).single(),
-        supabase.from('user_font_settings').select('font_settings, updated_at').eq('user_id', uid).single()
+        readMaybe(db.from('user_home_settings').select('*').eq('user_id', uid).single()),
+        readSitesRows(db, uid),
+        readMaybe(db.from('user_tags').select('name').eq('user_id', uid)),
+        readMaybe(db.from('user_site_tags').select('site_id,tag_name').eq('user_id', uid)),
+        readMaybe(db.from('user_site_order').select('site_id,position').eq('user_id', uid)),
+        readMaybe(db.from('user_tag_order').select('tag_name,position').eq('user_id', uid))
     ]);
 
     const homeConfig = buildHomeConfigFromLegacy({
         settingsRow: settingsRes.data,
-        sitesRows: sitesRes.data,
-        tagsRows: tagsRes.data,
-        siteTagsRows: siteTagsRes.data,
-        siteOrderRows: siteOrderRes.data,
-        tagOrderRows: tagOrderRes.data,
-        fontSettings: fontSettingsRes.data?.font_settings
+        sitesRows: Array.isArray(sitesRes) ? sitesRes : (sitesRes?.data || []),
+        tagsRows: tagsRes.data || [],
+        siteTagsRows: siteTagsRes.data || [],
+        siteOrderRows: siteOrderRes.data || [],
+        tagOrderRows: tagOrderRes.data || []
     });
-
-    const colorConfig = toColorPayloadFromLegacy(themeSettingsRes.data?.theme_settings);
 
     return {
         homeConfig,
-        homeUpdatedAt: latestTimestamp(settingsRes.data?.updated_at, fontSettingsRes.data?.updated_at),
-        colorConfig,
-        colorUpdatedAt: themeSettingsRes.data?.updated_at
+        homeUpdatedAt: settingsRes.data?.updated_at
     };
 }
 
+// True once a read shows user_sites has no `icon` column yet
+// (supabase_glass_migration.sql not applied). Custom icons then stay local.
+let siteIconColumnMissing = false;
+
+async function readSitesRows(db, uid) {
+    const withIcon = await readMaybe(db.from('user_sites').select('id,name,url,show_on_home,type,children,icon').eq('user_id', uid));
+    if (withIcon && Array.isArray(withIcon.data)) {
+        siteIconColumnMissing = false;
+        return withIcon.data;
+    }
+    siteIconColumnMissing = true;
+    const full = await readMaybe(db.from('user_sites').select('id,name,url,show_on_home,type,children').eq('user_id', uid));
+    if (full && Array.isArray(full.data)) {
+        return full.data;
+    }
+    // Columns may not exist yet (migration not applied) — fall back to the basic schema.
+    const basic = await readMaybe(db.from('user_sites').select('id,name,url,show_on_home').eq('user_id', uid));
+    if (basic && Array.isArray(basic.data)) {
+        return basic.data;
+    }
+    return [];
+}
+
+function buildHomeSettingsRow(uid, payload, syncedAt) {
+    const s = payload?.settings || {};
+    return {
+        user_id: uid,
+        view_mode: s.viewMode || 'general',
+        engine_index: Number.isFinite(s.engineIndex) ? s.engineIndex : 0,
+        engine_id: s.engineId || null,
+        enabled_engine_ids: Array.isArray(s.enabledEngineIds) ? s.enabledEngineIds : [],
+        date_format_index: Number.isFinite(s.dateFormatIndex) ? s.dateFormatIndex : 0,
+        time_format: s.timeFormat || '24h',
+        locale: s.locale || 'zh',
+        wallpaper: Object.prototype.hasOwnProperty.call(s, 'wallpaper') ? s.wallpaper : null,
+        theme: 'glass',
+        color_mode: normalizeAppearanceValue(s.appearance),
+        zoom_level: s.zoomLevel || '100',
+        open_behavior: s.openBehavior || 'newtab',
+        workbench: payload?.workbench || null,
+        updated_at: syncedAt
+    };
+}
+
+async function writeOptionalTable(operationName, runner) {
+    const res = await runner();
+    if (res?.error) {
+        if (isMissingRelationError(res.error)) {
+            console.warn(`Skipping missing optional sync table during ${operationName}:`, compactSupabaseError(res.error));
+            return false;
+        }
+        throw res.error;
+    }
+    return true;
+}
+
+async function writeRequiredTable(operationName, runner) {
+    const res = await runner();
+    if (res?.error) {
+        throw new Error(`${operationName} failed: ${compactSupabaseError(res.error)}`);
+    }
+    return true;
+}
+
+async function writeHomeSettingsRow(uid, payload, syncedAt) {
+    const db = getSupabaseClient();
+    try {
+        await writeRequiredTable('home settings upsert', () => (
+            db
+                .from('user_home_settings')
+                .upsert(buildHomeSettingsRow(uid, payload, syncedAt), { onConflict: 'user_id' })
+        ));
+        return;
+    } catch (err) {
+        // Migration not applied yet: the new columns (zoom_level / open_behavior / workbench)
+        // are missing, so retry with the legacy column set instead of failing the whole sync.
+        const msg = compactSupabaseError(err).toLowerCase();
+        if (msg.includes('zoom_level') || msg.includes('open_behavior') || msg.includes('workbench') || msg.includes('column')) {
+            const s = payload?.settings || {};
+            await writeRequiredTable('home settings upsert (legacy)', () => (
+                db
+                    .from('user_home_settings')
+                    .upsert({
+                        user_id: uid,
+                        view_mode: s.viewMode || 'general',
+                        engine_index: Number.isFinite(s.engineIndex) ? s.engineIndex : 0,
+                        engine_id: s.engineId || null,
+                        enabled_engine_ids: Array.isArray(s.enabledEngineIds) ? s.enabledEngineIds : [],
+                        date_format_index: Number.isFinite(s.dateFormatIndex) ? s.dateFormatIndex : 0,
+                        time_format: s.timeFormat || '24h',
+                        locale: s.locale || 'zh',
+                        wallpaper: Object.prototype.hasOwnProperty.call(s, 'wallpaper') ? s.wallpaper : null,
+                        theme: 'glass',
+                        color_mode: normalizeAppearanceValue(s.appearance),
+                        updated_at: syncedAt
+                    }, { onConflict: 'user_id' })
+            ));
+            return;
+        }
+        throw err;
+    }
+}
+
+async function saveLegacyHomeConfigFallback(uid, payload, syncedAt) {
+    const db = getSupabaseClient();
+    if (!db) {
+        throw new Error('Supabase client is not ready');
+    }
+
+    const sites = Array.isArray(payload?.sites) ? payload.sites : [];
+    const tags = Array.isArray(payload?.tags) ? payload.tags : [];
+    const siteOrder = Array.isArray(payload?.site_order) ? payload.site_order : [];
+    const tagOrder = Array.isArray(payload?.tag_order) ? payload.tag_order : [];
+
+    await writeHomeSettingsRow(uid, payload, syncedAt);
+
+    const hasSitesTable = await writeOptionalTable('sites delete', () => (
+        db.from('user_sites').delete().eq('user_id', uid)
+    ));
+    if (hasSitesTable && sites.length) {
+        const rowsFull = sites.map((site) => ({
+            id: site.id,
+            user_id: uid,
+            name: site.name || '',
+            url: site.url || '',
+            show_on_home: site.showOnHome !== false,
+            type: site.type === 'folder' ? 'folder' : 'link',
+            children: site.type === 'folder' ? (Array.isArray(site.children) ? site.children : []) : [],
+            icon: site.customIcon || null,
+            updated_at: syncedAt
+        }));
+        let ok;
+        try {
+            ok = await writeOptionalTable('sites insert', () => db.from('user_sites').insert(rowsFull));
+        } catch (err) {
+            // `icon` column missing (migration not applied): retry without it.
+            if (!/icon/i.test(compactSupabaseError(err))) throw err;
+            siteIconColumnMissing = true;
+            ok = await writeOptionalTable('sites insert (no icon)', () => (
+                db.from('user_sites').insert(rowsFull.map(({ icon, ...row }) => row))
+            ));
+        }
+        if (!ok) {
+            // Migration not applied: retry without type/children columns
+            const rowsLegacy = rowsFull.map((r) => ({
+                id: r.id,
+                user_id: r.user_id,
+                name: r.name,
+                url: r.url,
+                show_on_home: r.show_on_home,
+                updated_at: r.updated_at
+            }));
+            await writeOptionalTable('sites insert (legacy)', () => db.from('user_sites').insert(rowsLegacy));
+        }
+    }
+
+    const hasTagsTable = await writeOptionalTable('tags delete', () => (
+        db.from('user_tags').delete().eq('user_id', uid)
+    ));
+    if (hasTagsTable && tags.length) {
+        await writeOptionalTable('tags insert', () => (
+            db.from('user_tags').insert(tags.map((name) => ({
+                user_id: uid,
+                name,
+                updated_at: syncedAt
+            })))
+        ));
+    }
+
+    const hasSiteTagsTable = await writeOptionalTable('site tags delete', () => (
+        db.from('user_site_tags').delete().eq('user_id', uid)
+    ));
+    if (hasSiteTagsTable) {
+        const rows = [];
+        for (const site of sites) {
+            if (!site?.id || !Array.isArray(site.tags)) continue;
+            for (const tagName of site.tags) {
+                if (tagName) {
+                    rows.push({
+                        user_id: uid,
+                        site_id: site.id,
+                        tag_name: tagName
+                    });
+                }
+            }
+        }
+        if (rows.length) {
+            await writeOptionalTable('site tags insert', () => db.from('user_site_tags').insert(rows));
+        }
+    }
+
+    const hasSiteOrderTable = await writeOptionalTable('site order delete', () => (
+        db.from('user_site_order').delete().eq('user_id', uid)
+    ));
+    if (hasSiteOrderTable && siteOrder.length) {
+        await writeOptionalTable('site order insert', () => (
+            db.from('user_site_order').insert(siteOrder.map((siteId, index) => ({
+                user_id: uid,
+                site_id: siteId,
+                position: index
+            })))
+        ));
+    }
+
+    const hasTagOrderTable = await writeOptionalTable('tag order delete', () => (
+        db.from('user_tag_order').delete().eq('user_id', uid)
+    ));
+    if (hasTagOrderTable && tagOrder.length) {
+        await writeOptionalTable('tag order insert', () => (
+            db.from('user_tag_order').insert(tagOrder.map((tagName, index) => ({
+                user_id: uid,
+                tag_name: tagName,
+                position: index
+            })))
+        ));
+    }
+}
+
+let rpcDisabledForSession = false;
+
 async function saveLegacyHomeConfig(payload, syncedAt) {
-    const { error } = await supabase.rpc('sync_home_config', {
+    const db = getSupabaseClient();
+    if (!db) {
+        throw new Error('Supabase client is not ready');
+    }
+
+    const uid = window.authState?.user?.id;
+    if (!uid) throw new Error('Missing authenticated user id');
+
+    // If the RPC proved incompatible (e.g. missing ::uuid casts on an old schema),
+    // skip it for the rest of the session and write tables directly.
+    if (rpcDisabledForSession) {
+        await saveLegacyHomeConfigFallback(uid, payload, syncedAt);
+        return;
+    }
+
+    const { error } = await db.rpc('sync_home_config', {
         p_payload: {
             ...payload,
             updated_at: syncedAt
         }
     });
-    if (error) throw error;
-}
+    if (!error) return;
 
-async function saveLegacyThemeConfig(uid, settings, syncedAt) {
-    const [themeRes, fontRes] = await Promise.all([
-        supabase.from('user_theme_settings').upsert({
-            user_id: uid,
-            theme_settings: settings,
-            updated_at: syncedAt
-        }, { onConflict: 'user_id' }),
-        supabase.from('user_font_settings').upsert({
-            user_id: uid,
-            font_settings: {
-                fontChinese: settings.fontChinese || '',
-                fontEnglish: settings.fontEnglish || ''
-            },
-            updated_at: syncedAt
-        }, { onConflict: 'user_id' })
-    ]);
-    if (themeRes.error) throw themeRes.error;
-    if (fontRes.error) throw fontRes.error;
+    const code = String(error.code || '');
+    const detail = String(error.message || '') + ' ' + String(error.details || '');
+    if (['42804', '42703', '42P01', '42704'].includes(code) || /uuid|type text|type mismatch|does not exist|column .* does not exist|relation .* does not exist/i.test(detail)) {
+        // Deployed RPC predates the latest schema (missing ::uuid casts / columns).
+        // Table sync still works, so disable the RPC for this session and log once.
+        rpcDisabledForSession = true;
+        console.warn('sync_home_config RPC incompatible with the current schema (' + code + '). Using direct table sync for this session. Re-run supabase_folders_migration.sql to re-enable the RPC.');
+    } else {
+        console.warn('sync_home_config failed, falling back to table sync:', compactSupabaseError(error));
+    }
+    await saveLegacyHomeConfigFallback(uid, payload, syncedAt);
 }
 
 function buildCurrentHomePayload() {
-    const colorMode = document.body.classList.contains('dark') ? 'dark' : 'light';
+    ensureSiteIdsAreUuid();
 
     return {
         sites: (state.sites || []).map(s => ({
             id: s.id,
             name: s.name,
-            url: s.url,
+            url: s.url || '',
             tags: Array.isArray(s.tags) ? s.tags : [],
-            showOnHome: !!s.showOnHome
+            showOnHome: !!s.showOnHome,
+            type: s.type === 'folder' ? 'folder' : 'link',
+            children: s.type === 'folder' ? (Array.isArray(s.children) ? s.children : []) : undefined,
+            customIcon: s.customIcon || undefined
         })),
         tags: state.tags || [],
         tag_order: state.tagOrder || [],
@@ -416,25 +619,20 @@ function buildCurrentHomePayload() {
             timeFormat: state.timeFormat || '24h',
             locale: (typeof i18n !== 'undefined' && i18n.currentLocale) ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'),
             wallpaper: window.wallpaperState?.selectedWallpaper || null,
-            theme: state.currentTheme || 'handdrawn',
-            colorMode,
-            fontChinese: window.themeState?.customSettings?.fontChinese || '优设好身体',
-            fontEnglish: window.themeState?.customSettings?.fontEnglish || 'Patrick Hand'
-        }
+            appearance: normalizeAppearanceValue(window.getAppearance?.()),
+            // Same value under the old key: the sync_home_config RPC deployed
+            // before supabase_glass_migration.sql reads settings.colorMode.
+            colorMode: normalizeAppearanceValue(window.getAppearance?.()),
+            zoomLevel: state.zoomLevel || '100',
+            openBehavior: state.openBehavior || 'newtab'
+        },
+        // Chat messages stay on this device (see workbenchSyncPayload in workspace.js)
+        workbench: window.getWorkbenchSyncPayload ? window.getWorkbenchSyncPayload() : (window.workbench || undefined)
     };
 }
 
 async function persistHomeConfig(uid, payload, syncedAt) {
     localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(payload));
-    mergeAppearanceSnapshot({
-        currentTheme: payload.settings.theme || 'handdrawn',
-        colorMode: payload.settings.colorMode || 'light',
-        customSettings: {
-            ...(window.themeState?.customSettings || {}),
-            fontChinese: payload.settings.fontChinese,
-            fontEnglish: payload.settings.fontEnglish
-        }
-    });
     updateConfigMeta(uid, 'home', {
         localUpdatedAt: syncedAt,
         pending: true,
@@ -450,12 +648,24 @@ async function persistHomeConfig(uid, payload, syncedAt) {
 function applyHomeConfig(config) {
     if (!config || typeof config !== 'object') return;
 
-    if (Array.isArray(config.sites)) state.sites = config.sites;
+    if (Array.isArray(config.sites)) {
+        // Without the icon column the server can't return custom icons; keep
+        // the ones this device has instead of wiping them on every refresh.
+        if (siteIconColumnMissing && Array.isArray(state.sites)) {
+            const localIcons = new Map(state.sites.filter((x) => x && x.customIcon).map((x) => [x.id, x.customIcon]));
+            config.sites.forEach((site) => {
+                if (site && !site.customIcon && localIcons.has(site.id)) site.customIcon = localIcons.get(site.id);
+            });
+        }
+        state.sites = config.sites;
+    }
     if (Array.isArray(config.tags)) state.tags = config.tags;
     if (Array.isArray(config.site_order)) state.siteOrder = config.site_order;
     if (Array.isArray(config.tag_order)) state.tagOrder = config.tag_order;
 
     const s = config.settings || {};
+    state.openFolderId = null;
+
     if (typeof s.viewMode === 'string') state.viewMode = s.viewMode;
     if (Number.isFinite(s.engineIndex)) state.engineIndex = s.engineIndex;
     if (typeof s.engineId === 'string') state.engineId = normalizeEngineId(s.engineId);
@@ -474,83 +684,34 @@ function applyHomeConfig(config) {
         }
     }
 
+    if (typeof s.openBehavior === 'string') {
+        state.openBehavior = s.openBehavior === 'current' ? 'current' : 'newtab';
+        localStorage.setItem('openBehavior', state.openBehavior);
+    }
+
+    if (config.workbench && typeof window.applyRemoteWorkbench === 'function') {
+        window.applyRemoteWorkbench(config.workbench);
+    }
+
+    if (typeof s.zoomLevel === 'string' && window.applyZoomLevel) {
+        window.applyZoomLevel(s.zoomLevel, false);
+    }
+
     if (Object.prototype.hasOwnProperty.call(s, 'wallpaper') && window.applyWallpaper) {
         window.applyWallpaper(s.wallpaper, { sync: false });
     }
 
-    if (typeof s.theme === 'string') {
-        state.currentTheme = s.theme;
-        localStorage.setItem('currentTheme', s.theme);
-        window.applyStyleTheme?.(state.currentTheme);
-        if (window.themeState) window.themeState.currentTheme = state.currentTheme;
+    if (typeof s.appearance === 'string') {
+        window.setAppearance?.(s.appearance, { sync: false });
     }
-
-    if (s.fontChinese || s.fontEnglish) {
-        if (window.applyFontSettings) {
-            window.applyFontSettings({
-                fontChinese: s.fontChinese,
-                fontEnglish: s.fontEnglish
-            });
-        } else if (window.themeState && window.themeState.customSettings) {
-            if (s.fontChinese) window.themeState.customSettings.fontChinese = s.fontChinese;
-            if (s.fontEnglish) window.themeState.customSettings.fontEnglish = s.fontEnglish;
-        }
-    }
-
-    if (typeof s.colorMode === 'string') {
-        const mode = s.colorMode === 'dark' ? 'dark' : 'light';
-        document.body.classList.toggle('dark', mode === 'dark');
-        document.body.classList.toggle('light', mode !== 'dark');
-        localStorage.setItem('theme', mode);
-        window.applyCustomThemeForCurrentMode?.();
-    }
-
-    mergeAppearanceSnapshot({
-        currentTheme: state.currentTheme || 'handdrawn',
-        colorMode: typeof s.colorMode === 'string' ? (s.colorMode === 'dark' ? 'dark' : 'light') : (localStorage.getItem('theme') || 'light'),
-        customSettings: {
-            fontChinese: window.themeState?.customSettings?.fontChinese,
-            fontEnglish: window.themeState?.customSettings?.fontEnglish
-        }
-    });
-
-    window.applyStyleTheme?.(state.currentTheme || window.themeState?.currentTheme || 'handdrawn');
-    window.applyCustomThemeForCurrentMode?.();
-}
-
-// Applies the parsed Color Config payload directly to themeState
-function applyColorConfig(config) {
-    if (!config || !window.themeState || !window.themeState.customSettings) return;
-    
-    // Config has format: { light: { ... }, dark: { ... } }
-    if (config.light) {
-        const mergedLight = { ...window.themeState.customSettings, ...config.light };
-        // Clean out nested darkMode if it accidentally merged
-        delete mergedLight.darkMode; 
-        
-        mergedLight.darkMode = {
-            ...((window.themeState.customSettings.darkMode) || {}),
-            ...(config.dark || {})
-        };
-        
-        window.themeState.customSettings = mergedLight;
-    }
-    
-    window.applyStyleTheme?.(window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn');
-    window.applyCustomThemeForCurrentMode?.();
-    mergeAppearanceSnapshot({
-        currentTheme: window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
-        colorMode: document.body.classList.contains('dark') ? 'dark' : 'light',
-        customSettings: window.themeState?.customSettings || {}
-    });
 }
 
 // 1. Initial Cached Load -> 2. Remote Fetch Overwrite
 // The app now standardizes on the normalized Supabase schema:
 // user_home_settings + user_sites + user_tags + user_site_tags + order tables
-// plus user_theme_settings / user_font_settings.
 async function loadUserData(options = {}) {
-    if (!window.authState || !window.authState.isLoggedIn || !supabase) {
+    const db = getSupabaseClient();
+    if (!window.authState || !window.authState.isLoggedIn || !db) {
         return;
     }
 
@@ -564,16 +725,13 @@ async function loadUserData(options = {}) {
         const preferRemote = options.force === true || options.skipLocalHydration === true;
 
         clearExpiredPendingMeta(uid, 'home');
-        clearExpiredPendingMeta(uid, 'color');
 
         // === Phase 1: Local Cache Immediate Hydration ===
         if (!options.skipLocalHydration) {
             try {
                 const localHome = localStorage.getItem(getHomeConfigCacheKey(uid));
-                const localColor = localStorage.getItem(getColorConfigCacheKey(uid));
                 
                 if (localHome) applyHomeConfig(JSON.parse(localHome));
-                if (localColor) applyColorConfig(JSON.parse(localColor));
 
                 window.renderHome?.();
                 window.renderSearchEngine?.();
@@ -589,9 +747,7 @@ async function loadUserData(options = {}) {
             let requiresRender = false;
             const remoteRes = await fetchLegacyConfigs(uid);
             const homeCacheKey = getHomeConfigCacheKey(uid);
-            const colorCacheKey = getColorConfigCacheKey(uid);
             const currentHomeRaw = localStorage.getItem(homeCacheKey);
-            const currentColorRaw = localStorage.getItem(colorCacheKey);
 
             if (remoteRes.homeConfig && (preferRemote || shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt))) {
                 const nextHomeRaw = stringifyConfig(remoteRes.homeConfig);
@@ -608,25 +764,6 @@ async function loadUserData(options = {}) {
 
                 applyHomeConfig(remoteRes.homeConfig);
                 if (homeChanged) {
-                    requiresRender = true;
-                }
-            }
-
-            if (remoteRes.colorConfig && (preferRemote || shouldApplyRemoteConfig(uid, 'color', remoteRes.colorUpdatedAt))) {
-                const nextColorRaw = stringifyConfig(remoteRes.colorConfig);
-                const colorChanged = currentColorRaw !== nextColorRaw;
-
-                localStorage.setItem(colorCacheKey, nextColorRaw);
-                updateConfigMeta(uid, 'color', {
-                    localUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
-                    remoteUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
-                    pending: false,
-                    pendingSince: null,
-                    pendingSessionId: null
-                });
-
-                applyColorConfig(remoteRes.colorConfig);
-                if (colorChanged) {
                     requiresRender = true;
                 }
             }
@@ -649,7 +786,7 @@ async function loadUserData(options = {}) {
 
 // Aggressive overwrite save for Home Config
 async function saveUserDataToBackend(immediate = true) {
-    if (!window.authState || !window.authState.isLoggedIn || !supabase) return;
+    if (!window.authState || !window.authState.isLoggedIn || !getSupabaseClient()) return false;
 
     const doSync = async () => {
         try {
@@ -657,123 +794,37 @@ async function saveUserDataToBackend(immediate = true) {
             const syncedAt = new Date().toISOString();
             const payload = buildCurrentHomePayload();
             await persistHomeConfig(uid, payload, syncedAt);
+            return true;
         } catch (err) {
             console.error('Error saving home config:', err);
-            notifySyncStatus('syncSaveFailed', 'Save failed. Your changes were not synced to the cloud yet.', 'error');
+            notifySyncStatus('syncSaveFailed', 'Save failed: ' + String(err?.message || err), 'error');
+            return false;
         }
     };
 
     if (immediate !== false) {
-        await doSync();
-        return;
+        return await doSync();
     }
 
     if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
     syncDebounceTimer = setTimeout(async () => {
         await doSync();
     }, SYNC_DEBOUNCE_MS);
-}
-
-// Specialized save for strictly Color Configurations
-async function saveThemeSettings(settings) {
-    if (!window.authState || !window.authState.isLoggedIn || !supabase) return;
-
-    try {
-        const uid = window.authState.user.id;
-        const syncedAt = new Date().toISOString();
-        
-        // Settings object usually contains fonts & strings like 'style', but we want to strip those.
-        // We separate them into light and dark structural buckets.
-        const { style, fontChinese, fontEnglish, ...colorsOnly } = settings;
-        
-        const colorPayload = {
-            light: { ...colorsOnly },
-            dark: { ...(colorsOnly.darkMode || {}) }
-        };
-        delete colorPayload.light.darkMode; // Keep hygiene
-
-        // 1. Cache Locally
-        localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(colorPayload));
-        mergeAppearanceSnapshot({
-            currentTheme: settings.style || window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
-            colorMode: document.body.classList.contains('dark') ? 'dark' : 'light',
-            customSettings: settings
-        });
-        updateConfigMeta(uid, 'color', {
-            localUpdatedAt: syncedAt,
-            pending: true,
-            pendingSince: syncedAt,
-            pendingSessionId: CURRENT_SYNC_SESSION_ID
-        });
-
-        // Theme style and fonts are also stored with the home config, so persist them
-        // even if the dedicated theme/color table write fails later.
-        await persistHomeConfig(uid, buildCurrentHomePayload(), syncedAt);
-
-        // 2. Persist through normalized theme/font tables
-        await saveLegacyThemeConfig(uid, settings, syncedAt);
-
-        clearPendingMeta(uid, 'color', syncedAt);
-
-    } catch (e) {
-        console.error('Error saving color config:', e);
-        throw e;
-    }
-}
-
-// Proxies existing API bindings to the new system
-async function saveFontSettings(fontSettings) {
-    // Fonts are now embedded inside the Home Config payload
-    await saveUserDataToBackend(true);
-}
-
-async function resetThemeCustomizationOnBackend() {
-    if (!window.authState || !window.authState.isLoggedIn || !supabase) return;
-    try {
-        const uid = window.authState.user.id;
-        const syncedAt = new Date().toISOString();
-        localStorage.removeItem(getColorConfigCacheKey(uid));
-        await saveLegacyThemeConfig(uid, {}, syncedAt);
-
-        updateConfigMeta(uid, 'color', {
-            localUpdatedAt: syncedAt,
-            remoteUpdatedAt: syncedAt,
-            pending: false,
-            pendingSince: null,
-            pendingSessionId: null
-        });
-        
-        window.clearCustomThemeSettings?.();
-    } catch (e) {
-        console.error('Failed resetting theme', e);
-    }
+    return true;
 }
 
 function markHomeConfigUpdated() {
-    saveUserDataToBackend(true);
+    return saveUserDataToBackend(true);
 }
 
 function flushPendingProfileSync() {
-    if (!navigator.onLine || !window.authState?.user || !supabase) {
+    if (!navigator.onLine || !window.authState?.user || !getSupabaseClient()) {
         return Promise.resolve();
     }
 
     const uid = window.authState.user.id;
 
     return (async () => {
-        if (hasPendingConfigSync(uid, 'color')) {
-            try {
-                const settings = buildThemeSettingsFromLocalCache(uid);
-                if (settings) {
-                    const syncedAt = new Date().toISOString();
-                    await saveLegacyThemeConfig(uid, settings, syncedAt);
-                    clearPendingMeta(uid, 'color', syncedAt);
-                }
-            } catch (err) {
-                console.error('Failed flushing pending color config:', err);
-            }
-        }
-
         if (hasPendingConfigSync(uid, 'home')) {
             try {
                 await saveUserDataToBackend(true);
@@ -793,9 +844,7 @@ function applyCachedUserData() {
             if (!ready) return;
             try {
                 const h = localStorage.getItem(getHomeConfigCacheKey(uid));
-                const c = localStorage.getItem(getColorConfigCacheKey(uid));
                 if (h) applyHomeConfig(JSON.parse(h));
-                if (c) applyColorConfig(JSON.parse(c));
             } catch (e) {
                 console.warn('Failed to apply cached user data:', e);
             }
@@ -803,8 +852,31 @@ function applyCachedUserData() {
     }
 }
 
+function hydrateCachedConfigFromLastUser() {
+    // Instantly apply the last user's cached config (appearance, zoom, sites, workbench...)
+    // so a second open renders immediately, before the remote fetch completes.
+    try {
+        const uid = localStorage.getItem('lastAuthUid');
+        if (!uid) return false;
+        const h = localStorage.getItem(getHomeConfigCacheKey(uid));
+        if (!h) return false;
+        applyHomeConfig(JSON.parse(h));
+        window.renderHome?.();
+        window.renderSearchEngine?.();
+        window.updateAllText?.();
+        window.updateTime?.();
+        window.renderWorkbench?.();
+        return true;
+    } catch (err) {
+        console.warn('Cached config hydration failed:', err);
+        return false;
+    }
+}
+
+window.hydrateCachedConfigFromLastUser = hydrateCachedConfigFromLastUser;
+
 function shouldRefreshUserData() {
-    return !!(window.authState && window.authState.isLoggedIn && supabase && navigator.onLine && !document.hidden);
+    return !!(window.authState && window.authState.isLoggedIn && getSupabaseClient() && navigator.onLine && !document.hidden);
 }
 
 function scheduleUserDataRefresh() {
@@ -818,9 +890,6 @@ function scheduleUserDataRefresh() {
 // Attach to Global Scope
 window.loadUserData = loadUserData;
 window.saveUserDataToBackend = saveUserDataToBackend;
-window.saveThemeSettings = saveThemeSettings;
-window.saveFontSettings = saveFontSettings;
-window.resetThemeCustomizationOnBackend = resetThemeCustomizationOnBackend;
 window.markHomeConfigUpdated = markHomeConfigUpdated;
 window.flushPendingProfileSync = flushPendingProfileSync;
 window.applyCachedUserData = applyCachedUserData;

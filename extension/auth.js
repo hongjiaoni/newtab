@@ -172,6 +172,10 @@ async function handleSession(session) {
   authState.isLoggedIn = true;
   authState.user = session.user;
   window.authState = authState; // Ensure window reference is updated
+  try {
+    localStorage.setItem('lastAuthUid', session.user.id);
+  } catch (_err) {
+  }
 
   const pendingLoginAt = Number(localStorage.getItem(AUTH_PENDING_LOGIN_AT_KEY) || 0);
   if (pendingLoginAt) {
@@ -380,7 +384,7 @@ async function handleLogout() {
 function signOutLocally() {
   // Clear only NewTab-related local storage data
   const keysToRemove = [
-    'auth_last_login_at', 'auth_pending_login_at',
+    'auth_last_login_at', 'auth_pending_login_at', 'lastAuthUid',
     'user_sites', 'user_tags', 'user_site_tags',
     'user_site_order', 'user_tag_order',
     'cached_user_data', 'cached_settings',
@@ -403,8 +407,7 @@ function signOutLocally() {
   // Reset wallpaper
   if (window.wallpaperState) {
     window.wallpaperState.selectedWallpaper = null;
-    document.body.style.backgroundImage = '';
-    document.body.style.backgroundColor = '';
+    if (window.previewWallpaper) window.previewWallpaper(null);
   }
 
   // Clear chrome.storage.local in extension mode, then reload
@@ -487,7 +490,7 @@ window.openUserProfile = function () {
     </div>
     <div style="padding: 0 20px 20px; display: grid; gap: 12px;">
       <!-- Subscription records button hidden
-      <button class="primary-btn sketchy-border" style="width: 100%;" onclick="openSubscriptionRecords()">
+      <button class="primary-btn" style="width: 100%;" onclick="openSubscriptionRecords()">
         ${isZh ? '订阅记录' : 'Subscription records'}
       </button>
       -->

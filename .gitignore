@@ -7,3 +7,7 @@ data/
 uploads/
 .DS_Store
 Thumbs.db
+
+dist/
+extension/.key.pem
+keys/

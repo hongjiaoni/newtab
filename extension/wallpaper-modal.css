@@ -25,17 +25,17 @@
     border-radius: 8px;
     overflow: hidden;
     transition: transform 0.2s;
-    border: 2px solid var(--border-color);
+    border: 1px solid var(--border-color);
     width: 100%;
     text-align: center;
     background: var(--card-bg);
     padding: 6px;
-    box-shadow: 3px 3px 0 var(--shadow-color);
+    box-shadow: var(--sketch-shadow);
 }
 
 .wallpaper-item:hover {
     transform: translate(-2px, -2px) scale(1.05);
-    box-shadow: 6px 6px 0 var(--shadow-color);
+    box-shadow: var(--sketch-shadow);
 }
 
 .wallpaper-item img {
@@ -43,7 +43,7 @@
     height: 100px;
     object-fit: cover;
     display: block;
-    border-bottom: 2px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
     margin-bottom: 6px;
 }
 
@@ -66,14 +66,14 @@
 
 .wallpaper-tab {
     font-family: inherit;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
     cursor: pointer;
     font-weight: 700;
     font-size: 14px;
     background: var(--card-bg);
     color: var(--text-color);
-    box-shadow: 2px 2px 0 var(--shadow-color);
+    box-shadow: var(--sketch-shadow);
     transition: all 0.2s ease;
     padding: 8px 14px;
     opacity: 0.9;
@@ -81,7 +81,7 @@
 
 .wallpaper-tab:hover {
     transform: translate(-2px, -2px);
-    box-shadow: 4px 4px 0 var(--shadow-color);
+    box-shadow: var(--sketch-shadow);
     background: var(--hover-bg);
     opacity: 1;
 }

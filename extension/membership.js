@@ -23,14 +23,14 @@ const MEMBERSHIP_CONFIG = {
         name: '基础会员',
         nameEn: 'Basic',
         features: ['基础壁纸库', '网站标签管理', '数据同步'],
-        limitations: ['无法自定义主题', '无法上传壁纸', '无法自定义字体']
+        limitations: ['无法上传壁纸']
     },
     2: {
         name: '高级会员',
         nameEn: 'Premium',
         priceMonthly: 4.99,
         priceYearly: 49.99,
-        features: ['所有基础功能', '自定义主题', '自定义字体', '上传壁纸 (50张)', '优先支持'],
+        features: ['所有基础功能', '上传壁纸 (50张)', '优先支持'],
         badge: '⭐'
     },
     3: {
@@ -38,7 +38,7 @@ const MEMBERSHIP_CONFIG = {
         nameEn: 'Super',
         priceMonthly: 9.99,
         priceYearly: 99.99,
-        features: ['所有高级功能', '无限壁纸上传', '专属主题', 'API访问', '专属客服'],
+        features: ['所有高级功能', '无限壁纸上传', 'API访问', '专属客服'],
         badge: '👑'
     }
 };
@@ -99,15 +99,6 @@ function updateMembershipUI() {
 
 // Update feature locks based on tier
 function updateFeatureLocks() {
-    // Theme customization is handled centrally in themes.js.
-    // Avoid rebinding click handlers here, otherwise the menu item can
-    // end up with competing listeners after auth/membership refreshes.
-    const themeBtn = document.getElementById('themeCustomizationBtn');
-    if (themeBtn) {
-        themeBtn.classList.remove('locked-feature');
-        themeBtn.onclick = null;
-    }
-
     // Custom wallpaper category
     const customCategory = document.querySelector('[data-category="Custom"]');
     if (customCategory) {
@@ -130,8 +121,6 @@ function updateFeatureLocks() {
 // Check if user has access to a feature
 function hasFeatureAccess(feature) {
     const accessMap = {
-        'theme_customization': 2,
-        'font_customization': 2,
         'custom_wallpaper': 2,
         'unlimited_upload': 3,
         'api_access': 3
@@ -217,17 +206,15 @@ function createUpgradeModal() {
               $${MEMBERSHIP_CONFIG[2].priceYearly}<span style="font-size: 14px; opacity: 0.7;">/${isZh ? '年' : 'year'}</span>
             </div>
             <ul class="tier-features" style="list-style: none; padding: 0; margin: 15px 0;">
-              <li style="padding: 5px 0;">✓ ${isZh ? '自定义主题' : 'Custom themes'}</li>
-              <li style="padding: 5px 0;">✓ ${isZh ? '自定义字体' : 'Custom fonts'}</li>
               <li style="padding: 5px 0;">✓ ${isZh ? '上传壁纸 (50张)' : 'Upload wallpapers (50 images)'}</li>
             </ul>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <button class="btn primary-btn" onclick="handleUpgrade(2, 'monthly')" 
+              <button class="primary-btn" onclick="handleUpgrade(2, 'monthly')" 
                       style="width: 100%; padding: 12px;" 
                       ${membershipState.tier >= 2 ? 'disabled' : ''}>
                 ${membershipState.tier >= 2 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '月付升级' : 'Upgrade Monthly')}
               </button>
-              <button class="btn primary-btn" onclick="handleUpgrade(2, 'yearly')" 
+              <button class="primary-btn" onclick="handleUpgrade(2, 'yearly')" 
                       style="width: 100%; padding: 12px;" 
                       ${membershipState.tier >= 2 ? 'disabled' : ''}>
                 ${membershipState.tier >= 2 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '年付升级' : 'Upgrade Yearly')}
@@ -249,12 +236,12 @@ function createUpgradeModal() {
               <li style="padding: 5px 0;">✓ ${isZh ? '无限壁纸上传' : 'Unlimited wallpaper uploads'}</li>
             </ul>
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-              <button class="btn primary-btn" onclick="handleUpgrade(3, 'monthly')" 
+              <button class="primary-btn" onclick="handleUpgrade(3, 'monthly')" 
                       style="width: 100%; padding: 12px;" 
                       ${membershipState.tier >= 3 ? 'disabled' : ''}>
                 ${membershipState.tier >= 3 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '月付升级' : 'Upgrade Monthly')}
               </button>
-              <button class="btn primary-btn" onclick="handleUpgrade(3, 'yearly')" 
+              <button class="primary-btn" onclick="handleUpgrade(3, 'yearly')" 
                       style="width: 100%; padding: 12px;" 
                       ${membershipState.tier >= 3 ? 'disabled' : ''}>
                 ${membershipState.tier >= 3 ? (isZh ? '当前方案' : 'Current Plan') : (isZh ? '年付升级' : 'Upgrade Yearly')}

@@ -14,12 +14,12 @@ const wallpaperState = {
 };
 
 window.wallpaperState = wallpaperState;
+window.openWallpaperModal = openWallpaperModal;
 
 const MAX_WALLPAPER_UPLOAD_BYTES = 15 * 1024 * 1024;
 const WALLPAPER_UPLOAD_COOLDOWN_MS = 10 * 1000;
 const LAST_WALLPAPER_UPLOAD_AT_KEY = 'wallpaper_last_upload_at';
-
-// ── Caching for faster loading ───────────────────────────────────────
+// ?? Caching for faster loading ???????????????????????????????????????
 const WALLPAPER_CACHE_KEY = 'wp_cache_data';
 const CATEGORIES_CACHE_KEY = 'wp_cats_cache';
 const WALLPAPER_CACHE_TTL = 5 * 60 * 1000;   // 5 min for wallpaper list
@@ -41,8 +41,9 @@ function getCache(key, ttl) {
 function setCache(key, data) {
   try {
     localStorage.setItem(key, JSON.stringify({ data, ts: Date.now() }));
-  } catch { /* quota exceeded — silently ignore */ }
+  } catch { /* quota exceeded ? silently ignore */ }
 }
+
 
 // Initialize wallpaper system
 async function initializeWallpaper() {
@@ -98,22 +99,50 @@ async function initializeWallpaper() {
   }
 }
 
-function previewWallpaper(wallpaperId) {
-  if (!wallpaperId) {
-    document.body.style.backgroundImage = '';
-    document.body.style.backgroundColor = '';
-    return;
-  }
-
-  if (wallpaperId.startsWith('#') || wallpaperId.startsWith('rgb')) {
-    document.body.style.backgroundColor = wallpaperId;
-    document.body.style.backgroundImage = '';
+// Relative luminance (0..1) of a #hex or rgb() color, or null if unparsable.
+function wallpaperColorLuminance(color) {
+  let rgb = null;
+  const hex = String(color).trim().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hex) {
+    const h = hex[1].length === 3 ? hex[1].replace(/./g, '$&$&') : hex[1];
+    rgb = [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
   } else {
-    document.body.style.backgroundImage = `url('${wallpaperId}')`;
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundAttachment = 'fixed';
+    const m = String(color).match(/rgba?\(\s*(\d+)[\s,]+(\d+)[\s,]+(\d+)/i);
+    if (m) rgb = [m[1], m[2], m[3]].map(Number);
   }
+  if (!rgb) return null;
+  const [r, g, b] = rgb.map((v) => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+// Paints a wallpaper on <body>. No id falls back to the built-in mesh in
+// home.css; a solid color must also clear that mesh image. The tone tells the
+// clock and icon labels whether to use white or dark ink.
+function paintWallpaper(wallpaperId) {
+  const style = document.body.style;
+  let tone = 'dark';
+  if (!wallpaperId) {
+    style.backgroundImage = '';
+    style.backgroundColor = '';
+  } else if (wallpaperId.startsWith('#') || wallpaperId.startsWith('rgb')) {
+    style.backgroundColor = wallpaperId;
+    style.backgroundImage = 'none';
+    const lum = wallpaperColorLuminance(wallpaperId);
+    if (lum !== null && lum > 0.45) tone = 'light';
+  } else {
+    style.backgroundImage = `url('${wallpaperId}')`;
+    style.backgroundSize = 'cover';
+    style.backgroundPosition = 'center';
+    style.backgroundAttachment = 'fixed';
+  }
+  document.body.dataset.wallpaperTone = tone;
+}
+
+function previewWallpaper(wallpaperId) {
+  paintWallpaper(wallpaperId);
 }
 
 // Load categories from Supabase
@@ -136,8 +165,8 @@ async function loadCategories() {
 
     if (data && data.length > 0) {
       wallpaperState.categories = data;
-      wallpaperState.activeCategory = data[0].name;
       setCache(CATEGORIES_CACHE_KEY, data);
+      wallpaperState.activeCategory = data[0].name;
     }
   } catch (err) {
     console.error('Load categories exception:', err);
@@ -190,39 +219,28 @@ async function loadWallpapers() {
 // Apply wallpaper to page
 function applyWallpaper(wallpaperId, options = {}) {
   const shouldSync = options.sync !== false;
-  const syncWallpaperSelection = () => {
-    if (!shouldSync || !window.authState || !window.authState.isLoggedIn) return;
+  const syncWallpaperSelection = async () => {
+    if (!shouldSync || !window.authState || !window.authState.isLoggedIn) return true;
     if (window.saveUserDataToBackend) {
-      window.saveUserDataToBackend(true);
+      return await window.saveUserDataToBackend(true);
     } else if (window.markHomeConfigUpdated) {
-      window.markHomeConfigUpdated();
+      return await window.markHomeConfigUpdated();
     }
+    return true;
   };
 
+  paintWallpaper(wallpaperId);
   if (!wallpaperId) {
-    document.body.style.backgroundImage = '';
-    document.body.style.backgroundColor = '';
     wallpaperState.selectedWallpaper = null;
     localStorage.removeItem('selectedWallpaper');
 
-    syncWallpaperSelection();
-    return;
-  }
-
-  if (wallpaperId.startsWith('#') || wallpaperId.startsWith('rgb')) {
-    document.body.style.backgroundColor = wallpaperId;
-    document.body.style.backgroundImage = '';
-  } else {
-    document.body.style.backgroundImage = `url('${wallpaperId}')`;
-    document.body.style.backgroundSize = 'cover';
-    document.body.style.backgroundPosition = 'center';
-    document.body.style.backgroundAttachment = 'fixed';
+    return syncWallpaperSelection();
   }
 
   wallpaperState.selectedWallpaper = wallpaperId;
   localStorage.setItem('selectedWallpaper', wallpaperId);
 
-  syncWallpaperSelection();
+  return syncWallpaperSelection();
 }
 
 // Open wallpaper selection modal
@@ -284,7 +302,7 @@ function renderWallpaperUI() {
               <p style="margin-bottom: 15px; opacity: 0.8;">
                 ${currentLocale === 'zh' ? '登录后可添加自定义壁纸' : 'Login to add custom wallpapers'}
               </p>
-              <button onclick="wpOpenLoginFromWallpaper()" class="primary-btn sketchy-border"
+              <button onclick="wpOpenLoginFromWallpaper()" class="primary-btn"
                 style="padding: 15px 30px; margin: 0 auto; display: block;">
                 ${currentLocale === 'zh' ? '立即登录' : 'Login'}
               </button>
@@ -296,7 +314,7 @@ function renderWallpaperUI() {
               <p style="margin-bottom: 15px; opacity: 0.8;">
                 ${currentLocale === 'zh' ? '自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}
               </p>
-              <button onclick="wpOpenUpgradeFromWallpaper()" class="primary-btn sketchy-border"
+              <button onclick="wpOpenUpgradeFromWallpaper()" class="primary-btn"
                 style="padding: 15px 30px; margin: 0 auto; display: block;">
                 ${currentLocale === 'zh' ? '升级会员' : 'Upgrade Membership'}
               </button>
@@ -322,12 +340,12 @@ function renderWallpaperUI() {
                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
                   <input type="text" id="customWallpaperUrlInput" class="modal-input"
                     placeholder="${t('pasteImageUrl')}" style="max-width: 360px; margin-bottom: 0;">
-                  <button class="primary-btn sketchy-border" onclick="uploadCustomWallpaperFromUrl()"
+                  <button class="primary-btn" onclick="uploadCustomWallpaperFromUrl()"
                     style="padding: 10px 18px;">
                     ${t('confirmUpload')}
                   </button>
                   <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
-                  <button class="cancel-btn sketchy-border" onclick="wpTriggerFileInput()"
+                  <button class="cancel-btn" onclick="wpTriggerFileInput()"
                     style="padding: 10px 18px;">
                     ${t('localUpload')}
                   </button>
@@ -341,12 +359,12 @@ function renderWallpaperUI() {
                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
                   <input type="text" id="customWallpaperUrlInput" class="modal-input"
                     placeholder="${t('pasteImageUrl')}" style="max-width: 360px; margin-bottom: 0;">
-                  <button class="primary-btn sketchy-border" onclick="uploadCustomWallpaperFromUrl()"
+                  <button class="primary-btn" onclick="uploadCustomWallpaperFromUrl()"
                     style="padding: 10px 18px;">
                     ${t('confirmUpload')}
                   </button>
                   <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
-                  <button class="cancel-btn sketchy-border" onclick="wpTriggerFileInput()"
+                  <button class="cancel-btn" onclick="wpTriggerFileInput()"
                     style="padding: 10px 18px;">
                     ${t('localUpload')}
                   </button>
@@ -388,7 +406,7 @@ function renderWallpaperUI() {
       : wallpaperState.selectedWallpaper;
     gridContainer.innerHTML = filteredWallpapers.map(w => `
       <div class="wallpaper-item ${currentSelected === w.url ? 'selected' : ''}" onclick="selectWallpaper('${w.url}')">
-        <img src="${w.url}" alt="Wallpaper" title="Wallpaper" loading="lazy">
+        <img src="${w.url}" alt="Wallpaper" title="Wallpaper">
       </div>
     `).join('');
   }
@@ -641,6 +659,11 @@ async function addCustomWallpaperByUrl() {
   }
 }
 
+window.toggleCustomWallpaperAdd = toggleCustomWallpaperAdd;
+window.setCustomWallpaperAddMode = setCustomWallpaperAddMode;
+window.addCustomWallpaperByUrl = addCustomWallpaperByUrl;
+window.uploadCustomWallpaperFromUrl = uploadCustomWallpaperFromUrl;
+
 // Helper functions for CSP-safe onclick in dynamic HTML (extension compatibility)
 window.wpOpenLoginFromWallpaper = function() {
   if (window.closeWallpaperModal) window.closeWallpaperModal();
@@ -654,11 +677,6 @@ window.wpTriggerFileInput = function() {
   var input = document.getElementById('wallpaperFileInput');
   if (input) input.click();
 };
-
-window.toggleCustomWallpaperAdd = toggleCustomWallpaperAdd;
-window.setCustomWallpaperAddMode = setCustomWallpaperAddMode;
-window.addCustomWallpaperByUrl = addCustomWallpaperByUrl;
-window.uploadCustomWallpaperFromUrl = uploadCustomWallpaperFromUrl;
 
 // User Wallpaper Upload Logic (Tier 2+ only)
 async function handleUserWallpaperUpload(event) {
@@ -934,7 +952,7 @@ function setupWallpaperEventListeners() {
   if (closeWallpaperModalBtn) closeWallpaperModalBtn.addEventListener('click', closeWallpaperModal);
   if (restoreBtn) restoreBtn.addEventListener('click', restoreDefaultWallpaper);
   if (saveBtn) {
-    saveBtn.addEventListener('click', () => {
+    saveBtn.addEventListener('click', async () => {
       const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
       const next = wallpaperState.pendingWallpaper;
 
@@ -943,7 +961,12 @@ function setupWallpaperEventListeners() {
         return;
       }
 
-      applyWallpaper(next || null);
+      const saved = await applyWallpaper(next || null);
+      if (saved === false) {
+        showNotification(typeof i18n !== 'undefined' ? i18n.t('syncSaveFailed') : (currentLocale === 'zh' ? '保存失败，暂未同步到云端' : 'Save failed. Your changes were not synced to the cloud yet.'), 'error');
+        return;
+      }
+
       wallpaperState.pendingWallpaper = undefined;
       wallpaperState.baseWallpaper = null;
 

@@ -1,8 +1,10 @@
 // ===== Paddle Payment Integration =====
 
 // Paddle environment config (set via window or fallback)
-const PADDLE_ENVIRONMENT = window.PADDLE_ENVIRONMENT || 'sandbox'; // 'sandbox' or 'production'
-const PADDLE_CLIENT_TOKEN = window.PADDLE_CLIENT_TOKEN || '';
+// Local aliases to avoid redeclaring config.js globals (PADDLE_ENVIRONMENT /
+// PADDLE_CLIENT_TOKEN) — redeclaring them throws 'Identifier already declared'.
+const paddleEnvironment = window.PADDLE_ENVIRONMENT || 'sandbox'; // 'sandbox' or 'production'
+const paddleClientToken = window.PADDLE_CLIENT_TOKEN || '';
 
 // Price IDs for different tiers and billing cycles (set in config.js or here)
 const PADDLE_PRICES = {
@@ -26,9 +28,19 @@ function initializePaddle() {
     }
 
     try {
+      // Paddle auto-loads ProfitWell (retention analytics), which strict CSPs
+      // (extension MV3 and some local dev servers) block. It is unused here —
+      // pre-stub it so the SDK skips loading the script entirely.
+      if (typeof window.profitwell === 'undefined') {
+        var pwStub = function () {};
+        pwStub.isLoaded = true;
+        window.profitwell = pwStub;
+      }
+
+      // Note: Paddle v2 derives the environment from the token prefix
+      // (test_ / live_) — 'environment' is not a valid option.
       Paddle.Initialize({
-        token: PADDLE_CLIENT_TOKEN,
-        environment: PADDLE_ENVIRONMENT,
+        token: paddleClientToken,
         eventCallback: handlePaddleEvent
       });
       paddleInitialized = true;
@@ -42,7 +54,16 @@ function initializePaddle() {
 
 // Handle Paddle events (checkout completed, closed, etc.)
 function handlePaddleEvent(event) {
+  // Hide inline container when checkout is done
+  function hideInlineContainer() {
+    if (window.IS_EXTENSION) {
+      const container = document.getElementById('paddle-checkout-container');
+      if (container) container.classList.add('hidden');
+    }
+  }
+
   if (event.name === 'checkout.completed') {
+    hideInlineContainer();
     const currentLocale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
     if (window.showNotification) {
       window.showNotification(
@@ -74,7 +95,7 @@ function handlePaddleEvent(event) {
   }
 
   if (event.name === 'checkout.closed') {
-    // Checkout closed by user
+    hideInlineContainer();
   }
 }
 
@@ -125,6 +146,12 @@ async function createCheckoutSession(tier = 2, billingCycle = 'monthly') {
 
   // Open Paddle Checkout overlay
   try {
+    // In extension mode, show the inline container before opening
+    if (window.IS_EXTENSION) {
+      const container = document.getElementById('paddle-checkout-container');
+      if (container) container.classList.remove('hidden');
+    }
+
     Paddle.Checkout.open({
       items: [{ priceId: priceId, quantity: 1 }],
       customer: {
@@ -136,12 +163,16 @@ async function createCheckoutSession(tier = 2, billingCycle = 'monthly') {
         billing_cycle: billingCycle
       },
       settings: {
-        displayMode: 'overlay',
+        displayMode: window.IS_EXTENSION ? 'inline' : 'overlay',
         theme: 'light',
         locale: (typeof i18n !== 'undefined' && i18n.currentLocale === 'zh') ? 'zh' : 'en',
         allowLogout: false,
         successUrl,
-        cancelUrl
+        cancelUrl,
+        ...(window.IS_EXTENSION ? {
+          frameTarget: 'paddle-inline-root',
+          frameStyle: 'width: 100%; min-height: 450px; background: transparent; border: none;'
+        } : {})
       }
     });
   } catch (err) {
@@ -199,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
   handlePaddleReturn();
   
   // Pre-initialize Paddle if token is available
-  if (PADDLE_CLIENT_TOKEN) {
+  if (paddleClientToken) {
     initializePaddle().catch(() => {});
   }
 });

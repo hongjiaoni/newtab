@@ -54,3 +54,14 @@ More features: `FEATURE_LIST.md`
 ## License
 
 No license file yet. Add one (MIT or Apache-2.0) before going fully public.
+
+## Chrome Extension
+
+The project ships both a web app and a Chrome extension. `public/` is the single source of truth; `extension/` is generated from it (see `AGENTS.md`).
+
+- Load unpacked: open `chrome://extensions` → enable Developer mode → "Load unpacked" → select the `extension/` folder
+- Regenerate the extension: `npm run build:extension`
+- Verify both ends are in sync: `npm run check:extension`
+- Package for the store: `npm run pack:extension` → `dist/newtab-extension-<version>.zip`
+
+> Extension login uses `chrome.identity.launchWebAuthFlow` + Supabase OAuth. Add `https://<extension-id>.chromiumapp.org/` to the Supabase Auth Redirect URLs (the extension ID is pinned by the `key` field in `manifest.json`). Publishing details: `DEPLOY.md`.

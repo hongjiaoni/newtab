@@ -1,8 +1,10 @@
 // ===== Paddle Payment Integration =====
 
 // Paddle environment config (set via window or fallback)
-var PADDLE_ENVIRONMENT = window.PADDLE_ENVIRONMENT || 'sandbox'; // 'sandbox' or 'production'
-var PADDLE_CLIENT_TOKEN = window.PADDLE_CLIENT_TOKEN || '';
+// Local aliases to avoid redeclaring config.js globals (PADDLE_ENVIRONMENT /
+// PADDLE_CLIENT_TOKEN) — redeclaring them throws 'Identifier already declared'.
+const paddleEnvironment = window.PADDLE_ENVIRONMENT || 'sandbox'; // 'sandbox' or 'production'
+const paddleClientToken = window.PADDLE_CLIENT_TOKEN || '';
 
 // Price IDs for different tiers and billing cycles (set in config.js or here)
 const PADDLE_PRICES = {
@@ -26,9 +28,19 @@ function initializePaddle() {
     }
 
     try {
+      // Paddle auto-loads ProfitWell (retention analytics), which strict CSPs
+      // (extension MV3 and some local dev servers) block. It is unused here —
+      // pre-stub it so the SDK skips loading the script entirely.
+      if (typeof window.profitwell === 'undefined') {
+        var pwStub = function () {};
+        pwStub.isLoaded = true;
+        window.profitwell = pwStub;
+      }
+
+      // Note: Paddle v2 derives the environment from the token prefix
+      // (test_ / live_) — 'environment' is not a valid option.
       Paddle.Initialize({
-        token: PADDLE_CLIENT_TOKEN,
-        environment: PADDLE_ENVIRONMENT,
+        token: paddleClientToken,
         eventCallback: handlePaddleEvent
       });
       paddleInitialized = true;
@@ -218,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
   handlePaddleReturn();
   
   // Pre-initialize Paddle if token is available
-  if (PADDLE_CLIENT_TOKEN) {
+  if (paddleClientToken) {
     initializePaddle().catch(() => {});
   }
 });
