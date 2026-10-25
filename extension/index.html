@@ -7,14 +7,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="referrer" content="no-referrer-when-downgrade" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@300;400;500;700&family=Inter:wght@400;600;700&family=Nunito:wght@400;600;700&family=Poppins:wght@400;600;700&family=Newsreader:wght@300;400;600;700&family=Anonymous+Pro:wght@400;700&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="https://chinese-fonts-cdn.deno.dev/packages/yshst/dist/result.css">
-  <link rel="stylesheet" href="https://chinese-fonts-cdn.deno.dev/packages/zhbtt/dist/result.css">
-  <link rel="stylesheet" href="https://chinese-fonts-cdn.deno.dev/packages/ysbth/dist/result.css">
+  <script src="appearance.js"></script>
+  <link rel="stylesheet" href="tokens.css" />
+  <link rel="stylesheet" href="glass.css" />
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="wallpaper-modal.css" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
@@ -47,9 +42,6 @@
           <div data-onclick="setAppearanceViewMode('minimalist')" data-mode-option="minimalist" id="modeMinimalist">极简</div>
         </div>
       </div>
-      <div class="settings-menu-item" id="appearanceMenuItem">
-        <span id="appearanceMenuText">外观</span>
-      </div>
       <div class="settings-menu-item" id="wallpaperMenuItem">
         <span id="wallpaperMenuText">壁纸</span>
       </div>
@@ -66,7 +58,7 @@
     <div class="modal google-signin-modal">
       <h3 id="googleSignInTitle">登录</h3>
       <div id="googleSignInContainer" style="text-align: center; padding: 20px;">
-        <button id="googleLoginAction" class="primary-btn sketchy-border"
+        <button id="googleLoginAction" class="primary-btn"
           style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 20px;">
           <img src="https://www.google.com/favicon.ico" width="18" height="18">
           <span id="googleLoginBtnText">Google 登录</span>
@@ -139,7 +131,7 @@
       <div class="wallpaper-content">
         <div id="wallpaperUploadContainer" class="wallpaper-upload-container hidden">
           <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*">
-          <button id="uploadWallpaperBtn" class="primary-btn sketchy-border"
+          <button id="uploadWallpaperBtn" class="primary-btn"
             style="padding: 15px 30px; margin: 20px auto; display: block;">
             上传图片
           </button>
@@ -179,6 +171,22 @@
     <div id="settingsModal" class="modal hidden">
       <h3 id="settingsModalTitle">设置</h3>
       <div class="appearance-panel">
+        <div class="appearance-row">
+          <label id="appearanceLabel">外观</label>
+          <div class="segmented-control" id="appearanceGroup">
+            <button class="seg-btn" data-appearance="light" id="apLight">浅色模式</button>
+            <button class="seg-btn" data-appearance="dark" id="apDark">深色模式</button>
+            <button class="seg-btn" data-appearance="auto" id="apAuto">跟随系统</button>
+          </div>
+        </div>
+        <div class="appearance-row">
+          <label id="zoomLabel">缩放</label>
+          <div class="segmented-control" id="zoomGroup">
+            <button class="seg-btn" data-zoom="100">100%</button>
+            <button class="seg-btn" data-zoom="125">125%</button>
+            <button class="seg-btn" data-zoom="150">150%</button>
+          </div>
+        </div>
         <div class="appearance-row">
           <label id="timeFormatLabel">时间格式</label>
           <div class="segmented-control" id="timeFormatGroup">
@@ -327,10 +335,10 @@
       <div style="text-align: center; padding: 20px;">
         <p style="margin-bottom: 20px; opacity: 0.8;" id="aboutDesc">简洁美观的新标签页，让每次打开浏览器都是一种享受。</p>
         <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-          <button id="aboutCoffeeAction" class="primary-btn sketchy-border" style="padding: 12px 24px;">
+          <button id="aboutCoffeeAction" class="primary-btn" style="padding: 12px 24px;">
             <span id="coffeeBtn">请我喝杯咖啡</span>
           </button>
-          <button id="aboutFeedbackAction" class="cancel-btn sketchy-border" style="padding: 12px 24px;">
+          <button id="aboutFeedbackAction" class="cancel-btn" style="padding: 12px 24px;">
             <span id="feedbackBtn">提交反馈</span>
           </button>
         </div>
@@ -433,7 +441,6 @@
   <script src="membership.js"></script>
   <script src="auth.js"></script>
   <script src="data-sync.js"></script>
-  <script src="themes.js"></script>
   <script src="script.js"></script>
 <script src="adapter/click-handler.js"></script>
 </body>

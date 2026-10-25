@@ -24,6 +24,9 @@ const DIST_DIR = path.join(ROOT, 'dist');
 // Files copied verbatim from public/ into extension/. Keep this list in
 // sync with the script tags referenced by index.html.
 export const COPY_FILES = [
+  'appearance.js',
+  'tokens.css',
+  'glass.css',
   'script.js',
   'style.css',
   'wallpaper-modal.css',
@@ -33,7 +36,6 @@ export const COPY_FILES = [
   'membership.js',
   'paddle.js',
   'supabase-client.js',
-  'themes.js',
   'time-display.js',
   'wallpaper.js',
   'badge.svg',

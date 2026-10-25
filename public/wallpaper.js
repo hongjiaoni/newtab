@@ -285,7 +285,7 @@ function renderWallpaperUI() {
               <p style="margin-bottom: 15px; opacity: 0.8;">
                 ${currentLocale === 'zh' ? '登录后可添加自定义壁纸' : 'Login to add custom wallpapers'}
               </p>
-              <button onclick="wpOpenLoginFromWallpaper()" class="primary-btn sketchy-border"
+              <button onclick="wpOpenLoginFromWallpaper()" class="primary-btn"
                 style="padding: 15px 30px; margin: 0 auto; display: block;">
                 ${currentLocale === 'zh' ? '立即登录' : 'Login'}
               </button>
@@ -297,7 +297,7 @@ function renderWallpaperUI() {
               <p style="margin-bottom: 15px; opacity: 0.8;">
                 ${currentLocale === 'zh' ? '自定义壁纸需要高级会员' : 'Premium membership required for custom wallpapers'}
               </p>
-              <button onclick="wpOpenUpgradeFromWallpaper()" class="primary-btn sketchy-border"
+              <button onclick="wpOpenUpgradeFromWallpaper()" class="primary-btn"
                 style="padding: 15px 30px; margin: 0 auto; display: block;">
                 ${currentLocale === 'zh' ? '升级会员' : 'Upgrade Membership'}
               </button>
@@ -323,12 +323,12 @@ function renderWallpaperUI() {
                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
                   <input type="text" id="customWallpaperUrlInput" class="modal-input"
                     placeholder="${t('pasteImageUrl')}" style="max-width: 360px; margin-bottom: 0;">
-                  <button class="primary-btn sketchy-border" onclick="uploadCustomWallpaperFromUrl()"
+                  <button class="primary-btn" onclick="uploadCustomWallpaperFromUrl()"
                     style="padding: 10px 18px;">
                     ${t('confirmUpload')}
                   </button>
                   <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
-                  <button class="cancel-btn sketchy-border" onclick="wpTriggerFileInput()"
+                  <button class="cancel-btn" onclick="wpTriggerFileInput()"
                     style="padding: 10px 18px;">
                     ${t('localUpload')}
                   </button>
@@ -342,12 +342,12 @@ function renderWallpaperUI() {
                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; align-items: center;">
                   <input type="text" id="customWallpaperUrlInput" class="modal-input"
                     placeholder="${t('pasteImageUrl')}" style="max-width: 360px; margin-bottom: 0;">
-                  <button class="primary-btn sketchy-border" onclick="uploadCustomWallpaperFromUrl()"
+                  <button class="primary-btn" onclick="uploadCustomWallpaperFromUrl()"
                     style="padding: 10px 18px;">
                     ${t('confirmUpload')}
                   </button>
                   <input type="file" id="wallpaperFileInput" class="hidden" accept="image/*" onchange="handleUserWallpaperUpload(event)">
-                  <button class="cancel-btn sketchy-border" onclick="wpTriggerFileInput()"
+                  <button class="cancel-btn" onclick="wpTriggerFileInput()"
                     style="padding: 10px 18px;">
                     ${t('localUpload')}
                   </button>

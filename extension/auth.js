@@ -491,7 +491,7 @@ window.openUserProfile = function () {
     </div>
     <div style="padding: 0 20px 20px; display: grid; gap: 12px;">
       <!-- Subscription records button hidden
-      <button class="primary-btn sketchy-border" style="width: 100%;" onclick="openSubscriptionRecords()">
+      <button class="primary-btn" style="width: 100%;" onclick="openSubscriptionRecords()">
         ${isZh ? '订阅记录' : 'Subscription records'}
       </button>
       -->

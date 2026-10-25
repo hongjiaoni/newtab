@@ -1,17 +1,18 @@
 # NewTab 设计系统：Liquid Glass
 
 NewTab 的视觉和交互规范，参照 Apple Human Interface Guidelines 与 2025 年推出的 Liquid Glass 设计语言。
-这里的文件是**视觉的唯一依据**：`public/` 里的页面只引用这里定义的变量和组件，不再有多套主题。
+设计变量和组件样式放在 `public/`（遵循单源码策略，构建时同步到插件端）；本目录保存规范文档和视觉样张。页面只引用这些变量和组件，不再有多套主题。
 
 | 文件 | 作用 |
 |---|---|
-| `tokens.css` | 设计变量：字体、字号、间距、圆角、颜色、玻璃材质、动效，含浅色/深色与无障碍覆盖 |
-| `glass.css` | 玻璃材质和基础组件：按钮、图标按钮、分段控件、开关、输入框、菜单、图标块、组件卡片、页面指示点 |
-| `glass.js` | 折射效果（渐进增强）：仅 Chromium 内核启用，其他浏览器保持普通毛玻璃 |
-| `preview.html` | 视觉样张：首页 + 工作站 + 设置菜单 + 添加网站弹窗 |
+| `public/tokens.css` | 设计变量：字体、字号、间距、圆角、颜色、玻璃材质、动效，含浅色/深色与无障碍覆盖 |
+| `public/glass.css` | 玻璃材质和基础组件：按钮、图标按钮、分段控件、开关、输入框、菜单、图标块、组件卡片、页面指示点 |
+| `public/glass.js` | 折射效果（渐进增强）：仅 Chromium 内核启用，其他浏览器保持普通毛玻璃 |
+| `public/appearance.js` | 外观切换（浅色/深色/自动），在 `<head>` 中加载以避免闪烁 |
+| `design-system/preview.html` | 视觉样张：首页 + 工作站 + 设置菜单 + 添加网站弹窗 |
 
 本地预览：在 Claude 的浏览器面板启动 `design-preview`，或运行
-`node -e "const e=require('express');e().use(e.static('design-system')).listen(4100)"`，再打开 `http://localhost:4100/preview.html`。
+`node -e "const e=require('express');e().use(e.static('.')).listen(4100)"`，再打开 `http://localhost:4100/design-system/preview.html`。
 
 ---
 
@@ -117,13 +118,13 @@ NewTab 的视觉和交互规范，参照 Apple Human Interface Guidelines 与 20
 - 指针设备上，可点区域不小于 28px。
 - 只有图标的按钮必须写 `aria-label`。
 
-## 9. 迁移到 `public/` 的映射（阶段 2–4）
+## 9. 迁移映射（阶段 2–4）
 
 | 现有 | 新 |
 |---|---|
-| `themes.js`、`data-style` 分支、`sketchy` 样式 | 删除，改用 `tokens.css` + `glass.css` |
-| 手绘字体、Google Fonts、中文字体 CDN | 删除，改用系统字体 |
-| `body.dark` | `html[data-appearance]`，同时支持跟随系统 |
+| `themes.js`、`data-style` 分支、`sketchy` 样式 | 已删除（阶段 2），改用 `tokens.css` + `glass.css` |
+| 手绘字体、Google Fonts、中文字体 CDN | 已删除（阶段 2），改用系统字体 |
+| `body.dark` | `html[data-appearance]` + `appearance.js`，支持跟随系统；`body.dark` 仍同步，供旧样式过渡 |
 | `.site-tile` / `.site-tile-icon` | `.tile` / `.tile-icon.glass` |
 | `.settings-menu` 汉堡菜单 | 右上角工具栏 `.toolbar` + 设置菜单 `.settings.menu` |
 | `.modal` | `.scrim > .sheet.glass--thick` |

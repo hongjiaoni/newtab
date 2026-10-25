@@ -5,9 +5,7 @@ const SYNC_DEBOUNCE_MS = 500;
 const USER_DATA_REFRESH_MS = 20 * 1000;
 const PENDING_SYNC_MAX_AGE_MS = 2 * 60 * 1000;
 const HOME_CONFIG_KEY_PREFIX = 'user_home_config_';
-const COLOR_CONFIG_KEY_PREFIX = 'user_color_config_';
 const CONFIG_META_KEY_PREFIX = 'user_config_meta_';
-var APPEARANCE_SNAPSHOT_KEY = 'last_applied_appearance';
 const CURRENT_SYNC_SESSION_ID = `sync-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 const SYNC_ERROR_NOTIFICATION_THROTTLE_MS = 30 * 1000;
 let userDataLoadPromise = null;
@@ -40,10 +38,7 @@ function isUserDataRuntimeReady() {
         typeof i18n !== 'undefined' &&
         typeof window.renderHome === 'function' &&
         typeof window.renderSearchEngine === 'function' &&
-        typeof window.updateTime === 'function' &&
-        !!window.themeState &&
-        typeof window.applyStyleTheme === 'function' &&
-        typeof window.applyCustomThemeForCurrentMode === 'function'
+        typeof window.updateTime === 'function'
     );
 }
 
@@ -62,29 +57,10 @@ function getHomeConfigCacheKey(uid) {
     return HOME_CONFIG_KEY_PREFIX + uid;
 }
 
-function getColorConfigCacheKey(uid) {
-    return COLOR_CONFIG_KEY_PREFIX + uid;
-}
-
 function parseTimestamp(value) {
     if (!value) return 0;
     const parsed = Date.parse(value);
     return Number.isFinite(parsed) ? parsed : 0;
-}
-
-function latestTimestamp(...values) {
-    let winner = '';
-    let winnerTs = 0;
-
-    for (const value of values) {
-        const currentTs = parseTimestamp(value);
-        if (currentTs >= winnerTs) {
-            winnerTs = currentTs;
-            winner = value || winner;
-        }
-    }
-
-    return winner;
 }
 
 function getConfigMeta(uid) {
@@ -162,7 +138,7 @@ function hasPendingConfigSync(uid, section) {
 
 function hasAnyPendingUserConfig(uid) {
     if (!uid) return false;
-    return hasPendingConfigSync(uid, 'home') || hasPendingConfigSync(uid, 'color');
+    return hasPendingConfigSync(uid, 'home');
 }
 
 function clearPendingMeta(uid, section, syncedAt) {
@@ -175,62 +151,9 @@ function clearPendingMeta(uid, section, syncedAt) {
     });
 }
 
-function buildThemeSettingsFromLocalCache(uid) {
-    if (!uid) return null;
-
-    try {
-        const rawColor = localStorage.getItem(getColorConfigCacheKey(uid));
-        if (!rawColor) return null;
-
-        const colorPayload = JSON.parse(rawColor);
-        if (!colorPayload || typeof colorPayload !== 'object') return null;
-
-        const snapshot = JSON.parse(localStorage.getItem(APPEARANCE_SNAPSHOT_KEY) || '{}') || {};
-        const snapshotSettings = snapshot.customSettings || {};
-
-        return {
-            style: snapshot.currentTheme || window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
-            fontChinese: snapshotSettings.fontChinese || window.themeState?.customSettings?.fontChinese || '优设好身体',
-            fontEnglish: snapshotSettings.fontEnglish || window.themeState?.customSettings?.fontEnglish || 'Patrick Hand',
-            ...(colorPayload.light || {}),
-            darkMode: {
-                ...(colorPayload.dark || {})
-            }
-        };
-    } catch (_err) {
-        return null;
-    }
-}
-
-function mergeAppearanceSnapshot(partial) {
-    if (!partial || typeof partial !== 'object') return;
-
-    let current = {};
-    try {
-        current = JSON.parse(localStorage.getItem(APPEARANCE_SNAPSHOT_KEY) || '{}') || {};
-    } catch (_err) {
-        current = {};
-    }
-
-    const next = {
-        ...current,
-        ...partial
-    };
-
-    if (partial.customSettings || current.customSettings) {
-        const currentCustom = current.customSettings || {};
-        const partialCustom = partial.customSettings || {};
-        next.customSettings = {
-            ...currentCustom,
-            ...partialCustom,
-            darkMode: {
-                ...(currentCustom.darkMode || {}),
-                ...(partialCustom.darkMode || {})
-            }
-        };
-    }
-
-    localStorage.setItem(APPEARANCE_SNAPSHOT_KEY, JSON.stringify(next));
+function normalizeAppearanceValue(value) {
+    if (value === 'system') return 'auto';
+    return ['light', 'dark', 'auto'].includes(value) ? value : 'auto';
 }
 
 function normalizeEngineId(input) {
@@ -242,30 +165,6 @@ function normalizeEnabledEngineIds(input) {
     if (!Array.isArray(input)) return null;
     const cleaned = input.map(v => String(v || '').trim()).filter(Boolean);
     return cleaned.length ? cleaned : null;
-}
-
-function toColorPayloadFromLegacy(themeSettings) {
-    if (!themeSettings || typeof themeSettings !== 'object') return null;
-    if (themeSettings.light || themeSettings.dark) {
-        return {
-            light: { ...(themeSettings.light || {}) },
-            dark: { ...(themeSettings.dark || {}) }
-        };
-    }
-
-    const { style, fontChinese, fontEnglish, darkMode, ...light } = themeSettings;
-    return {
-        light,
-        dark: { ...(darkMode || {}) }
-    };
-}
-
-function toFontPayloadFromLegacy(fontSettings) {
-    if (!fontSettings || typeof fontSettings !== 'object') return {};
-    return {
-        fontChinese: fontSettings.fontChinese || '',
-        fontEnglish: fontSettings.fontEnglish || ''
-    };
 }
 
 function isMissingRelationError(err) {
@@ -376,17 +275,6 @@ function buildHomeConfigFromLegacy(legacy) {
         .sort((a, b) => (a.position || 0) - (b.position || 0))
         .map((row) => row.tag_name);
 
-    const fontSettings = toFontPayloadFromLegacy(legacy.fontSettings);
-
-    // Fallback: read fonts from user_home_settings columns if user_font_settings is empty.
-    // This provides a second persistence path after the sync_home_config RPC migration.
-    const savedFontChinese = fontSettings.fontChinese
-        || legacy.settingsRow.font_chinese
-        || undefined;
-    const savedFontEnglish = fontSettings.fontEnglish
-        || legacy.settingsRow.font_english
-        || undefined;
-
     return {
         sites,
         tags: (legacy.tagsRows || []).map((row) => row.name),
@@ -401,10 +289,8 @@ function buildHomeConfigFromLegacy(legacy) {
             timeFormat: legacy.settingsRow.time_format || '24h',
             locale: legacy.settingsRow.locale || 'zh',
             wallpaper: legacy.settingsRow.wallpaper || null,
-            theme: legacy.settingsRow.theme || 'handdrawn',
-            colorMode: legacy.settingsRow.color_mode || 'light',
-            fontChinese: savedFontChinese,
-            fontEnglish: savedFontEnglish,
+            // color_mode now stores 'light' | 'dark' | 'auto'
+            appearance: normalizeAppearanceValue(legacy.settingsRow.color_mode),
             zoomLevel: legacy.settingsRow?.zoom_level || '100',
             openBehavior: legacy.settingsRow?.open_behavior || 'newtab'
         },
@@ -424,18 +310,14 @@ async function fetchLegacyConfigs(uid) {
         tagsRes,
         siteTagsRes,
         siteOrderRes,
-        tagOrderRes,
-        themeSettingsRes,
-        fontSettingsRes
+        tagOrderRes
     ] = await Promise.all([
         readMaybe(db.from('user_home_settings').select('*').eq('user_id', uid).single()),
         readSitesRows(db, uid),
         readMaybe(db.from('user_tags').select('name').eq('user_id', uid)),
         readMaybe(db.from('user_site_tags').select('site_id,tag_name').eq('user_id', uid)),
         readMaybe(db.from('user_site_order').select('site_id,position').eq('user_id', uid)),
-        readMaybe(db.from('user_tag_order').select('tag_name,position').eq('user_id', uid)),
-        readMaybe(db.from('user_theme_settings').select('theme_settings, updated_at').eq('user_id', uid).single()),
-        readMaybe(db.from('user_font_settings').select('font_settings, updated_at').eq('user_id', uid).single())
+        readMaybe(db.from('user_tag_order').select('tag_name,position').eq('user_id', uid))
     ]);
 
     const homeConfig = buildHomeConfigFromLegacy({
@@ -444,17 +326,12 @@ async function fetchLegacyConfigs(uid) {
         tagsRows: tagsRes.data || [],
         siteTagsRows: siteTagsRes.data || [],
         siteOrderRows: siteOrderRes.data || [],
-        tagOrderRows: tagOrderRes.data || [],
-        fontSettings: fontSettingsRes.data?.font_settings
+        tagOrderRows: tagOrderRes.data || []
     });
-
-    const colorConfig = toColorPayloadFromLegacy(themeSettingsRes.data?.theme_settings);
 
     return {
         homeConfig,
-        homeUpdatedAt: latestTimestamp(settingsRes.data?.updated_at, fontSettingsRes.data?.updated_at),
-        colorConfig,
-        colorUpdatedAt: themeSettingsRes.data?.updated_at
+        homeUpdatedAt: settingsRes.data?.updated_at
     };
 }
 
@@ -483,8 +360,8 @@ function buildHomeSettingsRow(uid, payload, syncedAt) {
         time_format: s.timeFormat || '24h',
         locale: s.locale || 'zh',
         wallpaper: Object.prototype.hasOwnProperty.call(s, 'wallpaper') ? s.wallpaper : null,
-        theme: s.theme || 'handdrawn',
-        color_mode: s.colorMode === 'dark' ? 'dark' : 'light',
+        theme: 'glass',
+        color_mode: normalizeAppearanceValue(s.appearance),
         zoom_level: s.zoomLevel || '100',
         open_behavior: s.openBehavior || 'newtab',
         workbench: payload?.workbench || null,
@@ -540,8 +417,8 @@ async function writeHomeSettingsRow(uid, payload, syncedAt) {
                         time_format: s.timeFormat || '24h',
                         locale: s.locale || 'zh',
                         wallpaper: Object.prototype.hasOwnProperty.call(s, 'wallpaper') ? s.wallpaper : null,
-                        theme: s.theme || 'handdrawn',
-                        color_mode: s.colorMode === 'dark' ? 'dark' : 'light',
+                        theme: 'glass',
+                        color_mode: normalizeAppearanceValue(s.appearance),
                         updated_at: syncedAt
                     }, { onConflict: 'user_id' })
             ));
@@ -694,47 +571,8 @@ async function saveLegacyHomeConfig(payload, syncedAt) {
     await saveLegacyHomeConfigFallback(uid, payload, syncedAt);
 }
 
-async function saveLegacyThemeConfig(uid, settings, syncedAt) {
-    const db = getSupabaseClient();
-    if (!db) {
-        throw new Error('Supabase client is not ready');
-    }
-
-    const [themeRes, fontRes] = await Promise.all([
-        db.from('user_theme_settings').upsert({
-            user_id: uid,
-            theme_settings: settings,
-            updated_at: syncedAt
-        }, { onConflict: 'user_id' }),
-        db.from('user_font_settings').upsert({
-            user_id: uid,
-            font_settings: {
-                fontChinese: settings.fontChinese || '',
-                fontEnglish: settings.fontEnglish || ''
-            },
-            updated_at: syncedAt
-        }, { onConflict: 'user_id' })
-    ]);
-    if (themeRes.error && !isMissingRelationError(themeRes.error)) throw themeRes.error;
-    if (fontRes.error && !isMissingRelationError(fontRes.error)) throw fontRes.error;
-
-    if (themeRes.error || fontRes.error) {
-        console.warn('Theme/font table missing, keeping theme metadata in home settings:', compactSupabaseError(themeRes.error || fontRes.error));
-        await writeOptionalTable('theme metadata fallback', () => (
-            db
-                .from('user_home_settings')
-                .upsert({
-                    user_id: uid,
-                    theme: settings.style || 'handdrawn',
-                    updated_at: syncedAt
-                }, { onConflict: 'user_id' })
-        ));
-    }
-}
-
 function buildCurrentHomePayload() {
     ensureSiteIdsAreUuid();
-    const colorMode = document.body.classList.contains('dark') ? 'dark' : 'light';
 
     return {
         sites: (state.sites || []).map(s => ({
@@ -758,10 +596,7 @@ function buildCurrentHomePayload() {
             timeFormat: state.timeFormat || '24h',
             locale: (typeof i18n !== 'undefined' && i18n.currentLocale) ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'),
             wallpaper: window.wallpaperState?.selectedWallpaper || null,
-            theme: state.currentTheme || 'handdrawn',
-            colorMode,
-            fontChinese: window.themeState?.customSettings?.fontChinese || '优设好身体',
-            fontEnglish: window.themeState?.customSettings?.fontEnglish || 'Patrick Hand',
+            appearance: normalizeAppearanceValue(window.getAppearance?.()),
             zoomLevel: state.zoomLevel || '100',
             openBehavior: state.openBehavior || 'newtab'
         },
@@ -771,15 +606,6 @@ function buildCurrentHomePayload() {
 
 async function persistHomeConfig(uid, payload, syncedAt) {
     localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(payload));
-    mergeAppearanceSnapshot({
-        currentTheme: payload.settings.theme || 'handdrawn',
-        colorMode: payload.settings.colorMode || 'light',
-        customSettings: {
-            ...(window.themeState?.customSettings || {}),
-            fontChinese: payload.settings.fontChinese,
-            fontEnglish: payload.settings.fontEnglish
-        }
-    });
     updateConfigMeta(uid, 'home', {
         localUpdatedAt: syncedAt,
         pending: true,
@@ -838,77 +664,14 @@ function applyHomeConfig(config) {
         window.applyWallpaper(s.wallpaper, { sync: false });
     }
 
-    if (typeof s.theme === 'string') {
-        state.currentTheme = s.theme;
-        localStorage.setItem('currentTheme', s.theme);
-        window.applyStyleTheme?.(state.currentTheme);
-        if (window.themeState) window.themeState.currentTheme = state.currentTheme;
+    if (typeof s.appearance === 'string') {
+        window.setAppearance?.(s.appearance, { sync: false });
     }
-
-    if (s.fontChinese || s.fontEnglish) {
-        if (window.applyFontSettings) {
-            window.applyFontSettings({
-                fontChinese: s.fontChinese,
-                fontEnglish: s.fontEnglish
-            });
-        } else if (window.themeState && window.themeState.customSettings) {
-            if (s.fontChinese) window.themeState.customSettings.fontChinese = s.fontChinese;
-            if (s.fontEnglish) window.themeState.customSettings.fontEnglish = s.fontEnglish;
-        }
-    }
-
-    if (typeof s.colorMode === 'string') {
-        const mode = s.colorMode === 'dark' ? 'dark' : 'light';
-        document.body.classList.toggle('dark', mode === 'dark');
-        document.body.classList.toggle('light', mode !== 'dark');
-        localStorage.setItem('theme', mode);
-        window.applyCustomThemeForCurrentMode?.();
-    }
-
-    mergeAppearanceSnapshot({
-        currentTheme: state.currentTheme || 'handdrawn',
-        colorMode: typeof s.colorMode === 'string' ? (s.colorMode === 'dark' ? 'dark' : 'light') : (localStorage.getItem('theme') || 'light'),
-        customSettings: {
-            fontChinese: window.themeState?.customSettings?.fontChinese,
-            fontEnglish: window.themeState?.customSettings?.fontEnglish
-        }
-    });
-
-    window.applyStyleTheme?.(state.currentTheme || window.themeState?.currentTheme || 'handdrawn');
-    window.applyCustomThemeForCurrentMode?.();
-}
-
-// Applies the parsed Color Config payload directly to themeState
-function applyColorConfig(config) {
-    if (!config || !window.themeState || !window.themeState.customSettings) return;
-    
-    // Config has format: { light: { ... }, dark: { ... } }
-    if (config.light) {
-        const mergedLight = { ...window.themeState.customSettings, ...config.light };
-        // Clean out nested darkMode if it accidentally merged
-        delete mergedLight.darkMode; 
-        
-        mergedLight.darkMode = {
-            ...((window.themeState.customSettings.darkMode) || {}),
-            ...(config.dark || {})
-        };
-        
-        window.themeState.customSettings = mergedLight;
-    }
-    
-    window.applyStyleTheme?.(window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn');
-    window.applyCustomThemeForCurrentMode?.();
-    mergeAppearanceSnapshot({
-        currentTheme: window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
-        colorMode: document.body.classList.contains('dark') ? 'dark' : 'light',
-        customSettings: window.themeState?.customSettings || {}
-    });
 }
 
 // 1. Initial Cached Load -> 2. Remote Fetch Overwrite
 // The app now standardizes on the normalized Supabase schema:
 // user_home_settings + user_sites + user_tags + user_site_tags + order tables
-// plus user_theme_settings / user_font_settings.
 async function loadUserData(options = {}) {
     const db = getSupabaseClient();
     if (!window.authState || !window.authState.isLoggedIn || !db) {
@@ -925,16 +688,13 @@ async function loadUserData(options = {}) {
         const preferRemote = options.force === true || options.skipLocalHydration === true;
 
         clearExpiredPendingMeta(uid, 'home');
-        clearExpiredPendingMeta(uid, 'color');
 
         // === Phase 1: Local Cache Immediate Hydration ===
         if (!options.skipLocalHydration) {
             try {
                 const localHome = localStorage.getItem(getHomeConfigCacheKey(uid));
-                const localColor = localStorage.getItem(getColorConfigCacheKey(uid));
                 
                 if (localHome) applyHomeConfig(JSON.parse(localHome));
-                if (localColor) applyColorConfig(JSON.parse(localColor));
 
                 window.renderHome?.();
                 window.renderSearchEngine?.();
@@ -950,9 +710,7 @@ async function loadUserData(options = {}) {
             let requiresRender = false;
             const remoteRes = await fetchLegacyConfigs(uid);
             const homeCacheKey = getHomeConfigCacheKey(uid);
-            const colorCacheKey = getColorConfigCacheKey(uid);
             const currentHomeRaw = localStorage.getItem(homeCacheKey);
-            const currentColorRaw = localStorage.getItem(colorCacheKey);
 
             if (remoteRes.homeConfig && (preferRemote || shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt))) {
                 const nextHomeRaw = stringifyConfig(remoteRes.homeConfig);
@@ -969,25 +727,6 @@ async function loadUserData(options = {}) {
 
                 applyHomeConfig(remoteRes.homeConfig);
                 if (homeChanged) {
-                    requiresRender = true;
-                }
-            }
-
-            if (remoteRes.colorConfig && (preferRemote || shouldApplyRemoteConfig(uid, 'color', remoteRes.colorUpdatedAt))) {
-                const nextColorRaw = stringifyConfig(remoteRes.colorConfig);
-                const colorChanged = currentColorRaw !== nextColorRaw;
-
-                localStorage.setItem(colorCacheKey, nextColorRaw);
-                updateConfigMeta(uid, 'color', {
-                    localUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
-                    remoteUpdatedAt: remoteRes.colorUpdatedAt || new Date().toISOString(),
-                    pending: false,
-                    pendingSince: null,
-                    pendingSessionId: null
-                });
-
-                applyColorConfig(remoteRes.colorConfig);
-                if (colorChanged) {
                     requiresRender = true;
                 }
             }
@@ -1037,84 +776,6 @@ async function saveUserDataToBackend(immediate = true) {
     return true;
 }
 
-// Specialized save for strictly Color Configurations
-async function saveThemeSettings(settings) {
-    if (!window.authState || !window.authState.isLoggedIn || !getSupabaseClient()) return false;
-
-    try {
-        const uid = window.authState.user.id;
-        const syncedAt = new Date().toISOString();
-        
-        // Settings object usually contains fonts & strings like 'style', but we want to strip those.
-        // We separate them into light and dark structural buckets.
-        const { style, fontChinese, fontEnglish, ...colorsOnly } = settings;
-        
-        const colorPayload = {
-            light: { ...colorsOnly },
-            dark: { ...(colorsOnly.darkMode || {}) }
-        };
-        delete colorPayload.light.darkMode; // Keep hygiene
-
-        // 1. Cache Locally
-        localStorage.setItem(getColorConfigCacheKey(uid), JSON.stringify(colorPayload));
-        mergeAppearanceSnapshot({
-            currentTheme: settings.style || window.themeState?.currentTheme || localStorage.getItem('currentTheme') || 'handdrawn',
-            colorMode: document.body.classList.contains('dark') ? 'dark' : 'light',
-            customSettings: settings
-        });
-        updateConfigMeta(uid, 'color', {
-            localUpdatedAt: syncedAt,
-            pending: true,
-            pendingSince: syncedAt,
-            pendingSessionId: CURRENT_SYNC_SESSION_ID
-        });
-
-        // Theme style and fonts are also stored with the home config, so persist them
-        // even if the dedicated theme/color table write fails later.
-        await persistHomeConfig(uid, buildCurrentHomePayload(), syncedAt);
-
-        // 2. Persist through normalized theme/font tables
-        await saveLegacyThemeConfig(uid, settings, syncedAt);
-
-        clearPendingMeta(uid, 'color', syncedAt);
-        return true;
-
-    } catch (e) {
-        console.error('Error saving color config:', e);
-        throw e;
-    }
-}
-
-// Proxies existing API bindings to the new system
-async function saveFontSettings(fontSettings) {
-    // Fonts are now embedded inside the Home Config payload
-    return await saveUserDataToBackend(true);
-}
-
-async function resetThemeCustomizationOnBackend() {
-    if (!window.authState || !window.authState.isLoggedIn || !getSupabaseClient()) return false;
-    try {
-        const uid = window.authState.user.id;
-        const syncedAt = new Date().toISOString();
-        localStorage.removeItem(getColorConfigCacheKey(uid));
-        await saveLegacyThemeConfig(uid, {}, syncedAt);
-
-        updateConfigMeta(uid, 'color', {
-            localUpdatedAt: syncedAt,
-            remoteUpdatedAt: syncedAt,
-            pending: false,
-            pendingSince: null,
-            pendingSessionId: null
-        });
-        
-        window.clearCustomThemeSettings?.();
-        return true;
-    } catch (e) {
-        console.error('Failed resetting theme', e);
-        return false;
-    }
-}
-
 function markHomeConfigUpdated() {
     return saveUserDataToBackend(true);
 }
@@ -1127,19 +788,6 @@ function flushPendingProfileSync() {
     const uid = window.authState.user.id;
 
     return (async () => {
-        if (hasPendingConfigSync(uid, 'color')) {
-            try {
-                const settings = buildThemeSettingsFromLocalCache(uid);
-                if (settings) {
-                    const syncedAt = new Date().toISOString();
-                    await saveLegacyThemeConfig(uid, settings, syncedAt);
-                    clearPendingMeta(uid, 'color', syncedAt);
-                }
-            } catch (err) {
-                console.error('Failed flushing pending color config:', err);
-            }
-        }
-
         if (hasPendingConfigSync(uid, 'home')) {
             try {
                 await saveUserDataToBackend(true);
@@ -1159,9 +807,7 @@ function applyCachedUserData() {
             if (!ready) return;
             try {
                 const h = localStorage.getItem(getHomeConfigCacheKey(uid));
-                const c = localStorage.getItem(getColorConfigCacheKey(uid));
                 if (h) applyHomeConfig(JSON.parse(h));
-                if (c) applyColorConfig(JSON.parse(c));
             } catch (e) {
                 console.warn('Failed to apply cached user data:', e);
             }
@@ -1170,7 +816,7 @@ function applyCachedUserData() {
 }
 
 function hydrateCachedConfigFromLastUser() {
-    // Instantly apply the last user's cached config (theme, zoom, sites, workbench...)
+    // Instantly apply the last user's cached config (appearance, zoom, sites, workbench...)
     // so a second open renders immediately, before the remote fetch completes.
     try {
         const uid = localStorage.getItem('lastAuthUid');
@@ -1178,8 +824,6 @@ function hydrateCachedConfigFromLastUser() {
         const h = localStorage.getItem(getHomeConfigCacheKey(uid));
         if (!h) return false;
         applyHomeConfig(JSON.parse(h));
-        const c = localStorage.getItem(getColorConfigCacheKey(uid));
-        if (c) applyColorConfig(JSON.parse(c));
         window.renderHome?.();
         window.renderSearchEngine?.();
         window.updateAllText?.();
@@ -1209,9 +853,6 @@ function scheduleUserDataRefresh() {
 // Attach to Global Scope
 window.loadUserData = loadUserData;
 window.saveUserDataToBackend = saveUserDataToBackend;
-window.saveThemeSettings = saveThemeSettings;
-window.saveFontSettings = saveFontSettings;
-window.resetThemeCustomizationOnBackend = resetThemeCustomizationOnBackend;
 window.markHomeConfigUpdated = markHomeConfigUpdated;
 window.flushPendingProfileSync = flushPendingProfileSync;
 window.applyCachedUserData = applyCachedUserData;

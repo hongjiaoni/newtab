@@ -1,7 +1,7 @@
 // ===== localStorage ↔ chrome.storage.local Bridge =====
 // Optional: mirrors critical localStorage keys to chrome.storage.local
 // for cross-context access (e.g., if a future options page or popup
-// needs to read the user's theme, locale, or site data).
+// needs to read the user's appearance, locale, or site data).
 
 (function() {
   'use strict';
@@ -15,13 +15,12 @@
   if (!isExtension) return;
 
   var BRIDGED_KEYS = [
-    'theme',
+    'appearance',
     'locale',
     'sites',
     'tags',
     'tagOrder',
     'siteOrder',
-    'currentTheme',
     'enabledEngineIds',
     'engineId',
     'engineIndex',

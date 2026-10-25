@@ -80,6 +80,8 @@
   --fill-1: rgba(120, 120, 128, 0.2);
   --fill-2: rgba(120, 120, 128, 0.14);
   --fill-3: rgba(120, 120, 128, 0.08);
+  --surface-base: #f2f2f7;     /* 无壁纸时的页面底色 */
+  --surface-raised: #ffffff;   /* 不透明面板（玻璃不可用时） */
 
   /* 壁纸上的文字（图标名称、时钟）：两种外观都用白字 + 柔和阴影，与 iOS 主屏一致 */
   --on-wallpaper: #ffffff;
@@ -143,6 +145,8 @@
     --fill-1: rgba(120, 120, 128, 0.36);
     --fill-2: rgba(120, 120, 128, 0.28);
     --fill-3: rgba(120, 120, 128, 0.18);
+    --surface-base: #1c1c1e;
+    --surface-raised: #2c2c2e;
     --glass-tint: rgba(28, 28, 32, 0.38);
     --glass-tint-clear: rgba(20, 20, 24, 0.16);
     --glass-tint-thick: rgba(30, 30, 34, 0.78);
@@ -174,6 +178,8 @@
   --fill-1: rgba(120, 120, 128, 0.36);
   --fill-2: rgba(120, 120, 128, 0.28);
   --fill-3: rgba(120, 120, 128, 0.18);
+  --surface-base: #1c1c1e;
+  --surface-raised: #2c2c2e;
   --glass-tint: rgba(28, 28, 32, 0.38);
   --glass-tint-clear: rgba(20, 20, 24, 0.16);
   --glass-tint-thick: rgba(30, 30, 34, 0.78);

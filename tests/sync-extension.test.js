@@ -16,7 +16,7 @@ describe('extension index.html transform', () => {
   test('strips inline event handlers for MV3 CSP', () => {
     expect(out).not.toMatch(/\sonclick="/);
     expect(out).not.toMatch(/\sonchange="/);
-    expect(out).toContain('id="appearanceMenuItem"');
+    expect(out).toContain('id="appearanceGroup"');
   });
 
   test('swaps CDN SDKs for local vendor copies', () => {
@@ -28,7 +28,8 @@ describe('extension index.html transform', () => {
 
   test('strips cache-busting query strings and leading slashes', () => {
     expect(out).not.toMatch(/\?v=/);
-    expect(out).toContain('src="themes.js"');
+    expect(out).toContain('src="appearance.js"');
+    expect(out).toContain('href="tokens.css"');
     expect(out).toContain('src="script.js"');
   });
 
@@ -52,9 +53,9 @@ describe('extension index.html transform', () => {
     expect(out).toContain('paddle-inline-root');
   });
 
-  test('keeps remote font stylesheets (allowed by CSP)', () => {
-    expect(out).toContain('chinese-fonts-cdn.deno.dev');
-    expect(out).toContain('fonts.googleapis.com');
+  test('loads no remote font stylesheets (system fonts only)', () => {
+    expect(out).not.toContain('chinese-fonts-cdn');
+    expect(out).not.toContain('fonts.googleapis.com');
   });
 });
 
