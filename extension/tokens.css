@@ -1,0 +1,257 @@
+/* =====================================================================
+ * NewTab Design Tokens — Liquid Glass
+ * 唯一的视觉变量来源。组件只引用这里的变量，不写死颜色/圆角/时长。
+ * 外观：浅色 / 深色 / 跟随系统（html[data-appearance="light|dark"]，缺省跟随系统）
+ * ===================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* ---------- Typography ----------
+   * 系统字体优先：macOS/iOS 得到 SF Pro + 苹方，Windows 得到 Segoe UI Variable + 微软雅黑。 */
+  --font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text", "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI Variable Display", "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", system-ui, sans-serif;
+  --font-rounded: ui-rounded, "SF Pro Rounded", var(--font-display);
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+
+  /* 字号层级（参照 HIG 的 macOS / iPadOS 文本样式，单位 px / 行高） */
+  --text-clock: 600 112px/1 var(--font-rounded);      /* 首页时钟 */
+  --text-large-title: 700 30px/1.15 var(--font-display);
+  --text-title1: 700 24px/1.2 var(--font-display);
+  --text-title2: 600 20px/1.25 var(--font-display);
+  --text-title3: 600 17px/1.3 var(--font-display);
+  --text-headline: 600 14px/1.35 var(--font-text);
+  --text-body: 400 14px/1.45 var(--font-text);
+  --text-callout: 400 13px/1.4 var(--font-text);
+  --text-subhead: 500 12px/1.35 var(--font-text);
+  --text-footnote: 400 12px/1.35 var(--font-text);
+  --text-caption: 500 11px/1.3 var(--font-text);
+
+  /* ---------- Spacing (4pt grid) ---------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ---------- Radius（同心圆角：内层圆角 = 外层圆角 - 内边距） ---------- */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;      /* 图标块（60px 图标 ≈ 26% 圆角，接近 App 图标 squircle） */
+  --radius-lg: 22px;      /* 弹出菜单 / 小卡片 */
+  --radius-xl: 28px;      /* 组件 / 面板 */
+  --radius-2xl: 36px;     /* 弹窗 sheet */
+  --radius-capsule: 999px;
+
+  /* ---------- Sizes ---------- */
+  --icon-tile: 56px;
+  --icon-glyph: 40px;
+  --page-side-clear: 64px; /* room kept free for the pager dots on the right */
+  --menu-row-h: 38px;    /* every menu row */
+  --control-h: 32px;     /* every button / select / tab inside menus and dialogs */
+  --control-sm: 28px;
+  --control-md: 36px;
+  --control-lg: 52px;     /* 搜索胶囊高度 */
+  --hit-min: 28px;        /* 指针设备的最小可点区域 */
+
+  /* ---------- System colors (light) ---------- */
+  --accent: #0a7aff;
+  --accent-contrast: #ffffff;
+  --red: #ff3b30;
+  --orange: #ff9500;
+  --yellow: #ffcc00;
+  --green: #34c759;
+  --teal: #30b0c7;
+  --blue: #007aff;
+  --indigo: #5856d6;
+  --purple: #af52de;
+  --pink: #ff2d55;
+
+  /* 文本层级：用透明度表达层级，而不是不同的灰 */
+  --label-1: rgba(0, 0, 0, 0.88);
+  --label-2: rgba(0, 0, 0, 0.6);
+  --label-3: rgba(0, 0, 0, 0.36);
+  --label-4: rgba(0, 0, 0, 0.18);
+  --separator: rgba(0, 0, 0, 0.1);
+  --fill-1: rgba(120, 120, 128, 0.2);
+  --fill-2: rgba(120, 120, 128, 0.14);
+  --fill-3: rgba(120, 120, 128, 0.08);
+  --surface-base: #f2f2f7;     /* 无壁纸时的页面底色 */
+  --surface-raised: #ffffff;   /* 不透明面板（玻璃不可用时） */
+
+  /* 壁纸上的文字（图标名称、时钟）：两种外观都用白字 + 柔和阴影，与 iOS 主屏一致 */
+  --on-wallpaper: #ffffff;
+  --on-wallpaper-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 0 12px rgba(0, 0, 0, 0.18);
+
+  /* ---------- Liquid Glass material ---------- */
+  /* Regular：控件、菜单、组件；Clear：叠在丰富壁纸上的大面积元素，透得更多 */
+  --glass-blur: 22px;
+  --glass-refract-blur: 10;   /* 折射模式下的模糊（SVG stdDeviation，无单位）；更低的模糊让边缘弯曲更明显 */
+  --glass-saturate: 1.8;
+  --glass-tint: rgba(255, 255, 255, 0.36);
+  --glass-tint-clear: rgba(255, 255, 255, 0.14);
+  --glass-tint-thick: rgba(250, 250, 252, 0.72);   /* 弹窗、长文本阅读区 */
+  --glass-rim: rgba(255, 255, 255, 0.75);          /* 顶部高光边 */
+  --glass-rim-low: rgba(255, 255, 255, 0.18);      /* 底部弱边 */
+  --glass-edge: rgba(0, 0, 0, 0.06);               /* 外轮廓，保证浅色壁纸上可辨 */
+  /* Liquid Glass: menus and controls. Clear tint, a specular rim that is
+     bright at the top-left and bottom-right, and a soft inner glow. */
+  --glass-tint-menu: rgba(255, 255, 255, 0.26);
+  --glass-menu-filter: blur(22px) saturate(1.9) brightness(1.06);
+  --glass-glow: radial-gradient(120% 70% at 50% 0%, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 62%);
+  --glass-specular: linear-gradient(150deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.28) 22%, rgba(255, 255, 255, 0.06) 50%, rgba(255, 255, 255, 0.22) 78%, rgba(255, 255, 255, 0.7) 100%);
+  --ctl-tint: rgba(255, 255, 255, 0.42);
+  --ctl-tint-hover: rgba(255, 255, 255, 0.6);
+  --ctl-sheen: linear-gradient(transparent, transparent);
+  --ctl-shadow: 0 0 transparent;
+  --ctl-rim: inset 0 0.5px 0 rgba(255, 255, 255, 0.9), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+  --glass-shadow: 0 10px 30px -8px rgba(0, 0, 0, 0.22), 0 2px 6px -2px rgba(0, 0, 0, 0.12);
+  --glass-shadow-lifted: 0 24px 60px -12px rgba(0, 0, 0, 0.32), 0 4px 12px -4px rgba(0, 0, 0, 0.16);
+  --glass-label: var(--label-1);
+  --glass-label-2: var(--label-2);
+  --glass-hover: rgba(255, 255, 255, 0.2);
+  --glass-press: rgba(0, 0, 0, 0.06);
+  --scrim: rgba(0, 0, 0, 0.22);                    /* 弹窗背后的遮罩 */
+
+  /* ---------- Motion ---------- */
+  --dur-fast: 160ms;
+  --dur-base: 280ms;
+  --dur-slow: 460ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* 弹簧（轻微回弹）。linear() 不支持时回退到 --ease-out */
+  --ease-spring: var(--ease-out);
+}
+
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(0, 0.009, 0.035 2.1%, 0.141, 0.281 6.7%, 0.723 12.9%, 0.938 16.7%, 1.017, 1.077,
+      1.121, 1.149 24.3%, 1.159, 1.163, 1.161, 1.154 29.9%, 1.129 32.8%, 1.051 39.6%, 1.017 43.1%, 0.991,
+      0.977 51%, 0.974 53.8%, 0.975 57.1%, 0.997 69.8%, 1.003 76.9%, 1);
+  }
+}
+
+/* ---------- Dark ---------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-appearance="light"]) {
+    --accent: #0a84ff;
+    --red: #ff453a;
+    --orange: #ff9f0a;
+    --yellow: #ffd60a;
+    --green: #30d158;
+    --teal: #40c8e0;
+    --blue: #0a84ff;
+    --indigo: #5e5ce6;
+    --purple: #bf5af2;
+    --pink: #ff375f;
+    --label-1: rgba(255, 255, 255, 0.92);
+    --label-2: rgba(235, 235, 245, 0.62);
+    --label-3: rgba(235, 235, 245, 0.34);
+    --label-4: rgba(235, 235, 245, 0.18);
+    --separator: rgba(255, 255, 255, 0.1);
+    --fill-1: rgba(120, 120, 128, 0.36);
+    --fill-2: rgba(120, 120, 128, 0.28);
+    --fill-3: rgba(120, 120, 128, 0.18);
+    --surface-base: #1c1c1e;
+    --surface-raised: #2c2c2e;
+    --glass-tint: rgba(28, 28, 32, 0.38);
+    --glass-tint-clear: rgba(20, 20, 24, 0.16);
+    --glass-tint-thick: rgba(30, 30, 34, 0.78);
+    --glass-rim: rgba(255, 255, 255, 0.32);
+    --glass-rim-low: rgba(255, 255, 255, 0.08);
+    --glass-edge: rgba(0, 0, 0, 0.3);
+  --glass-tint-menu: rgba(40, 40, 46, 0.32);
+  --glass-menu-filter: blur(22px) saturate(1.7) brightness(0.92);
+  --glass-glow: radial-gradient(120% 70% at 50% 0%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 62%);
+  --glass-specular: linear-gradient(150deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 22%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.08) 78%, rgba(255, 255, 255, 0.32) 100%);
+  --ctl-tint: rgba(255, 255, 255, 0.07);
+  --ctl-tint-hover: rgba(255, 255, 255, 0.13);
+  --ctl-sheen: linear-gradient(transparent, transparent);
+  --ctl-shadow: 0 0 transparent;
+  --ctl-rim: inset 0 0.5px 0 rgba(255, 255, 255, 0.14), 0 0 0 0.5px rgba(0, 0, 0, 0.2);
+    --glass-hover: rgba(255, 255, 255, 0.08);
+    --glass-press: rgba(255, 255, 255, 0.04);
+    --scrim: rgba(0, 0, 0, 0.42);
+  }
+}
+
+:root[data-appearance="dark"] {
+  --accent: #0a84ff;
+  --red: #ff453a;
+  --orange: #ff9f0a;
+  --yellow: #ffd60a;
+  --green: #30d158;
+  --teal: #40c8e0;
+  --blue: #0a84ff;
+  --indigo: #5e5ce6;
+  --purple: #bf5af2;
+  --pink: #ff375f;
+  --label-1: rgba(255, 255, 255, 0.92);
+  --label-2: rgba(235, 235, 245, 0.62);
+  --label-3: rgba(235, 235, 245, 0.34);
+  --label-4: rgba(235, 235, 245, 0.18);
+  --separator: rgba(255, 255, 255, 0.1);
+  --fill-1: rgba(120, 120, 128, 0.36);
+  --fill-2: rgba(120, 120, 128, 0.28);
+  --fill-3: rgba(120, 120, 128, 0.18);
+  --surface-base: #1c1c1e;
+  --surface-raised: #2c2c2e;
+  --glass-tint: rgba(28, 28, 32, 0.38);
+  --glass-tint-clear: rgba(20, 20, 24, 0.16);
+  --glass-tint-thick: rgba(30, 30, 34, 0.78);
+  --glass-rim: rgba(255, 255, 255, 0.32);
+  --glass-rim-low: rgba(255, 255, 255, 0.08);
+  --glass-edge: rgba(0, 0, 0, 0.3);
+  --glass-tint-menu: rgba(40, 40, 46, 0.32);
+  --glass-menu-filter: blur(22px) saturate(1.7) brightness(0.92);
+  --glass-glow: radial-gradient(120% 70% at 50% 0%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 62%);
+  --glass-specular: linear-gradient(150deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.1) 22%, rgba(255, 255, 255, 0.02) 50%, rgba(255, 255, 255, 0.08) 78%, rgba(255, 255, 255, 0.32) 100%);
+  --ctl-tint: rgba(255, 255, 255, 0.07);
+  --ctl-tint-hover: rgba(255, 255, 255, 0.13);
+  --ctl-sheen: linear-gradient(transparent, transparent);
+  --ctl-shadow: 0 0 transparent;
+  --ctl-rim: inset 0 0.5px 0 rgba(255, 255, 255, 0.14), 0 0 0 0.5px rgba(0, 0, 0, 0.2);
+  --glass-hover: rgba(255, 255, 255, 0.08);
+  --glass-press: rgba(255, 255, 255, 0.04);
+  --scrim: rgba(0, 0, 0, 0.42);
+}
+
+/* ---------- Accessibility ---------- */
+/* 降低透明度：玻璃变为接近不透明的面板 */
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --glass-tint: rgba(246, 246, 248, 0.96);
+    --glass-tint-clear: rgba(246, 246, 248, 0.96);
+    --glass-tint-thick: rgba(246, 246, 248, 0.98);
+    --glass-blur: 0px;
+  }
+  :root[data-appearance="dark"] {
+    --glass-tint: rgba(36, 36, 40, 0.96);
+    --glass-tint-clear: rgba(36, 36, 40, 0.96);
+    --glass-tint-thick: rgba(36, 36, 40, 0.98);
+  }
+}
+
+/* 增强对比度：加粗外轮廓、提高文字不透明度 */
+@media (prefers-contrast: more) {
+  :root {
+    --glass-edge: rgba(0, 0, 0, 0.45);
+    --label-2: rgba(0, 0, 0, 0.78);
+  }
+}
+
+/* 减弱动态效果：去掉位移与回弹，只保留淡入淡出 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ease-spring: var(--ease-standard);
+    --dur-base: 1ms;
+    --dur-slow: 1ms;
+  }
+}

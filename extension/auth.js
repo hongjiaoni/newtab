@@ -172,6 +172,10 @@ async function handleSession(session) {
   authState.isLoggedIn = true;
   authState.user = session.user;
   window.authState = authState; // Ensure window reference is updated
+  try {
+    localStorage.setItem('lastAuthUid', session.user.id);
+  } catch (_err) {
+  }
 
   const pendingLoginAt = Number(localStorage.getItem(AUTH_PENDING_LOGIN_AT_KEY) || 0);
   if (pendingLoginAt) {
@@ -380,7 +384,7 @@ async function handleLogout() {
 function signOutLocally() {
   // Clear only NewTab-related local storage data
   const keysToRemove = [
-    'auth_last_login_at', 'auth_pending_login_at',
+    'auth_last_login_at', 'auth_pending_login_at', 'lastAuthUid',
     'user_sites', 'user_tags', 'user_site_tags',
     'user_site_order', 'user_tag_order',
     'cached_user_data', 'cached_settings',
@@ -403,8 +407,7 @@ function signOutLocally() {
   // Reset wallpaper
   if (window.wallpaperState) {
     window.wallpaperState.selectedWallpaper = null;
-    document.body.style.backgroundImage = '';
-    document.body.style.backgroundColor = '';
+    if (window.previewWallpaper) window.previewWallpaper(null);
   }
 
   // Clear chrome.storage.local in extension mode, then reload
@@ -427,7 +430,35 @@ function signOutLocally() {
 }
 
 // Update auth UI (Avatar vs Login button)
+// Toolbar avatar: Google photo when signed in, a default glyph otherwise.
+function updateToolbarAvatar() {
+  const btn = document.getElementById('toolbarAvatarBtn');
+  if (!btn) return;
+  const img = btn.querySelector('.avatar-img');
+  const glyph = btn.querySelector('.avatar-default');
+  const meta = (authState.isLoggedIn && authState.user && authState.user.user_metadata) || {};
+  const url = meta.avatar_url || meta.picture || '';
+  const t = (k, fb) => (typeof i18n !== 'undefined' && i18n.t(k)) || fb;
+  btn.setAttribute('aria-label', authState.isLoggedIn ? (getUserNickname() || t('profile', 'Profile')) : t('login', 'Login'));
+  if (url) {
+    img.onerror = () => { img.classList.add('hidden'); glyph.classList.remove('hidden'); };
+    if (img.getAttribute('src') !== url) img.src = url;
+    img.classList.remove('hidden');
+    glyph.classList.add('hidden');
+  } else {
+    img.removeAttribute('src');
+    img.classList.add('hidden');
+    glyph.classList.remove('hidden');
+  }
+}
+
+function handleToolbarAvatarClick() {
+  if (authState.isLoggedIn && authState.user) window.openUserProfile();
+  else openGoogleSignInModal();
+}
+
 function updateAuthUI() {
+  updateToolbarAvatar();
   const authMenuContainer = document.getElementById('authMenuContainer');
   if (!authMenuContainer) return;
 
@@ -487,7 +518,7 @@ window.openUserProfile = function () {
     </div>
     <div style="padding: 0 20px 20px; display: grid; gap: 12px;">
       <!-- Subscription records button hidden
-      <button class="primary-btn sketchy-border" style="width: 100%;" onclick="openSubscriptionRecords()">
+      <button class="primary-btn" style="width: 100%;" onclick="openSubscriptionRecords()">
         ${isZh ? '订阅记录' : 'Subscription records'}
       </button>
       -->
@@ -644,7 +675,27 @@ function closeUserProfile() {
 }
 
 // Modal Helpers
+// The sign-in prompt replaces whatever is open: dialogs, folder window, menus.
+function closeAllWindowsExceptSignIn() {
+  const signIn = document.getElementById('googleSignInModal');
+  // Overlays close as a whole; only #modalOverlay toggles its sheets one by
+  // one (other overlays never unhide their inner .modal again).
+  document.querySelectorAll('.modal-overlay:not(.hidden), #modalOverlay > .modal:not(.hidden)').forEach((el) => {
+    if (el === signIn || signIn?.contains(el)) return;
+    el.classList.add('hidden');
+  });
+  document.getElementById('systemConfirmDialog')?.remove();
+  window.closeFolder?.();
+  window.hideAllContextMenus?.();
+  window.hideContextMenu?.();
+  window.hideWidgetMenu?.();
+  document.getElementById('settingsMenu')?.classList.add('hidden');
+  document.getElementById('modeSubmenu')?.classList.add('hidden');
+  document.getElementById('settingsToggle')?.setAttribute('aria-expanded', 'false');
+}
+
 function openGoogleSignInModal() {
+  closeAllWindowsExceptSignIn();
   openManagedOverlay('googleSignInModal');
 }
 
@@ -787,6 +838,7 @@ function showConfirmDialog({
 
 // Event Listeners Setup
 function setupAuthEventListeners() {
+  document.getElementById('toolbarAvatarBtn')?.addEventListener('click', handleToolbarAvatarClick);
   const authMenuContainer = document.getElementById('authMenuContainer');
   if (authMenuContainer) {
     authMenuContainer.onclick = (event) => {

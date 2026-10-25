@@ -117,7 +117,11 @@
         }
         responseInit.headers = respHeaders;
 
-        resolve(new Response(xhr.response, responseInit));
+        // 204/205/304 are no-content statuses: a body would make the Response
+        // constructor throw ("Response with null body status cannot have body").
+        var noBodyStatus = xhr.status === 204 || xhr.status === 205 || xhr.status === 304;
+        var responseBody = noBodyStatus ? null : xhr.response;
+        resolve(new Response(responseBody, responseInit));
       };
 
       xhr.onerror = function() {

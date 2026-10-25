@@ -27,6 +27,8 @@ function createLocalStorage() {
 function createSupabaseMock(options = {}) {
   const calls = [];
   const missingTables = new Set(options.missingTables || []);
+  // { table: error } -> the first insert into that table fails with this error
+  const failFirstInsert = { ...(options.failFirstInsert || {}) };
 
   const resultFor = (table) => {
     if (missingTables.has(table)) {
@@ -56,6 +58,11 @@ function createSupabaseMock(options = {}) {
       },
       insert(rows) {
         calls.push({ op: 'insert', table, rows });
+        if (failFirstInsert[table]) {
+          const error = failFirstInsert[table];
+          delete failFirstInsert[table];
+          return Promise.resolve({ data: null, error });
+        }
         return Promise.resolve(resultFor(table));
       },
       delete() {
@@ -122,24 +129,26 @@ function loadDataSync(options = {}) {
       dateFormatIndex: 0,
       timeFormat: '24h',
       sites: [
-        { id: 'default-0', name: 'GitHub', url: 'https://github.com', tags: ['dev'], showOnHome: true }
+        { id: 'default-0', name: 'GitHub', url: 'https://github.com', tags: ['dev'], showOnHome: true, customIcon: 'data:image/png;base64,AAAA' }
       ],
       tags: ['dev'],
       tagOrder: ['dev'],
-      siteOrder: ['default-0'],
-      currentTheme: 'comic'
+      siteOrder: ['default-0']
     },
     supabase,
     window: {
-      authState: { isLoggedIn: true, user: { id: '11111111-1111-4111-8111-111111111111' } },
-      themeState: {
-        currentTheme: 'comic',
-        customSettings: {
-          fontChinese: 'Test CN',
-          fontEnglish: 'Test EN',
-          bgColor: '#ffffff',
-          darkMode: { bgColor: '#000000' }
-        }
+      supabase,
+        authState: { isLoggedIn: true, user: { id: '11111111-1111-4111-8111-111111111111' } },
+      appearance: 'dark',
+      appliedAppearance: [],
+      getWorkbenchSyncPayload() {
+        return { widgets: ['notes'], agent: { projects: [{ id: 'a', name: 'A', chats: [] }] } };
+      },
+      getAppearance() {
+        return this.appearance;
+      },
+      setAppearance(mode, opts) {
+        this.appliedAppearance.push({ mode, opts });
       },
       wallpaperState: { selectedWallpaper: '#123456' },
       showNotification(message, type) {
@@ -148,9 +157,7 @@ function loadDataSync(options = {}) {
       addEventListener() {},
       renderHome() {},
       renderSearchEngine() {},
-      updateTime() {},
-      applyStyleTheme() {},
-      applyCustomThemeForCurrentMode() {}
+      updateTime() {}
     }
   };
   context.globalThis = context;
@@ -191,26 +198,60 @@ async function testOptionalTablesCanBeMissing() {
   expect(supabase.calls.some((call) => call.op === 'insert' && call.table === 'user_sites')).toBe(true);
 }
 
-async function testThemeSaveFallsBackWhenThemeTablesAreMissing() {
+async function testAppearanceIsSavedAndNotThemeTables() {
+  const { context, supabase, notifications } = loadDataSync();
+
+  await context.window.saveUserDataToBackend(true);
+
+  expect(notifications).toHaveLength(0);
+  const homeUpsert = supabase.calls.find((call) => call.op === 'upsert' && call.table === 'user_home_settings');
+  expect(homeUpsert.rows.color_mode).toBe('dark');
+  expect(homeUpsert.rows.theme).toBe('glass');
+  expect(supabase.calls.some((call) => call.table === 'user_theme_settings' || call.table === 'user_font_settings')).toBe(false);
+}
+
+async function testLegacyColorModeMapsToAppearance() {
+  const { context } = loadDataSync();
+  const uid = context.window.authState.user.id;
+  context.localStorage.setItem('lastAuthUid', uid);
+  context.localStorage.setItem('user_home_config_' + uid, JSON.stringify({ settings: { appearance: 'light' } }));
+
+  context.window.hydrateCachedConfigFromLastUser();
+
+  expect(context.window.appliedAppearance).toEqual([{ mode: 'light', opts: { sync: false } }]);
+}
+
+async function testPayloadCarriesIconsAppearanceAndChatFreeWorkbench() {
+  const { context, supabase } = loadDataSync();
+  await context.window.saveUserDataToBackend(true);
+  const rpc = supabase.calls.find((call) => call.op === 'rpc' && call.name === 'sync_home_config');
+  const payload = rpc.payload.p_payload;
+  expect(payload.sites[0].customIcon).toBe('data:image/png;base64,AAAA');
+  expect(payload.settings.appearance).toBe('dark');
+  expect(payload.settings.colorMode).toBe('dark'); // for the RPC deployed before the glass migration
+  expect(payload.workbench.agent.projects[0].chats).toEqual([]);
+  const siteInsert = supabase.calls.find((call) => call.op === 'insert' && call.table === 'user_sites');
+  expect(siteInsert.rows[0].icon).toBe('data:image/png;base64,AAAA');
+}
+
+async function testSiteInsertRetriesWithoutIconColumn() {
   const { context, supabase, notifications } = loadDataSync({
-    supabase: { missingTables: ['user_theme_settings', 'user_font_settings'] }
+    supabase: { failFirstInsert: { user_sites: { code: 'PGRST204', message: "Could not find the 'icon' column of 'user_sites' in the schema cache" } } }
   });
-
-  await context.window.saveThemeSettings({
-    style: 'cyber',
-    fontChinese: 'Test CN',
-    fontEnglish: 'Test EN',
-    bgColor: '#ffffff',
-    borderColor: '#111111',
-    darkMode: { bgColor: '#000000', borderColor: '#eeeeee' }
-  });
-
-  expect(notifications, 'theme save should not show save failed notification').toHaveLength(0);
-  expect(supabase.calls.some((call) => call.op === 'upsert' && call.table === 'user_home_settings')).toBe(true);
+  await context.window.saveUserDataToBackend(true);
+  expect(notifications).toHaveLength(0);
+  const inserts = supabase.calls.filter((call) => call.op === 'insert' && call.table === 'user_sites');
+  expect(inserts).toHaveLength(2);
+  expect('icon' in inserts[1].rows[0]).toBe(false);
 }
 
 describe('data sync fallback', () => {
+  test('sends site icons, appearance and a chat-free workbench', testPayloadCarriesIconsAppearanceAndChatFreeWorkbench);
+  test('retries the site insert without the icon column', testSiteInsertRetriesWithoutIconColumn);
   test('falls back to table sync and normalizes legacy site ids', testHomeSaveFallsBackAndNormalizesSiteIds);
   test('keeps saving when optional sync tables are missing', testOptionalTablesCanBeMissing);
-  test('keeps theme save working when theme/font tables are missing', testThemeSaveFallsBackWhenThemeTablesAreMissing);
+  test('saves appearance to color_mode and skips retired theme tables', testAppearanceIsSavedAndNotThemeTables);
+  test('applies cached appearance without re-syncing', testLegacyColorModeMapsToAppearance);
 });
+
+

@@ -55,3 +55,14 @@ npm run dev
 
 目前仓库还没有 License。公开前建议补充 MIT 或 Apache-2.0。
 
+
+## Chrome 插件
+
+项目同时维护 Web 版与 Chrome 插件，`public/` 是唯一源码，`extension/` 由构建脚本生成（见 `AGENTS.md`）。
+
+- 加载未打包插件：打开 `chrome://extensions` → 开启“开发者模式” → “加载已解压的扩展程序” → 选择 `extension/` 目录
+- 重新生成插件：`npm run build:extension`
+- 校验两端一致：`npm run check:extension`
+- 打包发布：`npm run pack:extension` → `dist/newtab-extension-<version>.zip`
+
+> 插件登录使用 `chrome.identity.launchWebAuthFlow` + Supabase OAuth，需要在 Supabase Auth 的 Redirect URLs 中加入 `https://<extension-id>.chromiumapp.org/`（扩展 ID 由 `manifest.json` 中的 `key` 固定）。上架与部署细节见 `DEPLOY.md`。

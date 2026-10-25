@@ -1,0 +1,958 @@
+/* =====================================================================
+ * NewTab home page — Liquid Glass
+ * Wallpaper, clock, search, app-icon site tiles, folders, the top-right
+ * toolbar and the floating menus. Built only from tokens.css / glass.css.
+ * ===================================================================== */
+
+/* ---------- Wallpaper ----------
+ * wallpaper.js paints a chosen wallpaper inline on <body>; without one the
+ * built-in mesh below shows. body[data-wallpaper-tone="light"] flips the text
+ * that sits directly on the wallpaper to dark ink. */
+:root {
+  --default-wallpaper:
+    radial-gradient(45% 55% at 15% 20%, #ffb38a 0%, transparent 70%),
+    radial-gradient(50% 60% at 85% 15%, #8f7bff 0%, transparent 72%),
+    radial-gradient(55% 65% at 75% 90%, #3cc6d6 0%, transparent 70%),
+    radial-gradient(45% 55% at 15% 90%, #ff7aa2 0%, transparent 70%),
+    linear-gradient(135deg, #4a56a8, #2a8fb0);
+}
+
+:root[data-appearance="dark"] {
+  --default-wallpaper:
+    radial-gradient(45% 55% at 15% 20%, #7a3e2c 0%, transparent 70%),
+    radial-gradient(50% 60% at 85% 15%, #3b2f8a 0%, transparent 72%),
+    radial-gradient(55% 65% at 75% 90%, #0f5a66 0%, transparent 70%),
+    radial-gradient(45% 55% at 15% 90%, #6b2340 0%, transparent 70%),
+    linear-gradient(135deg, #14183a, #0b2a3a);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-appearance="light"]) {
+    --default-wallpaper:
+      radial-gradient(45% 55% at 15% 20%, #7a3e2c 0%, transparent 70%),
+      radial-gradient(50% 60% at 85% 15%, #3b2f8a 0%, transparent 72%),
+      radial-gradient(55% 65% at 75% 90%, #0f5a66 0%, transparent 70%),
+      radial-gradient(45% 55% at 15% 90%, #6b2340 0%, transparent 70%),
+      linear-gradient(135deg, #14183a, #0b2a3a);
+  }
+}
+
+body {
+  background-color: var(--surface-base);
+  background-image: var(--default-wallpaper);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* Gentle shade at the top and bottom so white text sitting directly on the
+   wallpaper (clock, page titles) stays readable on bright images. Light solid
+   wallpapers switch to dark ink instead, so they skip it. */
+body:not([data-wallpaper-tone="light"])::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0) 26%, rgba(0, 0, 0, 0) 74%, rgba(0, 0, 0, 0.2));
+}
+
+body[data-wallpaper-tone="light"] {
+  --on-wallpaper: rgba(0, 0, 0, 0.84);
+  --on-wallpaper-shadow: 0 1px 1px rgba(255, 255, 255, 0.45);
+}
+
+/* ---------- Home layout ---------- */
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-8);
+  width: 100%;
+  max-width: 920px;
+  padding: var(--space-16) var(--space-6) calc(var(--space-16) + var(--space-6));
+  text-align: center;
+}
+
+.page-home .container > .time + .date {
+  margin-top: calc(-1 * var(--space-8) + var(--space-2));
+}
+
+/* ---------- Clock ---------- */
+.time {
+  font: var(--text-clock);
+  /* DIN: built into macOS / iOS (DIN Alternate); D-DIN or DIN Next if installed;
+     otherwise the system rounded face. */
+  font-family: "DIN Alternate", "DIN Next LT Pro", "D-DIN", "DIN", "Bahnschrift", var(--font-rounded);
+  font-weight: 700;
+  font-size: clamp(72px, 9vw, 112px);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--on-wallpaper);
+  text-shadow: var(--on-wallpaper-shadow);
+  cursor: default;
+  user-select: none;
+}
+
+.date {
+  font: var(--text-title3);
+  font-weight: 500;
+  color: var(--on-wallpaper);
+  text-shadow: var(--on-wallpaper-shadow);
+  opacity: 0.92;
+  cursor: default;
+  user-select: none;
+}
+
+/* ---------- Search (glass capsule) ---------- */
+.search-box {
+  z-index: 10; /* above the tile grid so the engine menu can overlap it */
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: min(640px, 100%, calc(var(--vw-full) - 2 * var(--page-side-clear)));
+  height: var(--control-lg);
+  padding: 0 var(--space-4) 0 var(--space-2);
+  border-radius: var(--radius-capsule);
+}
+
+.search-box:focus-within {
+  box-shadow:
+    0 0 0 0.5px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-rim),
+    0 0 0 4px color-mix(in srgb, var(--accent) 28%, transparent),
+    var(--glass-shadow);
+}
+
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  box-shadow: none;
+  font: 400 16px/1 var(--font-text);
+  color: var(--glass-label);
+}
+
+.search-box input::placeholder {
+  color: var(--glass-label-2);
+  opacity: 1;
+}
+
+.search-engine {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 40px;
+  padding: 0 var(--space-2) 0 var(--space-3);
+  border-radius: var(--radius-capsule);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.search-engine:hover {
+  background: var(--glass-hover);
+}
+
+.search-engine::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 6px;
+  border-right: 1.75px solid var(--glass-label-2);
+  border-bottom: 1.75px solid var(--glass-label-2);
+  transform: rotate(45deg);
+}
+
+#engineIcon {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+/* ---------- Floating menus ----------
+ * Every menu is Liquid Glass. An element with backdrop-filter becomes the
+ * backdrop root for its descendants, so the hosts of nested menus (the
+ * settings menu, the search capsule) paint their blur on a pseudo-element
+ * instead; the nested menu then blurs the page itself. */
+.settings-menu,
+.settings-submenu,
+.engine-menu,
+.context-menu,
+.page-context-menu {
+  background: var(--glass-glow), var(--glass-tint-menu);
+  -webkit-backdrop-filter: var(--glass-menu-filter);
+  backdrop-filter: var(--glass-menu-filter);
+}
+
+/* Specular rim: a 1px gradient ring, bright where light hits the edge */
+.settings-menu::before,
+.settings-submenu::before,
+.engine-menu::before,
+.context-menu::before,
+.page-context-menu::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--glass-specular);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.settings-menu,
+.search-box.glass,
+.lg-refraction .search-box.glass[data-refract] {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+.settings-menu {
+  isolation: isolate;
+}
+
+.settings-menu::after,
+.search-box.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  -webkit-backdrop-filter: var(--glass-menu-filter);
+  backdrop-filter: var(--glass-menu-filter);
+  pointer-events: none;
+}
+
+.search-box.glass::after {
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+}
+
+.lg-refraction .search-box.glass[data-refract]::after {
+  -webkit-backdrop-filter: var(--lg-refract);
+  backdrop-filter: var(--lg-refract);
+}
+
+.settings-menu,
+.settings-submenu,
+.engine-menu,
+.context-menu,
+.page-context-menu {
+  /* concentric: row radius (14) = menu radius (20) - padding (6) */
+  padding: 6px;
+  border-radius: 20px;
+  box-shadow:
+    0 0 0 0.5px var(--glass-edge),
+    0 12px 32px rgba(0, 0, 0, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.06);
+  color: var(--label-1);
+  font: var(--text-body);
+  text-align: left;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-spring),
+    visibility 0s linear 0s;
+}
+
+.settings-menu {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  width: 220px;
+  z-index: 100;
+  transform-origin: top right;
+}
+
+.settings-submenu {
+  position: absolute;
+  top: calc(-1 * var(--space-1));
+  right: calc(100% + var(--space-2));
+  width: 188px;
+  z-index: 101;
+  transform-origin: top right;
+}
+
+.engine-menu {
+  position: absolute;
+  top: calc(100% + var(--space-3));
+  left: 0;
+  z-index: 100;
+  width: max-content;
+  min-width: 200px;
+  transform-origin: top left;
+}
+
+/* Every right-click menu (site, folder, page, widget) shares one width */
+.context-menu,
+.page-context-menu {
+  width: 188px;
+}
+
+.context-menu {
+  position: fixed;
+  z-index: 2000;
+  transform-origin: top left;
+}
+
+.page-context-menu {
+  position: fixed;
+  z-index: 10000;
+  transform-origin: top left;
+}
+
+.settings-menu.hidden,
+.settings-submenu.hidden,
+.context-menu.hidden,
+.page-context-menu.hidden {
+  display: block !important;
+}
+
+.engine-menu.hidden {
+  display: block !important;
+}
+
+.settings-menu.hidden,
+.settings-submenu.hidden,
+.engine-menu.hidden,
+.context-menu.hidden,
+.page-context-menu.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.94);
+  transition:
+    opacity var(--dur-fast) var(--ease-standard),
+    transform var(--dur-base) var(--ease-spring),
+    visibility 0s linear var(--dur-base);
+}
+
+/* Menu rows (2px apart so hover pills never touch) */
+.settings-menu-item + .settings-menu-item,
+.settings-submenu div + div,
+.context-menu-item + .context-menu-item,
+.engine-option + .engine-option {
+  margin-top: 2px;
+}
+
+.settings-menu-item,
+.settings-submenu div,
+.context-menu-item,
+.engine-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--menu-row-h);
+  padding: 0 14px;
+  border-radius: 14px;
+  color: var(--label-1);
+  font: var(--text-body);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+
+.settings-menu-item:hover,
+.settings-submenu div:hover,
+.context-menu-item:hover,
+.engine-option:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.settings-menu-item:hover .user-info-menu,
+.settings-menu-item:hover .membership-badge {
+  color: inherit;
+}
+
+.settings-menu-divider,
+.context-menu-divider,
+.engine-menu-divider {
+  height: 0.5px;
+  margin: var(--space-1) var(--space-3);
+  background: var(--separator);
+}
+
+/* Current value in the Mode submenu (set inline by syncModeSubmenuUI) */
+#modeMenuItem::after {
+  content: "";
+  width: 6px;
+  height: 6px;
+  margin-left: auto;
+  border-right: 1.5px solid currentColor;
+  border-top: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.5;
+}
+
+.user-info-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.user-info-menu img {
+  flex: none;
+}
+
+/* Engine menu rows */
+.engine-option-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 38px;
+}
+
+.engine-option img {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.engine-option.active { font-weight: 600; }
+
+.engine-remove {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-right: calc(-1 * var(--space-1));
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 15px;
+  line-height: 1;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.engine-remove:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.engine-add {
+  padding: 0;
+}
+
+.engine-add-btn {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 14px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--accent);
+  font: var(--text-body);
+  text-align: left;
+}
+
+.engine-add-btn:hover {
+  background: var(--fill-3);
+}
+
+/* ---------- Top-right toolbar ---------- */
+.top-right-controls {
+  position: fixed;
+  top: var(--space-5);
+  right: var(--space-5);
+  z-index: 3000;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: var(--space-1);
+}
+
+.toolbar .icon-btn[aria-expanded="true"] {
+  background: var(--glass-press);
+}
+
+/* ---------- Content: tags + site grid ---------- */
+.content-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+}
+
+.sites-grid {
+  /* Wrapping flex rows: every row, the last one too, is centered. The
+     max-width caps a row at 8 icons (8 x 88 + 7 x 16 = 816px) and shrinks
+     with the window so the grid never reaches the pager dots. */
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5) var(--space-4);
+  justify-content: center;
+  width: 100%;
+  max-width: min(816px, calc(var(--vw-full) - 2 * var(--page-side-clear)));
+}
+
+@media (max-width: 640px) {
+  .sites-grid { gap: var(--space-4) var(--space-2); }
+  .sites-grid > .site-tile { flex-basis: 76px; width: 76px; }
+}
+
+/* App-icon tile: glass plate + favicon, name below in wallpaper ink */
+.sites-grid > .site-tile {
+  flex: 0 0 88px;
+  width: 88px;
+}
+
+.site-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-1) 0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-drag: element;
+}
+
+.site-tile.dragging {
+  opacity: 0.25;
+  transform: scale(0.9);
+  transition: opacity 0.15s, transform 0.2s;
+}
+
+/* Held over another icon: it swells to show a folder will be made */
+.site-tile.merge-target .site-tile-icon {
+  transform: scale(1.14);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent), var(--shadow-2, none);
+  transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.25, 1.2), box-shadow 0.2s;
+}
+
+/* Text icon: label on a solid color */
+.site-tile-icon.is-text-icon {
+  background: var(--icon-bg);
+  color: #fff;
+  font-family: var(--font-rounded);
+  font-weight: 700;
+  overflow: hidden;
+}
+.site-tile-icon.is-text-icon.is-light-bg { color: #1c1c1e; }
+.site-tile-text { font-size: 26px; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; }
+.site-tile-text[data-len="2"] { font-size: 21px; }
+.site-tile-text[data-len="3"] { font-size: 16px; }
+.site-tile-text[data-len="4"] { font-size: 13px; }
+.site-tile-icon.is-empty {
+  background: var(--fill-tertiary, rgba(120, 120, 128, 0.12));
+  border: 1px dashed var(--separator, rgba(120, 120, 128, 0.3));
+}
+.is-text-mini {
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+}
+
+/* Icon editor */
+.icon-mode-tabs { flex: 1; }
+.icon-custom {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+.icon-custom-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.icon-custom-row .section-label { min-width: 52px; margin: 0; }
+.icon-custom-row .modal-input { flex: 1; }
+.icon-custom .accent-swatches { flex-wrap: wrap; gap: 6px; }
+.icon-upload-btn { align-self: flex-start; }
+
+.site-tile-icon {
+  display: grid;
+  place-items: center;
+  width: var(--icon-tile);
+  height: var(--icon-tile);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-standard);
+}
+
+.site-tile:hover .site-tile-icon {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.site-tile:active .site-tile-icon {
+  transform: scale(0.94);
+}
+
+.site-tile-favicon {
+  position: relative;
+  z-index: 2;
+  width: var(--icon-glyph);
+  height: var(--icon-glyph);
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+/* Favicon with its own background: edge to edge, no glass rim */
+.site-tile-icon.is-full-bleed {
+  background: transparent;
+}
+.site-tile-icon.is-full-bleed::before { display: none; }
+.site-tile-icon.is-full-bleed .site-tile-favicon {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+/* Transparent favicon: the plate takes a soft tint of its main color */
+.site-tile-icon.is-tinted {
+  background: color-mix(in srgb, var(--icon-fill) 20%, #fff);
+}
+.site-tile-icon.is-tinted::before { display: none; }
+
+/* Letter fallback when no favicon could be loaded */
+.site-tile-letter {
+  display: none;
+}
+
+.site-tile-icon.is-letter {
+  background: linear-gradient(135deg, var(--letter-a, #7c6cf0), var(--letter-b, #4f8ef7));
+}
+
+.site-tile-icon.is-letter .site-tile-letter {
+  display: grid;
+  place-items: center;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  font: 600 26px/1 var(--font-rounded);
+  color: #fff;
+}
+
+.site-tile-name {
+  max-width: 100%;
+  overflow: hidden;
+  font: var(--text-subhead);
+  color: var(--on-wallpaper);
+  text-shadow: var(--on-wallpaper-shadow);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Folder: glass plate with a 3x3 grid of member icons, like iOS */
+.folder-tile-icon {
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  align-content: start;
+  gap: 4px;
+  padding: 6px;
+  place-items: stretch;
+}
+
+.folder-mini {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  aspect-ratio: 1;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--fill-1);
+}
+
+.folder-mini img {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+}
+
+.folder-mini.is-tinted { background: color-mix(in srgb, var(--icon-fill) 22%, #fff); }
+.folder-mini.is-full-bleed img { width: 100%; height: 100%; object-fit: cover; }
+
+.folder-mini.is-letter {
+  background: var(--fill-1);
+  font: 600 11px/1 var(--font-rounded);
+  color: var(--glass-label);
+}
+
+/* Add tile: clear glass with a plus */
+.add-tile-icon {
+  color: var(--glass-label);
+}
+
+.add-tile-icon .sym {
+  position: relative;
+  z-index: 2;
+  width: 24px;
+  height: 24px;
+}
+
+/* ---------- Folder window ---------- */
+/* No backdrop-filter on the overlay: it would become the backdrop root and the
+   glass sheet inside could only blur the dim layer, not the home page. */
+.folder-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 900; /* under #modalOverlay (1000) so edit/delete dialogs open on top */
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: color-mix(in srgb, var(--scrim) 70%, transparent);
+  animation: folder-fade var(--dur-base) var(--ease-standard);
+}
+
+.folder-sheet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: min(560px, 100%);
+  max-height: min(80vh, 640px);
+  padding: var(--space-6) var(--space-6) var(--space-5);
+  border-radius: var(--radius-2xl);
+  animation: folder-pop var(--dur-slow) var(--ease-spring);
+}
+
+@keyframes folder-fade {
+  from { opacity: 0; }
+}
+
+@keyframes folder-pop {
+  from { opacity: 0; transform: scale(0.88); }
+}
+
+.folder-name-input {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 320px);
+  height: var(--control-md);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font: var(--text-title2);
+  color: var(--label-1);
+  text-align: center;
+  transition: background-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);
+}
+
+.folder-name-input:hover {
+  background: var(--fill-3);
+}
+
+.folder-name-input:focus {
+  background: var(--fill-2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+.folder-grid {
+  position: relative;
+  z-index: 2;
+  max-width: 100%;
+  min-height: 92px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Inside the glass sheet: names use regular ink, plates use a fill instead of a
+   second glass layer. */
+.folder-grid .site-tile-name {
+  color: var(--label-1);
+  text-shadow: none;
+}
+
+.folder-grid .site-tile-icon:not(.is-letter):not(.has-custom-icon) {
+  background: var(--surface-raised);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: 0 0 0 0.5px var(--separator), 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.folder-grid .site-tile-icon::before {
+  display: none;
+}
+
+.folder-hint {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  font: var(--text-footnote);
+  color: var(--label-2);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .folder-overlay,
+  .folder-sheet {
+    animation: none;
+  }
+}
+
+/* ---------- Add item: Site / Folder tabs and the folder site picker ---------- */
+.add-type-tabs {
+  display: grid;
+  width: 100%;
+  margin-bottom: var(--space-5);
+}
+
+.folder-site-picker {
+  display: flex;
+  flex-direction: column;
+  max-height: 260px;
+  overflow-y: auto;
+  border-radius: var(--radius-md);
+  background: var(--fill-3);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+}
+
+.folder-picker-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  font: var(--text-body);
+  cursor: pointer;
+}
+
+.folder-picker-row + .folder-picker-row {
+  box-shadow: inset 0 0.5px 0 var(--separator);
+}
+
+.folder-picker-row:hover {
+  background: var(--fill-3);
+}
+
+.folder-picker-row .site-tile-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--surface-raised);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: 0 0 0 0.5px var(--separator);
+}
+
+.folder-picker-row .site-tile-icon::before {
+  display: none;
+}
+
+.folder-picker-row .site-tile-favicon {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.folder-picker-row .site-tile-icon.is-letter .site-tile-letter {
+  font-size: 13px;
+}
+
+.folder-picker-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.folder-picker-empty {
+  margin: 0;
+  padding: var(--space-4);
+  font: var(--text-callout);
+  color: var(--label-2);
+  text-align: center;
+}
+
+
+.to-workspace {
+  color: var(--glass-label);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-menu,
+.settings-submenu,
+.engine-menu,
+.context-menu,
+.page-context-menu,
+.site-tile-icon {
+    transition: none !important;
+  }
+}
+
+/* ---------- Custom icon picker (add / edit site dialog) ---------- */
+.site-icon-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.site-icon-preview .site-tile-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 13px;
+  /* inside a glass sheet: use a fill instead of a second glass layer */
+  background: var(--fill-2);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+}
+
+.site-icon-preview .site-tile-icon::before {
+  display: none;
+}
+
+.site-icon-preview .site-tile-favicon {
+  width: 30px;
+  height: 30px;
+}
+
+/* An uploaded icon fills the plate, like a real app icon */
+.site-tile-icon.has-custom-icon .site-tile-favicon {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+/* Toolbar avatar */
+.avatar-btn {
+  padding: 0;
+  overflow: hidden;
+}
+.avatar-btn .avatar-img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.avatar-btn .avatar-img.hidden,
+.avatar-btn .avatar-default.hidden { display: none; }
+
+/* Mode submenu: current option in the accent color */
+.settings-submenu div { font-weight: 400; color: var(--label-1); }
+.settings-submenu div.is-selected { color: var(--accent); font-weight: 600; }
+.settings-submenu div.is-selected:hover { color: var(--accent-contrast); }

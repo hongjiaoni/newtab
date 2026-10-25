@@ -1,0 +1,291 @@
+/* =====================================================================
+ * NewTab Liquid Glass — 材质与基础组件
+ * 依赖 tokens.css。所有组件只使用 token 变量。
+ * ===================================================================== */
+
+/* ---------- Glass material ----------
+ * 结构：tint 底色 + 背景模糊/饱和 + 顶部高光边(::before) + 外轮廓与投影。
+ * 可选折射：html.lg-refraction 时，glass.js 为带 [data-refract] 的元素生成位移滤镜。 */
+.glass {
+  position: relative;
+  isolation: isolate;
+  background: var(--glass-tint);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--glass-blur)) saturate(var(--glass-saturate));
+  border-radius: var(--radius-xl);
+  box-shadow:
+    0 0 0 0.5px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-rim),
+    inset 0 -1px 0 0 var(--glass-rim-low),
+    var(--glass-shadow);
+  color: var(--glass-label);
+}
+
+/* 高光：沿边缘的渐变描边，模拟光线在玻璃边缘的反射 */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(160deg, var(--glass-rim) 0%, transparent 32%, transparent 68%, var(--glass-rim-low) 100%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 折射：模糊、饱和与边缘位移都在 glass.js 生成的 SVG 滤镜里完成（--glass-refract-blur 控制模糊） */
+.lg-refraction .glass[data-refract] {
+  -webkit-backdrop-filter: var(--lg-refract);
+  backdrop-filter: var(--lg-refract);
+}
+
+.glass--clear { background: var(--glass-tint-clear); }
+.glass--thick { background: var(--glass-tint-thick); }
+.glass--capsule { border-radius: var(--radius-capsule); }
+.glass--lifted { box-shadow: 0 0 0 0.5px var(--glass-edge), inset 0 1px 0 0 var(--glass-rim), inset 0 -1px 0 0 var(--glass-rim-low), var(--glass-shadow-lifted); }
+
+/* 交互玻璃：悬停时提亮，按下时轻微缩小（弹簧回弹） */
+.glass--interactive {
+  cursor: pointer;
+  transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-standard);
+}
+.glass--interactive:hover { background-color: color-mix(in srgb, var(--glass-tint), var(--glass-hover)); }
+.glass--interactive:active { transform: scale(0.96); }
+
+/* ---------- Buttons ---------- */
+.btn {
+  box-shadow: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: var(--control-md);
+  padding: 0 var(--space-4);
+  border: 0;
+  border-radius: var(--radius-capsule);
+  font: var(--text-headline);
+  color: var(--label-1);
+  background: var(--fill-2);
+  cursor: pointer;
+  transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-standard);
+}
+.btn:hover { background: var(--fill-1); }
+.btn:active { transform: scale(0.96); }
+.btn:focus-visible, .icon-btn:focus-visible, .seg button:focus-visible, .switch input:focus-visible + span {
+  outline: 3px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset: 2px;
+}
+.btn--primary { background: var(--accent); color: var(--accent-contrast); }
+.btn--primary:hover { background: color-mix(in srgb, var(--accent), #000 8%); }
+.btn--plain { background: transparent; color: var(--accent); padding: 0 var(--space-2); }
+.btn--plain:hover { background: var(--fill-3); }
+.btn--sm { height: var(--control-sm); padding: 0 var(--space-3); font: var(--text-subhead); }
+
+/* 圆形图标按钮（工具栏里的 SF Symbol 风格图标） */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: var(--control-md);
+  height: var(--control-md);
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+  border-radius: var(--radius-capsule);
+  background: transparent;
+  color: var(--glass-label);
+  cursor: pointer;
+  transition: transform var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-standard);
+}
+.icon-btn:hover { background: var(--glass-hover); }
+.icon-btn:active { transform: scale(0.9); background: var(--glass-press); }
+.icon-btn svg, .sym { width: 18px; height: 18px; stroke: currentColor; stroke-width: 1.75; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ---------- Segmented control ---------- */
+.seg {
+  position: relative;
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  padding: 2px;
+  border-radius: var(--radius-capsule);
+  background: var(--fill-2);
+}
+.seg button {
+  position: relative;
+  z-index: 1;
+  height: var(--control-sm);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: transparent;
+  font: var(--text-subhead);
+  color: var(--label-1);
+  cursor: pointer;
+  transition: background-color var(--dur-fast) var(--ease-standard), box-shadow var(--dur-fast) var(--ease-standard);
+}
+.seg button[aria-pressed="true"] {
+  background: var(--glass-tint-thick);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14), 0 0 0 0.5px var(--glass-edge);
+}
+
+/* ---------- Switch ---------- */
+.switch { position: relative; display: inline-block; width: 42px; height: 26px; flex: none; }
+.switch input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.switch span {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-capsule);
+  background: var(--fill-1);
+  transition: background-color var(--dur-base) var(--ease-standard);
+  pointer-events: none;
+}
+.switch span::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(16px); }
+
+/* ---------- Text field ---------- */
+.field {
+  width: 100%;
+  height: var(--control-md);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--fill-3);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+  font: var(--text-body);
+  color: var(--label-1);
+  outline: none;
+  transition: box-shadow var(--dur-fast) var(--ease-standard);
+}
+.field::placeholder { color: var(--label-3); }
+.field:focus { box-shadow: inset 0 0 0 0.5px var(--separator), 0 0 0 3px color-mix(in srgb, var(--accent) 40%, transparent); }
+
+/* ---------- Menu (popover) ---------- */
+.menu {
+  min-width: 240px;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+}
+.menu-section + .menu-section { margin-top: var(--space-2); padding-top: var(--space-2); border-top: 0.5px solid var(--separator); }
+.menu-label { padding: var(--space-1) var(--space-3); font: var(--text-caption); color: var(--label-2); text-transform: uppercase; letter-spacing: 0.02em; }
+.menu-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 34px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-xs);
+  font: var(--text-body);
+  color: var(--label-1);
+}
+.menu-row--action { cursor: pointer; }
+.menu-row--action:hover { background: var(--accent); color: var(--accent-contrast); }
+.menu-row .spacer { flex: 1; }
+
+/* ---------- Popover / sheet transitions ---------- */
+.pop {
+  transform-origin: var(--pop-origin, top right);
+  transition: opacity var(--dur-fast) var(--ease-standard), transform var(--dur-base) var(--ease-spring), visibility 0s linear var(--dur-base);
+}
+.pop[hidden] { display: block; visibility: hidden; opacity: 0; transform: scale(0.92); pointer-events: none; }
+.pop:not([hidden]) { transition-delay: 0s; }
+
+/* ---------- App icon tile (home grid) ---------- */
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 88px;
+  padding: var(--space-1) 0;
+  border: 0;
+  background: none;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-user-drag: element;
+}
+.tile-icon {
+  display: grid;
+  place-items: center;
+  width: var(--icon-tile);
+  height: var(--icon-tile);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+.tile-icon img { width: var(--icon-glyph); height: var(--icon-glyph); border-radius: 8px; object-fit: contain; }
+.tile-icon .letter { font: 600 26px/1 var(--font-rounded); color: var(--glass-label); }
+.tile:hover .tile-icon { transform: translateY(-2px) scale(1.04); }
+.tile:active .tile-icon { transform: scale(0.94); }
+.tile-name {
+  max-width: 100%;
+  overflow: hidden;
+  font: var(--text-subhead);
+  color: var(--on-wallpaper);
+  text-shadow: var(--on-wallpaper-shadow);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+/* 文件夹：玻璃底 + 3x3 迷你图标，与 iOS 文件夹一致 */
+.tile-icon--folder { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 10px; place-items: stretch; }
+.tile-icon--folder img { width: 100%; height: auto; aspect-ratio: 1; border-radius: 3px; }
+
+/* ---------- Widget (workspace) ---------- */
+.widget {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-xl);
+}
+.widget-head { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
+.widget-head .sym { width: 16px; height: 16px; }
+.widget-title { font: var(--text-headline); color: var(--label-1); }
+.widget-head .spacer { flex: 1; }
+.widget-body { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--label-4) transparent; }
+
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 40px;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  /* 同心圆角：widget 28 - padding 16 = 12 */
+  color: var(--label-1);
+  text-decoration: none;
+}
+.list-row:hover { background: var(--glass-hover); }
+.list-row img { width: 20px; height: 20px; border-radius: 5px; flex: none; }
+.list-row .main { flex: 1; min-width: 0; }
+.list-row .t { font: var(--text-callout); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-row .s { font: var(--text-footnote); color: var(--label-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list-row .meta { font: var(--text-footnote); color: var(--label-3); flex: none; font-variant-numeric: tabular-nums; }
+
+/* ---------- Page indicator ---------- */
+.pager-dots { display: flex; flex-direction: column; gap: var(--space-2); padding: var(--space-2); }
+.pager-dots button {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: var(--label-3);
+  cursor: pointer;
+  transition: height var(--dur-base) var(--ease-spring), background-color var(--dur-fast) var(--ease-standard);
+}
+.pager-dots button[aria-current="true"] { height: 22px; background: var(--label-1); }

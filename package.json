@@ -7,7 +7,10 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build:extension": "node scripts/sync-extension.mjs build",
+    "check:extension": "node scripts/sync-extension.mjs check",
+    "pack:extension": "node scripts/sync-extension.mjs pack"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0",
