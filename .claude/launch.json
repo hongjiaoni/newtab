@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["start"],
       "port": 3000
+    },
+    {
+      "name": "design-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "const e=require('express');e().use(e.static('design-system')).listen(4100)"],
+      "port": 4100
     }
   ]
 }
