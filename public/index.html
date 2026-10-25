@@ -7,12 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="referrer" content="no-referrer-when-downgrade" />
 
-  <script src="appearance.js?v=20261025-glass"></script>
-  <link rel="stylesheet" href="tokens.css?v=20261025-glass" />
-  <link rel="stylesheet" href="glass.css?v=20261025-glass" />
-  <link rel="stylesheet" href="style.css?v=20261025-glass" />
-  <link rel="stylesheet" href="wallpaper-modal.css?v=20261025-glass" />
-  <link rel="stylesheet" href="home.css?v=20261025-glass" />
+  <script src="appearance.js?v=20261025-p5c"></script>
+  <link rel="stylesheet" href="tokens.css?v=20261025-p5c" />
+  <link rel="stylesheet" href="glass.css?v=20261025-p5c" />
+  <link rel="stylesheet" href="style.css?v=20261025-p5c" />
+  <link rel="stylesheet" href="wallpaper-modal.css?v=20261025-p5c" />
+  <link rel="stylesheet" href="home.css?v=20261025-p5c" />
+  <link rel="stylesheet" href="workspace.css?v=20261025-p5c" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20260131">
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20260131">
   <link rel="shortcut icon" href="/favicon.png?v=20260131">
@@ -110,16 +111,9 @@
     </section>
 
     <section id="pageWorkspace" class="page page-workspace" data-page="workspace" data-hash="workspace" aria-labelledby="workbenchHeader">
-      <div class="workbench">
-        <div class="workbench-header" id="workbenchHeader"></div>
-        <div class="workbench-plugins">
-          <div class="workbench-section-title" id="pluginsSectionTitle">工作台</div>
-          <div class="plugin-cards" id="pluginCards"></div>
-        </div>
-        <div class="workbench-agent">
-          <div class="workbench-section-title" id="agentSectionTitle">个人 Agent</div>
-          <div class="agent-panel" id="agentPanel"></div>
-        </div>
+      <div class="workspace">
+        <header class="ws-head" id="workbenchHeader"></header>
+        <div class="bento" id="wsGrid"></div>
       </div>
     </section>
   </main>
@@ -448,16 +442,17 @@
     </div>
   </div>
 
-  <script src="config.js?v=20261025-glass"></script>
+  <script src="config.js?v=20261025-p5c"></script>
   <script src="supabase-client.js"></script>
-  <script src="wallpaper.js?v=20261025-glass"></script>
+  <script src="wallpaper.js?v=20261025-p5c"></script>
   <script src="paddle.js"></script>
-  <script src="membership.js?v=20261025-glass"></script>
-  <script src="auth.js?v=20261025-glass"></script>
-  <script src="data-sync.js?v=20261025-glass"></script>
-  <script src="glass.js?v=20261025-glass"></script>
-  <script src="pager.js?v=20261025-glass"></script>
-  <script src="/script.js?v=20261025-glass"></script>
+  <script src="membership.js?v=20261025-p5c"></script>
+  <script src="auth.js?v=20261025-p5c"></script>
+  <script src="data-sync.js?v=20261025-p5c"></script>
+  <script src="glass.js?v=20261025-p5c"></script>
+  <script src="pager.js?v=20261025-p5c"></script>
+  <script src="/script.js?v=20261025-p5c"></script>
+  <script src="workspace.js?v=20261025-p5c"></script>
 </body>
 
 </html>

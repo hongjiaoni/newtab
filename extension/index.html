@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="wallpaper-modal.css" />
   <link rel="stylesheet" href="home.css" />
+  <link rel="stylesheet" href="workspace.css" />
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
   <link rel="shortcut icon" href="favicon.png">
@@ -108,16 +109,9 @@
     </section>
 
     <section id="pageWorkspace" class="page page-workspace" data-page="workspace" data-hash="workspace" aria-labelledby="workbenchHeader">
-      <div class="workbench">
-        <div class="workbench-header" id="workbenchHeader"></div>
-        <div class="workbench-plugins">
-          <div class="workbench-section-title" id="pluginsSectionTitle">工作台</div>
-          <div class="plugin-cards" id="pluginCards"></div>
-        </div>
-        <div class="workbench-agent">
-          <div class="workbench-section-title" id="agentSectionTitle">个人 Agent</div>
-          <div class="agent-panel" id="agentPanel"></div>
-        </div>
+      <div class="workspace">
+        <header class="ws-head" id="workbenchHeader"></header>
+        <div class="bento" id="wsGrid"></div>
       </div>
     </section>
   </main>
@@ -459,6 +453,7 @@
   <script src="glass.js"></script>
   <script src="pager.js"></script>
   <script src="script.js"></script>
+  <script src="workspace.js"></script>
 <script src="adapter/click-handler.js"></script>
 </body>
 

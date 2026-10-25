@@ -30,6 +30,8 @@ export const COPY_FILES = [
   'glass.css',
   'glass.js',
   'home.css',
+  'workspace.css',
+  'workspace.js',
   'script.js',
   'style.css',
   'wallpaper-modal.css',

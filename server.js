@@ -300,6 +300,9 @@ app.delete('/api/admin/categories/:id', async (req, res) => {
 });
 
 // Public Categories API
+// RSS proxy for the workspace RSS widget (same handler Vercel serves from api/)
+app.get('/api/rss-proxy', require('./api/rss-proxy'));
+
 app.get('/api/categories', async (req, res) => {
   try {
     const categories = db.all('SELECT * FROM wallpaper_categories ORDER BY created_at DESC');

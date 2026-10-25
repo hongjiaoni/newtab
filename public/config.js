@@ -157,6 +157,11 @@ window.AGENT_API_URL = IS_EXTENSION
   ? 'https://newtab.online/api/agent-chat'
   : (window.location.origin + '/api/agent-chat');
 
+// RSS fetch proxy (CORS + SSRF checks server side); same split as the agent API
+window.RSS_API_URL = IS_EXTENSION
+  ? 'https://newtab.online/api/rss-proxy'
+  : (window.location.origin + '/api/rss-proxy');
+
 // Feature Flags
 const FEATURES = {
   enableAutoLogin: true,

@@ -11,6 +11,9 @@
     "identity",
     "favicon"
   ],
+  "optional_permissions": [
+    "history"
+  ],
   "host_permissions": [
     "https://*.supabase.co/*",
     "https://newtab.online/*",

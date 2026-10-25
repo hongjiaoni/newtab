@@ -9,6 +9,7 @@ NewTab 的视觉和交互规范，参照 Apple Human Interface Guidelines 与 20
 | `public/glass.css` | 玻璃材质和基础组件：按钮、图标按钮、分段控件、开关、输入框、菜单、图标块、组件卡片、页面指示点 |
 | `public/glass.js` | 折射效果（渐进增强）：仅 Chromium 内核启用，其他浏览器保持普通毛玻璃 |
 | `public/home.css` | 首页：默认壁纸、时钟、玻璃搜索框、App 图标、文件夹、右上角工具栏、玻璃菜单 |
+| `public/workspace.css` / `workspace.js` | 工作站：12 列卡片网格与六个组件（Agent、日历、便签、待办、最近浏览、订阅），编辑模式 |
 | `public/appearance.js` | 外观切换（浅色/深色/自动），在 `<head>` 中加载以避免闪烁 |
 | `design-system/preview.html` | 视觉样张：首页 + 工作站 + 设置菜单 + 添加网站弹窗 |
 
