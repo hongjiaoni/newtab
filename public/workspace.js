@@ -19,7 +19,8 @@ const WS_STRINGS = {
     agentPrompt: '角色设定（系统提示词）', agentPromptPlaceholder: '例如：你是一名中文写作助手，回答简洁，必要时给出修改建议。',
     agentModelLabel: '模型', agentSave: '保存', agentDeleteAgent: '删除 Agent', agentDeleteConfirm: '删除这个 Agent 及其全部对话？',
     agentDefaultName: '通用助手', agentMessagePlaceholder: '给 {name} 发消息', agentEmpty: '开始和 {name} 对话吧',
-    agentChats: '对话', cancel: '取消', weekStart: '0'
+    agentChats: '对话', cancel: '取消', weekStart: '0',
+    storageFull: '本地存储空间不足，已压缩较早聊天中的图片'
   },
   en: {
     widgetAgent: 'AI Agent', widgetHistory: 'Recently Visited', widgetRss: 'Feeds',
@@ -33,7 +34,8 @@ const WS_STRINGS = {
     agentPrompt: 'Role (system prompt)', agentPromptPlaceholder: 'e.g. You are a concise writing assistant who suggests edits when useful.',
     agentModelLabel: 'Model', agentSave: 'Save', agentDeleteAgent: 'Delete Agent', agentDeleteConfirm: 'Delete this agent and all its chats?',
     agentDefaultName: 'Assistant', agentMessagePlaceholder: 'Message {name}', agentEmpty: 'Start a conversation with {name}',
-    agentChats: 'Chats', cancel: 'Cancel', weekStart: '0'
+    agentChats: 'Chats', cancel: 'Cancel', weekStart: '0',
+    storageFull: 'Local storage is full; images in older chats were compacted'
   },
   fr: {
     widgetAgent: 'Agent IA', widgetHistory: 'Visités récemment', widgetRss: 'Flux',
@@ -47,7 +49,8 @@ const WS_STRINGS = {
     agentPrompt: 'Rôle (prompt système)', agentPromptPlaceholder: 'Ex. : Tu es un assistant de rédaction concis qui propose des corrections utiles.',
     agentModelLabel: 'Modèle', agentSave: 'Enregistrer', agentDeleteAgent: 'Supprimer l\'agent', agentDeleteConfirm: 'Supprimer cet agent et toutes ses conversations ?',
     agentDefaultName: 'Assistant', agentMessagePlaceholder: 'Écrire à {name}', agentEmpty: 'Commencez une conversation avec {name}',
-    agentChats: 'Conversations', cancel: 'Annuler', weekStart: '1'
+    agentChats: 'Conversations', cancel: 'Annuler', weekStart: '1',
+    storageFull: 'Stockage local plein : les images des anciennes conversations ont été compactées'
   },
   es: {
     widgetAgent: 'Agente IA', widgetHistory: 'Visitados recientemente', widgetRss: 'Fuentes',
@@ -61,7 +64,8 @@ const WS_STRINGS = {
     agentPrompt: 'Rol (prompt del sistema)', agentPromptPlaceholder: 'P. ej.: Eres un asistente de redacción conciso que sugiere mejoras útiles.',
     agentModelLabel: 'Modelo', agentSave: 'Guardar', agentDeleteAgent: 'Eliminar agente', agentDeleteConfirm: '¿Eliminar este agente y todas sus conversaciones?',
     agentDefaultName: 'Asistente', agentMessagePlaceholder: 'Escribe a {name}', agentEmpty: 'Empieza una conversación con {name}',
-    agentChats: 'Conversaciones', cancel: 'Cancelar', weekStart: '1'
+    agentChats: 'Conversaciones', cancel: 'Cancelar', weekStart: '1',
+    storageFull: 'Almacenamiento local lleno: se compactaron las imágenes de conversaciones antiguas'
   },
   ja: {
     widgetAgent: 'AI エージェント', widgetHistory: '最近のアクセス', widgetRss: 'フィード',
@@ -75,7 +79,8 @@ const WS_STRINGS = {
     agentPrompt: '役割（システムプロンプト）', agentPromptPlaceholder: '例：簡潔に答え、必要に応じて修正案を出す文章アシスタントです。',
     agentModelLabel: 'モデル', agentSave: '保存', agentDeleteAgent: 'エージェントを削除', agentDeleteConfirm: 'このエージェントとすべての会話を削除しますか？',
     agentDefaultName: 'アシスタント', agentMessagePlaceholder: '{name} にメッセージ', agentEmpty: '{name} との会話を始めましょう',
-    agentChats: '会話', cancel: 'キャンセル', weekStart: '0'
+    agentChats: '会話', cancel: 'キャンセル', weekStart: '0',
+    storageFull: 'ローカル保存容量が不足したため、古い会話の画像を圧縮しました'
   },
   ko: {
     widgetAgent: 'AI 에이전트', widgetHistory: '최근 방문', widgetRss: '피드',
@@ -89,7 +94,8 @@ const WS_STRINGS = {
     agentPrompt: '역할 (시스템 프롬프트)', agentPromptPlaceholder: '예: 간결하게 답하고 필요할 때 수정안을 제시하는 글쓰기 도우미입니다.',
     agentModelLabel: '모델', agentSave: '저장', agentDeleteAgent: '에이전트 삭제', agentDeleteConfirm: '이 에이전트와 모든 대화를 삭제하시겠습니까?',
     agentDefaultName: '어시스턴트', agentMessagePlaceholder: '{name}에게 메시지', agentEmpty: '{name}와(과) 대화를 시작하세요',
-    agentChats: '대화', cancel: '취소', weekStart: '0'
+    agentChats: '대화', cancel: '취소', weekStart: '0',
+    storageFull: '로컬 저장 공간이 부족하여 이전 대화의 이미지를 정리했습니다'
   }
 };
 
@@ -278,10 +284,57 @@ function loadWorkbench() {
   }
 }
 
+// Chats (with pasted images) only live in localStorage, which is ~5 MB.
+// When a save hits the quota, compact step by step instead of losing data:
+// 1) drop images except in each chat's last 6 messages, 2) drop all images,
+// 3) keep only the 10 most recent chats per agent.
+function stripMessageImages(msg) {
+  if (Array.isArray(msg.content)) msg.content = messageTextContent(msg) + ' [image]';
+}
+
+function compactChats(level) {
+  workbench.agent.projects.forEach((p) => {
+    if (level === 1) p.chats.forEach((c) => c.messages.slice(0, -6).forEach(stripMessageImages));
+    if (level === 2) p.chats.forEach((c) => c.messages.forEach(stripMessageImages));
+    if (level === 3) {
+      p.chats = p.chats.slice().sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)).slice(0, 10);
+    }
+  });
+}
+
+function isQuotaError(err) {
+  return !!err && (err.name === 'QuotaExceededError' || err.code === 22 || err.code === 1014);
+}
+
+let storageFullNotified = false;
+
 function saveWorkbench() {
-  try {
-    localStorage.setItem(WORKBENCH_KEY, JSON.stringify(workbench));
-  } catch (_err) { /* quota */ }
+  for (let level = 0; level <= 3; level++) {
+    if (level) compactChats(level);
+    try {
+      localStorage.setItem(WORKBENCH_KEY, JSON.stringify(workbench));
+      if (level && !storageFullNotified) {
+        storageFullNotified = true;
+        window.showNotification?.(wsT('storageFull'), 'warning');
+      }
+      return true;
+    } catch (err) {
+      if (!isQuotaError(err)) return false;
+    }
+  }
+  return false;
+}
+
+// What syncs to the cloud: everything except chat messages (they can hold
+// large images and stay on this device) and per-device UI state.
+function workbenchSyncPayload() {
+  const { calView, calSel, todoFilter, ...rest } = workbench;
+  return {
+    ...rest,
+    agent: {
+      projects: workbench.agent.projects.map(({ chats, ...config }) => ({ ...config, chats: [] }))
+    }
+  };
 }
 
 // Save, re-render and sync. The Agent widget keeps its draft (see renderAgentPanel).
@@ -1623,16 +1676,33 @@ function compressImage(file, maxDim, quality) {
 }
 
 // ---------- Wiring ----------
+// Remote config wins, but chats stay local: they are matched back to agents
+// by id (older synced data may still carry chats; used only when this device
+// has none for that agent). A refresh that changes nothing doesn't re-render,
+// so a periodic sync never interrupts typing.
 window.applyRemoteWorkbench = function (remote) {
   if (!remote || typeof remote !== 'object') return;
   try {
-    workbench = normalizeWorkbench(remote);
+    const before = JSON.stringify(workbenchSyncPayload());
+    const localChats = new Map(workbench.agent.projects.map((p) => [p.id, p.chats]));
+    const next = normalizeWorkbench(remote);
+    next.agent.projects.forEach((p) => {
+      const local = localChats.get(p.id);
+      if (local && local.length) p.chats = local;
+    });
+    next.calView = workbench.calView;
+    next.calSel = workbench.calSel;
+    next.todoFilter = workbench.todoFilter;
+    next.agent.activeProjectId = workbench.agent.activeProjectId;
+    next.agent.activeChatId = workbench.agent.activeChatId;
+    workbench = next;
     window.workbench = workbench;
-    agentPendingImages = [];
     saveWorkbench();
-    renderWorkbench();
+    if (JSON.stringify(workbenchSyncPayload()) !== before) renderWorkbench();
   } catch (_err) { /* best effort */ }
 };
+
+window.getWorkbenchSyncPayload = workbenchSyncPayload;
 
 window.getWorkbench = function () {
   return workbench;

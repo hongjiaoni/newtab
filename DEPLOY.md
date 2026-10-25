@@ -111,6 +111,25 @@ npx serve public -l 3000
 
 - 同上执行 `supabase_folders_migration.sql`(已包含 `user_home_settings.open_behavior`、`workbench` 字段与更新后的 RPC)
 
+### 1.5 Liquid Glass 改版迁移（2026-10）
+
+在 `supabase_folders_migration.sql` 之后,于 SQL Editor 执行:
+
+- `supabase_glass_migration.sql`
+
+包含:
+
+- `user_sites.icon`(自定义网站图标:https 地址或 ≤60KB 的 `data:image`,带长度约束)
+- 更新后的 `sync_home_config` RPC:写入 `icon`;`color_mode` 存外观 `light` / `dark` / `auto`;`theme` 固定为 `glass`;不再写字体字段
+
+> 未执行时:自定义图标只保存在本机(刷新同步不会把它冲掉),外观仍可同步(客户端同时发送旧字段 `colorMode`)。
+> 工作站同步内容为组件布局、便签、待办、日程、订阅源和 Agent 配置;**聊天记录只保存在本机**,不上传。
+> 旧的 `user_theme_settings` / `user_font_settings` 表不再读写,确认没有旧版客户端后可自行清理。
+
+### 1.6 RSS 代理
+
+- `api/rss-proxy.js` 随 Vercel 自动部署,无需环境变量;插件端请求 `https://newtab.online/api/rss-proxy`(已在 `host_permissions` 内)
+
 ### 8. 个人 Agent 配置
 
 - 聊天请求通过 Vercel Serverless 函数 `api/agent-chat.js` 转发到模型提供商

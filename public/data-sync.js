@@ -262,7 +262,8 @@ function buildHomeConfigFromLegacy(legacy) {
         showOnHome: row.show_on_home !== false,
         tags: siteTagMap.get(row.id) || [],
         type: row.type === 'folder' ? 'folder' : 'link',
-        children: row.type === 'folder' ? (Array.isArray(row.children) ? row.children : []) : undefined
+        children: row.type === 'folder' ? (Array.isArray(row.children) ? row.children : []) : undefined,
+        customIcon: row.icon || undefined
     }));
 
     const orderedSiteIds = (legacy.siteOrderRows || [])
@@ -335,7 +336,17 @@ async function fetchLegacyConfigs(uid) {
     };
 }
 
+// True once a read shows user_sites has no `icon` column yet
+// (supabase_glass_migration.sql not applied). Custom icons then stay local.
+let siteIconColumnMissing = false;
+
 async function readSitesRows(db, uid) {
+    const withIcon = await readMaybe(db.from('user_sites').select('id,name,url,show_on_home,type,children,icon').eq('user_id', uid));
+    if (withIcon && Array.isArray(withIcon.data)) {
+        siteIconColumnMissing = false;
+        return withIcon.data;
+    }
+    siteIconColumnMissing = true;
     const full = await readMaybe(db.from('user_sites').select('id,name,url,show_on_home,type,children').eq('user_id', uid));
     if (full && Array.isArray(full.data)) {
         return full.data;
@@ -453,9 +464,20 @@ async function saveLegacyHomeConfigFallback(uid, payload, syncedAt) {
             show_on_home: site.showOnHome !== false,
             type: site.type === 'folder' ? 'folder' : 'link',
             children: site.type === 'folder' ? (Array.isArray(site.children) ? site.children : []) : [],
+            icon: site.customIcon || null,
             updated_at: syncedAt
         }));
-        const ok = await writeOptionalTable('sites insert', () => db.from('user_sites').insert(rowsFull));
+        let ok;
+        try {
+            ok = await writeOptionalTable('sites insert', () => db.from('user_sites').insert(rowsFull));
+        } catch (err) {
+            // `icon` column missing (migration not applied): retry without it.
+            if (!/icon/i.test(compactSupabaseError(err))) throw err;
+            siteIconColumnMissing = true;
+            ok = await writeOptionalTable('sites insert (no icon)', () => (
+                db.from('user_sites').insert(rowsFull.map(({ icon, ...row }) => row))
+            ));
+        }
         if (!ok) {
             // Migration not applied: retry without type/children columns
             const rowsLegacy = rowsFull.map((r) => ({
@@ -582,7 +604,8 @@ function buildCurrentHomePayload() {
             tags: Array.isArray(s.tags) ? s.tags : [],
             showOnHome: !!s.showOnHome,
             type: s.type === 'folder' ? 'folder' : 'link',
-            children: s.type === 'folder' ? (Array.isArray(s.children) ? s.children : []) : undefined
+            children: s.type === 'folder' ? (Array.isArray(s.children) ? s.children : []) : undefined,
+            customIcon: s.customIcon || undefined
         })),
         tags: state.tags || [],
         tag_order: state.tagOrder || [],
@@ -597,10 +620,14 @@ function buildCurrentHomePayload() {
             locale: (typeof i18n !== 'undefined' && i18n.currentLocale) ? i18n.currentLocale : (localStorage.getItem('locale') || 'zh'),
             wallpaper: window.wallpaperState?.selectedWallpaper || null,
             appearance: normalizeAppearanceValue(window.getAppearance?.()),
+            // Same value under the old key: the sync_home_config RPC deployed
+            // before supabase_glass_migration.sql reads settings.colorMode.
+            colorMode: normalizeAppearanceValue(window.getAppearance?.()),
             zoomLevel: state.zoomLevel || '100',
             openBehavior: state.openBehavior || 'newtab'
         },
-        workbench: (typeof window.workbench !== 'undefined' && window.workbench) ? window.workbench : undefined
+        // Chat messages stay on this device (see workbenchSyncPayload in workspace.js)
+        workbench: window.getWorkbenchSyncPayload ? window.getWorkbenchSyncPayload() : (window.workbench || undefined)
     };
 }
 
@@ -621,7 +648,17 @@ async function persistHomeConfig(uid, payload, syncedAt) {
 function applyHomeConfig(config) {
     if (!config || typeof config !== 'object') return;
 
-    if (Array.isArray(config.sites)) state.sites = config.sites;
+    if (Array.isArray(config.sites)) {
+        // Without the icon column the server can't return custom icons; keep
+        // the ones this device has instead of wiping them on every refresh.
+        if (siteIconColumnMissing && Array.isArray(state.sites)) {
+            const localIcons = new Map(state.sites.filter((x) => x && x.customIcon).map((x) => [x.id, x.customIcon]));
+            config.sites.forEach((site) => {
+                if (site && !site.customIcon && localIcons.has(site.id)) site.customIcon = localIcons.get(site.id);
+            });
+        }
+        state.sites = config.sites;
+    }
     if (Array.isArray(config.tags)) state.tags = config.tags;
     if (Array.isArray(config.site_order)) state.siteOrder = config.site_order;
     if (Array.isArray(config.tag_order)) state.tagOrder = config.tag_order;

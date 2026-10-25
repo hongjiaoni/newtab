@@ -263,6 +263,16 @@
         </div>
 
         <div class="modal-section">
+          <label class="section-label" id="siteIconLabel">图标</label>
+          <div class="site-icon-picker">
+            <div class="site-icon-preview" id="siteIconPreview"></div>
+            <button type="button" class="btn btn--sm" id="siteIconUpload">上传图片</button>
+            <button type="button" class="btn btn--sm btn--plain hidden" id="siteIconAuto">自动获取</button>
+            <input type="file" id="siteIconFile" accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml" class="hidden" />
+          </div>
+        </div>
+
+        <div class="modal-section">
           <label class="section-label" id="selectTagsLabel">Select Tags</label>
           <div class="tags-select" id="tagSelector">
             <!-- Checkboxes for tags -->

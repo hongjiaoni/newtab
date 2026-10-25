@@ -651,3 +651,38 @@ body[data-wallpaper-tone="light"] {
     transition: none !important;
   }
 }
+
+/* ---------- Custom icon picker (add / edit site dialog) ---------- */
+.site-icon-picker {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.site-icon-preview .site-tile-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 13px;
+  /* inside a glass sheet: use a fill instead of a second glass layer */
+  background: var(--fill-2);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+}
+
+.site-icon-preview .site-tile-icon::before {
+  display: none;
+}
+
+.site-icon-preview .site-tile-favicon {
+  width: 30px;
+  height: 30px;
+}
+
+/* An uploaded icon fills the plate, like a real app icon */
+.site-tile-icon.has-custom-icon .site-tile-favicon {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+}

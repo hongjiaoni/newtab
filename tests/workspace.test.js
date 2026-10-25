@@ -103,4 +103,51 @@ describe('workspace.js', () => {
     expect(withRole.map((m) => m.role)).toEqual(['system', 'user', 'assistant']);
     expect(window.apiMessages(chat, { systemPrompt: '' }).map((m) => m.role)).toEqual(['user', 'assistant']);
   });
+
+  it('syncs config but not chat messages or per-device UI state', () => {
+    window.applyRemoteWorkbench({
+      notes: [{ id: 'n', text: 'hi' }],
+      calSel: '2026-01-01',
+      agent: { projects: [{ id: 'a1', name: 'Writer', systemPrompt: 'Be brief', chats: [{ id: 'c', title: 't', messages: [{ role: 'user', content: 'secret' }] }] }] }
+    });
+    const payload = window.getWorkbenchSyncPayload();
+    expect(payload.notes).toHaveLength(1);
+    expect(payload.calSel).toBeUndefined();
+    expect(payload.agent.projects[0]).toMatchObject({ id: 'a1', name: 'Writer', systemPrompt: 'Be brief', chats: [] });
+    expect(JSON.stringify(payload)).not.toContain('secret');
+  });
+
+  it('keeps local chats when remote config arrives, matched by agent id', () => {
+    window.applyRemoteWorkbench({ agent: { projects: [{ id: 'a1', name: 'Writer', chats: [] }] } });
+    const local = window.getWorkbench().agent.projects[0];
+    local.chats = [{ id: 'local-chat', title: 'mine', messages: [{ role: 'user', content: 'keep me' }] }];
+    window.applyRemoteWorkbench({ agent: { projects: [{ id: 'a1', name: 'Writer v2', chats: [] }, { id: 'a2', name: 'New', chats: [] }] } });
+    const [a1, a2] = window.getWorkbench().agent.projects;
+    expect(a1.name).toBe('Writer v2');
+    expect(a1.chats[0].id).toBe('local-chat');
+    expect(a2.chats).toHaveLength(1); // fresh empty chat
+    expect(a2.chats[0].messages).toEqual([]);
+  });
+
+  it('compacts chat images instead of failing when storage is full', () => {
+    const wb = window.getWorkbench();
+    const img = { type: 'image_url', image_url: { url: 'data:image/jpeg;base64,' + 'x'.repeat(10) } };
+    wb.agent.projects[0].chats = [{ id: 'c', title: 't', updatedAt: 1, messages: Array.from({ length: 8 }, (_, i) => ({ role: 'user', content: [{ type: 'text', text: 'm' + i }, img] })) }];
+    const realSet = Storage.prototype.setItem;
+    let calls = 0;
+    Storage.prototype.setItem = function (k, v) {
+      calls++;
+      if (calls === 1) throw Object.assign(new Error('full'), { name: 'QuotaExceededError' });
+      return realSet.call(this, k, v);
+    };
+    try {
+      expect(window.saveWorkbench()).toBe(true);
+    } finally {
+      Storage.prototype.setItem = realSet;
+    }
+    const msgs = wb.agent.projects[0].chats[0].messages;
+    expect(typeof msgs[0].content).toBe('string');      // older: image stripped
+    expect(msgs[0].content).toContain('m0');
+    expect(Array.isArray(msgs[7].content)).toBe(true);   // recent: image kept
+  });
 });

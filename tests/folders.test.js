@@ -41,6 +41,7 @@ function extractFunction(src, name) {
 }
 
 const FUNCS = [
+  'isValidSiteIcon',
   'getFaviconSources',
   'getSiteFaviconUrl',
   'loadFavicon',
@@ -79,6 +80,7 @@ function makeContext(initialState) {
     },
     generateUuid: () => 'uuid-' + Math.random().toString(36).slice(2, 10),
     ZOOM_FACTORS: { '100': 0.9, '125': 1.125, '150': 1.35 },
+    SITE_ICON_MAX_CHARS: 60000,
     contentEl,
     document,
     window,
@@ -140,6 +142,26 @@ describe('site tiles rendering', () => {
     const minis = folderTile.querySelectorAll('.folder-tile-icon .folder-mini');
     expect(minis.length).toBe(1);
     expect(minis[0].querySelector('img').src).toContain('google.com');
+  });
+
+  it('uses a valid custom icon first and ignores unsafe ones', () => {
+    const png = 'data:image/png;base64,iVBORw0KGgo=';
+    ctx.state.sites[0].customIcon = png;
+    ctx.state.sites[1].customIcon = 'javascript:alert(1)';
+    ctx.renderHome();
+    const tiles = ctx.contentEl.querySelectorAll('.site-tile.link-tile');
+    expect(tiles[0].querySelector('img').src).toBe(png);
+    expect(tiles[0].querySelector('.site-tile-icon').classList.contains('has-custom-icon')).toBe(true);
+    expect(tiles[1].querySelector('img').src).toContain('baidu.com');
+    // the folder (child 'a') shows the custom icon too
+    expect(ctx.contentEl.querySelector('.folder-mini img').src).toBe(png);
+  });
+
+  it('rejects oversized or non-image icons', () => {
+    expect(ctx.isValidSiteIcon('https://example.com/icon.png')).toBe(true);
+    expect(ctx.isValidSiteIcon('http://example.com/icon.png')).toBe(false);
+    expect(ctx.isValidSiteIcon('data:text/html;base64,PGgxPg==')).toBe(false);
+    expect(ctx.isValidSiteIcon('data:image/png;base64,' + 'A'.repeat(60000))).toBe(false);
   });
 
   it('falls back through favicon sources, then to the letter tile', () => {

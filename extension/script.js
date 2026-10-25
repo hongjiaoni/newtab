@@ -30,6 +30,7 @@ const translations = {
     tagName: '标签名称',
     selectTags: '选择标签',
     pinToHome: '固定在首页',
+    iconLabel: '图标', iconUpload: '上传图片', iconAuto: '自动获取', iconInvalid: '无法读取这张图片',
     cancel: '取消',
     save: '保存',
     close: '关闭',
@@ -205,6 +206,7 @@ const translations = {
     tagName: 'Tag Name',
     selectTags: 'Select Tags',
     pinToHome: 'Pin to Home',
+    iconLabel: 'Icon', iconUpload: 'Upload Image', iconAuto: 'Automatic', iconInvalid: 'Could not read this image',
     cancel: 'Cancel',
     save: 'Save',
     close: 'Close',
@@ -294,6 +296,7 @@ const translations = {
     tagName: "Nom de l'étiquette",
     selectTags: 'Sélectionner les étiquettes',
     pinToHome: "Épingler à l'accueil",
+    iconLabel: 'Icône', iconUpload: 'Importer une image', iconAuto: 'Automatique', iconInvalid: 'Impossible de lire cette image',
     cancel: 'Annuler',
     save: 'Enregistrer',
     close: 'Fermer',
@@ -509,6 +512,7 @@ const translations = {
     tagName: 'Nombre de etiqueta',
     selectTags: 'Seleccionar etiquetas',
     pinToHome: 'Fijar en inicio',
+    iconLabel: 'Icono', iconUpload: 'Subir imagen', iconAuto: 'Automático', iconInvalid: 'No se pudo leer esta imagen',
     cancel: 'Cancelar',
     save: 'Guardar',
     close: 'Cerrar',
@@ -724,6 +728,7 @@ const translations = {
     tagName: 'タグ名',
     selectTags: 'タグを選択',
     pinToHome: 'ホームに固定',
+    iconLabel: 'アイコン', iconUpload: '画像をアップロード', iconAuto: '自動取得', iconInvalid: 'この画像を読み込めませんでした',
     cancel: 'キャンセル',
     save: '保存',
     close: '閉じる',
@@ -939,6 +944,7 @@ const translations = {
     tagName: '태그 이름',
     selectTags: '태그 선택',
     pinToHome: '홈에 고정',
+    iconLabel: '아이콘', iconUpload: '이미지 업로드', iconAuto: '자동', iconInvalid: '이 이미지를 읽을 수 없습니다',
     cancel: '취소',
     save: '저장',
     close: '닫기',
@@ -1540,6 +1546,11 @@ window.updateAllText = function () {
   document.getElementById('tagName').placeholder = i18n.t('tagName');
 
   // Update checkbox label
+  const iconLabels = { siteIconLabel: 'iconLabel', siteIconUpload: 'iconUpload', siteIconAuto: 'iconAuto' };
+  Object.entries(iconLabels).forEach(([id, key]) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = i18n.t(key);
+  });
   const pinToHomeLabel = document.getElementById('pinToHomeLabel');
   if (pinToHomeLabel) pinToHomeLabel.textContent = i18n.t('pinToHome');
 
@@ -2403,17 +2414,16 @@ if (oldLinks && oldLinks.length > 0 && state.sites.length === 0) {
 // Initialize default sites if empty (first visit)
 if (state.sites.length === 0) {
   const defaultSites = [
-    { name: 'GitHub', url: 'https://github.com', icon: 'https://github.com/favicon.ico' },
-    { name: 'Google', url: 'https://google.com', icon: 'https://www.google.com/favicon.ico' },
-    { name: 'YouTube', url: 'https://youtube.com', icon: 'https://www.youtube.com/favicon.ico' },
-    { name: 'Twitter', url: 'https://twitter.com', icon: 'https://abs.twimg.com/favicons/twitter.2.ico' },
-    { name: 'Gmail', url: 'https://mail.google.com', icon: 'https://ssl.gstatic.com/mail/ static/images/icons/versions/mail_favicon_2.png' }
+    { name: 'GitHub', url: 'https://github.com' },
+    { name: 'Google', url: 'https://google.com' },
+    { name: 'YouTube', url: 'https://youtube.com' },
+    { name: 'Twitter', url: 'https://twitter.com' },
+    { name: 'Gmail', url: 'https://mail.google.com' }
   ];
   state.sites = defaultSites.map((s, i) => ({
     id: `default-${i}`,
     name: s.name,
     url: s.url,
-    icon: s.icon,
     tags: [],
     showOnHome: true
   }));
@@ -3007,6 +3017,7 @@ function renderContextMenu() {
     document.getElementById('siteName').value = item.name;
     document.getElementById('siteUrl').value = item.url;
     document.getElementById('showOnHome').checked = item.showOnHome;
+    pendingSiteIcon = undefined;
 
     // Render tag checkboxes (with current site selection)
     renderTagSelector(item.tags);
@@ -3022,6 +3033,7 @@ function renderContextMenu() {
 
   // Store the item being edited for save logic
   window.editingItem = { item, type };
+  if (type === 'site') renderSiteIconPreview();
 
   addModal.classList.remove('hidden');
   modalOverlay.classList.remove('hidden');
@@ -3131,6 +3143,55 @@ function getFaviconSources(url) {
   return sources;
 }
 
+// site.customIcon is either an https URL or a small data:image (see
+// supabase_glass_migration.sql, which enforces the same rule server side).
+const SITE_ICON_MAX_CHARS = 60000;
+
+function isValidSiteIcon(icon) {
+  return typeof icon === 'string'
+    && icon.length <= SITE_ICON_MAX_CHARS
+    && /^(https:\/\/|data:image\/(png|jpeg|webp|gif);base64,)/.test(icon);
+}
+
+// Resizes an uploaded image to a 128px square (contain) and returns a data URL
+// small enough to sync; tries PNG first, then WebP/JPEG at decreasing quality.
+function imageFileToIcon(file) {
+  return new Promise((resolve, reject) => {
+    if (!file || !/^image\//.test(file.type) || file.size > 5 * 1024 * 1024) {
+      reject(new Error('invalid image'));
+      return;
+    }
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      URL.revokeObjectURL(url);
+      const size = 128;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const scale = Math.min(size / img.width, size / img.height);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+      const candidates = [
+        canvas.toDataURL('image/png'),
+        canvas.toDataURL('image/webp', 0.9),
+        canvas.toDataURL('image/webp', 0.75),
+        canvas.toDataURL('image/jpeg', 0.8)
+      ];
+      const fit = candidates.find(isValidSiteIcon);
+      if (fit) resolve(fit);
+      else reject(new Error('image too large'));
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('invalid image'));
+    };
+    img.src = url;
+  });
+}
+
 function getSiteFaviconUrl(url) {
   return getFaviconSources(url)[0] || '';
 }
@@ -3175,6 +3236,10 @@ function createFaviconIcon(site) {
   icon.appendChild(letter);
 
   const sources = getFaviconSources(site.url);
+  if (isValidSiteIcon(site.customIcon)) {
+    sources.unshift(site.customIcon);
+    icon.classList.add('has-custom-icon');
+  }
   if (!sources.length) {
     icon.classList.add('is-letter');
     return icon;
@@ -3198,6 +3263,7 @@ function createFolderIcon(children) {
     const mini = document.createElement('span');
     mini.className = 'folder-mini';
     const sources = getFaviconSources(child.url);
+    if (isValidSiteIcon(child.customIcon)) sources.unshift(child.customIcon);
     const showLetter = () => {
       mini.textContent = getSiteInitial(child);
       mini.classList.add('is-letter');
@@ -3409,15 +3475,60 @@ function renderTagSelector(selectedTags) {
   });
 }
 
+// Icon chosen in the add/edit dialog: undefined = leave as is, '' = automatic
+// (favicon), otherwise a data URL.
+let pendingSiteIcon;
+
+function renderSiteIconPreview() {
+  const preview = document.getElementById('siteIconPreview');
+  if (!preview) return;
+  const editingIcon = window.editingItem?.type === 'site' ? window.editingItem.item.customIcon : '';
+  const icon = pendingSiteIcon === undefined ? editingIcon : pendingSiteIcon;
+  const url = (document.getElementById('siteUrl')?.value || '').trim();
+  const site = {
+    name: (document.getElementById('siteName')?.value || '').trim() || url,
+    url: url && !/^https?:\/\//i.test(url) ? 'https://' + url : url,
+    customIcon: icon
+  };
+  preview.replaceChildren(createFaviconIcon(site));
+  document.getElementById('siteIconAuto')?.classList.toggle('hidden', !icon);
+}
+
 function openAddSiteModal() {
+  pendingSiteIcon = undefined;
+  window.editingItem = undefined;
   document.getElementById('siteName').value = '';
   document.getElementById('siteUrl').value = '';
   document.getElementById('tagName').value = '';
   renderTagSelector();
+  renderSiteIconPreview();
   addModal.classList.remove('hidden');
   modalOverlay.classList.remove('hidden');
   addTypeRadios.forEach((r) => r.disabled = false);
-}// ===== Add/Edit Modal =====
+}
+
+let siteIconPreviewTimer = null;
+['siteUrl', 'siteName'].forEach((id) => {
+  document.getElementById(id)?.addEventListener('input', () => {
+    clearTimeout(siteIconPreviewTimer);
+    siteIconPreviewTimer = setTimeout(renderSiteIconPreview, 350);
+  });
+});
+document.getElementById('siteIconUpload')?.addEventListener('click', () => {
+  document.getElementById('siteIconFile')?.click();
+});
+document.getElementById('siteIconFile')?.addEventListener('change', (e) => {
+  const file = e.target.files && e.target.files[0];
+  e.target.value = '';
+  imageFileToIcon(file).then((icon) => {
+    pendingSiteIcon = icon;
+    renderSiteIconPreview();
+  }).catch(() => window.showNotification?.(i18n.t('iconInvalid'), 'warning'));
+});
+document.getElementById('siteIconAuto')?.addEventListener('click', () => {
+  pendingSiteIcon = '';
+  renderSiteIconPreview();
+});// ===== Add/Edit Modal =====
 // Note: Add button is now rendered as a chip in renderHome()
 
 function closeModals() {
@@ -3479,6 +3590,10 @@ saveItemBtn.addEventListener('click', async () => {
         state.sites[siteIndex].url = url;
         state.sites[siteIndex].tags = selectedTags;
         state.sites[siteIndex].showOnHome = showOnHome;
+        if (pendingSiteIcon !== undefined) {
+          if (pendingSiteIcon) state.sites[siteIndex].customIcon = pendingSiteIcon;
+          else delete state.sites[siteIndex].customIcon;
+        }
 
         // Update siteOrder if showOnHome changed
         const inOrder = state.siteOrder.includes(state.sites[siteIndex].id);
@@ -3497,6 +3612,7 @@ saveItemBtn.addEventListener('click', async () => {
         tags: selectedTags,
         showOnHome
       };
+      if (pendingSiteIcon) newSite.customIcon = pendingSiteIcon;
 
       state.sites.push(newSite);
 
@@ -3554,6 +3670,7 @@ saveItemBtn.addEventListener('click', async () => {
 
   // Clear editing state
   window.editingItem = undefined;
+  pendingSiteIcon = undefined;
 
   const saved = await saveData();
   if (saved === false) return;

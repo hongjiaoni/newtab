@@ -27,6 +27,8 @@ function createLocalStorage() {
 function createSupabaseMock(options = {}) {
   const calls = [];
   const missingTables = new Set(options.missingTables || []);
+  // { table: error } -> the first insert into that table fails with this error
+  const failFirstInsert = { ...(options.failFirstInsert || {}) };
 
   const resultFor = (table) => {
     if (missingTables.has(table)) {
@@ -56,6 +58,11 @@ function createSupabaseMock(options = {}) {
       },
       insert(rows) {
         calls.push({ op: 'insert', table, rows });
+        if (failFirstInsert[table]) {
+          const error = failFirstInsert[table];
+          delete failFirstInsert[table];
+          return Promise.resolve({ data: null, error });
+        }
         return Promise.resolve(resultFor(table));
       },
       delete() {
@@ -122,7 +129,7 @@ function loadDataSync(options = {}) {
       dateFormatIndex: 0,
       timeFormat: '24h',
       sites: [
-        { id: 'default-0', name: 'GitHub', url: 'https://github.com', tags: ['dev'], showOnHome: true }
+        { id: 'default-0', name: 'GitHub', url: 'https://github.com', tags: ['dev'], showOnHome: true, customIcon: 'data:image/png;base64,AAAA' }
       ],
       tags: ['dev'],
       tagOrder: ['dev'],
@@ -134,6 +141,9 @@ function loadDataSync(options = {}) {
         authState: { isLoggedIn: true, user: { id: '11111111-1111-4111-8111-111111111111' } },
       appearance: 'dark',
       appliedAppearance: [],
+      getWorkbenchSyncPayload() {
+        return { widgets: ['notes'], agent: { projects: [{ id: 'a', name: 'A', chats: [] }] } };
+      },
       getAppearance() {
         return this.appearance;
       },
@@ -211,7 +221,33 @@ async function testLegacyColorModeMapsToAppearance() {
   expect(context.window.appliedAppearance).toEqual([{ mode: 'light', opts: { sync: false } }]);
 }
 
+async function testPayloadCarriesIconsAppearanceAndChatFreeWorkbench() {
+  const { context, supabase } = loadDataSync();
+  await context.window.saveUserDataToBackend(true);
+  const rpc = supabase.calls.find((call) => call.op === 'rpc' && call.name === 'sync_home_config');
+  const payload = rpc.payload.p_payload;
+  expect(payload.sites[0].customIcon).toBe('data:image/png;base64,AAAA');
+  expect(payload.settings.appearance).toBe('dark');
+  expect(payload.settings.colorMode).toBe('dark'); // for the RPC deployed before the glass migration
+  expect(payload.workbench.agent.projects[0].chats).toEqual([]);
+  const siteInsert = supabase.calls.find((call) => call.op === 'insert' && call.table === 'user_sites');
+  expect(siteInsert.rows[0].icon).toBe('data:image/png;base64,AAAA');
+}
+
+async function testSiteInsertRetriesWithoutIconColumn() {
+  const { context, supabase, notifications } = loadDataSync({
+    supabase: { failFirstInsert: { user_sites: { code: 'PGRST204', message: "Could not find the 'icon' column of 'user_sites' in the schema cache" } } }
+  });
+  await context.window.saveUserDataToBackend(true);
+  expect(notifications).toHaveLength(0);
+  const inserts = supabase.calls.filter((call) => call.op === 'insert' && call.table === 'user_sites');
+  expect(inserts).toHaveLength(2);
+  expect('icon' in inserts[1].rows[0]).toBe(false);
+}
+
 describe('data sync fallback', () => {
+  test('sends site icons, appearance and a chat-free workbench', testPayloadCarriesIconsAppearanceAndChatFreeWorkbench);
+  test('retries the site insert without the icon column', testSiteInsertRetriesWithoutIconColumn);
   test('falls back to table sync and normalizes legacy site ids', testHomeSaveFallsBackAndNormalizesSiteIds);
   test('keeps saving when optional sync tables are missing', testOptionalTablesCanBeMissing);
   test('saves appearance to color_mode and skips retired theme tables', testAppearanceIsSavedAndNotThemeTables);
