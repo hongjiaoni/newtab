@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+<defs><linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".3" stop-color="#fff" stop-opacity=".25"/>
+  <stop offset=".7" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#fff" stop-opacity=".6"/></linearGradient>
+<radialGradient id="glow" cx=".5" cy="0" r=".75"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient><linearGradient id="nink" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#3a8bff"/><stop offset=".55" stop-color="#7b5cff"/><stop offset="1" stop-color="#ff6fae"/></linearGradient><linearGradient id="plate" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".92"/><stop offset="1" stop-color="#eef1ff" stop-opacity=".78"/></linearGradient></defs>
+<path d="M64 4C99 4 112 4 118 10s6 19 6 54-0 48-6 54-19 6-54 6-48 0-54-6S4 99 4 64 4 16 10 10 29 4 64 4Z" fill="url(#plate)"/>
+<path d="M44 88V42c0-2 2-3 3.5-1.6L80.5 86c1.5 1.4 3.5.4 3.5-1.6V40" fill="none" stroke="url(#nink)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M64 4C99 4 112 4 118 10s6 19 6 54-0 48-6 54-19 6-54 6-48 0-54-6S4 99 4 64 4 16 10 10 29 4 64 4Z" fill="none" stroke="#7b5cff" stroke-opacity=".18" stroke-width="1"/>
+<path d="M64 4C99 4 112 4 118 10s6 19 6 54-0 48-6 54-19 6-54 6-48 0-54-6S4 99 4 64 4 16 10 10 29 4 64 4Z" fill="none" stroke="url(#rim)" stroke-width="2"/>
+</svg>
