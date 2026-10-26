@@ -49,6 +49,8 @@ const FUNCS = [
   'createFaviconIcon',
   'createFolderIcon',
   'createSiteTile',
+  'tileRenderKey',
+  'reconcileTiles',
   'getVisibleSites',
   'getFolderChildren',
   'renderHome',
@@ -100,6 +102,8 @@ function makeContext(initialState) {
     handleDragOver: () => {},
     handleDrop: () => {},
     handleDragEnd: () => {},
+    dragState: { draggedId: null },
+    homeRenderDeferred: false,
     updateSettingsMenu: () => {},
     showNotification: () => {},
     URL,
@@ -143,6 +147,36 @@ describe('site tiles rendering', () => {
     expect(img.src).toContain('google.com');
     expect(tiles[0].querySelector('.site-tile-name').textContent).toBe('Google');
     expect(tiles[0].querySelector('.site-tile-icon')).toBeTruthy();
+  });
+
+  it('keeps unchanged tiles when re-rendering (background sync does not reload icons)', () => {
+    ctx.renderHome();
+    const before = Array.from(ctx.contentEl.querySelectorAll('.site-tile'));
+    ctx.state.sites = ctx.state.sites.map((s) => ({ ...s })); // same data, new objects
+    ctx.renderHome();
+    const after = Array.from(ctx.contentEl.querySelectorAll('.site-tile'));
+    expect(after).toEqual(before);
+    expect(after.every((t, i) => t === before[i])).toBe(true);
+
+    ctx.state.sites.find((s) => s.id === 'a').name = 'Renamed';
+    ctx.renderHome();
+    const renamed = ctx.contentEl.querySelector('.site-tile[data-id="a"]');
+    expect(renamed).not.toBe(before[0]);
+    expect(renamed.querySelector('.site-tile-name').textContent).toBe('Renamed');
+    expect(ctx.contentEl.querySelectorAll('.site-tile').length).toBe(before.length);
+  });
+
+  it('defers re-rendering while a tile is being dragged', () => {
+    ctx.renderHome();
+    ctx.dragState.draggedId = 'a';
+    ctx.state.siteOrder = ['b', 'f1', 'a'];
+    ctx.renderHome();
+    expect(ctx.contentEl.querySelector('.site-tile').dataset.id).toBe('a');
+    expect(ctx.homeRenderDeferred).toBe(true);
+    ctx.dragState.draggedId = null;
+    ctx.renderHome();
+    expect(ctx.contentEl.querySelector('.site-tile').dataset.id).toBe('b');
+    expect(ctx.contentEl.querySelectorAll('.site-tile').length).toBe(3);
   });
 
   it('renders folder tiles as a grid of member icons', () => {

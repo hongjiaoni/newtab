@@ -2194,6 +2194,9 @@ function handleDragOver(event) {
   }
   clearFolderHover();
 
+  // Let the last slide finish before the next one; swapping on every
+  // dragover made tiles bounce back and forth under the pointer.
+  if (performance.now() - (dragState.lastSwapAt || 0) < 180) return false;
   const from = state.siteOrder.indexOf(dragState.draggedId);
   const to = state.siteOrder.indexOf(targetId);
   if (from === -1 || to === -1 || from === to) return false;
@@ -2208,6 +2211,7 @@ function handleDragOver(event) {
     grid.insertBefore(draggedEl, after ? targetTile.nextSibling : targetTile);
   });
   dragState.reordered = true;
+  dragState.lastSwapAt = performance.now();
   return false;
 }
 
@@ -2231,6 +2235,8 @@ function handleDragEnd(event) {
   dragState.draggedElement = null;
   dragState.dropTarget = null;
   dragState.reordered = false;
+  dragState.lastSwapAt = 0;
+  if (homeRenderDeferred) renderHome();
 }
 
 // ===== Folder Operations =====
@@ -3145,11 +3151,12 @@ function getFaviconSources(url) {
     return [];
   }
   if (!host) return [];
-  const sources = [];
+  // Google's 128px icon first everywhere. The extension's _favicon is Chrome's
+  // own cache, usually a 16px icon scaled up, so it is only a fallback.
+  const sources = ['https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=128'];
   if (typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION && typeof chrome !== 'undefined' && chrome.runtime?.getURL) {
     sources.push(chrome.runtime.getURL('/_favicon/?pageUrl=' + encodeURIComponent(url) + '&size=64'));
   }
-  sources.push('https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=128');
   sources.push('https://icons.duckduckgo.com/ip3/' + encodeURIComponent(host) + '.ico');
   return sources;
 }
@@ -3456,19 +3463,21 @@ function createSiteTile(site, index, source) {
   tile.addEventListener('drop', (e) => handleDrop(e, site.id, isFolder ? 'folder' : 'site'));
   tile.addEventListener('dragend', handleDragEnd);
 
+  // Tiles can outlive a sync (see renderHome), so always act on the current site
+  const current = () => (state.sites || []).find((s) => s && s.id === site.id) || site;
   if (isFolder) {
     tile.onclick = () => openFolder(site.id);
   } else {
-    tile.onclick = () => openLink(site.url, site.name);
+    tile.onclick = () => openLink(current().url, current().name);
     tile.onmousedown = (e) => {
       if (e.button === 1) {
         e.preventDefault();
-        window.recordVisit?.(site.url, site.name);
-        window.open(site.url, '_blank');
+        window.recordVisit?.(current().url, current().name);
+        window.open(current().url, '_blank');
       }
     };
   }
-  tile.oncontextmenu = (e) => showContextMenu(e, site, isFolder ? 'folder' : 'site', source);
+  tile.oncontextmenu = (e) => showContextMenu(e, current(), isFolder ? 'folder' : 'site', source);
   return tile;
 }
 
@@ -3488,22 +3497,64 @@ function getFolderChildren(folder) {
   return children.map((id) => byId.get(id)).filter((s) => s !== undefined);
 }
 
-function renderHome() {
-  contentEl.innerHTML = '';
+// Everything a tile shows. Equal keys mean the existing tile can stay as is.
+function tileRenderKey(site, source) {
+  const children = site.type === 'folder'
+    ? getFolderChildren(site).slice(0, 4).map((c) => [c.id, c.url, c.customIcon, c.iconText, c.iconColor])
+    : null;
+  return JSON.stringify([source, i18n.currentLocale, site.id, site.name, site.url, site.type,
+    site.customIcon, site.iconText, site.iconColor, children]);
+}
+
+// Updates a grid in place: unchanged tiles are kept (their icons are not
+// reloaded, so a background sync is invisible), changed ones are rebuilt,
+// and the order is fixed by moving nodes.
+function reconcileTiles(grid, sites, source) {
+  const existing = new Map();
+  Array.from(grid.children).forEach((tile) => existing.set(tile.dataset.renderKey, tile));
+  const next = sites.map((site, index) => {
+    const key = tileRenderKey(site, source);
+    const kept = existing.get(key);
+    if (kept) {
+      existing.delete(key);
+      return kept;
+    }
+    const tile = createSiteTile(site, index, source);
+    tile.dataset.renderKey = key;
+    return tile;
+  });
+  existing.forEach((tile) => tile.remove());
+  next.forEach((tile, i) => {
+    if (grid.children[i] !== tile) grid.insertBefore(tile, grid.children[i] || null);
+  });
+}
+
+let homeRenderDeferred = false;
+
+function renderHome(options) {
+  // A rebuild during a drag would orphan the dragged tile (and show it twice);
+  // run it when the drag ends instead.
+  if (dragState.draggedId && !(options && options.duringDrag)) {
+    homeRenderDeferred = true;
+    return;
+  }
+  homeRenderDeferred = false;
 
   if (state.viewMode === 'minimalist') {
+    contentEl.innerHTML = '';
     renderFolderPopup();
     return;
   }
 
   // Sites grid (favicon tiles + folder tiles)
-  const grid = document.createElement('div');
-  grid.className = 'sites-grid';
-  getVisibleSites().forEach((site, index) => {
-    grid.appendChild(createSiteTile(site, index, 'home'));
-  });
-
-  contentEl.appendChild(grid);
+  let grid = contentEl.querySelector(':scope > .sites-grid');
+  if (!grid) {
+    contentEl.innerHTML = '';
+    grid = document.createElement('div');
+    grid.className = 'sites-grid';
+    contentEl.appendChild(grid);
+  }
+  reconcileTiles(grid, getVisibleSites(), 'home');
   renderFolderPopup();
 }
 
@@ -3532,7 +3583,7 @@ function renderFolderPopup() {
   folderNameInput.placeholder = i18n.t('newFolder') || 'New Folder';
   folderNameInput.setAttribute('aria-label', i18n.t('renameLabel') || 'Folder name');
   const children = getFolderChildren(folder);
-  folderGrid.replaceChildren(...children.map((site, index) => createSiteTile(site, index, 'folder')));
+  if (!dragState.draggedId) reconcileTiles(folderGrid, children, 'folder');
   folderHint.textContent = children.length ? '' : i18n.t('emptyFolder');
   folderHint.classList.toggle('hidden', children.length > 0);
   folderOverlay.classList.remove('hidden');
@@ -3578,7 +3629,14 @@ folderOverlay?.addEventListener('dragover', (e) => {
   moveSiteOutOfFolder(dragState.draggedId);
   dragState.draggedSource = 'home';
   state.openFolderId = null;
-  renderHome();
+  // The dragged tile lives in the folder grid, so the home grid can be
+  // rebuilt now; the drag continues with the tile's new home copy.
+  renderHome({ duringDrag: true });
+  const homeTile = contentEl.querySelector('.sites-grid > .site-tile[data-id="' + dragState.draggedId + '"]');
+  if (homeTile) {
+    dragState.draggedElement = homeTile;
+    homeTile.classList.add('dragging');
+  }
   saveData();
 });
 
