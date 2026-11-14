@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "NewTab",
   "version": "1.0.0",
-  "description": "A Liquid Glass new tab page — search, favicon shortcuts, wallpapers, a personal workspace, and cloud sync",
+  "description": "A Liquid Glass new tab page — search, favicon shortcuts, folders, wallpapers, and cloud sync",
   "chrome_url_overrides": {
     "newtab": "index.html"
   },

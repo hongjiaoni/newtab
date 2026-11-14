@@ -525,6 +525,7 @@ window.openUserProfile = function () {
     </div>
   `;
 
+  window.closeAllWindowsExcept?.(modal);
   modal.classList.remove('hidden');
   document.getElementById('modalOverlay').classList.remove('hidden');
   document.getElementById('settingsMenu').classList.add('hidden');
@@ -555,6 +556,7 @@ async function openSubscriptionRecords() {
   }
 
   if (profileModal) profileModal.classList.add('hidden');
+  window.closeAllWindowsExcept?.(recordsModal);
   recordsModal.classList.remove('hidden');
   document.getElementById('modalOverlay')?.classList.remove('hidden');
 
@@ -765,6 +767,7 @@ function openManagedOverlay(id, options = {}) {
   }
   const modal = document.getElementById(id);
   if (modal) {
+    window.closeAllWindowsExcept?.(modal);
     modal.classList.remove('hidden');
   }
   return modal;
@@ -802,7 +805,7 @@ function showConfirmDialog({
 
     const overlay = document.createElement('div');
     overlay.id = 'systemConfirmDialog';
-    overlay.className = 'modal-overlay system-confirm-overlay';
+    overlay.className = 'modal-overlay system-confirm-overlay hidden';
     overlay.innerHTML = `
       <div class="modal system-confirm-dialog ${tone}">
         <h3>${confirmTitle}</h3>
@@ -831,6 +834,9 @@ function showConfirmDialog({
       }
     });
 
+    // Confirmations are windows too: never leave another dialog or menu
+    // clickable behind the scrim.
+    window.closeAllWindowsExcept?.(overlay);
     document.body.appendChild(overlay);
     requestAnimationFrame(() => overlay.classList.remove('hidden'));
   });

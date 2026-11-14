@@ -131,6 +131,69 @@ function stringifyConfig(config) {
     }
 }
 
+// A stable, defaulted view of a home config. Two configs that would render
+// the same page must produce the same signature, even if one came from the DB
+// (no `colorMode` alias, missing optional columns) and one from running state.
+function canonicalizeConfigValue(value) {
+    if (Array.isArray(value)) return value.map(canonicalizeConfigValue);
+    if (!value || typeof value !== 'object') return value;
+    const sorted = {};
+    Object.keys(value).sort().forEach((key) => {
+        const next = canonicalizeConfigValue(value[key]);
+        if (next !== undefined) sorted[key] = next;
+    });
+    return sorted;
+}
+
+function normalizeConfigForComparison(config) {
+    if (!config || typeof config !== 'object') return config;
+    let next;
+    try {
+        next = JSON.parse(JSON.stringify(config));
+    } catch (_err) {
+        return config;
+    }
+    if (next.settings) delete next.settings.colorMode;
+    const s = next.settings || (next.settings = {});
+    s.viewMode = s.viewMode || 'general';
+    s.engineIndex = Number.isFinite(s.engineIndex) ? s.engineIndex : 0;
+    s.engineId = s.engineId || '';
+    s.enabledEngineIds = Array.isArray(s.enabledEngineIds) ? s.enabledEngineIds : [];
+    s.dateFormatIndex = Number.isFinite(s.dateFormatIndex) ? s.dateFormatIndex : 0;
+    s.timeFormat = s.timeFormat === '12h' ? '12h' : '24h';
+    s.locale = s.locale || 'zh';
+    if (!Object.prototype.hasOwnProperty.call(s, 'wallpaper')) s.wallpaper = null;
+    s.appearance = normalizeAppearanceValue(s.appearance);
+    s.accent = s.accent || 'blue';
+    s.zoomLevel = ['100', '125', '150'].includes(String(s.zoomLevel)) ? String(s.zoomLevel) : '100';
+    s.openBehavior = s.openBehavior === 'current' ? 'current' : 'newtab';
+
+    next.sites = Array.isArray(next.sites) ? next.sites : [];
+    next.sites = next.sites.map((site) => {
+        const out = { ...site };
+        out.tags = Array.isArray(out.tags) ? out.tags : [];
+        out.showOnHome = out.showOnHome !== false;
+        out.type = out.type === 'folder' ? 'folder' : 'link';
+        if (out.type === 'folder') out.children = Array.isArray(out.children) ? out.children : [];
+        else delete out.children;
+        if (!out.customIcon) delete out.customIcon;
+        return out;
+    });
+    next.tags = Array.isArray(next.tags) ? next.tags : [];
+    next.site_order = Array.isArray(next.site_order) ? next.site_order : [];
+    next.tag_order = Array.isArray(next.tag_order) ? next.tag_order : [];
+    if (!next.workbench) next.workbench = null;
+    return next;
+}
+
+function configSignature(config) {
+    try {
+        return JSON.stringify(canonicalizeConfigValue(normalizeConfigForComparison(config)));
+    } catch (_err) {
+        return '';
+    }
+}
+
 function hasPendingConfigSync(uid, section) {
     if (!uid || !section) return false;
     return clearExpiredPendingMeta(uid, section);
@@ -141,10 +204,11 @@ function hasAnyPendingUserConfig(uid) {
     return hasPendingConfigSync(uid, 'home');
 }
 
-function clearPendingMeta(uid, section, syncedAt) {
+function clearPendingMeta(uid, section, syncedAt, signature) {
     updateConfigMeta(uid, section, {
         localUpdatedAt: syncedAt,
         remoteUpdatedAt: syncedAt,
+        remoteSignature: signature || undefined,
         pending: false,
         pendingSince: null,
         pendingSessionId: null
@@ -645,7 +709,7 @@ async function persistHomeConfig(uid, payload, syncedAt) {
     });
 
     await saveLegacyHomeConfig(payload, syncedAt);
-    clearPendingMeta(uid, 'home', syncedAt);
+    clearPendingMeta(uid, 'home', syncedAt, configSignature(payload));
 }
 
 // Text icons travel in the same `icon` column as images: "text:#rrggbb:Label".
@@ -673,6 +737,7 @@ function decodeSiteIcon(site) {
 // Applies the parsed Home Config payload directly to internal running state
 function applyHomeConfig(config) {
     if (!config || typeof config !== 'object') return;
+    const previousOpenFolderId = state.openFolderId;
 
     if (Array.isArray(config.sites)) {
         // Without the icon column the server can't return custom icons; keep
@@ -697,7 +762,12 @@ function applyHomeConfig(config) {
     if (window.migrateTagsToFolders?.()) setTimeout(() => window.saveData?.(), 0);
 
     const s = config.settings || {};
-    state.openFolderId = null;
+    // A background refresh must not close a folder the user has open. Keep it
+    // when the folder still exists; otherwise fall back to the home grid.
+    state.openFolderId = (previousOpenFolderId && Array.isArray(state.sites)
+        && state.sites.some((site) => site && site.id === previousOpenFolderId && site.type === 'folder'))
+        ? previousOpenFolderId
+        : null;
 
     if (typeof s.viewMode === 'string') state.viewMode = s.viewMode;
     if (Number.isFinite(s.engineIndex)) state.engineIndex = s.engineIndex;
@@ -742,6 +812,133 @@ function applyHomeConfig(config) {
     }
 }
 
+function isEditingSurfaceActive() {
+    try {
+        return !!(window.isConfigEditingSurfaceActive && window.isConfigEditingSurfaceActive());
+    } catch (_err) {
+        return false;
+    }
+}
+
+function rememberRemoteHomeConfig(uid, config, updatedAt) {
+    const at = updatedAt || new Date().toISOString();
+    const signature = configSignature(config);
+    localStorage.setItem(getHomeConfigCacheKey(uid), JSON.stringify(config));
+    updateConfigMeta(uid, 'home', {
+        localUpdatedAt: at,
+        remoteUpdatedAt: at,
+        remoteSignature: signature,
+        pending: false,
+        pendingSince: null,
+        pendingSessionId: null
+    });
+    return signature;
+}
+
+function applyRemoteHomeConfig(uid, config, updatedAt) {
+    if (!config || typeof config !== 'object') return false;
+    applyHomeConfig(config);
+    rememberRemoteHomeConfig(uid, config, updatedAt);
+    // Keep the per-key localStorage snapshot in step with the remote state so
+    // an immediate refresh cannot resurrect the discarded local edit.
+    try { window.saveData?.(false); } catch (_err) {}
+    window.renderHome?.();
+    window.renderSearchEngine?.();
+    window.updateTime?.();
+    return true;
+}
+
+let deferredRemoteHome = null;
+let deferredRemoteTimer = null;
+
+function scheduleDeferredRemoteApply() {
+    if (deferredRemoteTimer) return;
+    deferredRemoteTimer = setTimeout(() => {
+        deferredRemoteTimer = null;
+        if (!deferredRemoteHome) return;
+        if (isEditingSurfaceActive()) {
+            scheduleDeferredRemoteApply();
+            return;
+        }
+        const pending = deferredRemoteHome;
+        deferredRemoteHome = null;
+        const meta = getConfigMeta(pending.uid).home || {};
+        if (parseTimestamp(meta.remoteUpdatedAt) > parseTimestamp(pending.updatedAt)) return;
+        if (configSignature(pending.config) === configSignature(buildCurrentHomePayload())) {
+            rememberRemoteHomeConfig(pending.uid, pending.config, pending.updatedAt);
+            return;
+        }
+        applyRemoteHomeConfig(pending.uid, pending.config, pending.updatedAt);
+    }, 800);
+}
+
+async function readRemoteHomeUpdatedAt(uid) {
+    const db = getSupabaseClient();
+    if (!db) return null;
+    try {
+        const res = await readMaybe(db.from('user_home_settings').select('updated_at').eq('user_id', uid).single());
+        return res?.data?.updated_at || null;
+    } catch (_err) {
+        return null;
+    }
+}
+
+// Before a local save reaches the cloud, look for a newer remote row. If the
+// remote changed and its content differs, the local edit is stale: the caller
+// applies the cloud version and returns false instead of overwriting it.
+async function detectRemoteHomeConflict(uid, localPayload) {
+    const meta = getConfigMeta(uid).home || {};
+    if (!meta.remoteUpdatedAt) return null;
+
+    const remoteUpdatedAt = await readRemoteHomeUpdatedAt(uid);
+    if (!remoteUpdatedAt || remoteUpdatedAt === meta.remoteUpdatedAt) return null;
+
+    // A server-side now() can differ by a few hundred ms from the timestamp
+    // we wrote. Treat that as our own save, not another device's edit.
+    const remoteTs = parseTimestamp(remoteUpdatedAt);
+    const knownTs = parseTimestamp(meta.remoteUpdatedAt);
+    if (remoteTs && knownTs && Math.abs(remoteTs - knownTs) <= 5000) {
+        updateConfigMeta(uid, 'home', { remoteUpdatedAt });
+        return null;
+    }
+
+    const remoteRes = await fetchLegacyConfigs(uid);
+    if (!remoteRes.homeConfig) {
+        updateConfigMeta(uid, 'home', { remoteUpdatedAt });
+        return null;
+    }
+
+    const localSignature = configSignature(localPayload);
+    const remoteSignature = configSignature(remoteRes.homeConfig);
+    if (localSignature === remoteSignature) {
+        updateConfigMeta(uid, 'home', { remoteUpdatedAt, remoteSignature });
+        return null;
+    }
+    return { config: remoteRes.homeConfig, updatedAt: remoteUpdatedAt, signature: remoteSignature };
+}
+
+let lastConflictNotificationAt = 0;
+
+function notifyConfigConflict() {
+    if (typeof window.showNotification !== 'function') return;
+    const now = Date.now();
+    if (now - lastConflictNotificationAt < SYNC_ERROR_NOTIFICATION_THROTTLE_MS) return;
+    lastConflictNotificationAt = now;
+    const fallback = 'The cloud configuration changed. The latest cloud version has been loaded.';
+    const message = (typeof i18n !== 'undefined' && typeof i18n.t === 'function')
+        ? (i18n.t('syncRemoteWins') !== 'syncRemoteWins' ? i18n.t('syncRemoteWins') : fallback)
+        : fallback;
+    window.showNotification(message, 'info');
+}
+
+let configSaveQueue = Promise.resolve();
+
+function enqueueConfigSave(task) {
+    const run = configSaveQueue.then(task, task);
+    configSaveQueue = run.then(() => undefined, () => undefined);
+    return run;
+}
+
 // 1. Initial Cached Load -> 2. Remote Fetch Overwrite
 // The app now standardizes on the normalized Supabase schema:
 // user_home_settings + user_sites + user_tags + user_site_tags + order tables
@@ -757,8 +954,6 @@ async function loadUserData(options = {}) {
 
     const uid = window.authState.user.id;
     userDataLoadPromise = (async () => {
-
-        const preferRemote = options.force === true || options.skipLocalHydration === true;
 
         clearExpiredPendingMeta(uid, 'home');
 
@@ -779,35 +974,44 @@ async function loadUserData(options = {}) {
 
         // === Phase 2: Remote DB Overwrite ===
         try {
-
-            let requiresRender = false;
             const remoteRes = await fetchLegacyConfigs(uid);
             const homeCacheKey = getHomeConfigCacheKey(uid);
-            const currentHomeRaw = localStorage.getItem(homeCacheKey);
+            if (remoteRes.homeConfig) {
+                const remoteAt = remoteRes.homeUpdatedAt || new Date().toISOString();
+                const remoteSignature = configSignature(remoteRes.homeConfig);
+                const currentSignature = configSignature(buildCurrentHomePayload());
+                const sectionMeta = getConfigMeta(uid).home || {};
+                const sameAsCurrent = !!remoteSignature && remoteSignature === currentSignature;
+                const sameAsBaseline = !!remoteSignature && remoteSignature === sectionMeta.remoteSignature;
+                const backgroundRefresh = options.skipLocalHydration === true;
 
-            if (remoteRes.homeConfig && (preferRemote || shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt))) {
-                const nextHomeRaw = stringifyConfig(remoteRes.homeConfig);
-                const homeChanged = currentHomeRaw !== nextHomeRaw;
-
-                localStorage.setItem(homeCacheKey, nextHomeRaw);
-                updateConfigMeta(uid, 'home', {
-                    localUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
-                    remoteUpdatedAt: remoteRes.homeUpdatedAt || new Date().toISOString(),
-                    pending: false,
-                    pendingSince: null,
-                    pendingSessionId: null
-                });
-
-                applyHomeConfig(remoteRes.homeConfig);
-                if (homeChanged) {
-                    requiresRender = true;
+                if (sameAsCurrent) {
+                    // Nothing to redraw: just accept the newer remote timestamp.
+                    localStorage.setItem(homeCacheKey, stringifyConfig(remoteRes.homeConfig));
+                    updateConfigMeta(uid, 'home', {
+                        localUpdatedAt: remoteAt,
+                        remoteUpdatedAt: remoteAt,
+                        remoteSignature,
+                        pending: false,
+                        pendingSince: null,
+                        pendingSessionId: null
+                    });
+                } else if (!shouldApplyRemoteConfig(uid, 'home', remoteRes.homeUpdatedAt)) {
+                    // A fresh local edit is waiting to be synced. Leave it alone.
+                } else if (backgroundRefresh && sameAsBaseline) {
+                    // The 20s poll returned the same payload we already have.
+                    updateConfigMeta(uid, 'home', {
+                        remoteUpdatedAt: remoteAt,
+                        remoteSignature
+                    });
+                } else if (isEditingSurfaceActive()) {
+                    // Never rebuild the page under an open rename/add/folder
+                    // editor. Retry as soon as the surface closes.
+                    deferredRemoteHome = { uid, config: remoteRes.homeConfig, updatedAt: remoteAt };
+                    scheduleDeferredRemoteApply();
+                } else {
+                    applyRemoteHomeConfig(uid, remoteRes.homeConfig, remoteAt);
                 }
-            }
-
-            if (requiresRender) {
-                window.renderHome?.();
-                window.renderSearchEngine?.();
-                window.updateTime?.();
             }
         } catch (err) {
             console.error('Error fetching remote configs:', err);
@@ -827,8 +1031,21 @@ async function saveUserDataToBackend(immediate = true) {
     const doSync = async () => {
         try {
             const uid = window.authState.user.id;
-            const syncedAt = new Date().toISOString();
             const payload = buildCurrentHomePayload();
+
+            let conflict = null;
+            try {
+                conflict = await detectRemoteHomeConflict(uid, payload);
+            } catch (checkErr) {
+                console.warn('Remote config conflict check failed, saving local state:', checkErr);
+            }
+            if (conflict) {
+                applyRemoteHomeConfig(uid, conflict.config, conflict.updatedAt);
+                notifyConfigConflict();
+                return false;
+            }
+
+            const syncedAt = new Date().toISOString();
             await persistHomeConfig(uid, payload, syncedAt);
             return true;
         } catch (err) {
@@ -839,12 +1056,12 @@ async function saveUserDataToBackend(immediate = true) {
     };
 
     if (immediate !== false) {
-        return await doSync();
+        return await enqueueConfigSave(doSync);
     }
 
     if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
     syncDebounceTimer = setTimeout(async () => {
-        await doSync();
+        await enqueueConfigSave(doSync);
     }, SYNC_DEBOUNCE_MS);
     return true;
 }

@@ -27,10 +27,14 @@ function createLocalStorage() {
 function createSupabaseMock(options = {}) {
   const calls = [];
   const missingTables = new Set(options.missingTables || []);
+  const readResults = options.readResults || {};
   // { table: error } -> the first insert into that table fails with this error
   const failFirstInsert = { ...(options.failFirstInsert || {}) };
 
   const resultFor = (table) => {
+    if (Object.prototype.hasOwnProperty.call(readResults, table)) {
+      return { data: readResults[table], error: null };
+    }
     if (missingTables.has(table)) {
       return { data: null, error: { code: '42P01', message: `relation "${table}" does not exist` } };
     }
@@ -68,6 +72,9 @@ function createSupabaseMock(options = {}) {
       delete() {
         calls.push({ op: 'delete', table });
         return builder;
+      },
+      then(resolve, reject) {
+        return Promise.resolve(resultFor(table)).then(resolve, reject);
       }
     };
     return builder;
@@ -245,6 +252,99 @@ async function testSiteInsertRetriesWithoutIconColumn() {
   expect('icon' in inserts[1].rows[0]).toBe(false);
 }
 
+const TEST_SITE_ID = '22222222-2222-4222-8222-222222222222';
+
+function makeRemoteReads({ siteName = 'GitHub', updatedAt = '2026-11-14T00:00:00.000Z' } = {}) {
+  return {
+    user_home_settings: {
+      view_mode: 'general',
+      engine_index: 0,
+      engine_id: 'google',
+      enabled_engine_ids: ['google'],
+      date_format_index: 0,
+      time_format: '24h',
+      locale: 'zh',
+      wallpaper: '#123456',
+      color_mode: 'dark',
+      accent_color: 'blue',
+      zoom_level: '100',
+      open_behavior: 'newtab',
+      workbench: { widgets: ['notes'], agent: { projects: [{ id: 'a', name: 'A', chats: [] }] } },
+      updated_at: updatedAt
+    },
+    user_sites: [{
+      id: TEST_SITE_ID,
+      name: siteName,
+      url: 'https://github.com',
+      show_on_home: true,
+      type: 'link',
+      children: null,
+      icon: null
+    }],
+    user_tags: [],
+    user_site_tags: [],
+    user_site_order: [{ site_id: TEST_SITE_ID, position: 0 }],
+    user_tag_order: []
+  };
+}
+
+function applyTestState(context, siteName) {
+  context.state.sites = [{
+    id: TEST_SITE_ID,
+    name: siteName,
+    url: 'https://github.com',
+    tags: [],
+    showOnHome: true,
+    type: 'link'
+  }];
+  context.state.tags = [];
+  context.state.tagOrder = [];
+  context.state.siteOrder = [TEST_SITE_ID];
+  context.state.viewMode = 'general';
+  context.state.engineIndex = 0;
+  context.state.engineId = 'google';
+  context.state.enabledEngineIds = ['google'];
+  context.state.dateFormatIndex = 0;
+  context.state.timeFormat = '24h';
+  context.state.zoomLevel = '100';
+  context.state.openBehavior = 'newtab';
+  context.window.wallpaperState = { selectedWallpaper: '#123456' };
+}
+
+async function testBackgroundLoadSkipsRenderWhenRemoteIsIdentical() {
+  const { context } = loadDataSync({ supabase: { readResults: makeRemoteReads() } });
+  applyTestState(context, 'GitHub');
+  let renders = 0;
+  context.window.renderHome = () => { renders += 1; };
+
+  await context.window.loadUserData({ skipLocalHydration: true, force: true });
+
+  expect(renders, 'identical remote config must not rebuild the page').toBe(0);
+}
+
+async function testRemoteConflictWinsAndSkipsLocalWrite() {
+  const reads = makeRemoteReads();
+  const { context, supabase, notifications } = loadDataSync({ supabase: { readResults: reads } });
+  applyTestState(context, 'Local name');
+  const uid = context.window.authState.user.id;
+  context.localStorage.setItem('user_config_meta_' + uid, JSON.stringify({
+    home: { remoteUpdatedAt: '2026-11-14T00:00:00.000Z' }
+  }));
+
+  reads.user_home_settings.updated_at = '2026-11-14T00:10:00.000Z';
+  reads.user_sites[0].name = 'Remote name';
+  let renders = 0;
+  context.window.renderHome = () => { renders += 1; };
+
+  const saved = await context.window.saveUserDataToBackend(true);
+
+  expect(saved).toBe(false);
+  expect(context.state.sites[0].name).toBe('Remote name');
+  expect(renders).toBeGreaterThan(0);
+  expect(notifications.some((item) => item.type === 'info')).toBe(true);
+  expect(supabase.calls.some((call) => call.op === 'rpc' || call.op === 'upsert')).toBe(false);
+}
+
 describe('data sync fallback', () => {
   test('sends site icons, appearance and a chat-free workbench', testPayloadCarriesIconsAppearanceAndChatFreeWorkbench);
   test('retries the site insert without the icon column', testSiteInsertRetriesWithoutIconColumn);
@@ -252,6 +352,8 @@ describe('data sync fallback', () => {
   test('keeps saving when optional sync tables are missing', testOptionalTablesCanBeMissing);
   test('saves appearance to color_mode and skips retired theme tables', testAppearanceIsSavedAndNotThemeTables);
   test('applies cached appearance without re-syncing', testLegacyColorModeMapsToAppearance);
+  test('skips rendering an identical remote config', testBackgroundLoadSkipsRenderWhenRemoteIsIdentical);
+  test('applies a newer remote config instead of overwriting it', testRemoteConflictWinsAndSkipsLocalWrite);
 });
 
 

@@ -21,7 +21,7 @@ const translations = {
   zh: {
     search: '想要搜点什么吗？',
     addNew: '添加',
-    addNewTitle: '添加新项目',
+    addNewTitle: '添加网站',
     site: '网站',
     tag: '标签',
     name: '名称',
@@ -200,7 +200,7 @@ const translations = {
   en: {
     search: 'What would you like to search?',
     addNew: 'Add',
-    addNewTitle: 'Add New',
+    addNewTitle: 'Add Site',
     site: 'Site',
     tag: 'Tag',
     name: 'Name',
@@ -293,7 +293,7 @@ const translations = {
   fr: {
     search: 'Que voulez-vous rechercher ?',
     addNew: 'Ajouter',
-    addNewTitle: 'Ajouter un élément',
+    addNewTitle: 'Ajouter un site',
     site: 'Site',
     tag: 'Étiquette',
     name: 'Nom',
@@ -402,6 +402,7 @@ const translations = {
     paymentSystemNotLoaded: 'Système de paiement non chargé. Actualisez la page.',
     syncLoadFailed: 'Échec de la synchronisation. Veuillez réessayer plus tard.',
     syncSaveFailed: 'Échec de l\'enregistrement. Vos modifications ne sont pas encore synchronisées.',
+    syncRemoteWins: 'La configuration cloud a changé. La dernière version a été chargée.',
     deleteItemConfirm: 'Voulez-vous vraiment supprimer cet élément ?',
     loginRequiredTitle: 'Connexion requise',
     loginRequiredDesc: 'Veuillez vous connecter avant d\'utiliser cette fonctionnalité',
@@ -512,7 +513,7 @@ const translations = {
   es: {
     search: '¿Qué quieres buscar?',
     addNew: 'Añadir',
-    addNewTitle: 'Añadir elemento',
+    addNewTitle: 'Añadir sitio',
     site: 'Sitio',
     tag: 'Etiqueta',
     name: 'Nombre',
@@ -621,6 +622,7 @@ const translations = {
     paymentSystemNotLoaded: 'Sistema de pago no cargado. Actualiza la página.',
     syncLoadFailed: 'No se pudo sincronizar. Inténtalo más tarde.',
     syncSaveFailed: 'Error al guardar. Tus cambios aún no se han sincronizado.',
+    syncRemoteWins: 'La configuración en la nube cambió. Se cargó la última versión.',
     deleteItemConfirm: '¿Seguro que quieres eliminar este elemento?',
     loginRequiredTitle: 'Inicio de sesión requerido',
     loginRequiredDesc: 'Inicia sesión antes de usar esta función',
@@ -731,7 +733,7 @@ const translations = {
   ja: {
     search: '何を検索しますか？',
     addNew: '追加',
-    addNewTitle: '項目を追加',
+    addNewTitle: 'サイトを追加',
     site: 'サイト',
     tag: 'タグ',
     name: '名前',
@@ -840,6 +842,7 @@ const translations = {
     paymentSystemNotLoaded: '支払いシステムが読み込まれていません。ページを更新してください。',
     syncLoadFailed: '同期に失敗しました。後でもう一度お試しください。',
     syncSaveFailed: '保存に失敗しました。変更はまだクラウドに同期されていません。',
+    syncRemoteWins: 'クラウドの設定が更新されました。最新の設定を読み込みました。',
     deleteItemConfirm: 'この項目を削除しますか？',
     loginRequiredTitle: 'ログインが必要です',
     loginRequiredDesc: 'この機能を利用するにはログインしてください',
@@ -950,7 +953,7 @@ const translations = {
   ko: {
     search: '무엇을 검색하시겠어요?',
     addNew: '추가',
-    addNewTitle: '항목 추가',
+    addNewTitle: '사이트 추가',
     site: '사이트',
     tag: '태그',
     name: '이름',
@@ -1059,6 +1062,7 @@ const translations = {
     paymentSystemNotLoaded: '결제 시스템이 로드되지 않았습니다. 페이지를 새로고침하세요.',
     syncLoadFailed: '동기화에 실패했습니다. 나중에 다시 시도해 주세요.',
     syncSaveFailed: '저장에 실패했습니다. 변경 사항이 아직 클라우드에 동기화되지 않았습니다.',
+    syncRemoteWins: '클라우드 설정이 변경되어 최신 설정을 불러왔습니다.',
     deleteItemConfirm: '이 항목을 삭제하시겠습니까?',
     loginRequiredTitle: '로그인 필요',
     loginRequiredDesc: '이 기능을 사용하려면 먼저 로그인하세요',
@@ -1172,7 +1176,7 @@ const TRANSLATION_OVERRIDES = {
   zh: {
     search: '想要搜点什么呢？',
     addNew: '添加',
-    addNewTitle: '添加新项目',
+    addNewTitle: '添加网站',
     site: '网站',
     tag: '标签',
     name: '名称',
@@ -1275,6 +1279,7 @@ const TRANSLATION_OVERRIDES = {
     paymentSystemNotLoaded: '支付系统尚未加载，请刷新页面后重试',
     syncLoadFailed: '同步最新配置失败，请稍后重试',
     syncSaveFailed: '保存失败，暂未同步到云端',
+    syncRemoteWins: '云端配置已更新，已加载最新配置',
     deleteItemConfirm: '确定要删除吗？',
     loginRequiredTitle: '需要登录',
     loginRequiredDesc: '请先登录后再使用这个功能',
@@ -1323,6 +1328,7 @@ const TRANSLATION_OVERRIDES = {
     paymentSystemNotLoaded: 'Payment system not loaded. Please refresh and try again.',
     syncLoadFailed: 'Failed to sync the latest settings. Please try again later.',
     syncSaveFailed: 'Save failed. Your changes were not synced to the cloud yet.',
+    syncRemoteWins: 'The cloud configuration changed. The latest cloud version has been loaded.',
     deleteItemConfirm: 'Are you sure you want to delete this item?',
     loginRequiredTitle: 'Login Required',
     loginRequiredDesc: 'Please log in before using this feature',
@@ -1438,6 +1444,103 @@ const TRANSLATION_OVERRIDES = {
 
 Object.assign(translations.zh, TRANSLATION_OVERRIDES.zh);
 Object.assign(translations.en, TRANSLATION_OVERRIDES.en);
+Object.assign(translations.zh, {
+  presetPopular: '常用', presetSocial: '社交', presetVideo: '影音',
+  presetShopping: '购物', presetTools: '工具', presetAI: 'AI', presetNews: '新闻',
+  presetLearning: '学习', presetTravel: '旅行', presetLife: '生活', presetCustom: '自定义',
+  presetAdded: '已添加到首页', presetDuplicate: '该网站已在首页',
+  customSearch: '自定义搜索', customSearchHint: '在网址中使用 {query} 表示搜索词；不填写时会自动追加到网址末尾',
+  customSearchName: '名称', customSearchUrl: '搜索网址', customSearchNamePlaceholder: '例如：我的搜索',
+  customSearchPlaceholder: 'https://example.com/search?q={query}',
+  customSearchSave: '保存', customSearchClear: '清除', customSearchInvalid: '请输入有效的搜索网址',
+  customSearchSaved: '自定义搜索已保存', customSearchCleared: '已清除自定义搜索',
+  customEngineAdd: '添加', deleteEngine: '删除搜索引擎',
+  deleteEngineConfirm: '确定删除“{name}”吗？删除后可通过重置恢复。',
+  engineDeleted: '已删除搜索引擎', resetEngines: '重置',
+  resetEnginesConfirm: '将搜索引擎恢复为最初的 15 个，并清除自定义搜索。继续吗？',
+  enginesReset: '搜索引擎已重置', engineEmpty: '请先添加一个搜索引擎'
+});
+Object.assign(translations.en, {
+  presetPopular: 'Popular', presetSocial: 'Social', presetVideo: 'Video',
+  presetShopping: 'Shopping', presetTools: 'Tools', presetAI: 'AI', presetNews: 'News',
+  presetLearning: 'Learning', presetTravel: 'Travel', presetLife: 'Life', presetCustom: 'Custom',
+  presetAdded: 'Added to home', presetDuplicate: 'This site is already on your home page',
+  customSearch: 'Custom search', customSearchHint: 'Use {query} in the URL for the search term; otherwise it is appended to the end',
+  customSearchName: 'Name', customSearchUrl: 'Search URL', customSearchNamePlaceholder: 'e.g. My search',
+  customSearchPlaceholder: 'https://example.com/search?q={query}',
+  customSearchSave: 'Save', customSearchClear: 'Clear', customSearchInvalid: 'Enter a valid search URL',
+  customSearchSaved: 'Custom search saved', customSearchCleared: 'Custom search removed',
+  customEngineAdd: 'Add', deleteEngine: 'Delete engine',
+  deleteEngineConfirm: 'Delete "{name}"? You can restore all engines with Reset.',
+  engineDeleted: 'Search engine deleted', resetEngines: 'Reset',
+  resetEnginesConfirm: 'Restore the original 15 search engines and remove your custom one?',
+  enginesReset: 'Search engines reset', engineEmpty: 'Add a search engine first'
+});
+Object.assign(translations.fr, {
+  presetPopular: 'Populaires', presetSocial: 'Réseaux', presetVideo: 'Vidéo',
+  presetShopping: 'Achats', presetTools: 'Outils', presetAI: 'IA', presetNews: 'Actualités',
+  presetLearning: 'Apprentissage', presetTravel: 'Voyage', presetLife: 'Vie', presetCustom: 'Personnalisé',
+  presetAdded: 'Ajouté à l\'accueil', presetDuplicate: 'Ce site est déjà sur votre page d\'accueil',
+  customSearch: 'Recherche personnalisée', customSearchHint: 'Utilisez {query} dans l\'URL pour le terme recherché ; sinon il est ajouté à la fin',
+  customSearchName: 'Nom', customSearchUrl: 'URL de recherche', customSearchNamePlaceholder: 'ex. Ma recherche',
+  customSearchPlaceholder: 'https://exemple.com/recherche?q={query}',
+  customSearchSave: 'Enregistrer', customSearchClear: 'Effacer', customSearchInvalid: 'Saisissez une URL de recherche valide',
+  customSearchSaved: 'Recherche personnalisée enregistrée', customSearchCleared: 'Recherche personnalisée supprimée',
+  customEngineAdd: 'Ajouter', deleteEngine: 'Supprimer le moteur',
+  deleteEngineConfirm: 'Supprimer « {name} » ? Vous pourrez tout restaurer avec Réinitialiser.',
+  engineDeleted: 'Moteur de recherche supprimé', resetEngines: 'Réinitialiser',
+  resetEnginesConfirm: 'Restaurer les 15 moteurs d\'origine et supprimer votre moteur personnalisé ?',
+  enginesReset: 'Moteurs de recherche réinitialisés', engineEmpty: 'Ajoutez d\'abord un moteur de recherche'
+});
+Object.assign(translations.es, {
+  presetPopular: 'Populares', presetSocial: 'Redes', presetVideo: 'Vídeo',
+  presetShopping: 'Compras', presetTools: 'Herramientas', presetAI: 'IA', presetNews: 'Noticias',
+  presetLearning: 'Aprendizaje', presetTravel: 'Viajes', presetLife: 'Vida', presetCustom: 'Personalizado',
+  presetAdded: 'Añadido al inicio', presetDuplicate: 'Este sitio ya está en tu página de inicio',
+  customSearch: 'Búsqueda personalizada', customSearchHint: 'Usa {query} en la URL para el término de búsqueda; si no, se añade al final',
+  customSearchName: 'Nombre', customSearchUrl: 'URL de búsqueda', customSearchNamePlaceholder: 'p. ej. Mi búsqueda',
+  customSearchPlaceholder: 'https://ejemplo.com/buscar?q={query}',
+  customSearchSave: 'Guardar', customSearchClear: 'Borrar', customSearchInvalid: 'Introduce una URL de búsqueda válida',
+  customSearchSaved: 'Búsqueda personalizada guardada', customSearchCleared: 'Búsqueda personalizada eliminada',
+  customEngineAdd: 'Añadir', deleteEngine: 'Eliminar motor',
+  deleteEngineConfirm: '¿Eliminar "{name}"? Puedes restaurar todo con Restablecer.',
+  engineDeleted: 'Motor de búsqueda eliminado', resetEngines: 'Restablecer',
+  resetEnginesConfirm: '¿Restaurar los 15 motores originales y quitar el personalizado?',
+  enginesReset: 'Motores de búsqueda restablecidos', engineEmpty: 'Añade primero un motor de búsqueda'
+});
+Object.assign(translations.ja, {
+  presetPopular: 'よく使う', presetSocial: 'SNS', presetVideo: '動画',
+  presetShopping: '買い物', presetTools: 'ツール', presetAI: 'AI', presetNews: 'ニュース',
+  presetLearning: '学習', presetTravel: '旅行', presetLife: '生活', presetCustom: 'カスタム',
+  presetAdded: 'ホームに追加しました', presetDuplicate: 'このサイトはすでにホームにあります',
+  customSearch: 'カスタム検索', customSearchHint: 'URL 内の {query} が検索語に置き換わります。ない場合は末尾に追加されます',
+  customSearchName: '名前', customSearchUrl: '検索 URL', customSearchNamePlaceholder: '例：マイ検索',
+  customSearchPlaceholder: 'https://example.com/search?q={query}',
+  customSearchSave: '保存', customSearchClear: 'クリア', customSearchInvalid: '有効な検索 URL を入力してください',
+  customSearchSaved: 'カスタム検索を保存しました', customSearchCleared: 'カスタム検索を削除しました',
+  customEngineAdd: '追加', deleteEngine: '検索エンジンを削除',
+  deleteEngineConfirm: '「{name}」を削除しますか？リセットで復元できます。',
+  engineDeleted: '検索エンジンを削除しました', resetEngines: 'リセット',
+  resetEnginesConfirm: '最初の 15 個の検索エンジンに戻し、カスタム検索を削除しますか？',
+  enginesReset: '検索エンジンをリセットしました', engineEmpty: '先に検索エンジンを追加してください'
+});
+Object.assign(translations.ko, {
+  presetPopular: '자주 사용', presetSocial: '소셜', presetVideo: '동영상',
+  presetShopping: '쇼핑', presetTools: '도구', presetAI: 'AI', presetNews: '뉴스',
+  presetLearning: '학습', presetTravel: '여행', presetLife: '생활', presetCustom: '사용자 지정',
+  presetAdded: '홈에 추가했습니다', presetDuplicate: '이 사이트는 이미 홈에 있습니다',
+  customSearch: '사용자 지정 검색', customSearchHint: 'URL의 {query}가 검색어로 바뀝니다. 없으면 끝에 추가됩니다',
+  customSearchName: '이름', customSearchUrl: '검색 URL', customSearchNamePlaceholder: '예: 내 검색',
+  customSearchPlaceholder: 'https://example.com/search?q={query}',
+  customSearchSave: '저장', customSearchClear: '지우기', customSearchInvalid: '유효한 검색 URL을 입력하세요',
+  customSearchSaved: '사용자 지정 검색을 저장했습니다', customSearchCleared: '사용자 지정 검색을 삭제했습니다',
+  customEngineAdd: '추가', deleteEngine: '검색 엔진 삭제',
+  deleteEngineConfirm: '"{name}"을(를) 삭제할까요? 초기화로 복원할 수 있습니다.',
+  engineDeleted: '검색 엔진을 삭제했습니다', resetEngines: '초기화',
+  resetEnginesConfirm: '처음 15개 검색 엔진으로 복원하고 사용자 지정 검색을 삭제할까요?',
+  enginesReset: '검색 엔진을 초기화했습니다', engineEmpty: '먼저 검색 엔진을 추가하세요'
+});
+
 
 function normalizeLocale(input) {
   if (!input) return 'zh';
@@ -1542,24 +1645,14 @@ window.updateAllText = function () {
   const modalTitle = document.getElementById('addModalTitle');
   if (modalTitle) modalTitle.textContent = i18n.t('addNewTitle');
 
-  // Update modal type switch labels
-  const typeLabel1 = document.getElementById('typeLabel1');
-  const typeLabel2 = document.getElementById('typeLabel2');
-  if (typeLabel1) typeLabel1.textContent = i18n.t('site');
-  if (typeLabel2) typeLabel2.textContent = i18n.t('folder');
-
   // Update section labels
   const nameLabel = document.getElementById('nameLabel');
   const urlLabel = document.getElementById('urlLabel');
   if (nameLabel) nameLabel.textContent = i18n.t('name');
   if (urlLabel) urlLabel.textContent = i18n.t('url');
-  const newFolderNameLabel = document.getElementById('newFolderNameLabel');
-  if (newFolderNameLabel) newFolderNameLabel.textContent = i18n.t('renameLabel');
-
   // Update input placeholders
   document.getElementById('siteName').placeholder = i18n.t('name');
   document.getElementById('siteUrl').placeholder = i18n.t('urlPlaceholder');
-  document.getElementById('newFolderName').placeholder = i18n.t('newFolder');
 
   // Update checkbox label
   const iconLabels = {
@@ -1579,10 +1672,8 @@ window.updateAllText = function () {
   updateTime();
 
   const ctxAddSiteEl = document.getElementById('ctxAddSite');
-  const ctxAddFolderEl = document.getElementById('ctxAddFolder');
   const ctxWallpaperEl = document.getElementById('ctxWallpaper');
   if (ctxAddSiteEl) ctxAddSiteEl.textContent = i18n.t('addSite') || 'Add Site';
-  if (ctxAddFolderEl) ctxAddFolderEl.textContent = i18n.t('addFolder') || '添加文件夹';
   if (ctxWallpaperEl) ctxWallpaperEl.textContent = i18n.t('changeWallpaper') || 'Change Wallpaper';
   const modeGeneralEl = document.getElementById('modeGeneral');
   const modeMinimalistEl = document.getElementById('modeMinimalist');
@@ -1639,10 +1730,6 @@ window.updateAllText = function () {
   if (obCurrentEl) obCurrentEl.textContent = i18n.t('obCurrent') || 'Current tab';
   if (settingsAboutBtnEl) settingsAboutBtnEl.textContent = i18n.t('settingsAbout') || 'About';
   if (closeSettingsModalEl) closeSettingsModalEl.textContent = i18n.t('done') || 'Done';
-  const toWorkspaceTextEl = document.getElementById('toWorkspaceText');
-  if (toWorkspaceTextEl) toWorkspaceTextEl.textContent = i18n.t('workbench') || 'Workbench';
-  document.getElementById('dotHome')?.setAttribute('aria-label', i18n.t('wbBackHome') || 'Home');
-  document.getElementById('dotWorkspace')?.setAttribute('aria-label', i18n.t('workbench') || 'Workbench');
   const appearanceLabels = {
     appearanceLabel: i18n.t('appearance') || 'Appearance',
     apLight: i18n.t('lightMode') || 'Light',
@@ -1658,6 +1745,7 @@ window.updateAllText = function () {
 
   updateSettingsMenu();
   syncSettingsModalUI?.();
+  renderAddSiteCatalog();
   window.renderWorkbench?.();
 
   // Auth UI logic: update the auth container handled by auth.js but ensure we call it
@@ -1814,49 +1902,217 @@ window.updateAllText = function () {
 }
 
 // ===== Data & State =====
-let ENGINE_CATALOG = [
+function faviconBustQuery(bust, first = false) {
+  return bust ? (first ? '?' : '&') + 'v=' + encodeURIComponent(String(bust)) : '';
+}
+
+// Request the largest source the provider has. 128px was visibly soft at 40px
+// on HiDPI screens; Google/DDG both honour 256 and return their best asset.
+const FAVICON_REQUEST_SIZE = 256;
+const FAVICON_SHARP_EDGE = 48;
+
+function googleFavicon(domain, bust) {
+  return 'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(domain) + '&sz=' + FAVICON_REQUEST_SIZE + faviconBustQuery(bust);
+}
+
+function engineFavicon(domain, bust) {
+  return googleFavicon(domain, bust);
+}
+
+function engineDomain(engine) {
+  try {
+    // www.google.com often gets a generic globe from the favicon providers;
+    // the apex domain returns the real brand mark.
+    return new URL(String(engine?.url || '')).hostname.replace(/^www\./i, '');
+  } catch (_err) {
+    return '';
+  }
+}
+
+function getEngineFallbackIcon(engine, bust) {
+  const domain = engineDomain(engine);
+  return domain
+    ? 'https://icons.duckduckgo.com/ip3/' + encodeURIComponent(domain) + '.ico' + faviconBustQuery(bust, true)
+    : 'https://www.google.com/favicon.ico' + faviconBustQuery(bust, true);
+}
+
+// Brands with a vector mark on the Simple Icons CDN. It is the last resort:
+// real favicons win whenever the provider has a sharp one, but this guarantees
+// engines such as Sogou / Xiaohongshu never end up with a blank tile.
+const ENGINE_SIMPLEICON_SLUGS = {
+  google: 'google',
+  bing: 'bing',
+  duckduckgo: 'duckduckgo',
+  baidu: 'baidu',
+  sogou: 'sogou',
+  bilibili: 'bilibili',
+  xiaohongshu: 'xiaohongshu',
+  github: 'github',
+  stackoverflow: 'stackoverflow',
+  twitter: 'x',
+  reddit: 'reddit',
+  wikipedia: 'wikipedia',
+  amazon: 'amazon',
+  taobao: 'taobao',
+  jd: 'jd'
+};
+
+function dedupeUrls(urls) {
+  const seen = new Set();
+  return (Array.isArray(urls) ? urls : []).filter((url) => {
+    if (!url || seen.has(url)) return false;
+    seen.add(url);
+    return true;
+  });
+}
+
+// Ordered from the real, colour-correct favicon to guaranteed-sharp vectors.
+// The delegated image handlers walk this list when a source 404s or is only
+// 16px, which is what makes the engines without a Google icon work.
+function getEngineIconSources(engine, bust) {
+  const domain = engineDomain(engine);
+  const bustQuery = faviconBustQuery(bust);
+  const sources = [];
+  if (domain) {
+    sources.push(googleFavicon(domain, bust));
+    sources.push('https://icons.duckduckgo.com/ip3/' + encodeURIComponent(domain) + '.ico' + faviconBustQuery(bust, true));
+    sources.push('https://' + domain + '/favicon.ico' + faviconBustQuery(bust, true));
+    sources.push('https://icon.horse/icon/' + encodeURIComponent(domain) + bustQuery);
+  }
+  sources.push('https://www.google.com/favicon.ico' + faviconBustQuery(bust, true));
+  const slug = ENGINE_SIMPLEICON_SLUGS[String(engine?.id || '')];
+  if (slug) sources.push('https://cdn.simpleicons.org/' + slug + bustQuery);
+  return dedupeUrls(sources);
+}
+
+function getEngineIcon(engine, bust) {
+  const sources = getEngineIconSources(engine, bust);
+  return sources[0] || getEngineFallbackIcon(engine, bust);
+}
+
+const BASE_ENGINE_CATALOG = [
   // Global / General
-  { id: 'google', name: { zh: '谷歌', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: 'https://www.google.com/favicon.ico' },
-  { id: 'bing', name: { zh: '必应', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: 'https://www.bing.com/favicon.ico' },
-  { id: 'duckduckgo', name: { zh: 'DuckDuckGo', en: 'DuckDuckGo' }, url: 'https://duckduckgo.com/?q=', icon: 'https://duckduckgo.com/favicon.ico' },
-  { id: 'yahoo', name: { zh: '雅虎', en: 'Yahoo', ja: 'Yahoo!' }, url: 'https://search.yahoo.com/search?p=', icon: 'https://www.google.com/s2/favicons?domain=yahoo.com&sz=64' },
-  { id: 'yandex', name: { zh: 'Yandex', en: 'Yandex' }, url: 'https://yandex.com/search/?text=', icon: 'https://yandex.com/favicon.ico' },
-  { id: 'ecosia', name: { zh: 'Ecosia', en: 'Ecosia' }, url: 'https://www.ecosia.org/search?q=', icon: 'https://www.ecosia.org/favicon.ico' },
-  { id: 'startpage', name: { zh: 'Startpage', en: 'Startpage' }, url: 'https://www.startpage.com/sp/search?query=', icon: 'https://www.startpage.com/favicon.ico' },
+  { id: 'google', name: { zh: '谷歌', en: 'Google' }, url: 'https://www.google.com/search?q=', icon: engineFavicon('google.com') },
+  { id: 'bing', name: { zh: '必应', en: 'Bing' }, url: 'https://www.bing.com/search?q=', icon: engineFavicon('bing.com') },
+  { id: 'duckduckgo', name: { zh: 'DuckDuckGo', en: 'DuckDuckGo' }, url: 'https://duckduckgo.com/?q=', icon: engineFavicon('duckduckgo.com') },
 
   // Chinese Specific
-  { id: 'baidu', name: { zh: '百度', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: 'https://www.baidu.com/favicon.ico' },
-  { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: 'https://www.google.com/s2/favicons?domain=sogou.com&sz=64' },
-  { id: 'so360', name: { zh: '360 搜索', en: '360 Search' }, url: 'https://www.so.com/s?q=', icon: 'https://www.so.com/favicon.ico' },
-  { id: 'zhihu', name: { zh: '知乎', en: 'Zhihu' }, url: 'https://www.zhihu.com/search?q=', icon: 'https://static.zhihu.com/heifetz/favicon.ico' },
-  { id: 'bilibili', name: { zh: '哔哩哔哩', en: 'Bilibili' }, url: 'https://search.bilibili.com/all?keyword=', icon: 'https://www.bilibili.com/favicon.ico' },
-  { id: 'xiaohongshu', name: { zh: '小红书', en: 'Xiaohongshu' }, url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: 'https://www.xiaohongshu.com/favicon.ico' },
-  { id: 'weibo', name: { zh: '微博', en: 'Weibo' }, url: 'https://s.weibo.com/weibo?q=', icon: 'https://weibo.com/favicon.ico' },
-  { id: 'douban', name: { zh: '豆瓣', en: 'Douban' }, url: 'https://www.douban.com/search?q=', icon: 'https://img3.doubanio.com/favicon.ico' },
+  { id: 'baidu', name: { zh: '百度', en: 'Baidu' }, url: 'https://www.baidu.com/s?wd=', icon: engineFavicon('baidu.com') },
+  { id: 'sogou', name: { zh: '搜狗', en: 'Sogou' }, url: 'https://www.sogou.com/web?query=', icon: engineFavicon('sogou.com') },
+  { id: 'bilibili', name: { zh: '哔哩哔哩', en: 'Bilibili' }, url: 'https://search.bilibili.com/all?keyword=', icon: engineFavicon('bilibili.com') },
+  { id: 'xiaohongshu', name: { zh: '小红书', en: 'Xiaohongshu' }, url: 'https://www.xiaohongshu.com/search_result?keyword=', icon: engineFavicon('xiaohongshu.com') },
 
   // Dev / Tech
-  { id: 'github', name: { zh: 'GitHub', en: 'GitHub' }, url: 'https://github.com/search?q=', icon: 'https://github.com/favicon.ico' },
-  { id: 'stackoverflow', name: { zh: 'StackOverflow', en: 'StackOverflow' }, url: 'https://stackoverflow.com/search?q=', icon: 'https://stackoverflow.com/favicon.ico' },
+  { id: 'github', name: { zh: 'GitHub', en: 'GitHub' }, url: 'https://github.com/search?q=', icon: engineFavicon('github.com') },
+  { id: 'stackoverflow', name: { zh: 'StackOverflow', en: 'StackOverflow' }, url: 'https://stackoverflow.com/search?q=', icon: engineFavicon('stackoverflow.com') },
 
   // Social / Media
-  { id: 'twitter', name: { zh: 'Twitter', en: 'Twitter' }, url: 'https://twitter.com/search?q=', icon: 'https://abs.twimg.com/favicons/twitter.2.ico' },
-  { id: 'reddit', name: { zh: 'Reddit', en: 'Reddit' }, url: 'https://www.reddit.com/search/?q=', icon: 'https://www.reddit.com/favicon.ico' },
-  { id: 'instagram', name: { zh: 'Instagram', en: 'Instagram' }, url: 'https://www.instagram.com/explore/tags/', icon: 'https://www.google.com/s2/favicons?domain=instagram.com&sz=64' },
+  { id: 'twitter', name: { zh: 'X / Twitter', en: 'X / Twitter' }, url: 'https://x.com/search?q=', icon: engineFavicon('x.com') },
+  { id: 'reddit', name: { zh: 'Reddit', en: 'Reddit' }, url: 'https://www.reddit.com/search/?q=', icon: engineFavicon('reddit.com') },
 
   // Knowledge
-  { id: 'wikipedia', name: { zh: '维基百科', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: 'https://en.wikipedia.org/favicon.ico' },
-  { id: 'scholar', name: { zh: '学术搜索', en: 'Scholar' }, url: 'https://scholar.google.com/scholar?q=', icon: 'https://scholar.google.com/favicon.ico' },
+  { id: 'wikipedia', name: { zh: '维基百科', en: 'Wikipedia' }, url: 'https://en.wikipedia.org/wiki/Special:Search?search=', icon: engineFavicon('wikipedia.org') },
 
   // Shopping
-  { id: 'amazon', name: { zh: '亚马逊', en: 'Amazon' }, url: 'https://www.amazon.com/s?k=', icon: 'https://www.amazon.com/favicon.ico' },
-  { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: 'https://www.google.com/s2/favicons?domain=taobao.com&sz=64' },
-  { id: 'jd', name: { zh: '京东', en: 'JD' }, url: 'https://search.jd.com/Search?keyword=', icon: 'https://www.jd.com/favicon.ico' },
+  { id: 'amazon', name: { zh: '亚马逊', en: 'Amazon' }, url: 'https://www.amazon.com/s?k=', icon: engineFavicon('amazon.com') },
+  { id: 'taobao', name: { zh: '淘宝', en: 'Taobao' }, url: 'https://s.taobao.com/search?q=', icon: engineFavicon('taobao.com') },
+  { id: 'jd', name: { zh: '京东', en: 'JD' }, url: 'https://search.jd.com/Search?keyword=', icon: engineFavicon('jd.com') },
 
 ];
 
 const DEFAULT_ENGINE_IDS = ['google', 'bing', 'baidu', 'xiaohongshu'];
 // Offered nowhere, even when the server list still has them
-const HIDDEN_ENGINE_IDS = new Set(['youtube', 'pinterest', 'npm', 'mdn', 'brave']);
+const HIDDEN_ENGINE_IDS = new Set([
+  'youtube', 'pinterest', 'npm', 'mdn', 'brave',
+  'yahoo', 'yandex', 'ecosia', 'startpage', 'so360',
+  'zhihu', 'douban', 'weibo', 'instagram', 'scholar'
+]);
+
+const DELETED_ENGINE_STORAGE_KEY = 'deletedEngineIds';
+
+function readDeletedEngineIds() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(DELETED_ENGINE_STORAGE_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed.map((id) => String(id)).filter(Boolean) : [];
+  } catch (_err) {
+    return [];
+  }
+}
+
+const deletedEngineIds = new Set(readDeletedEngineIds());
+
+function cloneBaseEngineCatalog() {
+  return BASE_ENGINE_CATALOG.map((engine) => ({
+    ...engine,
+    name: { ...engine.name }
+  }));
+}
+
+function isEngineDeleted(id) {
+  return deletedEngineIds.has(String(id));
+}
+
+let ENGINE_CATALOG = cloneBaseEngineCatalog().filter((engine) => !isEngineDeleted(engine.id));
+
+const CUSTOM_ENGINE_ID = 'custom';
+const CUSTOM_ENGINE_STORAGE_KEY = 'customEngine';
+
+function normalizeCustomSearchUrl(input) {
+  let raw = String(input || '').trim();
+  if (!raw) return '';
+  if (raw.includes('%s') && !raw.includes('{query}')) raw = raw.replace(/%s/g, '{query}');
+  if (!/^https?:\/\//i.test(raw)) return '';
+  try {
+    const probe = raw.includes('{query}') ? raw.replace(/\{query\}/g, 'newtab') : raw + 'newtab';
+    const parsed = new URL(probe);
+    return /^https?:$/.test(parsed.protocol) ? raw : '';
+  } catch (_err) {
+    return '';
+  }
+}
+
+function readCustomEngine() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CUSTOM_ENGINE_STORAGE_KEY) || 'null');
+    const url = normalizeCustomSearchUrl(parsed?.url);
+    if (!url) return null;
+    return {
+      name: String(parsed?.name || 'Custom').trim().slice(0, 40) || 'Custom',
+      url
+    };
+  } catch (_err) {
+    return null;
+  }
+}
+
+function buildCustomEngineOption(custom) {
+  const url = normalizeCustomSearchUrl(custom?.url);
+  if (!url) return null;
+  const domain = engineDomain({ url });
+  return {
+    id: CUSTOM_ENGINE_ID,
+    name: { zh: custom.name, en: custom.name },
+    url,
+    icon: domain ? engineFavicon(domain) : getEngineFallbackIcon({ url })
+  };
+}
+
+function ensureCustomEngineInCatalog(custom = readCustomEngine()) {
+  ENGINE_CATALOG = ENGINE_CATALOG.filter((engine) => engine.id !== CUSTOM_ENGINE_ID);
+  const option = buildCustomEngineOption(custom);
+  if (option) ENGINE_CATALOG.push(option);
+  return option;
+}
+
+function buildSearchUrl(engine, query) {
+  const q = encodeURIComponent(String(query || ''));
+  const template = String(engine?.url || '');
+  if (!template) return '';
+  return template.includes('{query}') ? template.replace(/\{query\}/g, q) : template + q;
+}
+
+// Restore the custom engine before state reads enabledEngineIds.
+ensureCustomEngineInCatalog();
 
 // Engine names exist in zh and en (a few carry more); other UI languages use
 // the English (brand) name.
@@ -1881,8 +2137,8 @@ function reconcileEngineStateAfterCatalogLoad() {
 
   state.enabledEngineIds = nextEnabled.slice(0, 5);
 
-  if (!state.enabledEngineIds.includes(state.engineId) && state.enabledEngineIds.length) {
-    state.engineId = state.enabledEngineIds[0];
+  if (!state.enabledEngineIds.includes(state.engineId)) {
+    state.engineId = state.enabledEngineIds[0] || '';
     state.engineIndex = 0;
   } else {
     const enabled = getEnabledEngines(state.enabledEngineIds);
@@ -1912,20 +2168,35 @@ async function loadGlobalEngineCatalog() {
       .filter((r) => r && r.id && r.url)
       .filter((r) => r.is_active !== false)
       .filter((r) => !HIDDEN_ENGINE_IDS.has(String(r.id)))
-      .map((r) => ({
-        id: String(r.id),
-        name: {
-          zh: String(r.name_zh || r.name_en || r.id),
-          en: String(r.name_en || r.name_zh || r.id)
-        },
-        url: String(r.url),
-        icon: String(r.icon || 'https://www.google.com/favicon.ico')
-      }));
+      .filter((r) => !isEngineDeleted(String(r.id)))
+      .map((r) => {
+        const builtin = ENGINE_CATALOG.find((e) => e.id === String(r.id));
+        let domain = '';
+        try { domain = new URL(String(r.url || '')).hostname; } catch (_err) {}
+        return {
+          id: String(r.id),
+          name: {
+            zh: String(r.name_zh || r.name_en || r.id),
+            en: String(r.name_en || r.name_zh || r.id)
+          },
+          url: String(r.url),
+          // Server-provided icon URLs have drifted in the past (old Twitter
+          // bird, wrong 360/Sogou marks). Derive non-built-in engines from
+          // their actual search host so the mark always matches the engine.
+          icon: builtin
+            ? builtin.icon
+            : (domain ? engineFavicon(domain) : String(r.icon || 'https://www.google.com/favicon.ico'))
+        };
+      });
 
     if (!list.length) return false;
     // The server list leads; built-in engines it lacks are kept after it.
     const serverIds = new Set(list.map((e) => e.id));
-    ENGINE_CATALOG = list.concat(ENGINE_CATALOG.filter((e) => !serverIds.has(e.id)));
+    ENGINE_CATALOG = list
+      .concat(ENGINE_CATALOG.filter((e) => !serverIds.has(e.id)))
+      .filter((engine) => !isEngineDeleted(engine.id));
+    // Server refreshes must not drop the user's private search engine.
+    ensureCustomEngineInCatalog();
     return true;
   } catch (err) {
     console.warn('Failed to load global search engines:', err);
@@ -1971,7 +2242,7 @@ function loadEnabledEngineIds() {
     if (list && list.length) return list.slice(0, 5);
   } catch {
   }
-  return [...DEFAULT_ENGINE_IDS].slice(0, 5);
+  return DEFAULT_ENGINE_IDS.filter((id) => ENGINE_CATALOG.some((e) => e.id === id)).slice(0, 5);
 }
 
 function saveEnabledEngineIds(ids) {
@@ -1991,6 +2262,7 @@ let state = {
   engineIndex: parseInt(localStorage.getItem('engineIndex')) || 0,
   engineId: localStorage.getItem('engineId') || '',
   enabledEngineIds: loadEnabledEngineIds(),
+  customEngine: readCustomEngine(),
   dateFormatIndex: parseInt(localStorage.getItem('dateFormatIndex')) || 0, // 0: YMD, 1: MDY, 2: DMY
   timeFormat: localStorage.getItem('timeFormat') || '24h', // '24h' or '12h'
   sites: JSON.parse(localStorage.getItem('sites')) || [],
@@ -2013,10 +2285,19 @@ if (!state.engineId) {
   }
 }
 
+// A locally deleted engine may still be referenced by saved state.
+{
+  const enabled = getEnabledEngines(state.enabledEngineIds);
+  if (!enabled.some((e) => e.id === state.engineId)) {
+    state.engineId = enabled[0]?.id || ENGINE_CATALOG[0]?.id || '';
+    state.engineIndex = 0;
+  }
+}
+
 function getCurrentEngine() {
   const enabled = getEnabledEngines(state.enabledEngineIds);
   const found = enabled.find((e) => e.id === state.engineId);
-  return found || enabled[0] || ENGINE_CATALOG[0];
+  return found || enabled[0] || ENGINE_CATALOG[0] || null;
 }
 
 function generateUuid() {
@@ -2218,8 +2499,23 @@ function handleDragOver(event) {
 function handleDrop(event, targetId, targetType) {
   event.preventDefault();
   event.stopPropagation();
-  // Dropped while still over another icon: make the folder now.
-  if (dragState.hoverTargetId === targetId && dragState.draggedId && dragState.draggedId !== targetId) {
+  if (!dragState.draggedId || dragState.draggedId === targetId) return false;
+
+  const tile = event.currentTarget?.closest?.('.site-tile') || event.currentTarget;
+  let overIcon = targetType === 'folder';
+  if (!overIcon && tile?.querySelector) {
+    const iconEl = tile.querySelector('.site-tile-icon');
+    if (iconEl) {
+      const r = iconEl.getBoundingClientRect();
+      const inset = r.width * 0.18;
+      overIcon = event.clientX > r.left + inset && event.clientX < r.right - inset
+        && event.clientY > r.top + inset && event.clientY < r.bottom - inset;
+    }
+  }
+
+  // Dropping on a folder always adds; dropping on another site's icon also
+  // merges immediately instead of depending on the 650ms hover timer.
+  if (overIcon && (targetType === 'folder' || dragState.draggedType === 'site')) {
     finishFolderHover(targetId);
   }
   return false;
@@ -2367,31 +2663,17 @@ window.migrateTagsToFolders = migrateTagsToFolders;
 const renameModal = document.getElementById('renameModal');
 const renameInput = document.getElementById('renameInput');
 let pendingRenameId = null;
-let pendingRenameType = 'folder'; // 'folder' | 'agent-chat' | 'agent-project'
-
 function openRenameModal(id, type) {
-  pendingRenameType = type || 'folder';
-  let value = '';
-  if (pendingRenameType === 'folder') {
-    const folder = (state.sites || []).find((s) => s && s.id === id);
-    if (!folder) return;
-    value = folder.name || '';
-  } else if (pendingRenameType === 'agent-chat') {
-    const project = getActiveProject();
-    const chat = project.chats.find((c) => c.id === id);
-    if (!chat) return;
-    value = chat.title || '';
-  } else if (pendingRenameType === 'agent-project') {
-    const project = workbench.agent.projects.find((pr) => pr.id === id);
-    if (!project) return;
-    value = project.name || '';
-  } else if (pendingRenameType === 'calendar-event') {
-    const ev = (workbench.calendar || []).find((e) => e.id === id);
-    if (!ev) return;
-    value = ev.title || '';
-  }
+  // Only folders are renameable in the home-only build. The workspace and
+  // agent sheets were removed with the second screen, so never touch their
+  // dead globals here.
+  if (type && type !== 'folder') return;
+  const folder = (state.sites || []).find((s) => s && s.id === id && s.type === 'folder');
+  if (!folder) return;
+  const value = folder.name || '';
   pendingRenameId = id;
   if (renameInput) renameInput.value = value;
+  window.closeAllWindowsExcept?.(renameModal);
   if (renameModal) renameModal.classList.remove('hidden');
   modalOverlay.classList.remove('hidden');
   if (renameInput) { renameInput.focus(); renameInput.select(); }
@@ -2405,37 +2687,11 @@ function saveRename() {
     window.showNotification?.(i18n.t('folderNameRequired') || 'Folder name cannot be empty', 'warning');
     return;
   }
-  if (pendingRenameType === 'folder') {
-    const folder = (state.sites || []).find((s) => s && s.id === pendingRenameId);
-    if (folder) {
-      folder.name = name;
-      saveData();
-      renderHome();
-    }
-  } else if (pendingRenameType === 'agent-chat') {
-    const project = getActiveProject();
-    const chat = project.chats.find((c) => c.id === pendingRenameId);
-    if (chat) {
-      chat.title = name;
-      chat.updatedAt = Date.now();
-      saveWorkbench();
-      renderAgentPanel();
-    }
-  } else if (pendingRenameType === 'agent-project') {
-    const project = workbench.agent.projects.find((pr) => pr.id === pendingRenameId);
-    if (project) {
-      project.name = name;
-      saveWorkbench();
-      renderAgentPanel();
-    }
-  } else if (pendingRenameType === 'calendar-event') {
-    const ev = (workbench.calendar || []).find((e) => e.id === pendingRenameId);
-    if (ev) {
-      ev.title = name;
-      ev.updatedAt = Date.now();
-      persistWorkbenchSync();
-      openCalendarEditor();
-    }
+  const folder = (state.sites || []).find((s) => s && s.id === pendingRenameId && s.type === 'folder');
+  if (folder) {
+    folder.name = name;
+    saveData();
+    renderHome();
   }
   closeRenameModal();
 }
@@ -2607,12 +2863,11 @@ const modalOverlay = document.getElementById('modalOverlay');
 const addModal = document.getElementById('addModal');
 const closeAddModalBtn = document.getElementById('closeAddModal');
 const saveItemBtn = document.getElementById('saveItem');
-const addTypeRadios = document.getElementsByName('addType');
 const siteForm = document.getElementById('siteForm');
-const folderForm = document.getElementById('folderForm');
 
 // Context Menu
 const contextMenu = document.getElementById('contextMenu');
+const engineContextMenu = document.getElementById('engineContextMenu');
 
 // ===== Time & Date =====
 function updateTime() {
@@ -2689,14 +2944,25 @@ setInterval(updateTime, 1000);
 updateTime();
 
 // ===== Search Engine =====
-// Broken engine icons fall back via data-fallback-src. One delegated listener
-// (image errors don't bubble, so capture) replaces inline onerror attributes,
-// which the extension's CSP blocks.
+// Engine icons use a source chain in data-favicon-sources. The delegated
+// error/load listeners advance it when a source 404s or only yields a 16px
+// globe. They replace inline handlers, which the extension's CSP blocks.
 document.addEventListener('error', (e) => {
   const img = e.target;
-  if (img && img.tagName === 'IMG' && img.dataset.fallbackSrc && img.src !== img.dataset.fallbackSrc) {
+  if (!img || img.tagName !== 'IMG') return;
+  if (advanceFaviconChain(img)) return;
+  if (img.dataset.fallbackSrc && img.src !== img.dataset.fallbackSrc) {
     img.src = img.dataset.fallbackSrc;
   }
+}, true);
+
+document.addEventListener('load', (e) => {
+  const img = e.target;
+  if (!img || img.tagName !== 'IMG' || !img.dataset.faviconSources) return;
+  if (img.naturalWidth > 0 && img.naturalWidth < FAVICON_SHARP_EDGE && advanceFaviconChain(img)) return;
+  const list = decodeFaviconSources(img.dataset.faviconSources);
+  const source = list[Number(img.dataset.faviconIndex || 0)];
+  if (source && window.MediaCache?.warm) window.MediaCache.warm(source);
 }, true);
 
 function renderSearchEngine() {
@@ -2704,8 +2970,11 @@ function renderSearchEngine() {
   const enabled = getEnabledEngines(enabledIds);
   const engine = getCurrentEngine();
 
-  engineIcon.src = engine.icon;
-  engineIcon.onerror = () => { engineIcon.src = 'https://www.google.com/favicon.ico'; };
+  if (engine) {
+    setFaviconChain(engineIcon, getEngineIconSources(engine), getEngineFallbackIcon(engine));
+  } else {
+    setFaviconChain(engineIcon, ['https://www.google.com/favicon.ico'], 'https://www.google.com/favicon.ico');
+  }
 
   const addable = getCatalogAddableEngines(enabledIds);
   const addLabel = i18n.t('addEngine');
@@ -2715,11 +2984,12 @@ function renderSearchEngine() {
     <div class="engine-menu-section">
       ${enabled.map((eng) => {
     const name = getEngineName(eng);
-    const isCurrent = eng.id === engine.id;
+    const isCurrent = !!engine && eng.id === engine.id;
+    const iconAttrs = faviconChainAttributes(getEngineIconSources(eng), getEngineFallbackIcon(eng));
     return `
           <div class="engine-option ${isCurrent ? 'active' : ''}" data-engine-id="${eng.id}">
             <div class="engine-option-main" onclick="selectEngineById('${eng.id}')">
-              <img src="${eng.icon}" alt="${name}" data-fallback-src="https://www.google.com/favicon.ico">
+              <img ${iconAttrs} alt="${escapeFaviconAttr(name)}">
               <span>${name}</span>
             </div>
             ${enabled.length > 1 ? `
@@ -2751,10 +3021,11 @@ function renderEngineQuickList() {
     const engine = ENGINE_CATALOG.find(e => e.id === id);
     if (!engine) return '';
     const name = engine.name?.[lang] || engine.name?.en || engine.id;
-    const isActive = engine.id === currentEngine.id;
+    const isActive = !!currentEngine && engine.id === currentEngine.id;
+    const iconAttrs = faviconChainAttributes(getEngineIconSources(engine), getEngineFallbackIcon(engine));
     return `
-      <div class="engine-quick-item ${isActive ? 'active' : ''}" onclick="selectEngineById('${engine.id}')" title="${name}">
-        <img src="${engine.icon}" alt="${name}" data-fallback-src="https://www.google.com/favicon.ico">
+      <div class="engine-quick-item ${isActive ? 'active' : ''}" data-engine-id="${engine.id}" onclick="selectEngineById('${engine.id}')" title="${name}">
+        <img ${iconAttrs} alt="${escapeFaviconAttr(name)}">
         <span>${name}</span>
       </div>
     `;
@@ -2763,10 +3034,46 @@ function renderEngineQuickList() {
 
 // ===== Search Engine Modal Logic =====
 
+function updateEngineCustomLabels() {
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = text;
+  };
+  setText('customEngineTitle', i18n.t('customSearch'));
+  setText('customEngineHint', i18n.t('customSearchHint'));
+  setText('customEngineNameLabel', i18n.t('customSearchName'));
+  setText('customEngineUrlLabel', i18n.t('customSearchUrl'));
+  const saveBtn = document.getElementById('saveCustomEngine');
+  if (saveBtn) saveBtn.textContent = i18n.t('customEngineAdd');
+  const resetBtn = document.getElementById('resetEngines');
+  if (resetBtn) resetBtn.textContent = i18n.t('resetEngines');
+  const nameInput = document.getElementById('customEngineName');
+  const urlInput = document.getElementById('customEngineUrl');
+  if (nameInput) nameInput.placeholder = i18n.t('customSearchNamePlaceholder');
+  if (urlInput) urlInput.placeholder = i18n.t('customSearchPlaceholder');
+}
+
+function populateEngineCustomPanel() {
+  const nameInput = document.getElementById('customEngineName');
+  const urlInput = document.getElementById('customEngineUrl');
+  if (nameInput) nameInput.value = state.customEngine?.name || '';
+  if (urlInput) urlInput.value = state.customEngine?.url || '';
+  updateEngineCustomLabels();
+}
+
+function refreshEngineCatalogUI() {
+  const grid = document.getElementById('engineList');
+  if (grid) grid.dataset.key = '';
+  renderSearchEngine();
+  renderEngineQuickList();
+  renderEngineModal();
+}
+
 function openEngineModal() {
   const engineModal = document.getElementById('engineModal');
   if (!engineModal) return;
   engineMenu?.classList.add('hidden'); // one glass layer at a time
+  window.closeAllWindowsExcept?.(engineModal);
   engineModal.classList.remove('hidden');
 
   // Ensure the shared overlay is not blocking clicks
@@ -2784,6 +3091,7 @@ function openEngineModal() {
   enginePageState.selectedIds = [...(state.enabledEngineIds || [])];
   enginePageState.page = 1;
 
+  populateEngineCustomPanel();
   renderEngineModal();
 }
 
@@ -2844,10 +3152,11 @@ function renderEngineModal() {
   grid.innerHTML = items.map(eng => {
     const isSelected = enginePageState.selectedIds.includes(eng.id);
     const name = getEngineName(eng);
+    const iconAttrs = faviconChainAttributes(getEngineIconSources(eng), getEngineFallbackIcon(eng));
     return `
       <div class="engine-item ${isSelected ? 'selected' : ''}" data-engine-id="${eng.id}" onclick="toggleEngineSelection('${eng.id}')">
         <div class="engine-check">✓</div>
-        <img src="${eng.icon}" alt="" width="32" height="32" loading="lazy" decoding="async" data-fallback-src="https://www.google.com/favicon.ico">
+        <img ${iconAttrs} alt="" width="32" height="32" loading="lazy" decoding="async">
         <span>${name}</span>
       </div>
     `;
@@ -2862,22 +3171,17 @@ function renderEngineModal() {
 // Bind events
 document.getElementById('closeEngineModal').onclick = closeEngineModal;
 document.getElementById('saveEngineSelection').onclick = async () => {
-  if (!window.authState || !window.authState.isLoggedIn) {
-    window.requireLoginForPersistentChange?.();
-    return;
-  }
-
   if (enginePageState.selectedIds.length === 0) {
-    // Prevent empty selection? logic says at least one
-    // Fallback to default if empty
-    enginePageState.selectedIds = [...DEFAULT_ENGINE_IDS];
+    const fallback = DEFAULT_ENGINE_IDS.find((id) => ENGINE_CATALOG.some((engine) => engine.id === id))
+      || ENGINE_CATALOG[0]?.id;
+    enginePageState.selectedIds = fallback ? [fallback] : [];
   }
 
   state.enabledEngineIds = [...enginePageState.selectedIds].slice(0, 5);
 
   // Ensure current engine is still valid
   if (!state.enabledEngineIds.includes(state.engineId)) {
-    state.engineId = state.enabledEngineIds[0];
+    state.engineId = state.enabledEngineIds[0] || '';
   }
 
   const saved = await saveData();
@@ -2889,11 +3193,6 @@ document.getElementById('saveEngineSelection').onclick = async () => {
 };
 
 window.selectEngineById = async (id) => {
-  if (!window.authState || !window.authState.isLoggedIn) {
-    window.requireLoginForPersistentChange?.();
-    return;
-  }
-
   const enabled = getEnabledEngines(state.enabledEngineIds || []);
   const idx = enabled.findIndex((e) => e.id === id);
   if (idx < 0) return;
@@ -2913,11 +3212,6 @@ window.toggleEngineAddMenu = () => {
 };
 
 window.addEngineById = async (id) => {
-  if (!window.authState || !window.authState.isLoggedIn) {
-    window.requireLoginForPersistentChange?.();
-    return;
-  }
-
   if (!ENGINE_CATALOG.some((e) => e.id === id)) return;
   const set = new Set(state.enabledEngineIds || []);
   if (set.has(id)) return;
@@ -2933,11 +3227,6 @@ window.addEngineById = async (id) => {
 };
 
 window.removeEngineById = async (id) => {
-  if (!window.authState || !window.authState.isLoggedIn) {
-    window.requireLoginForPersistentChange?.();
-    return;
-  }
-
   const current = String(state.engineId || '');
   const list = (state.enabledEngineIds || []).filter((x) => x !== id);
   if (list.length < 1) return;
@@ -2959,6 +3248,137 @@ window.removeEngineById = async (id) => {
   renderEngineQuickList();
 };
 
+document.getElementById('saveCustomEngine')?.addEventListener('click', async () => {
+  const nameInput = document.getElementById('customEngineName');
+  const urlInput = document.getElementById('customEngineUrl');
+  const name = String(nameInput?.value || '').trim().slice(0, 40) || i18n.t('customSearch');
+  const url = normalizeCustomSearchUrl(urlInput?.value);
+  if (!url) {
+    window.showNotification?.(i18n.t('customSearchInvalid'), 'error');
+    urlInput?.focus();
+    return;
+  }
+
+  const custom = { name, url };
+  localStorage.setItem(CUSTOM_ENGINE_STORAGE_KEY, JSON.stringify(custom));
+  state.customEngine = custom;
+  ensureCustomEngineInCatalog(custom);
+
+  if (!state.enabledEngineIds.includes(CUSTOM_ENGINE_ID) && state.enabledEngineIds.length < 5) {
+    state.enabledEngineIds = [...state.enabledEngineIds, CUSTOM_ENGINE_ID];
+  }
+  if (state.enabledEngineIds.includes(CUSTOM_ENGINE_ID)) {
+    state.engineId = CUSTOM_ENGINE_ID;
+    state.engineIndex = Math.max(0, getEnabledEngines(state.enabledEngineIds).findIndex((e) => e.id === CUSTOM_ENGINE_ID));
+  }
+
+  enginePageState.selectedIds = [...state.enabledEngineIds];
+  const saved = await saveData();
+  if (saved === false) return;
+  populateEngineCustomPanel();
+  refreshEngineCatalogUI();
+  window.showNotification?.(i18n.t('customSearchSaved'), 'success');
+});
+
+function showEngineContextMenu(event, engineId) {
+  const engine = ENGINE_CATALOG.find((item) => item.id === engineId);
+  if (!engineContextMenu || !engine) return;
+  event.preventDefault();
+  event.stopPropagation();
+  hideContextMenu?.();
+  window.hideAllContextMenus?.();
+  engineContextMenu.dataset.engineId = engineId;
+  engineContextMenu.innerHTML = `<div class="context-menu-item">${i18n.t('deleteEngine')}</div>`;
+  engineContextMenu.classList.remove('hidden');
+  placeMenuAt(engineContextMenu, event.clientX, event.clientY);
+}
+
+async function deleteEngineById(id) {
+  const engine = ENGINE_CATALOG.find((item) => item.id === id);
+  if (!engine) return;
+  engineContextMenu?.classList.add('hidden');
+  const wasOpen = !document.getElementById('engineModal')?.classList.contains('hidden');
+  const message = i18n.t('deleteEngineConfirm').replace('{name}', getEngineName(engine));
+  const shouldDelete = window.showConfirmDialog
+    ? await window.showConfirmDialog({
+      title: i18n.t('deleteConfirm'),
+      message,
+      confirmText: i18n.t('delete'),
+      cancelText: i18n.t('cancel'),
+      tone: 'danger'
+    })
+    : window.confirm(message);
+  if (!shouldDelete) return;
+
+  if (id === CUSTOM_ENGINE_ID) {
+    localStorage.removeItem(CUSTOM_ENGINE_STORAGE_KEY);
+    state.customEngine = null;
+  } else {
+    deletedEngineIds.add(id);
+    localStorage.setItem(DELETED_ENGINE_STORAGE_KEY, JSON.stringify([...deletedEngineIds]));
+  }
+
+  ENGINE_CATALOG = ENGINE_CATALOG.filter((item) => item.id !== id);
+  state.enabledEngineIds = (state.enabledEngineIds || []).filter((engineId) => engineId !== id);
+  enginePageState.selectedIds = (enginePageState.selectedIds || []).filter((engineId) => engineId !== id);
+  if (state.engineId === id) {
+    const next = getEnabledEngines(state.enabledEngineIds)[0] || ENGINE_CATALOG[0] || null;
+    state.engineId = next ? next.id : '';
+    state.engineIndex = 0;
+  }
+
+  const saved = await saveData();
+  if (saved === false) return;
+  populateEngineCustomPanel();
+  refreshEngineCatalogUI();
+  if (wasOpen) openEngineModal();
+  window.showNotification?.(i18n.t('engineDeleted'), 'success');
+}
+
+async function resetEngineCatalog() {
+  const shouldReset = window.showConfirmDialog
+    ? await window.showConfirmDialog({
+      title: i18n.t('resetEngines'),
+      message: i18n.t('resetEnginesConfirm'),
+      confirmText: i18n.t('resetEngines'),
+      cancelText: i18n.t('cancel'),
+      tone: 'warning'
+    })
+    : window.confirm(i18n.t('resetEnginesConfirm'));
+  if (!shouldReset) return;
+
+  deletedEngineIds.clear();
+  localStorage.removeItem(DELETED_ENGINE_STORAGE_KEY);
+  localStorage.removeItem(CUSTOM_ENGINE_STORAGE_KEY);
+  state.customEngine = null;
+  ENGINE_CATALOG = cloneBaseEngineCatalog();
+  state.enabledEngineIds = DEFAULT_ENGINE_IDS.filter((id) => ENGINE_CATALOG.some((engine) => engine.id === id));
+  state.engineId = state.enabledEngineIds[0] || '';
+  state.engineIndex = 0;
+  enginePageState.selectedIds = [...state.enabledEngineIds];
+
+  const saved = await saveData();
+  if (saved === false) return;
+  populateEngineCustomPanel();
+  refreshEngineCatalogUI();
+  openEngineModal();
+  window.showNotification?.(i18n.t('enginesReset'), 'success');
+}
+
+document.getElementById('resetEngines')?.addEventListener('click', resetEngineCatalog);
+
+engineContextMenu?.addEventListener('click', (event) => {
+  if (!event.target.closest('.context-menu-item')) return;
+  const id = engineContextMenu.dataset.engineId;
+  if (id) deleteEngineById(id);
+});
+
+document.addEventListener('contextmenu', (event) => {
+  const target = event.target.closest?.('.engine-item[data-engine-id], .engine-quick-item[data-engine-id], .engine-option[data-engine-id]');
+  if (!target) return;
+  showEngineContextMenu(event, target.dataset.engineId);
+}, true);
+
 searchEngineEl.addEventListener('click', (e) => {
   e.stopPropagation();
   if (e.target && e.target.closest && e.target.closest('#engineMenu')) {
@@ -2976,9 +3396,15 @@ searchForm.addEventListener('submit', (e) => {
   const query = searchInput.value.trim();
   if (!query) return;
   const engine = getCurrentEngine();
+  if (!engine) {
+    window.showNotification?.(i18n.t('engineEmpty'), 'info');
+    openEngineModal();
+    return;
+  }
   (async () => {
     await logSearchQueryToSupabase(query, engine);
-    const targetUrl = engine.url + encodeURIComponent(query);
+    const targetUrl = buildSearchUrl(engine, query);
+    if (!targetUrl) return;
     if (state.openBehavior === 'newtab') {
       window.open(targetUrl, '_blank', 'noopener,noreferrer');
     } else {
@@ -3050,21 +3476,20 @@ function renderContextMenu() {
   const type = contextMenuState.targetType;
 
   if (type !== 'site') return;
-  setAddType('site');
   document.getElementById('siteName').value = item.name;
   document.getElementById('siteUrl').value = item.url;
   resetIconDraft(item);
+  addSiteCategory = 'custom';
+  renderAddSiteCatalog();
 
   // Store the item being edited for save logic
   window.editingItem = { item, type };
   if (type === 'site') renderSiteIconPreview();
 
+  window.closeAllWindowsExcept?.(addModal);
   addModal.classList.remove('hidden');
   modalOverlay.classList.remove('hidden');
   hideContextMenu();
-
-  // Disable type switching during edit
-  addTypeRadios.forEach(r => r.disabled = true);
 };
 
 // Delete Modal State
@@ -3082,6 +3507,7 @@ window.deleteItem = function () {
   document.getElementById('deleteMessage').textContent = `${i18n.t('deleteConfirm')} "${itemName}"?`;
 
   // Show Modal
+  window.closeAllWindowsExcept?.(document.getElementById('deleteModal'));
   document.getElementById('deleteModal').classList.remove('hidden');
   modalOverlay.classList.remove('hidden');
 
@@ -3143,22 +3569,123 @@ document.addEventListener('click', (e) => {
 // ===== Content Rendering =====
 // Favicon sources, best first. The extension reads Chrome's own favicon cache
 // (offline, no third-party request); the web build tries Google, then DuckDuckGo.
-function getFaviconSources(url) {
+let faviconRefreshEpoch = 0;
+
+function getFaviconSources(url, options) {
+  const opts = options || {};
+  const bust = opts.bust ? String(opts.bust) : '';
+  const bustQuery = (asFirst) => bust ? (asFirst ? '?' : '&') + 'v=' + encodeURIComponent(bust) : '';
   let host = '';
+  let absoluteUrl = '';
   try {
-    host = new URL(String(url || ''), window.location.href).hostname;
+    const parsed = new URL(String(url || ''), window.location.href);
+    host = parsed.hostname.replace(/^www\./i, '');
+    absoluteUrl = parsed.href;
   } catch (_err) {
     return [];
   }
   if (!host) return [];
-  // Google's 128px icon first everywhere. The extension's _favicon is Chrome's
-  // own cache, usually a 16px icon scaled up, so it is only a fallback.
-  const sources = ['https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=128'];
-  if (typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION && typeof chrome !== 'undefined' && chrome.runtime?.getURL) {
-    sources.push(chrome.runtime.getURL('/_favicon/?pageUrl=' + encodeURIComponent(url) + '&size=64'));
+  // NewTab's own new liquid-glass mark beats any cached letter favicon.
+  if (/^(www\.|staging\.)?newtab\.online$/i.test(host)) {
+    const localIcon = (typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION && typeof chrome !== 'undefined' && chrome.runtime?.getURL)
+      ? chrome.runtime.getURL('favicon.svg')
+      : new URL('/favicon.svg', window.location.origin).href;
+    return [
+      localIcon + bustQuery(true),
+      'https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=256' + bustQuery()
+    ];
   }
-  sources.push('https://icons.duckduckgo.com/ip3/' + encodeURIComponent(host) + '.ico');
+  // In the extension, Chrome's own favicon store is local and returns before
+  // any network request. The web build keeps Google's 128px icon first because
+  // it has no access to the browser's favicon database.
+  const sources = [];
+  if (typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION && typeof chrome !== 'undefined' && chrome.runtime?.getURL) {
+    sources.push(chrome.runtime.getURL('/_favicon/?pageUrl=' + encodeURIComponent(absoluteUrl) + '&size=128' + (bust ? '&t=' + encodeURIComponent(bust) : '')));
+  }
+  sources.push('https://www.google.com/s2/favicons?domain=' + encodeURIComponent(host) + '&sz=256' + bustQuery());
+  sources.push('https://icons.duckduckgo.com/ip3/' + encodeURIComponent(host) + '.ico' + bustQuery(true));
   return sources;
+}
+
+// Extra sources tried only after both primary providers fail. They are kept
+// out of getFaviconSources so the tile renderer can show its letter fallback
+// immediately, then swap in a late, sharper icon if one of these loads.
+function getSiteFaviconFallbackSources(url, bust) {
+  const bustFirst = bust ? '?' : '&';
+  const bustQuery = bust ? bustFirst + 'v=' + encodeURIComponent(String(bust)) : '';
+  let host = '';
+  try {
+    host = new URL(String(url || ''), window.location.href).hostname.replace(/^www\./i, '');
+  } catch (_err) {
+    return [];
+  }
+  if (!host) return [];
+  return dedupeUrls([
+    'https://' + host + '/favicon.ico' + bustQuery,
+    'https://icon.horse/icon/' + encodeURIComponent(host) + bustQuery
+  ]);
+}
+
+function getDisplayFaviconSources(url, bust) {
+  return dedupeUrls([
+    ...getFaviconSources(url, { bust }),
+    ...getSiteFaviconFallbackSources(url, bust)
+  ]);
+}
+
+function escapeFaviconAttr(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+function encodeFaviconSources(sources) {
+  return dedupeUrls(sources)
+    .map((url) => encodeURIComponent(url).replace(/'/g, '%27'))
+    .join('|');
+}
+
+function decodeFaviconSources(raw) {
+  if (!raw) return [];
+  return String(raw).split('|').map((part) => {
+    try { return decodeURIComponent(part); } catch (_err) { return ''; }
+  }).filter(Boolean);
+}
+
+// Markup for a templated <img>. The image starts on the best source and the
+// delegated load/error handlers advance through the rest without inline JS,
+// which keeps the extension CSP happy.
+function faviconChainAttributes(sources, fallback) {
+  const list = dedupeUrls(sources);
+  const first = list[0] || fallback || '';
+  return 'src="' + escapeFaviconAttr(first) + '"'
+    + ' data-favicon-sources="' + escapeFaviconAttr(encodeFaviconSources(list)) + '"'
+    + ' data-favicon-index="0"'
+    + (fallback ? ' data-fallback-src="' + escapeFaviconAttr(fallback) + '"' : '');
+}
+
+function setFaviconChain(img, sources, fallback) {
+  if (!img) return;
+  const list = dedupeUrls(sources);
+  img.dataset.faviconSources = encodeFaviconSources(list);
+  img.dataset.faviconIndex = '0';
+  if (fallback) img.dataset.fallbackSrc = fallback;
+  else delete img.dataset.fallbackSrc;
+  img.src = list[0] || fallback || '';
+}
+
+function advanceFaviconChain(img) {
+  if (!img || img.tagName !== 'IMG') return false;
+  const list = decodeFaviconSources(img.dataset.faviconSources);
+  if (list.length < 2) return false;
+  const index = Number(img.dataset.faviconIndex || 0);
+  const next = index + 1;
+  if (next >= list.length) return false;
+  img.dataset.faviconIndex = String(next);
+  img.src = list[next];
+  return true;
 }
 
 // site.customIcon is either an https URL or a small data:image (see
@@ -3216,14 +3743,32 @@ function getSiteFaviconUrl(url) {
 
 // Walks the source list on error. A tiny first hit (Google's 16px globe for
 // unknown sites) is kept as a fallback while a sharper source is tried.
-function loadFavicon(img, sources, onFail) {
+function loadFavicon(img, sources, onFail, options) {
+  const opts = options || {};
+  if (!sources.length) {
+    onFail();
+    return;
+  }
   let i = 0;
   let lowRes = '';
+  let warmed = false;
+  const isExtensionRuntime = typeof IS_EXTENSION !== 'undefined' && IS_EXTENSION;
+  const force = !!opts.force;
+  const minEdge = Number.isFinite(opts.minEdge) ? opts.minEdge : 48;
+  const warmLoadedSource = () => {
+    if (warmed || isExtensionRuntime) return;
+    warmed = true;
+    const source = sources[i] || sources[0];
+    if (window.MediaCache?.warm) window.MediaCache.warm(source);
+  };
   img.onload = () => {
-    if (img.naturalWidth < 32 && i < sources.length - 1) {
+    // Do not persist a tiny 16px globe: try the sharper providers first.
+    if (img.naturalWidth > 0 && img.naturalWidth < minEdge && i < sources.length - 1) {
       lowRes = lowRes || img.src;
       img.src = sources[++i];
+      return;
     }
+    warmLoadedSource();
   };
   img.onerror = () => {
     if (i < sources.length - 1) {
@@ -3236,7 +3781,18 @@ function loadFavicon(img, sources, onFail) {
       onFail();
     }
   };
-  img.src = sources[0];
+
+  // Web: reuse a previously stored response when available, otherwise show
+  // the regular remote URL and persist it after it loads.
+  if (!force && !isExtensionRuntime && window.MediaCache?.resolveFirst) {
+    window.MediaCache.resolveFirst(sources).then((cached) => {
+      img.src = cached || sources[0];
+    }).catch(() => {
+      img.src = sources[0];
+    });
+  } else {
+    img.src = sources[0];
+  }
 }
 
 function getSiteInitial(site) {
@@ -3253,18 +3809,22 @@ function isValidIconColor(color) {
 
 function createTextIcon(text, color) {
   const icon = document.createElement('div');
-  icon.className = 'site-tile-icon is-text-icon';
+  icon.className = 'site-tile-icon glass is-text-icon';
   icon.style.setProperty('--icon-bg', color);
   const hex = color.replace('#', '');
   const [r, g, b] = [0, 2, 4].map((i) => parseInt(hex.slice(i, i + 2), 16));
   // perceived brightness decides white or dark text
   icon.classList.toggle('is-light-bg', (r * 299 + g * 587 + b * 114) / 1000 > 170);
+  const badge = document.createElement('span');
+  badge.className = 'site-tile-badge';
+  badge.style.background = color;
   const label = document.createElement('span');
   label.className = 'site-tile-text';
   const chars = Array.from(String(text).trim()).slice(0, ICON_TEXT_MAX);
   label.textContent = chars.join('');
   label.dataset.len = String(chars.length);
-  icon.appendChild(label);
+  badge.appendChild(label);
+  icon.appendChild(badge);
   return icon;
 }
 
@@ -3285,92 +3845,23 @@ function placeMenuAt(menu, clientX, clientY) {
 }
 window.placeMenuAt = placeMenuAt;
 
-// ---- Icon plate fill ----
-// A favicon fills its plate. When the image has its own opaque background it
-// is shown edge to edge; when it is transparent the plate takes a soft tint of
-// the icon's main color. Results are cached per image URL.
-const iconFillCache = new Map();
-
-function analyzeIconImage(src) {
-  if (iconFillCache.has(src)) return iconFillCache.get(src);
-  const job = new Promise((resolve) => {
-    const probe = new Image();
-    probe.crossOrigin = 'anonymous';
-    probe.onload = () => {
-      try {
-        const n = 24;
-        const canvas = document.createElement('canvas');
-        canvas.width = n;
-        canvas.height = n;
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(probe, 0, 0, n, n);
-        const data = ctx.getImageData(0, 0, n, n).data;
-        const alphaAt = (x, y) => data[(y * n + x) * 4 + 3];
-        const corners = [alphaAt(1, 1), alphaAt(n - 2, 1), alphaAt(1, n - 2), alphaAt(n - 2, n - 2)];
-        const opaque = corners.every((a) => a > 230);
-        // Main color: most common saturated-enough bucket among opaque pixels
-        const buckets = new Map();
-        for (let i = 0; i < data.length; i += 4) {
-          if (data[i + 3] < 200) continue;
-          const r = data[i], g = data[i + 1], b = data[i + 2];
-          const max = Math.max(r, g, b), min = Math.min(r, g, b);
-          const weight = max - min > 40 ? 3 : 1; // prefer colorful over gray/white
-          if (max > 245 && min > 235) continue; // skip near-white
-          const key = (r >> 5) + ',' + (g >> 5) + ',' + (b >> 5);
-          const bk = buckets.get(key) || { r: 0, g: 0, b: 0, n: 0, w: 0 };
-          bk.r += r; bk.g += g; bk.b += b; bk.n += 1; bk.w += weight;
-          buckets.set(key, bk);
-        }
-        let best = null;
-        buckets.forEach((bk) => { if (!best || bk.w > best.w) best = bk; });
-        const color = best ? [best.r / best.n, best.g / best.n, best.b / best.n].map(Math.round) : null;
-        resolve({ opaque, color });
-      } catch (_err) {
-        resolve(null); // tainted canvas (no CORS): keep the default plate
-      }
-    };
-    probe.onerror = () => resolve(null);
-    probe.src = src;
-  });
-  iconFillCache.set(src, job);
-  return job;
-}
-
-// Only images whose pixels can be read: data URLs and same-origin files
-// (the extension's _favicon). Remote favicon services send no CORS header, so
-// probing them would only fail and log errors.
-function canReadIconPixels(src) {
-  if (src.startsWith('data:')) return true;
-  try { return new URL(src, location.href).origin === location.origin; } catch (_err) { return false; }
-}
-
-function applyIconFill(plate, img) {
-  const src = img.currentSrc || img.src;
-  if (!src || img.naturalWidth < 24) return; // tiny fallbacks stay centered
-  if (!canReadIconPixels(src)) return;
-  analyzeIconImage(src).then((info) => {
-    if (!info || !plate.isConnected && !plate.parentNode) return;
-    if (info.opaque) {
-      plate.classList.add('is-full-bleed');
-    } else if (info.color) {
-      const [r, g, b] = info.color;
-      plate.classList.add('is-tinted');
-      plate.style.setProperty('--icon-fill', 'rgb(' + r + ' ' + g + ' ' + b + ')');
-    }
-  });
-}
-
 function createFaviconIcon(site) {
   if (site.iconText && isValidIconColor(site.iconColor)) return createTextIcon(site.iconText, site.iconColor);
   const icon = document.createElement('div');
   icon.className = 'site-tile-icon glass';
+  const refreshEpoch = typeof faviconRefreshEpoch === 'number' ? faviconRefreshEpoch : 0;
 
   const letter = document.createElement('span');
   letter.className = 'site-tile-letter';
   letter.textContent = getSiteInitial(site);
   icon.appendChild(letter);
 
-  const sources = getFaviconSources(site.url);
+  const sources = getFaviconSources(site.url, { bust: refreshEpoch || undefined });
+  // The test harness only extracts the core functions, so guard the richer
+  // fallback list instead of assuming it exists there.
+  if (typeof getSiteFaviconFallbackSources === 'function') {
+    sources.push(...getSiteFaviconFallbackSources(site.url, refreshEpoch || undefined));
+  }
   if (isValidSiteIcon(site.customIcon)) {
     sources.unshift(site.customIcon);
     icon.classList.add('has-custom-icon');
@@ -3382,11 +3873,10 @@ function createFaviconIcon(site) {
   const img = document.createElement('img');
   img.className = 'site-tile-favicon';
   img.loading = 'lazy';
+  img.decoding = 'async';
   img.alt = '';
+  img.draggable = false;
   icon.appendChild(img);
-  if (!icon.classList.contains('has-custom-icon')) {
-    img.addEventListener('load', () => applyIconFill(icon, img));
-  }
   loadFavicon(img, sources, () => {
     img.remove();
     icon.classList.add('is-letter');
@@ -3397,6 +3887,7 @@ function createFaviconIcon(site) {
 function createFolderIcon(children) {
   const icon = document.createElement('div');
   icon.className = 'site-tile-icon folder-tile-icon glass';
+  const refreshEpoch = typeof faviconRefreshEpoch === 'number' ? faviconRefreshEpoch : 0;
   // Up to four members, 2 x 2, filling the plate left to right, top to bottom
   children.slice(0, 4).forEach((child) => {
     const mini = document.createElement('span');
@@ -3408,7 +3899,7 @@ function createFolderIcon(children) {
       icon.appendChild(mini);
       return;
     }
-    const sources = getFaviconSources(child.url);
+    const sources = getFaviconSources(child.url, { bust: refreshEpoch || undefined });
     if (isValidSiteIcon(child.customIcon)) sources.unshift(child.customIcon);
     const showLetter = () => {
       mini.textContent = getSiteInitial(child);
@@ -3418,9 +3909,8 @@ function createFolderIcon(children) {
       const img = document.createElement('img');
       img.alt = '';
       img.loading = 'lazy';
+      img.draggable = false;
       mini.appendChild(img);
-      if (!isValidSiteIcon(child.customIcon)) img.addEventListener('load', () => applyIconFill(mini, img));
-      else mini.classList.add('is-full-bleed');
       loadFavicon(img, sources, () => {
         img.remove();
         showLetter();
@@ -3432,6 +3922,91 @@ function createFolderIcon(children) {
   });
   return icon;
 }
+
+function refreshEngineCatalogIcons(bust) {
+  ENGINE_CATALOG.forEach((engine) => {
+    const domain = engineDomain(engine);
+    if (domain) engine.icon = engineFavicon(domain, bust);
+  });
+}
+
+// Re-fetch site and engine artwork without rebuilding the whole page. The
+// cache-busting token also keeps MediaCache from returning the previous blob.
+function refreshFaviconImages() {
+  if (document.visibilityState === 'hidden') return;
+  if (dragState.draggedId) return;
+
+  faviconRefreshEpoch = Date.now();
+  refreshEngineCatalogIcons(faviconRefreshEpoch);
+
+  document.querySelectorAll('.site-tile.link-tile[data-id]').forEach((tile) => {
+    const site = (state.sites || []).find((item) => item && item.id === tile.dataset.id);
+    if (!site || site.iconText || isValidSiteIcon(site.customIcon)) return;
+    const icon = tile.querySelector('.site-tile-icon');
+    const img = tile.querySelector('img.site-tile-favicon');
+    const sources = getFaviconSources(site.url, { bust: faviconRefreshEpoch });
+    if (typeof getSiteFaviconFallbackSources === 'function') {
+      sources.push(...getSiteFaviconFallbackSources(site.url, faviconRefreshEpoch));
+    }
+    if (!sources.length) return;
+    if (img) {
+      loadFavicon(img, sources, () => {
+        img.remove();
+        icon?.classList.add('is-letter');
+      }, { force: true });
+    } else if (icon?.classList.contains('is-letter')) {
+      icon.replaceWith(createFaviconIcon(site));
+    }
+  });
+
+  document.querySelectorAll('.site-tile.folder-tile[data-id]').forEach((tile) => {
+    const folder = (state.sites || []).find((item) => item && item.id === tile.dataset.id);
+    if (!folder) return;
+    const children = getFolderChildren(folder).slice(0, 4);
+    tile.querySelectorAll('.folder-mini').forEach((mini, index) => {
+      const child = children[index];
+      if (!child || child.iconText || isValidSiteIcon(child.customIcon)) return;
+      const img = mini.querySelector('img');
+      const sources = getFaviconSources(child.url, { bust: faviconRefreshEpoch });
+      if (!img || !sources.length) return;
+      loadFavicon(img, sources, () => {
+        img.remove();
+        mini.textContent = getSiteInitial(child);
+        mini.classList.add('is-letter');
+      }, { force: true, minEdge: 24 });
+    });
+  });
+
+  renderSearchEngine();
+  renderEngineQuickList();
+
+  const engineModalEl = document.getElementById('engineModal');
+  if (engineModalEl && !engineModalEl.classList.contains('hidden')) {
+    const grid = document.getElementById('engineList');
+    if (grid) grid.dataset.key = '';
+    renderEngineModal();
+  }
+
+  const addModalEl = document.getElementById('addModal');
+  const catalogPanel = document.getElementById('siteCatalogPanel');
+  if (addModalEl && !addModalEl.classList.contains('hidden') && catalogPanel
+    && !catalogPanel.classList.contains('hidden') && addSiteCategory !== 'custom') {
+    renderAddSiteCatalog();
+  }
+}
+
+const FAVICON_REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+let lastFaviconRefreshAt = Date.now();
+
+function maybeRefreshFavicons() {
+  if (Date.now() - lastFaviconRefreshAt < FAVICON_REFRESH_INTERVAL_MS) return;
+  if (document.visibilityState === 'hidden') return;
+  refreshFaviconImages();
+  lastFaviconRefreshAt = Date.now();
+}
+
+setInterval(maybeRefreshFavicons, FAVICON_REFRESH_INTERVAL_MS);
+document.addEventListener('visibilitychange', maybeRefreshFavicons);
 
 // title is optional; it labels the visit in the workspace "Recently visited" widget.
 function openLink(url, title) {
@@ -3558,6 +4133,27 @@ function renderHome(options) {
   renderFolderPopup();
 }
 
+// True while the user is naming/editing something that a background sync
+// must not rebuild underneath. The search box is deliberately excluded so
+// cloud refreshes still work while someone is searching.
+function isConfigEditingSurfaceActive() {
+  if (typeof window.editingItem !== 'undefined') return true;
+  const visible = (id) => {
+    const el = document.getElementById(id);
+    return !!el && !el.classList.contains('hidden');
+  };
+  if (visible('renameModal')) return true;
+  if (visible('contextMenu')) return true;
+  const active = document.activeElement;
+  if (active && typeof active.closest === 'function'
+    && active.closest('#addModal, #renameModal, #folderOverlay, #settingsModal')) {
+    return true;
+  }
+  return false;
+}
+
+window.isConfigEditingSurfaceActive = isConfigEditingSurfaceActive;
+
 // ===== Folder window =====
 // A folder opens as a centered glass window over a blurred home page. Its
 // icons can be edited/deleted from the context menu, reordered by dragging,
@@ -3590,6 +4186,9 @@ function renderFolderPopup() {
 }
 
 function openFolder(folderId) {
+  // A folder is a window too: opening it dismisses menus/dialogs and keeps
+  // the page behind it inert until the folder is closed.
+  window.closeAllWindowsExcept?.(folderOverlay);
   state.openFolderId = folderId;
   renderFolderPopup();
 }
@@ -3749,26 +4348,304 @@ function applyIconDraft(site) {
   }
 }
 
-function setAddType(type) {
-  const isFolder = type === 'folder';
-  const radio = document.querySelector('input[name="addType"][value="' + (isFolder ? 'folder' : 'site') + '"]');
-  if (radio) radio.checked = true;
-  siteForm.classList.toggle('hidden', isFolder);
-  folderForm.classList.toggle('hidden', !isFolder);
+// ---- Add-site catalog: common sites grouped by category ----
+function presetSite(id, zh, en, domain, url) {
+  return { id, name: { zh, en }, domain, url: url || ('https://' + domain + '/') };
 }
 
-// type: 'site' (default) or 'folder'
-function openAddSiteModal(type) {
+const SITE_PRESET_CATEGORIES = [
+  {
+    id: 'popular', labelKey: 'presetPopular', sites: [
+      presetSite('google', '\u8c37\u6b4c', 'Google', 'google.com'),
+      presetSite('youtube', 'YouTube', 'YouTube', 'youtube.com'),
+      presetSite('github', 'GitHub', 'GitHub', 'github.com'),
+      presetSite('bilibili', '\u54d4\u54e9\u54d4\u54e9', 'Bilibili', 'bilibili.com'),
+      presetSite('zhihu', '\u77e5\u4e4e', 'Zhihu', 'zhihu.com'),
+      presetSite('weibo', '\u5fae\u535a', 'Weibo', 'weibo.com'),
+      presetSite('xiaohongshu', '\u5c0f\u7ea2\u4e66', 'Xiaohongshu', 'xiaohongshu.com'),
+      presetSite('baidu', '\u767e\u5ea6', 'Baidu', 'baidu.com'),
+      presetSite('chatgpt', 'ChatGPT', 'ChatGPT', 'chatgpt.com'),
+      presetSite('notion', 'Notion', 'Notion', 'notion.so'),
+      presetSite('google-maps', '\u8c37\u6b4c\u5730\u56fe', 'Google Maps', 'maps.google.com'),
+      presetSite('tiktok', '\u6296\u97f3\u56fd\u9645\u7248', 'TikTok', 'tiktok.com'),
+      presetSite('reddit-popular', 'Reddit', 'Reddit', 'reddit.com'),
+      presetSite('wikipedia-popular', '\u7ef4\u57fa\u767e\u79d1', 'Wikipedia', 'wikipedia.org'),
+      presetSite('perplexity', 'Perplexity', 'Perplexity', 'perplexity.ai')
+    ]
+  },
+  {
+    id: 'ai', labelKey: 'presetAI', sites: [
+      presetSite('chatgpt-ai', 'ChatGPT', 'ChatGPT', 'chatgpt.com'),
+      presetSite('claude', 'Claude', 'Claude', 'claude.ai'),
+      presetSite('gemini', 'Gemini', 'Gemini', 'gemini.google.com'),
+      presetSite('perplexity-ai', 'Perplexity', 'Perplexity', 'perplexity.ai'),
+      presetSite('deepseek', 'DeepSeek', 'DeepSeek', 'deepseek.com'),
+      presetSite('qwen', '\u901a\u4e49\u5343\u95ee', 'Qwen', 'chat.qwen.ai'),
+      presetSite('doubao', '\u8c46\u5305', 'Doubao', 'doubao.com'),
+      presetSite('minimax', 'MiniMax', 'MiniMax', 'minimax.io'),
+      presetSite('midjourney', 'Midjourney', 'Midjourney', 'midjourney.com'),
+      presetSite('huggingface', 'Hugging Face', 'Hugging Face', 'huggingface.co')
+    ]
+  },
+  {
+    id: 'social', labelKey: 'presetSocial', sites: [
+      presetSite('weibo-s', '\u5fae\u535a', 'Weibo', 'weibo.com'),
+      presetSite('xiaohongshu-s', '\u5c0f\u7ea2\u4e66', 'Xiaohongshu', 'xiaohongshu.com'),
+      presetSite('zhihu-s', '\u77e5\u4e4e', 'Zhihu', 'zhihu.com'),
+      presetSite('douban-s', '\u8c46\u74e3', 'Douban', 'douban.com'),
+      presetSite('x', 'X', 'X', 'x.com'),
+      presetSite('reddit', 'Reddit', 'Reddit', 'reddit.com'),
+      presetSite('instagram', 'Instagram', 'Instagram', 'instagram.com'),
+      presetSite('facebook', 'Facebook', 'Facebook', 'facebook.com'),
+      presetSite('telegram', 'Telegram', 'Telegram', 'telegram.org'),
+      presetSite('discord', 'Discord', 'Discord', 'discord.com'),
+      presetSite('linkedin', 'LinkedIn', 'LinkedIn', 'linkedin.com'),
+      presetSite('threads', 'Threads', 'Threads', 'threads.net'),
+      presetSite('pinterest', 'Pinterest', 'Pinterest', 'pinterest.com'),
+      presetSite('line', 'LINE', 'LINE', 'line.me'),
+      presetSite('whatsapp', 'WhatsApp', 'WhatsApp', 'whatsapp.com')
+    ]
+  },
+  {
+    id: 'video', labelKey: 'presetVideo', sites: [
+      presetSite('youtube-v', 'YouTube', 'YouTube', 'youtube.com'),
+      presetSite('bilibili-v', '\u54d4\u54e9\u54d4\u54e9', 'Bilibili', 'bilibili.com'),
+      presetSite('douyin', '\u6296\u97f3', 'Douyin', 'douyin.com'),
+      presetSite('netflix', 'Netflix', 'Netflix', 'netflix.com'),
+      presetSite('spotify', 'Spotify', 'Spotify', 'spotify.com'),
+      presetSite('netease-music', '\u7f51\u6613\u4e91\u97f3\u4e50', 'NetEase Music', 'music.163.com'),
+      presetSite('twitch', 'Twitch', 'Twitch', 'twitch.tv'),
+      presetSite('iqiyi', '\u7231\u5947\u827a', 'iQIYI', 'iqiyi.com'),
+      presetSite('youku', '\u4f18\u9177', 'Youku', 'youku.com'),
+      presetSite('vimeo', 'Vimeo', 'Vimeo', 'vimeo.com'),
+      presetSite('prime-video', 'Prime Video', 'Prime Video', 'primevideo.com'),
+      presetSite('disney-plus', 'Disney+', 'Disney+', 'disneyplus.com'),
+      presetSite('soundcloud', 'SoundCloud', 'SoundCloud', 'soundcloud.com'),
+      presetSite('apple-music', 'Apple Music', 'Apple Music', 'music.apple.com')
+    ]
+  },
+  {
+    id: 'shopping', labelKey: 'presetShopping', sites: [
+      presetSite('taobao', '\u6dd8\u5b9d', 'Taobao', 'taobao.com'),
+      presetSite('jd', '\u4eac\u4e1c', 'JD', 'jd.com'),
+      presetSite('pinduoduo', '\u62fc\u591a\u591a', 'Pinduoduo', 'pinduoduo.com'),
+      presetSite('tmall', '\u5929\u732b', 'Tmall', 'tmall.com'),
+      presetSite('1688', '1688', '1688', '1688.com'),
+      presetSite('amazon', '\u4e9a\u9a6c\u900a', 'Amazon', 'amazon.com'),
+      presetSite('ebay', 'eBay', 'eBay', 'ebay.com'),
+      presetSite('aliexpress', '\u901f\u5356\u901a', 'AliExpress', 'aliexpress.com'),
+      presetSite('etsy', 'Etsy', 'Etsy', 'etsy.com'),
+      presetSite('walmart', '\u6c83\u5c14\u739b', 'Walmart', 'walmart.com'),
+      presetSite('best-buy', 'Best Buy', 'Best Buy', 'bestbuy.com'),
+      presetSite('ikea', '\u5b9c\u5bb6', 'IKEA', 'ikea.com')
+    ]
+  },
+  {
+    id: 'tools', labelKey: 'presetTools', sites: [
+      presetSite('github-t', 'GitHub', 'GitHub', 'github.com'),
+      presetSite('chatgpt-t', 'ChatGPT', 'ChatGPT', 'chatgpt.com'),
+      presetSite('notion-t', 'Notion', 'Notion', 'notion.so'),
+      presetSite('figma', 'Figma', 'Figma', 'figma.com'),
+      presetSite('canva', 'Canva', 'Canva', 'canva.com'),
+      presetSite('gmail', 'Gmail', 'Gmail', 'mail.google.com', 'https://mail.google.com/'),
+      presetSite('drive', 'Google Drive', 'Google Drive', 'drive.google.com', 'https://drive.google.com/'),
+      presetSite('stackoverflow', 'Stack Overflow', 'Stack Overflow', 'stackoverflow.com'),
+      presetSite('mdn', 'MDN', 'MDN', 'developer.mozilla.org'),
+      presetSite('vercel', 'Vercel', 'Vercel', 'vercel.com'),
+      presetSite('supabase', 'Supabase', 'Supabase', 'supabase.com'),
+      presetSite('slack', 'Slack', 'Slack', 'slack.com'),
+      presetSite('trello', 'Trello', 'Trello', 'trello.com'),
+      presetSite('dropbox', 'Dropbox', 'Dropbox', 'dropbox.com'),
+      presetSite('google-calendar', '\u8c37\u6b4c\u65e5\u5386', 'Google Calendar', 'calendar.google.com'),
+      presetSite('deepl', 'DeepL', 'DeepL', 'deepl.com')
+    ]
+  },
+  {
+    id: 'news', labelKey: 'presetNews', sites: [
+      presetSite('bbc', 'BBC', 'BBC', 'bbc.com'),
+      presetSite('nytimes', '\u7ebd\u7ea6\u65f6\u62a5', 'The New York Times', 'nytimes.com'),
+      presetSite('reuters', '\u8def\u900f\u793e', 'Reuters', 'reuters.com'),
+      presetSite('guardian', '\u536b\u62a5', 'The Guardian', 'theguardian.com'),
+      presetSite('cnn', 'CNN', 'CNN', 'cnn.com'),
+      presetSite('ap-news', '\u7f8e\u8054\u793e', 'Associated Press', 'apnews.com'),
+      presetSite('thepaper', '\u6f8e\u6e43\u65b0\u95fb', 'The Paper', 'thepaper.cn'),
+      presetSite('zaobao', '\u8054\u5408\u65e9\u62a5', 'Lianhe Zaobao', 'zaobao.com.sg'),
+      presetSite('techcrunch', 'TechCrunch', 'TechCrunch', 'techcrunch.com'),
+      presetSite('hacker-news', 'Hacker News', 'Hacker News', 'news.ycombinator.com', 'https://news.ycombinator.com/')
+    ]
+  },
+  {
+    id: 'learning', labelKey: 'presetLearning', sites: [
+      presetSite('coursera', 'Coursera', 'Coursera', 'coursera.org'),
+      presetSite('khan-academy', '\u53ef\u6c57\u5b66\u9662', 'Khan Academy', 'khanacademy.org'),
+      presetSite('duolingo', '\u591a\u90bb\u56fd', 'Duolingo', 'duolingo.com'),
+      presetSite('edx', 'edX', 'edX', 'edx.org'),
+      presetSite('mit-ocw', 'MIT OpenCourseWare', 'MIT OpenCourseWare', 'ocw.mit.edu'),
+      presetSite('arxiv', 'arXiv', 'arXiv', 'arxiv.org'),
+      presetSite('google-scholar', '\u8c37\u6b4c\u5b66\u672f', 'Google Scholar', 'scholar.google.com'),
+      presetSite('quizlet', 'Quizlet', 'Quizlet', 'quizlet.com'),
+      presetSite('brilliant', 'Brilliant', 'Brilliant', 'brilliant.org'),
+      presetSite('codecademy', 'Codecademy', 'Codecademy', 'codecademy.com')
+    ]
+  },
+  {
+    id: 'travel', labelKey: 'presetTravel', sites: [
+      presetSite('maps-travel', '\u8c37\u6b4c\u5730\u56fe', 'Google Maps', 'maps.google.com'),
+      presetSite('booking', 'Booking.com', 'Booking.com', 'booking.com'),
+      presetSite('airbnb', 'Airbnb', 'Airbnb', 'airbnb.com'),
+      presetSite('trip-com', '\u643a\u7a0b', 'Trip.com', 'trip.com'),
+      presetSite('expedia', 'Expedia', 'Expedia', 'expedia.com'),
+      presetSite('agoda', 'Agoda', 'Agoda', 'agoda.com'),
+      presetSite('tripadvisor', 'Tripadvisor', 'Tripadvisor', 'tripadvisor.com'),
+      presetSite('skyscanner', '\u5929\u5de1', 'Skyscanner', 'skyscanner.net'),
+      presetSite('rail-12306', '12306', '12306', '12306.cn'),
+      presetSite('google-flights', '\u8c37\u6b4c\u822a\u73ed', 'Google Flights', 'google.com', 'https://www.google.com/travel/flights')
+    ]
+  },
+  {
+    id: 'life', labelKey: 'presetLife', sites: [
+      presetSite('meituan', '\u7f8e\u56e2', 'Meituan', 'meituan.com'),
+      presetSite('dianping', '\u5927\u4f17\u70b9\u8bc4', 'Dianping', 'dianping.com'),
+      presetSite('eleme', '\u997f\u4e86\u4e48', 'Eleme', 'ele.me'),
+      presetSite('xiachufang', '\u4e0b\u53a8\u623f', 'Xiachufang', 'xiachufang.com'),
+      presetSite('douban-life', '\u8c46\u74e3', 'Douban', 'douban.com'),
+      presetSite('xiaohongshu-life', '\u5c0f\u7ea2\u4e66', 'Xiaohongshu', 'xiaohongshu.com'),
+      presetSite('imdb', 'IMDb', 'IMDb', 'imdb.com'),
+      presetSite('yelp', 'Yelp', 'Yelp', 'yelp.com'),
+      presetSite('alltrails', 'AllTrails', 'AllTrails', 'alltrails.com'),
+      presetSite('weather', '\u5929\u6c14', 'Weather', 'weather.com')
+    ]
+  }
+];
+
+let addSiteCategory = 'popular';
+
+function getPresetSiteName(site) {
+  const locale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  return site.name[locale] || site.name.en || site.name.zh || site.domain;
+}
+
+function getPresetSiteUrlKey(url) {
+  try {
+    return new URL(String(url || '')).hostname.replace(/^www\./, '').toLowerCase();
+  } catch (_err) {
+    return String(url || '').trim().toLowerCase();
+  }
+}
+
+function escapeCatalogHtml(value) {
+  return String(value == null ? '' : value).replace(/[&<>"']/g, (ch) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+  }[ch]));
+}
+
+function applyAddSitePanelVisibility() {
+  const panel = document.getElementById('siteCatalogPanel');
+  if (!panel) return;
+  const isCustom = addSiteCategory === 'custom';
+  panel.classList.toggle('hidden', false);
+  panel.classList.toggle('is-catalog', !isCustom);
+  siteForm.classList.toggle('hidden', !isCustom);
+  document.querySelectorAll('#siteForm > .modal-section').forEach((section) => {
+    section.classList.toggle('hidden', !isCustom);
+  });
+  document.getElementById('addModalActions')?.classList.toggle('hidden', !isCustom);
+}
+
+function renderAddSiteCatalog() {
+  const panel = document.getElementById('siteCatalogPanel');
+  if (!panel) return;
+  const categories = SITE_PRESET_CATEGORIES.concat([{ id: 'custom', labelKey: 'presetCustom', sites: [] }]);
+  const active = categories.find((cat) => cat.id === addSiteCategory) || categories[0];
+  const added = new Set((state.sites || [])
+    .filter((item) => item && item.type !== 'folder')
+    .map((item) => getPresetSiteUrlKey(item.url)));
+  panel.innerHTML = `
+    <div class="site-catalog-tabs" role="tablist">
+      ${categories.map((cat) => `
+        <button type="button" class="site-catalog-tab ${cat.id === active.id ? 'active' : ''}"
+          role="tab" aria-selected="${cat.id === active.id}" onclick="setAddSiteCategory('${cat.id}')">
+          ${escapeCatalogHtml(i18n.t(cat.labelKey))}
+        </button>`).join('')}
+    </div>
+    ${active.id === 'custom' ? '' : `
+      <div class="site-catalog-list" role="tabpanel">
+        ${active.sites.map((site) => {
+          const isAdded = added.has(getPresetSiteUrlKey(site.url));
+          const bust = faviconRefreshEpoch || undefined;
+          const iconAttrs = faviconChainAttributes(
+            getDisplayFaviconSources(site.url, bust),
+            getEngineFallbackIcon({ url: site.url }, bust)
+          );
+          return `
+            <div class="site-catalog-row ${isAdded ? 'is-added' : ''}">
+              <span class="site-catalog-icon"><img ${iconAttrs} alt="" loading="lazy" decoding="async"></span>
+              <span class="site-catalog-meta">
+                <span class="site-catalog-name">${escapeCatalogHtml(getPresetSiteName(site))}</span>
+                <span class="site-catalog-url">${escapeCatalogHtml(site.url)}</span>
+              </span>
+              <button type="button" class="site-catalog-add" data-site-id="${site.id}" ${isAdded ? 'disabled' : ''}
+                aria-label="${escapeCatalogHtml(getPresetSiteName(site))}"
+                onclick="addPresetSiteById('${active.id}','${site.id}')">${isAdded ? '✓' : '+'}</button>
+            </div>`;
+        }).join('')}
+      </div>`}
+  `;
+  applyAddSitePanelVisibility();
+}
+
+function setAddSiteCategory(category) {
+  addSiteCategory = category === 'custom' ? 'custom' : String(category || 'popular');
+  renderAddSiteCatalog();
+}
+
+window.setAddSiteCategory = setAddSiteCategory;
+
+window.addPresetSiteById = async function (categoryId, siteId) {
+  if (!window.authState || !window.authState.isLoggedIn) {
+    window.requireLoginForPersistentChange?.();
+    return;
+  }
+  const category = SITE_PRESET_CATEGORIES.find((cat) => cat.id === categoryId);
+  const site = category && category.sites.find((item) => item.id === siteId);
+  if (!site) return;
+  const key = getPresetSiteUrlKey(site.url);
+  const exists = (state.sites || []).some((item) => item && item.type !== 'folder' && getPresetSiteUrlKey(item.url) === key);
+  if (exists) {
+    window.showNotification?.(i18n.t('presetDuplicate'), 'info');
+    return;
+  }
+  const newSite = {
+    id: generateUuid(),
+    name: getPresetSiteName(site),
+    url: site.url,
+    tags: [],
+    showOnHome: true
+  };
+  state.sites.push(newSite);
+  state.siteOrder.push(newSite.id);
+  const saved = await saveData();
+  if (saved === false) return;
+  renderHome();
+  window.showNotification?.(i18n.t('presetAdded'), 'success');
+  const button = document.querySelector(`.site-catalog-add[data-site-id="${siteId}"]`);
+  if (button) {
+    button.disabled = true;
+    button.textContent = '✓';
+    button.closest('.site-catalog-row')?.classList.add('is-added');
+  }
+};
+function openAddSiteModal() {
   resetIconDraft(null);
   window.editingItem = undefined;
   document.getElementById('siteName').value = '';
   document.getElementById('siteUrl').value = '';
-  document.getElementById('newFolderName').value = '';
-  setAddType(type === 'folder' ? 'folder' : 'site');
+  addSiteCategory = 'popular';
+  renderAddSiteCatalog();
   renderSiteIconPreview();
+  window.closeAllWindowsExcept?.(addModal);
   addModal.classList.remove('hidden');
   modalOverlay.classList.remove('hidden');
-  addTypeRadios.forEach((r) => r.disabled = false);
 }
 
 let siteIconPreviewTimer = null;
@@ -3806,17 +4683,8 @@ modalOverlay.onclick = (e) => {
   if (e.target === modalOverlay) closeModals();
 };
 
-// Switch Add Type
-addTypeRadios.forEach(radio => {
-  radio.addEventListener('change', (e) => {
-    setAddType(e.target.value);
-
-  });
-});
-
 // Save Logic
 saveItemBtn.addEventListener('click', async () => {
-  const type = document.querySelector('input[name="addType"]:checked').value;
   const isEditing = window.editingItem !== undefined;
 
   if (!window.authState || !window.authState.isLoggedIn) {
@@ -3824,64 +4692,52 @@ saveItemBtn.addEventListener('click', async () => {
     return;
   }
 
-  if (type === 'site') {
-    const name = document.getElementById('siteName').value.trim();
-    let url = document.getElementById('siteUrl').value.trim();
-    if (!name || !url) {
-      window.showNotification?.(i18n.t('nameRequired'), 'warning');
-      return;
-    }
+  const name = document.getElementById('siteName').value.trim();
+  let url = document.getElementById('siteUrl').value.trim();
+  if (!name || !url) {
+    window.showNotification?.(i18n.t('nameRequired'), 'warning');
+    return;
+  }
 
-    if (!url.startsWith('http')) url = 'https://' + url;
+  if (!url.startsWith('http')) url = 'https://' + url;
 
-    // Every site is pinned to the home page (the option was removed).
-    const showOnHome = true;
+  // Every site is pinned to the home page (the option was removed).
+  const showOnHome = true;
 
-    if (isEditing) {
-      // Update existing site
-      const siteIndex = state.sites.findIndex(s => s.id === window.editingItem.item.id);
-      if (siteIndex !== -1) {
-        state.sites[siteIndex].name = name;
-        state.sites[siteIndex].url = url;
-        state.sites[siteIndex].showOnHome = showOnHome;
-        applyIconDraft(state.sites[siteIndex]);
+  if (isEditing) {
+    // Update existing site
+    const siteIndex = state.sites.findIndex(s => s.id === window.editingItem.item.id);
+    if (siteIndex !== -1) {
+      state.sites[siteIndex].name = name;
+      state.sites[siteIndex].url = url;
+      state.sites[siteIndex].showOnHome = showOnHome;
+      applyIconDraft(state.sites[siteIndex]);
 
-        // Update siteOrder if showOnHome changed
-        const inOrder = state.siteOrder.includes(state.sites[siteIndex].id);
-        if (showOnHome && !inOrder) {
-          state.siteOrder.push(state.sites[siteIndex].id);
-        } else if (!showOnHome && inOrder) {
-          state.siteOrder = state.siteOrder.filter(id => id !== state.sites[siteIndex].id);
-        }
-      }
-    } else {
-      // Create new site
-      const newSite = {
-        id: generateUuid(),
-        name,
-        url,
-        tags: [],
-        showOnHome
-      };
-      applyIconDraft(newSite);
-
-      state.sites.push(newSite);
-
-      // Add to siteOrder
-      if (showOnHome) {
-        state.siteOrder.push(newSite.id);
+      // Update siteOrder if showOnHome changed
+      const inOrder = state.siteOrder.includes(state.sites[siteIndex].id);
+      if (showOnHome && !inOrder) {
+        state.siteOrder.push(state.sites[siteIndex].id);
+      } else if (!showOnHome && inOrder) {
+        state.siteOrder = state.siteOrder.filter(id => id !== state.sites[siteIndex].id);
       }
     }
   } else {
-    const name = document.getElementById('newFolderName').value.trim() || i18n.t('newFolder') || 'New Folder';
-    const ids = [];
-    const folder = { id: generateUuid(), type: 'folder', name, url: '', showOnHome: true, tags: [], children: ids };
-    state.sites.push(folder);
-    // The folder takes the place of the first site it swallowed.
-    const positions = ids.map((id) => state.siteOrder.indexOf(id)).filter((i) => i >= 0);
-    state.siteOrder = state.siteOrder.filter((id) => !ids.includes(id));
-    const at = positions.length ? Math.min(Math.min(...positions), state.siteOrder.length) : state.siteOrder.length;
-    state.siteOrder.splice(at, 0, folder.id);
+    // Create new site
+    const newSite = {
+      id: generateUuid(),
+      name,
+      url,
+      tags: [],
+      showOnHome
+    };
+    applyIconDraft(newSite);
+
+    state.sites.push(newSite);
+
+    // Add to siteOrder
+    if (showOnHome) {
+      state.siteOrder.push(newSite.id);
+    }
   }
 
   // Clear editing state
@@ -3999,11 +4855,36 @@ window.openSettingsModal = openSettingsModal;
 window.closeSettingsModal = closeSettingsModal;
 
 // ===== Settings Modal =====
+const SETTINGS_LANGUAGE_LABELS = {
+  zh: '中文',
+  en: 'English',
+  fr: 'Français',
+  es: 'Español',
+  ja: '日本語',
+  ko: '한국어'
+};
+
+function setSettingsLanguageMenuOpen(open) {
+  document.getElementById('settingsLangMenu')?.classList.toggle('hidden', !open);
+  document.getElementById('settingsLangButton')?.setAttribute('aria-expanded', String(!!open));
+}
+
+function closeSettingsLanguageMenu() {
+  setSettingsLanguageMenuOpen(false);
+}
+
 function syncSettingsModalUI() {
   const tfs = document.querySelectorAll('#timeFormatGroup .seg-btn');
   tfs.forEach((b) => b.classList.toggle('active', b.dataset.timeFormat === state.timeFormat));
-  const langSel = document.getElementById('settingsLangSelect');
-  if (langSel) langSel.value = (typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh');
+  const locale = typeof i18n !== 'undefined' ? i18n.currentLocale : 'zh';
+  const langValue = document.getElementById('settingsLangValue');
+  if (langValue) langValue.textContent = SETTINGS_LANGUAGE_LABELS[locale] || SETTINGS_LANGUAGE_LABELS.zh;
+  document.querySelectorAll('#settingsLangMenu .settings-language-option').forEach((option) => {
+    const selected = option.dataset.lang === locale;
+    option.classList.toggle('is-selected', selected);
+    option.setAttribute('aria-selected', String(selected));
+  });
+  setSettingsLanguageMenuOpen(false);
   const obs = document.querySelectorAll('#openBehaviorGroup .seg-btn');
   obs.forEach((b) => b.classList.toggle('active', b.dataset.openBehavior === state.openBehavior));
   const appearance = window.getAppearance?.() || 'auto';
@@ -4051,6 +4932,7 @@ function renderAccentSwatches() {
 window.syncSettingsModalUI = syncSettingsModalUI;
 
 function openSettingsModal() {
+  window.closeAllWindowsExcept?.(settingsModal);
   closeSettingsLayers();
   syncSettingsModalUI();
   if (settingsModal) settingsModal.classList.remove('hidden');
@@ -4088,8 +4970,20 @@ window.setSettingsLocale = setSettingsLocale;
 document.querySelectorAll('#timeFormatGroup .seg-btn').forEach((btn) => {
   btn.addEventListener('click', () => setTimeFormatFromSettings(btn.dataset.timeFormat));
 });
-document.getElementById('settingsLangSelect')?.addEventListener('change', (e) => {
-  setSettingsLocale(e.target.value);
+document.getElementById('settingsLangButton')?.addEventListener('click', (event) => {
+  event.stopPropagation();
+  const menu = document.getElementById('settingsLangMenu');
+  setSettingsLanguageMenuOpen(!!menu?.classList.contains('hidden'));
+});
+document.querySelectorAll('#settingsLangMenu .settings-language-option').forEach((option) => {
+  option.addEventListener('click', () => {
+    setSettingsLocale(option.dataset.lang);
+    closeSettingsLanguageMenu();
+    syncSettingsModalUI();
+  });
+});
+document.addEventListener('click', (event) => {
+  if (!event.target.closest?.('.settings-language-picker')) closeSettingsLanguageMenu();
 });
 document.querySelectorAll('#openBehaviorGroup .seg-btn').forEach((btn) => {
   btn.addEventListener('click', () => setOpenBehaviorFromSettings(btn.dataset.openBehavior));
@@ -4109,25 +5003,40 @@ document.getElementById('settingsAboutBtn')?.addEventListener('click', () => {
 });
 document.getElementById('closeSettingsModal')?.addEventListener('click', closeSettingsModal);
 
-// ===== Vertical pager: home <-> workspace =====
-let pager = null;
+// Modal manager: only one dialog window may be open at a time. The page
+// underneath stays covered by the active .modal-overlay, so background clicks
+// cannot reach it until the dialog is closed.
+function closeAllWindowsExcept(except) {
+  const keep = typeof except === 'string' ? document.getElementById(except) : except;
+  const keepOverlay = keep?.closest?.('.modal-overlay') || null;
+  const sharedOverlay = document.getElementById('modalOverlay');
 
-function setupPager() {
-  const container = document.getElementById('pager');
-  if (!container || typeof window.createPager !== 'function') return;
-  pager = window.createPager({
-    container,
-    dots: document.querySelectorAll('#pagerDots button'),
-    // Modals and menus own the wheel/keyboard while they are open.
-    isBlocked: () => hasOpenTransientUi(),
-    onChange: (_index, name) => {
-      if (name === 'home') searchInput?.focus({ preventScroll: true });
-    }
+  // Close whole overlays first. #modalOverlay is special: its sheets are
+  // siblings inside one scrim, so only its own visible sheet may survive.
+  document.querySelectorAll('.modal-overlay:not(.hidden)').forEach((overlay) => {
+    if (overlay !== keepOverlay) overlay.classList.add('hidden');
   });
-  document.getElementById('toWorkspaceBtn')?.addEventListener('click', () => pager.go(1));
-}
 
-window.scrollPagerTo = (index) => pager?.go(index);
+  if (sharedOverlay) {
+    Array.from(sharedOverlay.children).forEach((child) => {
+      if (!child.classList.contains('modal')) return;
+      if (child === keep || child.contains(keep)) return;
+      child.classList.add('hidden');
+    });
+    // An empty scrim must never remain: it would keep the home page inert
+    // after the external window (wallpaper, engine, sign-in) is dismissed.
+    if (keepOverlay !== sharedOverlay) sharedOverlay.classList.add('hidden');
+  }
+  const confirmDialog = document.getElementById('systemConfirmDialog');
+  if (confirmDialog && confirmDialog !== keep && confirmDialog !== keepOverlay) confirmDialog.remove();
+  window.closeFolder?.();
+  document.getElementById('engineMenu')?.classList.add('hidden');
+  window.hideAllContextMenus?.();
+  window.hideContextMenu?.();
+  window.hideWidgetMenu?.();
+  closeSettingsLayers();
+}
+window.closeAllWindowsExcept = closeAllWindowsExcept;
 
 function isElementVisible(element) {
   return !!element && !element.classList.contains('hidden');
@@ -4444,7 +5353,7 @@ function showPageContextMenu(e) {
   // Check if on modal or other non-applicable areas
   const skipSelectors = [
     '.modal', '.modal-overlay:not(.hidden)', '.settings-menu', '.settings-btn',
-    '.context-menu', '.page-context-menu', '.item-context-menu',
+    '.context-menu', '.page-context-menu', '.item-context-menu', '.folder-overlay',
     '.add-card'
   ];
 
@@ -4480,6 +5389,7 @@ function showItemContextMenu(e, type) {
 function hideAllContextMenus() {
   pageContextMenu?.classList.add('hidden');
   itemContextMenu?.classList.add('hidden');
+  engineContextMenu?.classList.add('hidden');
   currentContextItem = null;
 }
 
@@ -4493,16 +5403,7 @@ function openAddSiteFromContext() {
     window.requireLoginForPersistentChange?.();
     return;
   }
-  openAddSiteModal('site');
-}
-
-function openAddFolderFromContext() {
-  hidePageContextMenu();
-  if (!window.authState || !window.authState.isLoggedIn) {
-    window.requireLoginForPersistentChange?.();
-    return;
-  }
-  openAddSiteModal('folder');
+  openAddSiteModal();
 }
 
 function openWallpaperFromContext() {
@@ -4587,7 +5488,6 @@ document.addEventListener('scroll', hideAllContextMenus);
 window.hideAllContextMenus = hideAllContextMenus;
 window.hideContextMenu = hideContextMenu;
 window.openAddSiteFromContext = openAddSiteFromContext;
-window.openAddFolderFromContext = openAddFolderFromContext;
 window.openWallpaperFromContext = openWallpaperFromContext;
 window.editItemFromContext = editItemFromContext;
 window.deleteItemFromContext = deleteItemFromContext;
@@ -4613,7 +5513,6 @@ try {
   if (cb) cb.remove();
 } catch (_err) { /* ignore */ }
 applyZoomLevel(state.zoomLevel, false);
-setupPager();
 // Edge refraction on the toolbar, search and page dots (Chromium only; skipped
 // when the user asked the system for less transparency).
 if (!window.matchMedia?.('(prefers-reduced-transparency: reduce)').matches) window.LiquidGlass?.enable();

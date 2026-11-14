@@ -109,6 +109,25 @@ body {
   pointer-events: none;
 }
 
+/* A dialog owns the screen while it is open: the page and toolbar cannot
+   receive clicks underneath it. Clicking the dimmed overlay closes the dialog. */
+body:has(.modal-overlay:not(.hidden)) #pager,
+body:has(.modal-overlay:not(.hidden)) .top-right-controls,
+body:has(.modal-overlay:not(.hidden)) .folder-overlay,
+body:has(.modal-overlay:not(.hidden)) .page-context-menu,
+body:has(.modal-overlay:not(.hidden)) .item-context-menu,
+body:has(.modal-overlay:not(.hidden)) #contextMenu {
+  pointer-events: none;
+}
+
+/* A folder window owns the page as well: the toolbar must not open another
+   window on top of it, and the overlay itself handles click-to-close. */
+body:has(.folder-overlay:not(.hidden)) .top-right-controls,
+body:has(.folder-overlay:not(.hidden)) #engineMenu,
+body:has(.folder-overlay:not(.hidden)) #contextMenu {
+  pointer-events: none;
+}
+
 .hidden {
   display: none !important;
 }
@@ -253,51 +272,6 @@ button:active {
   align-items: center;
 }
 
-.page-workspace {
-  align-items: flex-start;
-}
-
-.pager-dock {
-  position: fixed;
-  right: var(--space-5);
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 20;
-}
-
-.to-workspace {
-  position: absolute;
-  left: 50%;
-  bottom: var(--space-6);
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-4);
-  border: 0;
-  font: var(--text-footnote);
-  cursor: pointer;
-  transition: transform var(--dur-base) var(--ease-spring), opacity var(--dur-base) var(--ease-standard);
-}
-
-.to-workspace .sym {
-  width: 14px;
-  height: 14px;
-  animation: to-workspace-nudge 2.4s var(--ease-standard) infinite;
-}
-
-.to-workspace:active {
-  transform: translateX(-50%) scale(0.95);
-}
-
-@keyframes to-workspace-nudge {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(3px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .to-workspace .sym { animation: none; }
-}
 
 /* ---------- Workbench ---------- */
 

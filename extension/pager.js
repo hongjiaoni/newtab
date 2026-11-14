@@ -30,7 +30,9 @@
   function createPager(options) {
     const opts = { ...DEFAULTS, ...options };
     const { container } = opts;
-    const pages = Array.from(container.querySelectorAll(opts.pageSelector || '.page'));
+    const pages = Array.isArray(opts.pages)
+      ? opts.pages.slice()
+      : Array.from(container.querySelectorAll(opts.pageSelector || '.page'));
     const dots = Array.from(opts.dots || []);
     const now = opts.now || (() => performance.now());
     let index = 0;

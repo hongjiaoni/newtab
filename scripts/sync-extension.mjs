@@ -39,6 +39,7 @@ export const COPY_FILES = [
   'config.js',
   'data-sync.js',
   'membership.js',
+  'media-cache.js',
   'paddle.js',
   'supabase-client.js',
   'time-display.js',
