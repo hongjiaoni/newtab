@@ -19,21 +19,16 @@ window.openWallpaperModal = openWallpaperModal;
 const MAX_WALLPAPER_UPLOAD_BYTES = 15 * 1024 * 1024;
 const WALLPAPER_UPLOAD_COOLDOWN_MS = 10 * 1000;
 const LAST_WALLPAPER_UPLOAD_AT_KEY = 'wallpaper_last_upload_at';
-// ?? Caching for faster loading ???????????????????????????????????????
+// Cache list metadata indefinitely for instant first paint. The network
+// refresh below always replaces it, so stale data never blocks an update.
 const WALLPAPER_CACHE_KEY = 'wp_cache_data';
 const CATEGORIES_CACHE_KEY = 'wp_cats_cache';
-const WALLPAPER_CACHE_TTL = 5 * 60 * 1000;   // 5 min for wallpaper list
-const CATEGORIES_CACHE_TTL = 10 * 60 * 1000;  // 10 min for categories
 
-function getCache(key, ttl) {
+function getCache(key) {
   try {
     const raw = localStorage.getItem(key);
     if (!raw) return null;
     const entry = JSON.parse(raw);
-    if (Date.now() - entry.ts > ttl) {
-      localStorage.removeItem(key);
-      return null;
-    }
     return entry.data;
   } catch { return null; }
 }
@@ -48,8 +43,8 @@ function setCache(key, data) {
 // Initialize wallpaper system
 async function initializeWallpaper() {
   // ── Phase 1: Show cached data immediately (fast) ──
-  const cachedCats = getCache(CATEGORIES_CACHE_KEY, CATEGORIES_CACHE_TTL);
-  const cachedWps = getCache(WALLPAPER_CACHE_KEY, WALLPAPER_CACHE_TTL);
+  const cachedCats = getCache(CATEGORIES_CACHE_KEY);
+  const cachedWps = getCache(WALLPAPER_CACHE_KEY);
   const hasCache = !!(cachedCats && cachedWps);
   const isLoggedIn = !!window.authState?.isLoggedIn;
 
@@ -124,6 +119,8 @@ function wallpaperColorLuminance(color) {
 function paintWallpaper(wallpaperId) {
   const style = document.body.style;
   let tone = 'dark';
+  const sourceKey = wallpaperId ? String(wallpaperId) : '';
+  document.body.dataset.wallpaperSource = sourceKey;
   if (!wallpaperId) {
     style.backgroundImage = '';
     style.backgroundColor = '';
@@ -137,6 +134,18 @@ function paintWallpaper(wallpaperId) {
     style.backgroundSize = 'cover';
     style.backgroundPosition = 'center';
     style.backgroundAttachment = 'fixed';
+    const mediaCache = window.MediaCache;
+    if (mediaCache && sourceKey) {
+      mediaCache.lookup(sourceKey).then((cached) => {
+        if (!cached || document.body.dataset.wallpaperSource !== sourceKey) return;
+        style.backgroundImage = `url('${cached}')`;
+      });
+      // Let the visible image use the network/HTTP cache first, then persist
+      // the bytes so the next page load can paint before the network responds.
+      window.setTimeout(() => {
+        if (document.body.dataset.wallpaperSource === sourceKey) mediaCache.warm?.(sourceKey);
+      }, 900);
+    }
   }
   document.body.dataset.wallpaperTone = tone;
 }
@@ -248,6 +257,7 @@ function openWallpaperModal() {
   window.closeSettingsLayers?.();
   const modal = document.getElementById('wallpaperModal');
   if (modal) {
+    window.closeAllWindowsExcept?.(modal);
     wallpaperState.baseWallpaper = wallpaperState.selectedWallpaper;
     wallpaperState.pendingWallpaper = wallpaperState.selectedWallpaper;
     modal.classList.remove('hidden');
@@ -361,10 +371,16 @@ function renderWallpaperUI() {
     // supports it) a 480px rendition instead of the full-size image.
     gridContainer.innerHTML = filteredWallpapers.map(w => `
       <div class="wallpaper-item" data-wallpaper-url="${w.url}" onclick="selectWallpaper('${w.url}')">
-        <img src="${wallpaperThumbUrl(w.url)}" data-fallback-src="${w.url}" alt="" loading="lazy" decoding="async" width="480" height="300">
+        <img data-media-src="${wallpaperThumbUrl(w.url)}" data-fallback-src="${w.url}" alt="" loading="lazy" decoding="async" width="360" height="225">
       </div>
     `).join('');
     gridContainer.querySelectorAll('img').forEach((img) => {
+      const source = img.dataset.mediaSrc;
+      if (window.MediaCache?.bindImage) {
+        window.MediaCache.bindImage(img, source, { fallback: img.dataset.fallbackSrc });
+      } else {
+        img.src = source || img.dataset.fallbackSrc;
+      }
       if (img.complete) img.classList.add('is-loaded');
       else img.addEventListener('load', () => img.classList.add('is-loaded'), { once: true });
     });
@@ -389,7 +405,7 @@ function wallpaperUploadRowHtml(t) {
 function wallpaperThumbUrl(url) {
   const marker = '/storage/v1/object/public/';
   if (typeof url !== 'string' || !url.includes(marker) || url.includes('?')) return url;
-  return url.replace(marker, '/storage/v1/render/image/public/') + '?width=480&quality=70&resize=cover';
+  return url.replace(marker, '/storage/v1/render/image/public/') + '?width=360&quality=65&resize=cover';
 }
 
 // Selection only toggles a class: re-rendering the grid on every click made

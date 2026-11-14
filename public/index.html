@@ -7,17 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="referrer" content="no-referrer-when-downgrade" />
 
-  <script src="appearance.js?v=20261026-fix2"></script>
-  <link rel="stylesheet" href="tokens.css?v=20261026-fix2" />
-  <link rel="stylesheet" href="glass.css?v=20261026-fix2" />
-  <link rel="stylesheet" href="style.css?v=20261026-fix2" />
-  <link rel="stylesheet" href="controls.css?v=20261026-fix2" />
-  <link rel="stylesheet" href="home.css?v=20261026-fix2" />
-  <link rel="stylesheet" href="workspace.css?v=20261026-fix2" />
+  <script src="appearance.js?v=20261114-sync-icons3"></script>
+  <link rel="stylesheet" href="tokens.css?v=20261114-sync-icons3" />
+  <link rel="stylesheet" href="glass.css?v=20261114-sync-icons3" />
+  <link rel="stylesheet" href="style.css?v=20261114-sync-icons3" />
+  <link rel="stylesheet" href="controls.css?v=20261114-sync-icons3" />
+  <link rel="stylesheet" href="home.css?v=20261114-sync-icons3" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261026">
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png?v=20261026">
-  <link rel="shortcut icon" href="/favicon.png?v=20261026">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=20260131">
 
   <!-- Supabase SDK -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -107,29 +103,14 @@
 
       </div>
 
-      <button type="button" id="toWorkspaceBtn" class="to-workspace glass glass--capsule glass--clear">
-        <span id="toWorkspaceText">工作台</span>
-        <svg class="sym" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-      </button>
     </section>
 
-    <section id="pageWorkspace" class="page page-workspace" data-page="workspace" data-hash="workspace" aria-labelledby="workbenchHeader">
-      <div class="workspace">
-        <header class="ws-head" id="workbenchHeader"></header>
-        <div class="bento" id="wsGrid"></div>
-      </div>
-    </section>
   </main>
 
-  <nav id="pagerDots" class="pager-dock glass glass--capsule glass--clear" data-refract aria-label="Pages">
-    <div class="pager-dots">
-      <button type="button" id="dotHome" aria-label="首页" aria-current="true"></button>
-      <button type="button" id="dotWorkspace" aria-label="工作台" aria-current="false"></button>
-    </div>
-  </nav>
 
   <!-- Context Menu -->
   <div id="contextMenu" class="context-menu hidden"></div>
+  <div id="engineContextMenu" class="context-menu hidden"></div>
 
 
 
@@ -166,7 +147,25 @@
       <div id="engineList" class="engine-grid">
         <!-- Populated by JS -->
       </div>
+      <div class="engine-custom" id="engineCustomPanel">
+        <div class="engine-custom-head">
+          <span class="engine-custom-title" id="customEngineTitle">自定义搜索</span>
+          <span class="engine-custom-hint" id="customEngineHint">在网址中使用 {query} 表示搜索词</span>
+        </div>
+        <div class="engine-custom-fields">
+          <label class="engine-custom-field" for="customEngineName">
+            <span id="customEngineNameLabel">名称</span>
+            <input type="text" id="customEngineName" class="modal-input" maxlength="40" autocomplete="off" />
+          </label>
+          <label class="engine-custom-field engine-custom-url" for="customEngineUrl">
+            <span id="customEngineUrlLabel">搜索网址</span>
+            <input type="text" id="customEngineUrl" class="modal-input" autocomplete="off" spellcheck="false" />
+          </label>
+          <button type="button" id="saveCustomEngine" class="primary-btn engine-custom-add">Add</button>
+        </div>
+      </div>
       <div class="modal-actions">
+        <button id="resetEngines" class="cancel-btn engine-reset-btn">Reset</button>
         <span id="engineCountHint" class="engine-count-hint"></span>
         <button id="closeEngineModal" class="cancel-btn">关闭</button>
         <button id="saveEngineSelection" class="primary-btn">保存</button>
@@ -210,7 +209,7 @@
           </div>
         </div>
       </div>
-      <div class="settings-group">
+      <div class="settings-group settings-group--menu-host">
         <div class="settings-row">
           <label id="timeFormatLabel">时间格式</label>
           <div class="segmented-control" id="timeFormatGroup">
@@ -219,15 +218,22 @@
           </div>
         </div>
         <div class="settings-row">
-          <label id="settingsLangLabel" for="settingsLangSelect">语言</label>
-          <select id="settingsLangSelect">
-            <option value="zh">中文</option>
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-            <option value="es">Español</option>
-            <option value="ja">日本語</option>
-            <option value="ko">한국어</option>
-          </select>
+          <label id="settingsLangLabel" for="settingsLangButton">语言</label>
+          <div class="settings-language-picker">
+            <button type="button" id="settingsLangButton" class="settings-language-button"
+              aria-haspopup="listbox" aria-expanded="false" aria-labelledby="settingsLangLabel settingsLangValue">
+              <span id="settingsLangValue">中文</span>
+              <svg viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" /></svg>
+            </button>
+            <div id="settingsLangMenu" class="settings-menu settings-language-menu hidden" role="listbox" aria-labelledby="settingsLangLabel">
+              <button type="button" class="settings-menu-item settings-language-option" data-lang="zh" role="option">中文</button>
+              <button type="button" class="settings-menu-item settings-language-option" data-lang="en" role="option">English</button>
+              <button type="button" class="settings-menu-item settings-language-option" data-lang="fr" role="option">Français</button>
+              <button type="button" class="settings-menu-item settings-language-option" data-lang="es" role="option">Español</button>
+              <button type="button" class="settings-menu-item settings-language-option" data-lang="ja" role="option">日本語</button>
+              <button type="button" class="settings-menu-item settings-language-option" data-lang="ko" role="option">한국어</button>
+            </div>
+          </div>
         </div>
         <div class="settings-row">
           <label id="openBehaviorLabel">页面打开方式</label>
@@ -259,12 +265,10 @@
     </div>
 
     <!-- Add/Edit Modal -->
-    <div id="addModal" class="modal hidden">
-      <h3 id="addModalTitle">Add New</h3>
-      <div class="segmented-control add-type-tabs" role="tablist">
-        <label class="seg-btn"><input type="radio" name="addType" value="site" checked><span id="typeLabel1">Site</span></label>
-        <label class="seg-btn"><input type="radio" name="addType" value="folder"><span id="typeLabel2">Folder</span></label>
-      </div>
+    <div id="addModal" class="modal add-modal hidden">
+      <h3 id="addModalTitle">Add Site</h3>
+
+      <div id="siteCatalogPanel" class="site-catalog"></div>
 
       <div id="siteForm">
         <div class="modal-section">
@@ -302,14 +306,7 @@
 
       </div>
 
-      <div id="folderForm" class="hidden">
-        <div class="modal-section">
-          <label class="section-label" id="newFolderNameLabel" for="newFolderName">文件夹名称</label>
-          <input type="text" id="newFolderName" class="modal-input" />
-        </div>
-      </div>
-
-      <div class="modal-actions">
+      <div class="modal-actions" id="addModalActions">
         <button id="closeAddModal" class="cancel-btn">Cancel</button>
         <button id="saveItem" class="primary-btn">Save</button>
       </div>
@@ -439,9 +436,6 @@
     <div class="context-menu-item" onclick="openAddSiteFromContext()">
       <span id="ctxAddSite">添加网站</span>
     </div>
-    <div class="context-menu-item" onclick="openAddFolderFromContext()">
-      <span id="ctxAddFolder">添加文件夹</span>
-    </div>
     <div class="context-menu-divider"></div>
     <div class="context-menu-item" onclick="openWallpaperFromContext()">
       <span id="ctxWallpaper">更换壁纸</span>
@@ -458,17 +452,16 @@
     </div>
   </div>
 
-  <script src="config.js?v=20261026-fix2"></script>
+  <script src="config.js?v=20261114-sync-icons3"></script>
   <script src="supabase-client.js"></script>
-  <script src="wallpaper.js?v=20261026-fix2"></script>
+  <script src="media-cache.js?v=20261114-sync-icons3"></script>
+  <script src="wallpaper.js?v=20261114-sync-icons3"></script>
   <script src="paddle.js"></script>
-  <script src="membership.js?v=20261026-fix2"></script>
-  <script src="auth.js?v=20261026-fix2"></script>
-  <script src="data-sync.js?v=20261026-fix2"></script>
-  <script src="glass.js?v=20261026-fix2"></script>
-  <script src="pager.js?v=20261026-fix2"></script>
-  <script src="/script.js?v=20261026-fix2"></script>
-  <script src="workspace.js?v=20261026-fix2"></script>
+  <script src="membership.js?v=20261114-sync-icons3"></script>
+  <script src="auth.js?v=20261114-sync-icons3"></script>
+  <script src="data-sync.js?v=20261114-sync-icons3"></script>
+  <script src="glass.js?v=20261114-sync-icons3"></script>
+  <script src="/script.js?v=20261114-sync-icons3"></script>
 </body>
 
 </html>

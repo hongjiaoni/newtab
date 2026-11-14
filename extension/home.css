@@ -543,19 +543,33 @@ body[data-wallpaper-tone="light"] {
   transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.25, 1.2), box-shadow 0.2s;
 }
 
-/* Text icon: label on a solid color */
+/* Text icon: a colored squircle inside the same glass plate as favicons */
 .site-tile-icon.is-text-icon {
-  background: var(--icon-bg);
+  background: var(--surface-raised);
   color: #fff;
   font-family: var(--font-rounded);
   font-weight: 700;
   overflow: hidden;
 }
 .site-tile-icon.is-text-icon.is-light-bg { color: #1c1c1e; }
-.site-tile-text { font-size: 26px; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; }
-.site-tile-text[data-len="2"] { font-size: 21px; }
-.site-tile-text[data-len="3"] { font-size: 16px; }
-.site-tile-text[data-len="4"] { font-size: 13px; }
+.site-tile-badge {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 76%;
+  height: 76%;
+  border-radius: 24%;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.16),
+    0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.site-tile-text { font-size: 25px; line-height: 1; letter-spacing: -0.02em; white-space: nowrap; }
+.site-tile-text[data-len="2"] { font-size: 20px; }
+.site-tile-text[data-len="3"] { font-size: 15px; }
+.site-tile-text[data-len="4"] { font-size: 12px; }
 .site-tile-icon.is-empty {
   background: var(--fill-tertiary, rgba(120, 120, 128, 0.12));
   border: 1px dashed var(--separator, rgba(120, 120, 128, 0.3));
@@ -594,6 +608,11 @@ body[data-wallpaper-tone="light"] {
   height: var(--icon-tile);
   border-radius: var(--radius-md);
   overflow: hidden;
+  /* One plate colour for links, folders and the folder's inner mini icons.
+     The specular rim still comes from the .glass base. */
+  background: var(--surface-raised);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-standard);
 }
 
@@ -612,33 +631,19 @@ body[data-wallpaper-tone="light"] {
   height: var(--icon-glyph);
   border-radius: 8px;
   object-fit: contain;
+  /* Let drag/drop target the tile itself, not the favicon image. */
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
-/* Favicon with its own background: edge to edge, no glass rim */
-.site-tile-icon.is-full-bleed {
-  background: transparent;
-}
-.site-tile-icon.is-full-bleed::before { display: none; }
-.site-tile-icon.is-full-bleed .site-tile-favicon {
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-  object-fit: cover;
-}
-
-/* Transparent favicon: the plate takes a soft tint of its main color */
-.site-tile-icon.is-tinted {
-  background: color-mix(in srgb, var(--icon-fill) 20%, #fff);
-}
-.site-tile-icon.is-tinted::before { display: none; }
-
-/* Letter fallback when no favicon could be loaded */
+/* Letter fallback when no favicon could be loaded: a colored badge on the
+   same glass plate, never a flat plate that fills the whole icon. */
 .site-tile-letter {
   display: none;
 }
 
 .site-tile-icon.is-letter {
-  background: linear-gradient(135deg, var(--letter-a, #7c6cf0), var(--letter-b, #4f8ef7));
+  background: var(--surface-raised);
 }
 
 .site-tile-icon.is-letter .site-tile-letter {
@@ -646,9 +651,15 @@ body[data-wallpaper-tone="light"] {
   place-items: center;
   position: relative;
   z-index: 2;
-  width: 100%;
-  height: 100%;
-  font: 600 26px/1 var(--font-rounded);
+  width: 76%;
+  height: 76%;
+  border-radius: 24%;
+  background: linear-gradient(135deg, var(--letter-a, #7c6cf0), var(--letter-b, #4f8ef7));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.18),
+    0 1px 2px rgba(0, 0, 0, 0.12);
+  font: 600 25px/1 var(--font-rounded);
   color: #fff;
 }
 
@@ -681,20 +692,19 @@ body[data-wallpaper-tone="light"] {
   aspect-ratio: 1;
   border-radius: 6px;
   overflow: hidden;
-  background: var(--fill-1);
+  background: var(--surface-raised);
 }
 
 .folder-mini img {
   width: 72%;
   height: 72%;
   object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
-.folder-mini.is-tinted { background: color-mix(in srgb, var(--icon-fill) 22%, #fff); }
-.folder-mini.is-full-bleed img { width: 100%; height: 100%; object-fit: cover; }
-
 .folder-mini.is-letter {
-  background: var(--fill-1);
+  background: var(--surface-raised);
   font: 600 11px/1 var(--font-rounded);
   color: var(--glass-label);
 }
@@ -785,7 +795,7 @@ body[data-wallpaper-tone="light"] {
   text-shadow: none;
 }
 
-.folder-grid .site-tile-icon:not(.is-letter):not(.has-custom-icon) {
+.folder-grid .site-tile-icon:not(.is-letter):not(.has-custom-icon):not(.is-text-icon) {
   background: var(--surface-raised);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
@@ -813,10 +823,173 @@ body[data-wallpaper-tone="light"] {
 }
 
 /* ---------- Add item: Site / Folder tabs and the folder site picker ---------- */
-.add-type-tabs {
+.add-modal {
+  width: min(760px, calc(100vw - 48px));
+  height: min(500px, calc(var(--vh-full) - 80px));
+  max-width: none;
+  max-height: none;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+/* Common-site catalog inside the add dialog */
+.site-catalog {
+  margin-bottom: var(--space-4);
+}
+
+/* Only the recommendation page stretches; the custom form keeps its natural
+   height so tabs and fields stay together. */
+.site-catalog.is-catalog {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  margin-bottom: 0;
+}
+
+.site-catalog-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  flex: none;
+  gap: 6px;
+  padding: 2px 1px 10px;
+}
+
+.site-catalog-tab {
+  flex: 0 0 auto;
+  padding: 7px 12px;
+  border: 0;
+  border-radius: var(--radius-capsule);
+  background: var(--fill-3);
+  color: var(--label-2);
+  font: var(--text-footnote);
+  font-weight: 600;
+  transition: background-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard);
+}
+
+.site-catalog-tab:hover {
+  background: var(--fill-2);
+  color: var(--label-1);
+}
+
+.site-catalog-tab.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.site-catalog-list {
   display: grid;
-  width: 100%;
-  margin-bottom: var(--space-5);
+  flex: 1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.add-modal > .modal-actions {
+  flex: none;
+  margin-top: var(--space-4);
+}
+
+.site-catalog-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 60px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--fill-3);
+  box-shadow: inset 0 0 0 0.5px var(--separator);
+  transition: background-color var(--dur-fast) var(--ease-standard);
+}
+
+.site-catalog-row:hover {
+  background: var(--fill-2);
+}
+
+.site-catalog-row.is-added {
+  opacity: 0.55;
+}
+
+.site-catalog-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: var(--surface-raised);
+  box-shadow: 0 0 0 0.5px var(--separator);
+}
+
+.site-catalog-icon img {
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.site-catalog-meta {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.site-catalog-name {
+  overflow: hidden;
+  font: var(--text-callout);
+  color: var(--label-1);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.site-catalog-url {
+  overflow: hidden;
+  font: var(--text-footnote);
+  color: var(--label-3);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.site-catalog-add {
+  display: grid;
+  place-items: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--fill-2);
+  color: var(--accent);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.site-catalog-add:hover {
+  background: var(--accent);
+  color: var(--accent-contrast);
+}
+
+.site-catalog-add:disabled {
+  cursor: default;
+  opacity: 0.45;
+}
+
+@media (max-width: 680px) {
+  .add-modal {
+    width: calc(100vw - 24px);
+  }
+
+  .site-catalog-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .folder-site-picker {
@@ -888,10 +1061,6 @@ body[data-wallpaper-tone="light"] {
 }
 
 
-.to-workspace {
-  color: var(--glass-label);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .settings-menu,
 .settings-submenu,
@@ -930,12 +1099,13 @@ body[data-wallpaper-tone="light"] {
   height: 30px;
 }
 
-/* An uploaded icon fills the plate, like a real app icon */
+/* Uploaded icons keep the same outer Liquid Glass rim as favicons. The image
+   itself sits inside as a rounded squircle instead of covering the plate. */
 .site-tile-icon.has-custom-icon .site-tile-favicon {
-  width: 100%;
-  height: 100%;
-  border-radius: 0;
-  object-fit: cover;
+  width: 76%;
+  height: 76%;
+  border-radius: 22%;
+  object-fit: contain;
 }
 
 /* Toolbar avatar */

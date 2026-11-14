@@ -92,6 +92,85 @@ select:focus-visible {
   box-shadow: inset 0 0 0 0.5px var(--separator), 0 0 0 3px color-mix(in srgb, var(--accent) 38%, transparent);
 }
 
+/* Settings language: a rounded-rectangle pop-up button whose menu uses the
+   same Liquid Glass rules as the top-right menu. */
+.settings-language-picker {
+  position: relative;
+}
+
+.settings-language-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 148px;
+  height: var(--control-md);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--ctl-sheen), linear-gradient(var(--ctl-tint), var(--ctl-tint));
+  box-shadow: var(--ctl-rim), var(--ctl-shadow);
+  font: var(--text-callout);
+  color: var(--label-1);
+  cursor: pointer;
+}
+
+.settings-language-button:hover {
+  background: var(--ctl-sheen), linear-gradient(var(--ctl-tint-hover), var(--ctl-tint-hover));
+}
+
+.settings-language-button:focus-visible {
+  box-shadow: var(--ctl-rim), var(--ctl-shadow), 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+  outline: none;
+}
+
+.settings-language-button svg {
+  width: 10px;
+  height: 6px;
+  flex: none;
+  stroke: var(--label-3);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.settings-language-menu {
+  top: calc(100% + var(--space-2));
+  right: 0;
+  width: 188px;
+  z-index: 120;
+}
+
+.settings-language-option {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.settings-language-option.is-selected {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.settings-language-option.is-selected:hover {
+  color: var(--accent-contrast);
+}
+
+/* The language menu has to escape its grouped card. */
+.settings-group.settings-group--menu-host {
+  overflow: visible;
+}
+
+.settings-group--menu-host > .settings-row:first-child {
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.settings-group--menu-host > .settings-row:last-child {
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+}
+
 select option {
   background: var(--surface-raised);
   color: var(--label-1);
@@ -631,6 +710,12 @@ button:disabled {
   max-height: 86vh;
   display: flex;
   flex-direction: column;
+  /* This sheet is large and scrolls. A live backdrop blur forces the browser
+     to re-sample the full wallpaper on every frame; an almost opaque fill
+     keeps the same look and makes scrolling compositor-friendly. */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: var(--surface-raised);
 }
 
 .wallpaper-tabs {
@@ -663,23 +748,26 @@ button:disabled {
 }
 
 .wallpaper-content {
-  flex: 1;
-  min-height: 280px;
+  flex: 0 0 auto;
+  height: calc(3 * 108px + 2 * var(--space-3));
+  min-height: 0;
   margin: 0 calc(-1 * var(--space-2));
   padding: var(--space-1) var(--space-2);
   overflow-y: auto;
   overscroll-behavior: contain;
+  contain: layout paint;
 }
 
 .wallpaper-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  grid-auto-rows: 108px;
   gap: var(--space-3);
 }
 
 .wallpaper-item {
   position: relative;
-  aspect-ratio: 16 / 10;
+  height: 100%;
   border-radius: var(--radius-sm);
   background: var(--fill-2);
   overflow: hidden;
@@ -687,15 +775,15 @@ button:disabled {
   /* keep off-screen thumbnails out of layout/paint work */
   content-visibility: auto;
   contain-intrinsic-size: 168px 105px;
-  transition: transform var(--dur-base) var(--ease-spring), box-shadow var(--dur-fast) var(--ease-standard);
+  transition: box-shadow var(--dur-fast) var(--ease-standard);
 }
 
 .wallpaper-item:hover {
-  transform: scale(1.02);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent);
 }
 
 .wallpaper-item:active {
-  transform: scale(0.98);
+  transform: none;
 }
 
 .wallpaper-item.selected {
@@ -885,4 +973,82 @@ select:focus-visible {
   margin-right: auto;
   font: var(--text-subhead);
   color: var(--label-2);
+}
+
+/* Custom search engine editor below the catalog */
+.engine-custom {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 0.5px solid var(--separator);
+}
+
+.engine-custom-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.engine-custom-title {
+  font: var(--text-headline);
+  color: var(--label-1);
+}
+
+.engine-custom-hint {
+  font: var(--text-footnote);
+  color: var(--label-3);
+  text-align: right;
+}
+
+.engine-custom-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.8fr) auto;
+  align-items: end;
+  gap: var(--space-3);
+}
+
+.engine-custom-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.engine-custom-field > span {
+  font: var(--text-footnote);
+  font-weight: 600;
+  color: var(--label-2);
+}
+
+.engine-custom-field .modal-input {
+  height: var(--control-h);
+}
+
+.engine-custom-add {
+  height: var(--control-md);
+  white-space: nowrap;
+}
+
+.engine-reset-btn {
+  margin-right: var(--space-2);
+}
+
+@media (max-width: 620px) {
+  .engine-custom-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .engine-custom-hint {
+    text-align: left;
+  }
+
+  .engine-custom-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .engine-custom-add {
+    width: 100%;
+  }
 }
